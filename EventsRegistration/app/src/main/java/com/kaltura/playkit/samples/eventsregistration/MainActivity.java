@@ -33,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
+
+    private Player player;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +52,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        if (player != null) {
+            player.pause();
+            player.onApplicationPaused();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (player != null) {
+            player.onApplicationResumed();
+            player.play();
+        }
+    }
+
     void showMenu() {
         final Context context = this;
         new AlertDialog.Builder(context)
@@ -58,13 +79,24 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(context, "Selected " + which, Toast.LENGTH_SHORT).show();
                         if (which == 0) {
                             playDemoVideo();
+                        } else if (which == 1) {
+                            pauseDemoVideo();
                         }
                     }
                 })
                 .show();
     }
 
+    private void pauseDemoVideo() {
+        if (player != null) {
+            player.pause();
+        }
+    }
+
     private void playDemoVideo() {
+        if (player != null) {
+            player.play();
+        }
         //First. Create PKMediaConfig object.
         PKMediaConfig mediaConfig = new PKMediaConfig()
                 // You can configure the start position for it.
@@ -83,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
 
         //Create instance of the player.
-        Player player = PlayKitManager.loadPlayer(pluginConfig, this);
+        player = PlayKitManager.loadPlayer(pluginConfig, this);
 
         //Get the layout, where the player view will be placed.
         LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);

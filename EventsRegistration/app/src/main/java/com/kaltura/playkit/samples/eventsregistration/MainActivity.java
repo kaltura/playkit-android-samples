@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
     private void playDemoVideo() {
         if (player != null) {
             player.play();
+            return;
         }
         //First. Create PKMediaConfig object.
         PKMediaConfig mediaConfig = new PKMediaConfig()

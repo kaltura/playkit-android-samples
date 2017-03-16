@@ -10,9 +10,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.kaltura.playkit.PKEvent;
+import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -20,11 +23,26 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.PlayerEvent;
+import com.kaltura.playkit.player.PKTracks;
+import com.kaltura.playkit.plugins.ads.AdError;
+import com.kaltura.playkit.plugins.ads.AdEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kaltura.playkit.PlayerEvent.Type.CAN_PLAY;
+import static com.kaltura.playkit.PlayerEvent.Type.ENDED;
+import static com.kaltura.playkit.PlayerEvent.Type.ERROR;
+import static com.kaltura.playkit.PlayerEvent.Type.PAUSE;
+import static com.kaltura.playkit.PlayerEvent.Type.PLAY;
+import static com.kaltura.playkit.PlayerEvent.Type.PLAYING;
+import static com.kaltura.playkit.PlayerEvent.Type.SEEKED;
+import static com.kaltura.playkit.PlayerEvent.Type.SEEKING;
+import static com.kaltura.playkit.PlayerEvent.Type.TRACKS_AVAILABLE;
+
 public class MainActivity extends AppCompatActivity {
+    private static final PKLog log = PKLog.get("EventReg");
 
     private static final int START_POSITION = 0;
 
@@ -35,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     private Player player;
+    private AdEvent.AdStartedEvent adStartedEventInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,6 +225,180 @@ public class MainActivity extends AppCompatActivity {
         mediaSources.add(mediaSource);
 
         return mediaSources;
+    }
+
+    protected void setPlayerListeners() {
+
+        player.addEventListener(new PKEvent.Listener() {
+
+                                       @Override
+                                       public void onEvent(PKEvent event) {
+                                           log.v("addEventListener " + event.eventType());
+                                           log.v("Player Total duration => " + player.getDuration());
+                                           log.v("Player Current duration => " + player.getCurrentPosition());
+
+
+                                           Enum receivedEventType = event.eventType();
+                                           if (event instanceof PlayerEvent) {
+                                               switch (((PlayerEvent) event).type) {
+                                                   case CAN_PLAY:
+                                                       log.v("Received " + CAN_PLAY.name());
+                                                       break;
+                                                   case PLAY:
+                                                       log.v("Received " + PLAY.name());
+                                                       getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                                                       break;
+                                                   case PLAYING:
+                                                       log.v("Received " + PLAYING.name());
+                                                       break;
+                                                   case PAUSE:
+                                                       log.v("Received " + PAUSE.name());
+                                                       getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                                                       break;
+                                                   case SEEKING:
+                                                       log.v("Received " + SEEKING.name());
+                                                       break;
+                                                   case SEEKED:
+                                                       log.v("Received " + SEEKED.name());
+                                                       break;
+                                                   case ENDED:
+                                                       log.v("Received " + ENDED.name());
+                                                       break;
+                                                   case TRACKS_AVAILABLE:
+                                                       PKTracks tracks = ((PlayerEvent.TracksAvailable) event).getPKTracks();
+                                                       log.v("Received " + TRACKS_AVAILABLE.name());
+                                                       break;
+                                                   case ERROR:
+                                                       log.v("Received " + ERROR.name());
+                                                       PlayerEvent.ExceptionInfo exceptionInfo = (PlayerEvent.ExceptionInfo) event;
+                                                       String errorMsg = "Player error occurred.";
+                                                       if (exceptionInfo != null && exceptionInfo.getException() != null && exceptionInfo.getException().getMessage() != null) {
+                                                           errorMsg = exceptionInfo.getException().getMessage();
+                                                       }
+                                                       log.e ("Player Error: " + errorMsg);
+
+                                                       break;
+                                               }
+                                           } else if (event instanceof AdEvent) {
+                                               switch (((AdEvent) event).type) {
+                                                   case LOADED:
+                                                       log.v("Received " + AdEvent.Type.LOADED.name());
+                                                       break;
+                                                   case CUEPOINTS_CHANGED:
+                                                       log.v("Received " + AdEvent.Type.CUEPOINTS_CHANGED.name());
+                                                       break;
+                                                   case ALL_ADS_COMPLETED:
+                                                       log.v("Received " + AdEvent.Type.ALL_ADS_COMPLETED.name());
+                                                       break;
+                                                   case AD_BREAK_IGNORED:
+                                                       log.v("Received " + AdEvent.Type.AD_BREAK_IGNORED.name());
+                                                       player.play();
+                                                       break;
+                                                   case CONTENT_PAUSE_REQUESTED:
+                                                       log.v("Received " + AdEvent.Type.CONTENT_PAUSE_REQUESTED.name());
+                                                       break;
+                                                   // case AD_DISPLAYED_AFTER_CONTENT_PAUSE:
+                                                   //     log.v("Received " + AdEvent.Type.AD_DISPLAYED_AFTER_CONTENT_PAUSE.name());
+                                                   //     break;
+                                                   case CONTENT_RESUME_REQUESTED:
+                                                       log.v("Received " + AdEvent.Type.CONTENT_RESUME_REQUESTED.name());
+                                                       break;
+                                                   case STARTED:
+                                                       log.v("Received " + AdEvent.Type.STARTED.name());
+                                                       adStartedEventInfo = (AdEvent.AdStartedEvent) event;
+                                                       getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                                                       break;
+                                                   case PAUSED:
+                                                       log.v("Received " + AdEvent.Type.PAUSED.name());
+                                                       break;
+                                                   case TAPPED:
+                                                       break;
+                                                   case COMPLETED:
+                                                       log.v("Received " + AdEvent.Type.COMPLETED.name());
+                                                       break;
+                                                   case SKIPPED:
+                                                       log.v("Received " + AdEvent.Type.SKIPPED.name());
+                                                       break;
+                                                   case CLICKED:
+                                                       log.v("Received " + AdEvent.Type.CLICKED.name());
+                                                       break;
+                                               }
+                                           } else if (event instanceof AdError) {
+                                               switch (((AdError) event).errorType) {
+                                                   case ADS_REQUEST_NETWORK_ERROR:
+                                                   case INTERNAL_ERROR:
+                                                   case VAST_MALFORMED_RESPONSE:
+                                                   case UNKNOWN_AD_RESPONSE:
+                                                   case VAST_LOAD_TIMEOUT:
+                                                   case VAST_TOO_MANY_REDIRECTS:
+                                                   case VIDEO_PLAY_ERROR:
+                                                   case VAST_MEDIA_LOAD_TIMEOUT:
+                                                   case VAST_LINEAR_ASSET_MISMATCH:
+                                                   case OVERLAY_AD_PLAYING_FAILED:
+                                                   case OVERLAY_AD_LOADING_FAILED:
+                                                   case VAST_NONLINEAR_ASSET_MISMATCH:
+                                                   case COMPANION_AD_LOADING_FAILED:
+                                                   case UNKNOWN_ERROR:
+                                                   case VAST_EMPTY_RESPONSE:
+                                                   case FAILED_TO_REQUEST_ADS:
+                                                   case VAST_ASSET_NOT_FOUND:
+                                                   case INVALID_ARGUMENTS:
+                                                   case QUIET_LOG_ERROR:
+                                                   case PLAYLIST_NO_CONTENT_TRACKING:
+                                                       log.e("Player Error: Play Called");
+                                                       player.play();
+
+                                                       break;
+                                               }
+                                           }
+                                       }
+
+                                   },
+                PlayerEvent.Type.PLAY,    PlayerEvent.Type.PLAYING,
+                PlayerEvent.Type.PAUSE,   PlayerEvent.Type.CAN_PLAY,
+                PlayerEvent.Type.SEEKING, PlayerEvent.Type.SEEKED,
+                PlayerEvent.Type.ENDED,   PlayerEvent.Type.TRACKS_AVAILABLE,
+                PlayerEvent.Type.ERROR,
+
+                AdEvent.Type.LOADED, AdEvent.Type.SKIPPED,
+                AdEvent.Type.TAPPED, AdEvent.Type.CONTENT_PAUSE_REQUESTED,
+                AdEvent.Type.CONTENT_RESUME_REQUESTED, AdEvent.Type.STARTED,
+                AdEvent.Type.PAUSED, AdEvent.Type.RESUMED,
+                AdEvent.Type.COMPLETED, AdEvent.Type.ALL_ADS_COMPLETED,
+                AdEvent.Type.CUEPOINTS_CHANGED, AdEvent.Type.CLICKED,
+                AdEvent.Type.AD_BREAK_IGNORED, //AdEvent.Type.AD_DISPLAYED_AFTER_CONTENT_PAUSE,
+
+                AdError.Type.VAST_EMPTY_RESPONSE, AdError.Type.COMPANION_AD_LOADING_FAILED,
+                AdError.Type.FAILED_TO_REQUEST_ADS, AdError.Type.INTERNAL_ERROR, AdError.Type.OVERLAY_AD_LOADING_FAILED,
+                AdError.Type.PLAYLIST_NO_CONTENT_TRACKING, AdError.Type.UNKNOWN_ERROR,
+                AdError.Type.VAST_LINEAR_ASSET_MISMATCH, AdError.Type.VAST_MALFORMED_RESPONSE,
+                AdError.Type.QUIET_LOG_ERROR, AdError.Type.VAST_LOAD_TIMEOUT,
+                AdError.Type.ADS_REQUEST_NETWORK_ERROR, AdError.Type.INVALID_ARGUMENTS,
+                AdError.Type.VAST_TOO_MANY_REDIRECTS);
+
+        player.addStateChangeListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+
+                PlayerEvent.StateChanged stateChanged = (PlayerEvent.StateChanged) event;
+                log.v("addStateChangeListener " + event.eventType() + " = " + stateChanged.newState);
+                switch (stateChanged.newState) {
+                    case IDLE:
+                        log.d("StateChange Idle");
+                        break;
+                    case LOADING:
+                        log.d("StateChange Loading");
+                        break;
+                    case READY:
+                        log.d("StateChange Ready");
+                        break;
+                    case BUFFERING:
+                        log.d("StateChange Buffering");
+                        break;
+                }
+            }
+        });
+
     }
 
 }

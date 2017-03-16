@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.kaltura.playkit.samples.basicsetup", appContext.getPackageName());
+        assertEquals("com.kaltura.playkit.samples.tracksselection", appContext.getPackageName());
     }
 }

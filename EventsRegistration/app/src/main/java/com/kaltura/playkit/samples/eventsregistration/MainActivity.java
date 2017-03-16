@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
@@ -95,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 .setItems(new String[]{ "Play", "Pause"}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(context, "Selected " + which, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, "Selected " + which, Toast.LENGTH_SHORT).show();
                         if (which == 0) {
                             playDemoVideo();
                         } else if (which == 1) {

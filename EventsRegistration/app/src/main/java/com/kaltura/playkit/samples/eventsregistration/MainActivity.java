@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Create instance of the player.
         player = PlayKitManager.loadPlayer(pluginConfig, this);
-
+        setPlayerListeners();
         //Get the layout, where the player view will be placed.
         LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
         //Add player view to the layout.
@@ -233,43 +233,43 @@ public class MainActivity extends AppCompatActivity {
 
                                        @Override
                                        public void onEvent(PKEvent event) {
-                                           log.v("addEventListener " + event.eventType());
-                                           log.v("Player Total duration => " + player.getDuration());
-                                           log.v("Player Current duration => " + player.getCurrentPosition());
+                                           log.d("addEventListener " + event.eventType());
+                                           log.d("Player Total duration => " + player.getDuration());
+                                           log.d("Player Current duration => " + player.getCurrentPosition());
 
 
                                            Enum receivedEventType = event.eventType();
                                            if (event instanceof PlayerEvent) {
                                                switch (((PlayerEvent) event).type) {
                                                    case CAN_PLAY:
-                                                       log.v("Received " + CAN_PLAY.name());
+                                                       log.d("Received " + CAN_PLAY.name());
                                                        break;
                                                    case PLAY:
                                                        log.v("Received " + PLAY.name());
                                                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                                                        break;
                                                    case PLAYING:
-                                                       log.v("Received " + PLAYING.name());
+                                                       log.d("Received " + PLAYING.name());
                                                        break;
                                                    case PAUSE:
                                                        log.v("Received " + PAUSE.name());
                                                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                                                        break;
                                                    case SEEKING:
-                                                       log.v("Received " + SEEKING.name());
+                                                       log.d("Received " + SEEKING.name());
                                                        break;
                                                    case SEEKED:
-                                                       log.v("Received " + SEEKED.name());
+                                                       log.d("Received " + SEEKED.name());
                                                        break;
                                                    case ENDED:
-                                                       log.v("Received " + ENDED.name());
+                                                       log.d("Received " + ENDED.name());
                                                        break;
                                                    case TRACKS_AVAILABLE:
                                                        PKTracks tracks = ((PlayerEvent.TracksAvailable) event).getPKTracks();
-                                                       log.v("Received " + TRACKS_AVAILABLE.name());
+                                                       log.d("Received " + TRACKS_AVAILABLE.name());
                                                        break;
                                                    case ERROR:
-                                                       log.v("Received " + ERROR.name());
+                                                       log.d("Received " + ERROR.name());
                                                        PlayerEvent.ExceptionInfo exceptionInfo = (PlayerEvent.ExceptionInfo) event;
                                                        String errorMsg = "Player error occurred.";
                                                        if (exceptionInfo != null && exceptionInfo.getException() != null && exceptionInfo.getException().getMessage() != null) {
@@ -282,20 +282,20 @@ public class MainActivity extends AppCompatActivity {
                                            } else if (event instanceof AdEvent) {
                                                switch (((AdEvent) event).type) {
                                                    case LOADED:
-                                                       log.v("Received " + AdEvent.Type.LOADED.name());
+                                                       log.d("Received " + AdEvent.Type.LOADED.name());
                                                        break;
                                                    case CUEPOINTS_CHANGED:
-                                                       log.v("Received " + AdEvent.Type.CUEPOINTS_CHANGED.name());
+                                                       log.d("Received " + AdEvent.Type.CUEPOINTS_CHANGED.name());
                                                        break;
                                                    case ALL_ADS_COMPLETED:
-                                                       log.v("Received " + AdEvent.Type.ALL_ADS_COMPLETED.name());
+                                                       log.d("Received " + AdEvent.Type.ALL_ADS_COMPLETED.name());
                                                        break;
                                                    case AD_BREAK_IGNORED:
-                                                       log.v("Received " + AdEvent.Type.AD_BREAK_IGNORED.name());
+                                                       log.d("Received " + AdEvent.Type.AD_BREAK_IGNORED.name());
                                                        player.play();
                                                        break;
                                                    case CONTENT_PAUSE_REQUESTED:
-                                                       log.v("Received " + AdEvent.Type.CONTENT_PAUSE_REQUESTED.name());
+                                                       log.d("Received " + AdEvent.Type.CONTENT_PAUSE_REQUESTED.name());
                                                        break;
                                                    // case AD_DISPLAYED_AFTER_CONTENT_PAUSE:
                                                    //     log.v("Received " + AdEvent.Type.AD_DISPLAYED_AFTER_CONTENT_PAUSE.name());
@@ -304,23 +304,23 @@ public class MainActivity extends AppCompatActivity {
                                                        log.v("Received " + AdEvent.Type.CONTENT_RESUME_REQUESTED.name());
                                                        break;
                                                    case STARTED:
-                                                       log.v("Received " + AdEvent.Type.STARTED.name());
+                                                       log.d("Received " + AdEvent.Type.STARTED.name());
                                                        adStartedEventInfo = (AdEvent.AdStartedEvent) event;
                                                        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                                                        break;
                                                    case PAUSED:
-                                                       log.v("Received " + AdEvent.Type.PAUSED.name());
+                                                       log.d("Received " + AdEvent.Type.PAUSED.name());
                                                        break;
                                                    case TAPPED:
                                                        break;
                                                    case COMPLETED:
-                                                       log.v("Received " + AdEvent.Type.COMPLETED.name());
+                                                       log.d("Received " + AdEvent.Type.COMPLETED.name());
                                                        break;
                                                    case SKIPPED:
-                                                       log.v("Received " + AdEvent.Type.SKIPPED.name());
+                                                       log.d("Received " + AdEvent.Type.SKIPPED.name());
                                                        break;
                                                    case CLICKED:
-                                                       log.v("Received " + AdEvent.Type.CLICKED.name());
+                                                       log.d("Received " + AdEvent.Type.CLICKED.name());
                                                        break;
                                                }
                                            } else if (event instanceof AdError) {

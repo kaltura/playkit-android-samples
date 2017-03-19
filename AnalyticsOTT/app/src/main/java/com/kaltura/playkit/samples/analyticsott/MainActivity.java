@@ -1,4 +1,4 @@
-package com.kaltura.playkit.samples.basicpluginssetup;
+package com.kaltura.playkit.samples.analyticsott;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -29,12 +29,8 @@ import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.plugins.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.TVPAPIAnalyticsPlugin;
-import com.kaltura.playkit.plugins.Youbora.YouboraPlugin;
 import com.kaltura.playkit.plugins.ads.AdError;
 import com.kaltura.playkit.plugins.ads.AdEvent;
-import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
-import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
-import com.kaltura.playkit.samples.basicpluginssetup.plugins.ConverterYoubora;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +47,7 @@ import static com.kaltura.playkit.PlayerEvent.Type.TRACKS_AVAILABLE;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final PKLog log = PKLog.get("BasicPluginSetup");
+    private static final PKLog log = PKLog.get("AnalyticsOTT");
 
     private static final int START_POSITION = 0;
 
@@ -68,8 +64,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
-        PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
         PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
 
@@ -152,8 +146,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
-        configureIMAPlugin(pluginConfig);
-        configureYouboraPlugin(pluginConfig);
         configureKalturaStatsPlugin(pluginConfig);
         configureTVPapiPlugin(pluginConfig);
 
@@ -423,54 +415,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void configureIMAPlugin(PKPluginConfigs pluginConfig) {
-        String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl).setVideoMimeTypes(null);
-        pluginConfig.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
-    }
-
-    private void configureYouboraPlugin(PKPluginConfigs pluginConfig) {
-        JsonObject youboraConfigEntry = new JsonObject();
-        youboraConfigEntry.addProperty("accountCode", "YOUR_ACCOUNT_CODE");
-        youboraConfigEntry.addProperty("username", "YOUR_YOUBORA_USER_NAME");
-        youboraConfigEntry.addProperty("haltOnError", true);
-        youboraConfigEntry.addProperty("enableAnalytics", true);
-
-        JsonObject mediaEntry = new JsonObject();
-        mediaEntry.addProperty("title", "YOUR_MEDIA_TITLE");
-
-        JsonObject adsEntry = new JsonObject();
-        adsEntry.addProperty("adsExpected", true);
-        adsEntry.addProperty("title", adStartedEventInfo != null ? adStartedEventInfo.adInfo.getAdTitle() : "");
-        adsEntry.addProperty("campaign", "");
-
-        JsonObject extraParamEntry = new JsonObject();
-        //extraParamEntry.addProperty("param1", "Mobile");
-        extraParamEntry.addProperty("param2", "playKitPlayer");
-        extraParamEntry.addProperty("param3", "");
-
-        JsonObject propertiesEntry = new JsonObject();
-        propertiesEntry.addProperty("genre", "");
-        propertiesEntry.addProperty("type", "");
-        propertiesEntry.addProperty("transaction_type", "");
-        propertiesEntry.addProperty("year", "");
-        propertiesEntry.addProperty("cast", "");
-        propertiesEntry.addProperty("director", "");
-        propertiesEntry.addProperty("owner", "");
-        propertiesEntry.addProperty("parental", "");
-        propertiesEntry.addProperty("price", "");
-        propertiesEntry.addProperty("rating", "");
-        propertiesEntry.addProperty("audioType", "");
-        propertiesEntry.addProperty("audioChannels", "");
-        propertiesEntry.addProperty("device", "");
-        propertiesEntry.addProperty("quality", "");
-
-        ConverterYoubora converterYoubora = new ConverterYoubora(youboraConfigEntry,
-                adsEntry, extraParamEntry, propertiesEntry);
-
-        pluginConfig.setPluginConfig(YouboraPlugin.factory.getName(), converterYoubora.toJson());
     }
 
     private void configureTVPapiPlugin(PKPluginConfigs pluginConfig) {

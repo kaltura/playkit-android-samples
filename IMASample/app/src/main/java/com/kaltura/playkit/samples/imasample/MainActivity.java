@@ -44,7 +44,7 @@ import static com.kaltura.playkit.PlayerEvent.Type.TRACKS_AVAILABLE;
 
 
 public class MainActivity extends AppCompatActivity {
-    private static final PKLog log = PKLog.get("EventReg");
+    private static final PKLog log = PKLog.get("IMASample");
 
     private static final int START_POSITION = 0;
 

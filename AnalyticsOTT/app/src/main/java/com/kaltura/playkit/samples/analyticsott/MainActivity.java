@@ -29,7 +29,6 @@ import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.plugins.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.TVPAPIAnalyticsPlugin;
-import com.kaltura.playkit.plugins.ads.AdError;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 
 import java.util.ArrayList;
@@ -297,101 +296,14 @@ public class MainActivity extends AppCompatActivity {
 
                                                     break;
                                             }
-                                        } else if (event instanceof AdEvent) {
-                                            switch (((AdEvent) event).type) {
-                                                case LOADED:
-                                                    log.d("Received " + AdEvent.Type.LOADED.name());
-                                                    break;
-                                                case CUEPOINTS_CHANGED:
-                                                    log.d("Received " + AdEvent.Type.CUEPOINTS_CHANGED.name());
-                                                    break;
-                                                case ALL_ADS_COMPLETED:
-                                                    log.v("Received " + AdEvent.Type.ALL_ADS_COMPLETED.name());
-                                                    break;
-                                                case AD_BREAK_IGNORED:
-                                                    log.d("Received " + AdEvent.Type.AD_BREAK_IGNORED.name());
-                                                    player.play();
-                                                    break;
-                                                case CONTENT_PAUSE_REQUESTED:
-                                                    log.d("Received " + AdEvent.Type.CONTENT_PAUSE_REQUESTED.name());
-                                                    break;
-                                                // case AD_DISPLAYED_AFTER_CONTENT_PAUSE:
-                                                //     log.v("Received " + AdEvent.Type.AD_DISPLAYED_AFTER_CONTENT_PAUSE.name());
-                                                //     break;
-                                                case CONTENT_RESUME_REQUESTED:
-                                                    log.v("Received " + AdEvent.Type.CONTENT_RESUME_REQUESTED.name());
-                                                    break;
-                                                case STARTED:
-                                                    log.v("Received " + AdEvent.Type.STARTED.name());
-                                                    adStartedEventInfo = (AdEvent.AdStartedEvent) event;
-                                                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                                    break;
-                                                case PAUSED:
-                                                    log.d("Received " + AdEvent.Type.PAUSED.name());
-                                                    break;
-                                                case TAPPED:
-                                                    break;
-                                                case COMPLETED:
-                                                    log.d("Received " + AdEvent.Type.COMPLETED.name());
-                                                    break;
-                                                case SKIPPED:
-                                                    log.d("Received " + AdEvent.Type.SKIPPED.name());
-                                                    break;
-                                                case CLICKED:
-                                                    log.d("Received " + AdEvent.Type.CLICKED.name());
-                                                    break;
-                                            }
-                                        } else if (event instanceof AdError) {
-                                            switch (((AdError) event).errorType) {
-                                                case ADS_REQUEST_NETWORK_ERROR:
-                                                case INTERNAL_ERROR:
-                                                case VAST_MALFORMED_RESPONSE:
-                                                case UNKNOWN_AD_RESPONSE:
-                                                case VAST_LOAD_TIMEOUT:
-                                                case VAST_TOO_MANY_REDIRECTS:
-                                                case VIDEO_PLAY_ERROR:
-                                                case VAST_MEDIA_LOAD_TIMEOUT:
-                                                case VAST_LINEAR_ASSET_MISMATCH:
-                                                case OVERLAY_AD_PLAYING_FAILED:
-                                                case OVERLAY_AD_LOADING_FAILED:
-                                                case VAST_NONLINEAR_ASSET_MISMATCH:
-                                                case COMPANION_AD_LOADING_FAILED:
-                                                case UNKNOWN_ERROR:
-                                                case VAST_EMPTY_RESPONSE:
-                                                case FAILED_TO_REQUEST_ADS:
-                                                case VAST_ASSET_NOT_FOUND:
-                                                case INVALID_ARGUMENTS:
-                                                case QUIET_LOG_ERROR:
-                                                case PLAYLIST_NO_CONTENT_TRACKING:
-                                                    log.e("Player Error: Play Called");
-                                                    player.play();
-                                                    break;
-                                            }
                                         }
                                     }
-
                                 },
                 PlayerEvent.Type.PLAY, PLAYING,
                 PlayerEvent.Type.PAUSE, CAN_PLAY,
-                SEEKING, SEEKED,
-                ENDED, TRACKS_AVAILABLE,
-                PlayerEvent.Type.ERROR,
-
-                AdEvent.Type.LOADED, AdEvent.Type.SKIPPED,
-                AdEvent.Type.TAPPED, AdEvent.Type.CONTENT_PAUSE_REQUESTED,
-                AdEvent.Type.CONTENT_RESUME_REQUESTED, AdEvent.Type.STARTED,
-                AdEvent.Type.PAUSED, AdEvent.Type.RESUMED,
-                AdEvent.Type.COMPLETED, AdEvent.Type.ALL_ADS_COMPLETED,
-                AdEvent.Type.CUEPOINTS_CHANGED, AdEvent.Type.CLICKED,
-                AdEvent.Type.AD_BREAK_IGNORED, //AdEvent.Type.AD_DISPLAYED_AFTER_CONTENT_PAUSE,
-
-                AdError.Type.VAST_EMPTY_RESPONSE, AdError.Type.COMPANION_AD_LOADING_FAILED,
-                AdError.Type.FAILED_TO_REQUEST_ADS, AdError.Type.INTERNAL_ERROR, AdError.Type.OVERLAY_AD_LOADING_FAILED,
-                AdError.Type.PLAYLIST_NO_CONTENT_TRACKING, AdError.Type.UNKNOWN_ERROR,
-                AdError.Type.VAST_LINEAR_ASSET_MISMATCH, AdError.Type.VAST_MALFORMED_RESPONSE,
-                AdError.Type.QUIET_LOG_ERROR, AdError.Type.VAST_LOAD_TIMEOUT,
-                AdError.Type.ADS_REQUEST_NETWORK_ERROR, AdError.Type.INVALID_ARGUMENTS,
-                AdError.Type.VAST_TOO_MANY_REDIRECTS);
+                PlayerEvent.Type.SEEKING, PlayerEvent.Type.SEEKED,
+                PlayerEvent.Type.ENDED, PlayerEvent.Type.TRACKS_AVAILABLE,
+                PlayerEvent.Type.ERROR);
 
         player.addStateChangeListener(new PKEvent.Listener() {
             @Override

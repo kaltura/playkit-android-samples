@@ -20,7 +20,6 @@ import com.kaltura.playkit.ads.AdController;
 
 public class SamplePlugin extends PKPlugin {
 
-    private static final String TAG = "SamplePlugin";
     private static final PKLog log = PKLog.get("SamplePlugin");
 
     private Player player;

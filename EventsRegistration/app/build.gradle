@@ -22,7 +22,7 @@ android {
 dependencies {
 
     try {
-        compile project(":playkit-android");
+        compile project(":playkit");
     } catch (UnknownProjectException ignored) {
         compile 'com.kaltura.playkit:playkit:0.2.12'
     }

@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         
         if (player == null) {
             //Create instance of the player.
-            player = PlayKitManager.loadPlayer(new PKPluginConfigs(), this);
+            player = PlayKitManager.loadPlayer(this, null);
 
             //Get the layout, where the player view will be placed.
             LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);

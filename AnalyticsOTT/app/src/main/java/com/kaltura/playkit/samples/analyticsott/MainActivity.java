@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         configureTVPapiPlugin(pluginConfig);
 
         //Create instance of the player.
-        player = PlayKitManager.loadPlayer(pluginConfig, this);
+        player = PlayKitManager.loadPlayer(this, pluginConfig);
 
         //Get the layout, where the player view will be placed.
         LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);

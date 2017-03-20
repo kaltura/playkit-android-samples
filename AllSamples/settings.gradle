@@ -3,30 +3,20 @@ include ':playkit'
 project(':playkit').projectDir = new File('../../playkit-android/playkit')
 
 // Sample apps
+def samples = [
+        'BasicSetup', 
+        'EventsRegistration', 
+        'BasicPluginsSetup', 
+        'TracksSelection', 
+        'AnalyticsOTT', 
+        'IMASample', 
+        'Offline', 
+        'Youbora',
+]
 
-include ':AnalyticsOTT'
-project(':AnalyticsOTT').projectDir = new File('../AnalyticsOTT/app')
-
-include ':BasicPluginsSetup'
-project(':BasicPluginsSetup').projectDir = new File('../BasicPluginsSetup/app')
-
-include ':BasicSetup'
-project(':BasicSetup').projectDir = new File('../BasicSetup/app')
-
-include ':EventsRegistration'
-project(':EventsRegistration').projectDir = new File('../EventsRegistration/app')
-
-include ':IMASample'
-project(':IMASample').projectDir = new File('../IMASample/app')
-
-include ':Offline'
-project(':Offline').projectDir = new File('../Offline/app')
-
-include ':TracksSelection'
-project(':TracksSelection').projectDir = new File('../TracksSelection/app')
-
-include ':Youbora'
-project(':Youbora').projectDir = new File('../Youbora/app')
-
-
-
+samples.each {
+    def entry = ':' + it
+    include entry
+    project(entry).projectDir = new File ('../' + it + '/app')
+} 
+    

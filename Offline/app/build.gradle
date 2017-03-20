@@ -17,6 +17,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        warning 'InvalidPackage'
+    }
 }
 
 repositories {
@@ -25,7 +28,7 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(":playkit-android");
+    compile project(":playkit");
     compile 'com.kaltura:playkit-dtg-android:v2.0.1'
     compile 'com.google.code.gson:gson:2.8.0'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

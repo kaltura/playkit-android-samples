@@ -28,7 +28,6 @@ import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.plugins.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.TVPAPIAnalyticsPlugin;
 import com.kaltura.playkit.plugins.Youbora.YouboraPlugin;
-import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
 import com.kaltura.playkit.samples.youbora.plugins.ConverterYoubora;
 
@@ -53,14 +52,10 @@ public class MainActivity extends AppCompatActivity {
 
     //The url of the source to play
     private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
-    private static final String STATS_KALTURA_COM = "https://stats.kaltura.com/api_v3/index.php";
-    public static final String ANALYTIC_TRIGGER_INTERVAL = "30"; // in seconds
-
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     private Player player;
-    private AdEvent.AdStartedEvent adStartedEventInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
         configureYouboraPlugin(pluginConfig);
 
         //Create instance of the player.
-        player = PlayKitManager.loadPlayer(pluginConfig, this);
+        player = PlayKitManager.loadPlayer(this, pluginConfig);
 
         //Get the layout, where the player view will be placed.
         LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
@@ -343,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
 
         JsonObject adsEntry = new JsonObject();
         adsEntry.addProperty("adsExpected", true);
-        adsEntry.addProperty("title", adStartedEventInfo != null ? adStartedEventInfo.adInfo.getAdTitle() : "");
+        adsEntry.addProperty("title", "ad_title");
         adsEntry.addProperty("campaign", "");
 
         JsonObject extraParamEntry = new JsonObject();

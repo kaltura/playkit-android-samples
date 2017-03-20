@@ -8,7 +8,6 @@ import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
-import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.samples.basicpluginssetup.R;
@@ -45,12 +44,8 @@ public class MainActivity extends AppCompatActivity {
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
 
-        //Create plugin config. In this sample we are not discussing plugins,
-        //so we will use a default instance of this object.
-        PKPluginConfigs pluginConfig = new PKPluginConfigs();
-
         //Create instance of the player.
-        Player player = PlayKitManager.loadPlayer(pluginConfig, this);
+        Player player = PlayKitManager.loadPlayer(this, null);
 
         //Get the layout, where the player view will be placed.
         LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);

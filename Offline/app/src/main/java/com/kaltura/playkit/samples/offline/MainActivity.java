@@ -19,7 +19,6 @@ import com.kaltura.playkit.LocalAssetsManager;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
-import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 
@@ -166,7 +165,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void unregisterDownloadedAsset() {
-        
+        String path = contentManager.getLocalFile(ASSET_ID).getAbsolutePath();
+        localAssetsManager.unregisterAsset(path, ASSET_ID, new LocalAssetsManager.AssetRemovalListener() {
+            @Override
+            public void onRemoved(String localAssetPath) {
+                Toast.makeText(context, "unregistered", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void playLocalAsset() {
@@ -187,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailed(String localAssetPath, Exception error) {
+                Toast.makeText(context, "failed", Toast.LENGTH_LONG).show();
 
             }
         });

@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">BasicPluginsSetup</string>
+    <string name="app_name">ChangeMedia</string>
+    <string name="change_media_text">Change media</string>
 </resources>

@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static final String TAG = "Main";
-    private static final String ASSET_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8";
+    private static final String ASSET_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
     private static final String ASSET_ID = "asset1";
     final private Context context = this;   // for ease of use in inner classes
     private Player player;

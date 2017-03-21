@@ -1,4 +1,4 @@
-package com.kaltura.playkit.samples.kalturastats;
+package com.kaltura.playkit.samples.tvpapistats;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +13,7 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.plugins.KalturaStatsPlugin;
+import com.kaltura.playkit.plugins.TVPAPIAnalyticsPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +31,20 @@ public class MainActivity extends AppCompatActivity {
     private static final String SESSION_ID = "your_session_id";
 
     //Analytics constants
-    private static final String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";//Server url
-    private static final int UI_CONF_ID = 12345; //your ui conf id here.
+    private static final String TVPAPI_ANALYTICS_URL = "http://tvpapi-as.ott.kaltura.com/v3_9/gateways/jsonpostgw.aspx?";//Server url
+    private static final String FILE_ID = "12345"; //your file id here.
     private static final int PARTNER_ID = 12345; // your partner id here.
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
+    private static final String SITE_GUID = "123456";
+    private static final String API_USER = "your_api_user";
+    private static final String DOMAIN_ID = "your_domain_id";
+    private static final String UDID = "your_udid";
+    private static final String API_PASS = "your_api_pass";
+    private static final String LOCALE_USER_STATE = "your_locale_user_state";
+    private static final String LOCALE_COUNTRY = "your_locale_country";
+    private static final String LOCALE_DEVICE = "your_locale_device";
+    private static final String LOCALE_LANGUAGE = "your_locale_language";
+    private static final String PLATFORM = "your_platform";
 
     private Player player;
     private PKMediaConfig mediaConfig;
@@ -46,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
         //Initialize media config object.
         createMediaConfig();
 
-        //Initialize PKPluginConfigs object with KalturaStatsPlugin.
-        PKPluginConfigs pluginConfigs = createKalturaStatsPlugin();
+        //Initialize PKPluginConfigs object with TVPapiAnalyticsPlugin.
+        PKPluginConfigs pluginConfigs = createTVPapiAnalyticsPlugin();
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
@@ -65,27 +76,42 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return - the pluginConfig object that should be passed as parameter when loading the player.
      */
-    private PKPluginConfigs createKalturaStatsPlugin() {
+    private PKPluginConfigs createTVPapiAnalyticsPlugin() {
 
         //First register your plugin.
-        PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
+        PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
 
         //Initialize PKPluginConfigs object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
-        //Initialize Json object that will hold all the configurations for the plugin.
         JsonObject pluginEntry = new JsonObject();
-        //Put session id.
-        pluginEntry.addProperty("sessionId", SESSION_ID);
-        //Put ui conf id.
-        pluginEntry.addProperty("uiconfId", UI_CONF_ID);
-        //Put url to the kaltura stats server.
-        pluginEntry.addProperty("baseUrl", KALTURA_STATS_URL);
-        //Put the partner id.
-        pluginEntry.addProperty("partnerId", PARTNER_ID);
-        //Put interval with which analitcs reports would be triggered.
+        pluginEntry.addProperty("fileId", FILE_ID);
+        pluginEntry.addProperty("baseUrl", TVPAPI_ANALYTICS_URL);
         pluginEntry.addProperty("timerInterval", ANALYTIC_TRIGGER_INTERVAL);
+
+        //Initialize user json object and configure it.
+        JsonObject userJson = new JsonObject();
+        userJson.addProperty("SiteGuid", SITE_GUID);
+        userJson.addProperty("ApiUser", API_USER);
+        userJson.addProperty("DomainID", DOMAIN_ID);
+        userJson.addProperty("UDID", UDID);
+        userJson.addProperty("ApiPass", API_PASS);
+        userJson.addProperty("Platform", PLATFORM);
+
+        //Initialize locale json object and configure it.
+        JsonObject localeJsonObject = new JsonObject();
+        localeJsonObject.addProperty("LocaleUserState", LOCALE_USER_STATE);
+        localeJsonObject.addProperty("LocaleCountry", LOCALE_COUNTRY);
+        localeJsonObject.addProperty("LocaleDevice", LOCALE_DEVICE);
+        localeJsonObject.addProperty("LocaleLanguage", LOCALE_LANGUAGE);
+
+        //Add locale json object to user json object with "Locale" as key.
+        userJson.add("Locale", localeJsonObject);
+
+        //Add user json object to plugin entry json object with "initObj" as key.
+        pluginEntry.add("initObj", userJson);
+
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(KalturaStatsPlugin.factory.getName(), pluginEntry);
+        pluginConfigs.setPluginConfig(TVPAPIAnalyticsPlugin.factory.getName(), pluginEntry);
 
         return pluginConfigs;
     }

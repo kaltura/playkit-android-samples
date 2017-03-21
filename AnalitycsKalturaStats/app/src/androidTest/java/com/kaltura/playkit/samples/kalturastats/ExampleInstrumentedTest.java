@@ -1,4 +1,4 @@
-package com.kaltura.playkit.samples.analyticskalturastats;
+package com.kaltura.playkit.samples.kalturastats;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.kaltura.playkit.samples.analyticskalturastats", appContext.getPackageName());
+        assertEquals("com.kaltura.playkit.samples.kalturastats", appContext.getPackageName());
     }
 }

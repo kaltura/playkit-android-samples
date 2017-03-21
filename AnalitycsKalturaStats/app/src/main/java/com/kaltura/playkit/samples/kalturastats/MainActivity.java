@@ -1,4 +1,4 @@
-package com.kaltura.playkit.samples.analyticskalturastats;
+package com.kaltura.playkit.samples.kalturastats;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +13,7 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.plugins.KalturaStatsPlugin;
+import com.kaltura.playkit.samples.analyticskalturastats.R;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.kaltura.playkit.samples.analyticskalturastats;
+package com.kaltura.playkit.samples.kalturastats;
 
 import org.junit.Test;
 

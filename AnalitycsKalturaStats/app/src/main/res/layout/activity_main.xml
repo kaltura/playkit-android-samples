@@ -4,7 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.kaltura.playkit.samples.analyticskalturastats.MainActivity">
+    tools:context="com.kaltura.playkit.samples.analyticskalturastats.com.kaltura.playkit.samples.kalturastats.MainActivity">
 
     <LinearLayout
         android:id="@+id/player_root"

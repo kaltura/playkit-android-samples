@@ -2,9 +2,11 @@ package com.kaltura.playkit.samples.kalturalivestats;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.LinearLayout;
 
 import com.google.gson.JsonObject;
+import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -12,6 +14,7 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.plugins.AnalyticsEvent;
 import com.kaltura.playkit.plugins.KalturaLiveStatsPlugin;
 
 import java.util.ArrayList;
@@ -20,8 +23,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Tag for logging.
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     //The url of the source to play
-    private static final String SOURCE_URL = "http://cfvod.kaltura.com/dasha/p/1851571/sp/185157100/serveFlavor/entryId/0_pl5lbfo0/v/2/flavorId/0_,zwq3l44r,otmaqpnf,ywkmqnkg,/forceproxy/true/name/a.mp4.urlset/manifest.mpd";
+    private static final String SOURCE_URL = "http://nasatv-lh.akamaihd.net/i/NASA_101@319270/master.m3u8";
 
     //The id of the entry.
     private static final String ENTRY_ID = "entry_id";
@@ -50,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
+
+        //Subscribe to analytics report event.
+        subscribeToKalturaLiveStatsReportEvent();
 
         //Add player to the view hierarchy.
         addPlayerToView();
@@ -87,6 +96,28 @@ public class MainActivity extends AppCompatActivity {
         return pluginConfigs;
     }
 
+
+    /**
+     * Subscribe to live stats report event.
+     * This event will be received each and every time
+     * the analytics report is sent.
+     */
+    private void subscribeToKalturaLiveStatsReportEvent() {
+        //Subscribe to the event.
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                //Cast received event to AnalyticsEvent.KalturaLiveStatsReportEvent.
+                AnalyticsEvent.KalturaLiveStatsReportEvent liveReportEvent = (AnalyticsEvent.KalturaLiveStatsReportEvent) event;
+
+                //Get the buffer time from the report.
+                long bufferTime = liveReportEvent.getBufferTime();
+                Log.i(TAG, "Live stats report sent. Buffer time: " + bufferTime);
+            }
+            //Event subscription.
+        }, AnalyticsEvent.Type.KALTURA_LIVE_STATS_REPORT);
+    }
+
     /**
      * Will create {@link PKMediaConfig} object.
      */
@@ -115,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Set media entry type. It could be Live,Vod or Unknown.
         //For now we will use Unknown.
-        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Unknown);
+        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Live);
 
         //Create list that contains at least 1 media source.
         //Each media entry can contain a couple of different media sources.

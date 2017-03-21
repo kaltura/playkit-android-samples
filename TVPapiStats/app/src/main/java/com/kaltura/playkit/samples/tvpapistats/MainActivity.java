@@ -2,9 +2,11 @@ package com.kaltura.playkit.samples.tvpapistats;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.LinearLayout;
 
 import com.google.gson.JsonObject;
+import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -12,6 +14,7 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.plugins.AnalyticsEvent;
 import com.kaltura.playkit.plugins.TVPAPIAnalyticsPlugin;
 
 import java.util.ArrayList;
@@ -20,8 +23,11 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Tag for logging.
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     //The url of the source to play
-    private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
+    private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/playManifest/entryId/1_w9zx2eti/format/mpegdash/protocol/https/a.mpd";
 
     //The id of the entry.
     private static final String ENTRY_ID = "entry_id";
@@ -60,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
+
+        //Subscribe to analytics report event.
+        subscribeToTVPapiReportEvent();
 
         //Add player to the view hierarchy.
         addPlayerToView();
@@ -113,6 +122,28 @@ public class MainActivity extends AppCompatActivity {
 
         return pluginConfigs;
     }
+
+    /**
+     * Subscribe to TVPapi report event.
+     * This event will be received each and every time
+     * the analytics report is sent.
+     */
+    private void subscribeToTVPapiReportEvent() {
+        //Subscribe to the event.
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
+                AnalyticsEvent.BaseAnalyticsReportEvent reportEvent = (AnalyticsEvent.BaseAnalyticsReportEvent) event;
+
+                //Get the event name from the report.
+                String reportedEventName = reportEvent.getReportedEventName();
+                Log.i(TAG, "TVPapi stats report sent. Reported event name: " + reportedEventName);
+            }
+            //Event subscription.
+        }, AnalyticsEvent.Type.TVPAPI_REPORT);
+    }
+
 
     /**
      * Will create {@link PKMediaConfig} object.
@@ -177,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
         mediaSource.setUrl(SOURCE_URL);
 
         //Set the format of the source. In our case it will be hls.
-        mediaSource.setMediaFormat(PKMediaFormat.hls);
+        mediaSource.setMediaFormat(PKMediaFormat.dash);
 
         //Add media source to the list.
         mediaSources.add(mediaSource);

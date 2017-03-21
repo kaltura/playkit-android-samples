@@ -1,4 +1,4 @@
-package com.kaltura.playkit.samples.tvpapistats;
+package com.kaltura.playkit.samples.kalturalivestats;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +12,7 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.plugins.TVPAPIAnalyticsPlugin;
+import com.kaltura.playkit.plugins.KalturaLiveStatsPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     //The url of the source to play
-    private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
+    private static final String SOURCE_URL = "http://cfvod.kaltura.com/dasha/p/1851571/sp/185157100/serveFlavor/entryId/0_pl5lbfo0/v/2/flavorId/0_,zwq3l44r,otmaqpnf,ywkmqnkg,/forceproxy/true/name/a.mp4.urlset/manifest.mpd";
 
     //The id of the entry.
     private static final String ENTRY_ID = "entry_id";
@@ -29,20 +29,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     //Analytics constants
-    private static final String TVPAPI_ANALYTICS_URL = "http://tvpapi-as.ott.kaltura.com/v3_9/gateways/jsonpostgw.aspx?"; //Server url
+    private static final int PARTNER_ID = 12345; // your partner id here.
+    private static final String SESSION_ID = "your_session_id";
+    private static final String KALTURA_LIVE_STATS_URL = "https://livestats.kaltura.com/api_v3/index.php"; //Server url
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
-
-    private static final String UDID = "your_udid";
-    private static final String FILE_ID = "12345"; //your file id here.
-    private static final String API_USER = "your_api_user";
-    private static final String API_PASS = "your_api_pass";
-    private static final String PLATFORM = "your_platform";
-    private static final String SITE_GUID = "123456";
-    private static final String DOMAIN_ID = "your_domain_id";
-    private static final String LOCALE_DEVICE = "your_locale_device";
-    private static final String LOCALE_COUNTRY = "your_locale_country";
-    private static final String LOCALE_LANGUAGE = "your_locale_language";
-    private static final String LOCALE_USER_STATE = "your_locale_user_state";
 
     private Player player;
     private PKMediaConfig mediaConfig;
@@ -55,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
         //Initialize media config object.
         createMediaConfig();
 
-        //Initialize PKPluginConfigs object with TVPapiAnalyticsPlugin.
-        PKPluginConfigs pluginConfigs = createTVPapiAnalyticsPlugin();
+        //Initialize PKPluginConfigs object with KalturaStatsPlugin.
+        PKPluginConfigs pluginConfigs = createKalturaLiveStatsPlugin();
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
@@ -70,46 +60,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Will create {@link PKPluginConfigs} object with {@link TVPAPIAnalyticsPlugin}.
+     * Will create {@link PKPluginConfigs} object with {@link KalturaLiveStatsPlugin}.
      *
      * @return - the pluginConfig object that should be passed as parameter when loading the player.
      */
-    private PKPluginConfigs createTVPapiAnalyticsPlugin() {
+    private PKPluginConfigs createKalturaLiveStatsPlugin() {
 
         //First register your plugin.
-        PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
+        PlayKitManager.registerPlugins(this, KalturaLiveStatsPlugin.factory);
 
         //Initialize PKPluginConfigs object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+        //Initialize Json object that will hold all the configurations for the plugin.
         JsonObject pluginEntry = new JsonObject();
-        pluginEntry.addProperty("fileId", FILE_ID);
-        pluginEntry.addProperty("baseUrl", TVPAPI_ANALYTICS_URL);
+        //Put session id.
+        pluginEntry.addProperty("sessionId", SESSION_ID);
+        //Put url to the kaltura stats server.
+        pluginEntry.addProperty("baseUrl", KALTURA_LIVE_STATS_URL);
+        //Put the partner id.
+        pluginEntry.addProperty("partnerId", PARTNER_ID);
+        //Put interval with which analitcs reports would be triggered.
         pluginEntry.addProperty("timerInterval", ANALYTIC_TRIGGER_INTERVAL);
-
-        //Initialize user json object and configure it.
-        JsonObject userJson = new JsonObject();
-        userJson.addProperty("SiteGuid", SITE_GUID);
-        userJson.addProperty("ApiUser", API_USER);
-        userJson.addProperty("DomainID", DOMAIN_ID);
-        userJson.addProperty("UDID", UDID);
-        userJson.addProperty("ApiPass", API_PASS);
-        userJson.addProperty("Platform", PLATFORM);
-
-        //Initialize locale json object and configure it.
-        JsonObject localeJsonObject = new JsonObject();
-        localeJsonObject.addProperty("LocaleUserState", LOCALE_USER_STATE);
-        localeJsonObject.addProperty("LocaleCountry", LOCALE_COUNTRY);
-        localeJsonObject.addProperty("LocaleDevice", LOCALE_DEVICE);
-        localeJsonObject.addProperty("LocaleLanguage", LOCALE_LANGUAGE);
-
-        //Add locale json object to user json object with "Locale" as key.
-        userJson.add("Locale", localeJsonObject);
-
-        //Add user json object to plugin entry json object with "initObj" as key.
-        pluginEntry.add("initObj", userJson);
-
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(TVPAPIAnalyticsPlugin.factory.getName(), pluginEntry);
+        pluginConfigs.setPluginConfig(KalturaLiveStatsPlugin.factory.getName(), pluginEntry);
 
         return pluginConfigs;
     }

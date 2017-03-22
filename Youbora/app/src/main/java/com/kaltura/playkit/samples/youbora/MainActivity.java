@@ -1,21 +1,14 @@
 package com.kaltura.playkit.samples.youbora;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKEvent;
-import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -23,165 +16,182 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.player.PKTracks;
-import com.kaltura.playkit.plugins.KalturaStatsPlugin;
-import com.kaltura.playkit.plugins.TVPAPIAnalyticsPlugin;
+import com.kaltura.playkit.plugins.AnalyticsEvent;
 import com.kaltura.playkit.plugins.Youbora.YouboraPlugin;
-import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
-import com.kaltura.playkit.samples.youbora.plugins.ConverterYoubora;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kaltura.playkit.PlayerEvent.Type.CAN_PLAY;
-import static com.kaltura.playkit.PlayerEvent.Type.ENDED;
-import static com.kaltura.playkit.PlayerEvent.Type.ERROR;
-import static com.kaltura.playkit.PlayerEvent.Type.PAUSE;
-import static com.kaltura.playkit.PlayerEvent.Type.PLAY;
-import static com.kaltura.playkit.PlayerEvent.Type.PLAYING;
-import static com.kaltura.playkit.PlayerEvent.Type.SEEKED;
-import static com.kaltura.playkit.PlayerEvent.Type.SEEKING;
-import static com.kaltura.playkit.PlayerEvent.Type.TRACKS_AVAILABLE;
-
 
 public class MainActivity extends AppCompatActivity {
-    private static final PKLog log = PKLog.get("BasicPluginSetup");
 
-    private static final int START_POSITION = 0;
+    //Tag for logging.
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     //The url of the source to play
-    private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
+    private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/playManifest/entryId/1_w9zx2eti/format/mpegdash/protocol/https/a.mpd";
+
+    //The id of the entry.
     private static final String ENTRY_ID = "entry_id";
+    //The id of the source.
     private static final String MEDIA_SOURCE_ID = "source_id";
 
+    //Youbora analytics Constants
+    public static final String ACCOUNT_CODE = "your_account_code";
+    public static final String USER_NAME = "your_user_name";
+    public static final String MEDIA_TITLE = "your_media_title";
+    public static final String AD_TITLE = "your_ad_title";
+    private static final String CAMPAIGN = "your_campaign_name";
+    public static final String EXTRA_PARAM_1 = "playKitPlayer";
+    public static final String EXTRA_PARAM_2 = "";
+    public static final String GENRE = "your_genre";
+    public static final String TYPE = "your_type";
+    public static final String TRANSACTION_TYPE = "your_trasnsaction_type";
+    public static final String YEAR = "your_year";
+    public static final String CAST = "your_cast";
+    public static final String DIRECTOR = "your_director";
+    private static final String OWNER = "your_owner";
+    public static final String PARENTAL = "your_parental";
+    public static final String PRICE = "your_price";
+    public static final String RATING = "your_rating";
+    public static final String AUDIO_TYPE = "your_audio_type";
+    public static final String AUDIO_CHANNELS = "your_audoi_channels";
+    public static final String DEVICE = "your_device";
+    public static final String QUALITY = "your_quality";
+
+
     private Player player;
+    private PKMediaConfig mediaConfig;
+    private Button playPauseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
-        PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
-        PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
-        PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        //Initialize media config object.
+        createMediaConfig();
+
+        //Initialize PKPluginConfigs object with Youbora.
+        PKPluginConfigs pluginConfigs = createYouboraPlugin();
+
+        //Create instance of the player with specified pluginConfigs.
+        player = PlayKitManager.loadPlayer(this, pluginConfigs);
+
+        //Subscribe to analytics report event.
+        subscribeToYouboraReportEvent();
+
+        //Add player to the view hierarchy.
+        addPlayerToView();
+
+        //Add simple play/pause button.
+        addPlayPauseButton();
+
+        //Prepare player with media config.
+        player.prepare(mediaConfig);
+
+    }
+
+    /**
+     * Will create {@link PKPluginConfigs} object with {@link YouboraPlugin}.
+     *
+     * @return - the pluginConfig object that should be passed as parameter when loading the player.
+     */
+    private PKPluginConfigs createYouboraPlugin() {
+
+        //Important!!! First you need to register your plugin.
+        PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
+
+        //Initialize PKPluginConfigs object.
+        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+        //Initialize Json object that will hold all the configurations for the plugin.
+        JsonObject pluginEntry = new JsonObject();
+
+        //Youbora config json. Main config goes here.
+        JsonObject youboraConfigJson = new JsonObject();
+        youboraConfigJson.addProperty("accountCode", ACCOUNT_CODE);
+        youboraConfigJson.addProperty("username", USER_NAME);
+        youboraConfigJson.addProperty("haltOnError", true);
+        youboraConfigJson.addProperty("enableAnalytics", true);
+
+        //Media entry json.
+        JsonObject mediaEntryJson = new JsonObject();
+        mediaEntryJson.addProperty("title", MEDIA_TITLE);
+
+        //Youbora ads configuration json.
+        JsonObject adsJson = new JsonObject();
+        adsJson.addProperty("adsExpected", true);
+        adsJson.addProperty("title", AD_TITLE);
+        adsJson.addProperty("campaign", CAMPAIGN);
+
+        //Configure custom properties here:
+        JsonObject propertiesJson = new JsonObject();
+        propertiesJson.addProperty("genre", GENRE);
+        propertiesJson.addProperty("type", TYPE);
+        propertiesJson.addProperty("transaction_type", TRANSACTION_TYPE);
+        propertiesJson.addProperty("year", YEAR);
+        propertiesJson.addProperty("cast", CAST);
+        propertiesJson.addProperty("director", DIRECTOR);
+        propertiesJson.addProperty("owner", OWNER);
+        propertiesJson.addProperty("parental", PARENTAL);
+        propertiesJson.addProperty("price", PRICE);
+        propertiesJson.addProperty("rating", RATING);
+        propertiesJson.addProperty("audioType", AUDIO_TYPE);
+        propertiesJson.addProperty("audioChannels", AUDIO_CHANNELS);
+        propertiesJson.addProperty("device", DEVICE);
+        propertiesJson.addProperty("quality", QUALITY);
+
+        //You can add some extra params here:
+        JsonObject extraParamJson = new JsonObject();
+        extraParamJson.addProperty("param1", EXTRA_PARAM_1);
+        extraParamJson.addProperty("param2", EXTRA_PARAM_2);
+
+        //Add all the json objects created before to the pluginEntry json.
+        pluginEntry.add("youboraConfig", youboraConfigJson);
+        pluginEntry.add("media", mediaEntryJson);
+        pluginEntry.add("ads", adsJson);
+        pluginEntry.add("properties", propertiesJson);
+        pluginEntry.add("extraParams", extraParamJson);
+
+        //Set plugin entry to the plugin configs.
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
+
+        return pluginConfigs;
+    }
+
+    /**
+     * Subscribe to kaltura stats report event.
+     * This event will be received each and every time
+     * the analytics report is sent.
+     */
+    private void subscribeToYouboraReportEvent() {
+        //Subscribe to the event.
+        player.addEventListener(new PKEvent.Listener() {
             @Override
-            public void onClick(View view) {
-                showMenu();
+            public void onEvent(PKEvent event) {
+                //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
+                AnalyticsEvent.BaseAnalyticsReportEvent reportEvent = (AnalyticsEvent.BaseAnalyticsReportEvent) event;
+
+                //Get the event name from the report.
+                String reportedEventName = reportEvent.getReportedEventName();
+                Log.i(TAG, "Youbora report sent. Reported event name: " + reportedEventName);
             }
-        });
+            //Event subscription.
+        }, AnalyticsEvent.Type.YOUBORA_REPORT);
     }
 
-    @Override
-    protected void onPause() {
-        if (player != null) {
-            player.pause();
-            player.onApplicationPaused();
-        }
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (player != null) {
-            player.onApplicationResumed();
-            player.play();
-        }
-    }
-
-    void showMenu() {
-        final Context context = this;
-        new AlertDialog.Builder(context)
-                .setItems(new String[]{"Play", "Pause"}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Toast.makeText(context, "Selected " + which, Toast.LENGTH_SHORT).show();
-                        if (which == 0) {
-                            playDemoVideo();
-                        } else if (which == 1) {
-                            pauseDemoVideo();
-                        }
-                    }
-                })
-                .show();
-    }
-
-    private void pauseDemoVideo() {
-        if (player != null) {
-            player.pause();
-        }
-    }
-
-    private void playDemoVideo() {
-        if (player != null) {
-            player.play();
-            return;
-        }
-
-
-
+    /**
+     * Will create {@link PKMediaConfig} object.
+     */
+    private void createMediaConfig() {
         //First. Create PKMediaConfig object.
-        PKMediaConfig mediaConfig = new PKMediaConfig()
-                // You can configure the start position for it.
-                // by default it will be 0.
-                // If start position is grater then duration of the source it will be reset to 0.
-                .setStartPosition(START_POSITION);
+        mediaConfig = new PKMediaConfig();
 
         //Second. Create PKMediaEntry object.
         PKMediaEntry mediaEntry = createMediaEntry();
 
-
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
-
-
-        PKPluginConfigs pluginConfig = new PKPluginConfigs();
-        configureYouboraPlugin(pluginConfig);
-
-        //Create instance of the player.
-        player = PlayKitManager.loadPlayer(this, pluginConfig);
-
-        //Get the layout, where the player view will be placed.
-        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
-        //Add player view to the layout.
-        layout.addView(player.getView());
-
-        //Prepare player with media configuration.
-        player.prepare(mediaConfig);
-
-        //Start playback.
-        player.play();
-
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -233,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         mediaSource.setUrl(SOURCE_URL);
 
         //Set the format of the source. In our case it will be hls.
-        mediaSource.setMediaFormat(PKMediaFormat.hls);
+        mediaSource.setMediaFormat(PKMediaFormat.dash);
 
         //Add media source to the list.
         mediaSources.add(mediaSource);
@@ -241,129 +251,36 @@ public class MainActivity extends AppCompatActivity {
         return mediaSources;
     }
 
-    protected void setPlayerListeners() {
-        player.addStateChangeListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
+    /**
+     * Will add player to the view.
+     */
+    private void addPlayerToView() {
+        //Get the layout, where the player view will be placed.
+        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
+        //Add player view to the layout.
+        layout.addView(player.getView());
+    }
 
-                PlayerEvent.StateChanged stateChanged = (PlayerEvent.StateChanged) event;
-                log.v("addStateChangeListener " + event.eventType() + " = " + stateChanged.newState);
-                switch (stateChanged.newState) {
-                    case IDLE:
-                        log.d("StateChange Idle");
-                        break;
-                    case LOADING:
-                        log.d("StateChange Loading");
-                        break;
-                    case READY:
-                        log.d("StateChange Ready");
-                        break;
-                    case BUFFERING:
-                        log.d("StateChange Buffering");
-                        break;
+    /**
+     * Just add a simple button which will start/pause playback.
+     */
+    private void addPlayPauseButton() {
+        //Get reference to the play/pause button.
+        playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
+        //Add clickListener.
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()) {
+                    //If player is playing, change text of the button and pause.
+                    playPauseButton.setText(R.string.play_text);
+                    player.pause();
+                } else {
+                    //If player is not playing, change text of the button and play.
+                    playPauseButton.setText(R.string.pause_text);
+                    player.play();
                 }
             }
         });
-
-        player.addEventListener(new PKEvent.Listener() {
-
-                                    @Override
-                                    public void onEvent(PKEvent event) {
-                                        log.d("addEventListener " + event.eventType());
-                                        log.d("Player Total duration => " + player.getDuration());
-                                        log.d("Player Current duration => " + player.getCurrentPosition());
-
-
-                                        Enum receivedEventType = event.eventType();
-                                        if (event instanceof PlayerEvent) {
-                                            switch (((PlayerEvent) event).type) {
-                                                case CAN_PLAY:
-                                                    log.d("Received " + CAN_PLAY.name());
-                                                    break;
-                                                case PLAY:
-                                                    log.d("Received " + PLAY.name());
-                                                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                                    break;
-                                                case PLAYING:
-                                                    log.d("Received " + PLAYING.name());
-                                                    break;
-                                                case PAUSE:
-                                                    log.v("Received " + PAUSE.name());
-                                                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                                    break;
-                                                case SEEKING:
-                                                    log.d("Received " + SEEKING.name());
-                                                    break;
-                                                case SEEKED:
-                                                    log.d("Received " + SEEKED.name());
-                                                    break;
-                                                case ENDED:
-                                                    log.d("Received " + ENDED.name());
-                                                    break;
-                                                case TRACKS_AVAILABLE:
-                                                    PKTracks tracks = ((PlayerEvent.TracksAvailable) event).getPKTracks();
-                                                    log.d("Received " + TRACKS_AVAILABLE.name());
-                                                    break;
-                                                case ERROR:
-                                                    log.d("Received " + ERROR.name());
-                                                    PlayerEvent.ExceptionInfo exceptionInfo = (PlayerEvent.ExceptionInfo) event;
-                                                    String errorMsg = "Player error occurred.";
-                                                    if (exceptionInfo != null && exceptionInfo.getException() != null && exceptionInfo.getException().getMessage() != null) {
-                                                        errorMsg = exceptionInfo.getException().getMessage();
-                                                    }
-                                                    log.e("Player Error: " + errorMsg);
-
-                                                    break;
-                                            }
-                                        }
-                                    }
-
-                                },
-                PlayerEvent.Type.PLAY, PlayerEvent.Type.PLAYING,
-                PlayerEvent.Type.PAUSE, PlayerEvent.Type.CAN_PLAY,
-                PlayerEvent.Type.SEEKING, PlayerEvent.Type.SEEKED,
-                PlayerEvent.Type.ENDED, PlayerEvent.Type.TRACKS_AVAILABLE,
-                PlayerEvent.Type.ERROR);
-    }
-
-    private void configureYouboraPlugin(PKPluginConfigs pluginConfig) {
-        JsonObject youboraConfigEntry = new JsonObject();
-        youboraConfigEntry.addProperty("accountCode", "YOUR_ACCOUNT_CODE");
-        youboraConfigEntry.addProperty("username", "YOUR_YOUBORA_USER_NAME");
-        youboraConfigEntry.addProperty("haltOnError", true);
-        youboraConfigEntry.addProperty("enableAnalytics", true);
-
-        JsonObject mediaEntry = new JsonObject();
-        mediaEntry.addProperty("title", "YOUR_MEDIA_TITLE");
-
-        JsonObject adsEntry = new JsonObject();
-        adsEntry.addProperty("adsExpected", true);
-        adsEntry.addProperty("title", "ad_title");
-        adsEntry.addProperty("campaign", "");
-
-        JsonObject extraParamEntry = new JsonObject();
-        //extraParamEntry.addProperty("param1", "Mobile");
-        extraParamEntry.addProperty("param2", "playKitPlayer");
-        extraParamEntry.addProperty("param3", "");
-
-        JsonObject propertiesEntry = new JsonObject();
-        propertiesEntry.addProperty("genre", "");
-        propertiesEntry.addProperty("type", "");
-        propertiesEntry.addProperty("transaction_type", "");
-        propertiesEntry.addProperty("year", "");
-        propertiesEntry.addProperty("cast", "");
-        propertiesEntry.addProperty("director", "");
-        propertiesEntry.addProperty("owner", "");
-        propertiesEntry.addProperty("parental", "");
-        propertiesEntry.addProperty("price", "");
-        propertiesEntry.addProperty("rating", "");
-        propertiesEntry.addProperty("audioType", "");
-        propertiesEntry.addProperty("audioChannels", "");
-        propertiesEntry.addProperty("device", "");
-        propertiesEntry.addProperty("quality", "");
-
-        ConverterYoubora converterYoubora = new ConverterYoubora(youboraConfigEntry,
-                adsEntry, extraParamEntry, propertiesEntry);
-        pluginConfig.setPluginConfig(YouboraPlugin.factory.getName(), converterYoubora.toJson());
     }
 }

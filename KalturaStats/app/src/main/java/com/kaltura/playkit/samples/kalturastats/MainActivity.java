@@ -3,6 +3,8 @@ package com.kaltura.playkit.samples.kalturastats;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.google.gson.JsonObject;
@@ -43,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Player player;
     private PKMediaConfig mediaConfig;
+    private Button playPauseButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +68,11 @@ public class MainActivity extends AppCompatActivity {
         //Add player to the view hierarchy.
         addPlayerToView();
 
-        //Prepare player with media config and start playback.
-        startPlayback();
+        //Add simple play/pause button.
+        addPlayPauseButton();
+
+        //Prepare player with media config.
+        player.prepare(mediaConfig);
 
     }
 
@@ -202,13 +209,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Will prepare player with media configurations and start playback.
+     * Just add a simple button which will start/pause playback.
      */
-    private void startPlayback() {
-        //Prepare player with media configuration.
-        player.prepare(mediaConfig);
-
-        //Start playback.
-        player.play();
+    private void addPlayPauseButton() {
+        //Get reference to the play/pause button.
+        playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
+        //Add clickListener.
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()) {
+                    //If player is playing, change text of the button and pause.
+                    playPauseButton.setText(R.string.play_text);
+                    player.pause();
+                } else {
+                    //If player is not playing, change text of the button and play.
+                    playPauseButton.setText(R.string.pause_text);
+                    player.play();
+                }
+            }
+        });
     }
 }

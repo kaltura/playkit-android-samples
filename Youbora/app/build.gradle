@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "com.kaltura.playkit.samples.youbora"
+        applicationId "com.kaltura.playkit.samples.basicpluginssetup"
         minSdkVersion 17
         targetSdkVersion 25
         versionCode 1
@@ -20,6 +20,10 @@ android {
     lintOptions {
         warning 'InvalidPackage'
     }
+}
+
+repositories {
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {

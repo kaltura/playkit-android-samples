@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //The url of the source to play
-    private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/playManifest/entryId/1_w9zx2eti/format/mpegdash/protocol/https/a.mpd";
+    private static final String SOURCE_URL = "https://tungsten.aaplimg.com/VOD/bipbop_adv_example_v2/master.m3u8";
 
     //The id of the entry.
     private static final String ENTRY_ID = "entry_id";
@@ -37,10 +37,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     //Analytics constants
-    private static final String TVPAPI_ANALYTICS_URL = "http://tvpapi-as.ott.kaltura.com/v3_9/gateways/jsonpostgw.aspx?"; //Server url
+    private static final String TVPAPI_ANALYTICS_URL = "http://tvpapi-preprod.ott.kaltura.com/v3_9/gateways/jsonpostgw.aspx?"; //Server url
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
     private static final String UDID = "your_udid";
+    private static final String TOKEN = "your_token";
     private static final String FILE_ID = "12345"; //your file id here.
     private static final String API_USER = "your_api_user";
     private static final String API_PASS = "your_api_pass";
@@ -98,18 +99,21 @@ public class MainActivity extends AppCompatActivity {
         //Initialize PKPluginConfigs object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
         JsonObject pluginEntry = new JsonObject();
-        pluginEntry.addProperty("fileId", FILE_ID);
-        pluginEntry.addProperty("baseUrl", TVPAPI_ANALYTICS_URL);
-        pluginEntry.addProperty("timerInterval", ANALYTIC_TRIGGER_INTERVAL);
+
+        JsonObject paramsJson = new JsonObject();
+        paramsJson.addProperty("fileId", FILE_ID);
+        paramsJson.addProperty("baseUrl", TVPAPI_ANALYTICS_URL);
+        paramsJson.addProperty("timerInterval", ANALYTIC_TRIGGER_INTERVAL);
 
         //Initialize user json object and configure it.
-        JsonObject userJson = new JsonObject();
-        userJson.addProperty("SiteGuid", SITE_GUID);
-        userJson.addProperty("ApiUser", API_USER);
-        userJson.addProperty("DomainID", DOMAIN_ID);
-        userJson.addProperty("UDID", UDID);
-        userJson.addProperty("ApiPass", API_PASS);
-        userJson.addProperty("Platform", PLATFORM);
+        JsonObject initObjJson = new JsonObject();
+        initObjJson.addProperty("SiteGuid", SITE_GUID);
+        initObjJson.addProperty("ApiUser", API_USER);
+        initObjJson.addProperty("DomainID", DOMAIN_ID);
+        initObjJson.addProperty("UDID", UDID);
+        initObjJson.addProperty("ApiPass", API_PASS);
+        initObjJson.addProperty("Platform", PLATFORM);
+        initObjJson.addProperty("Token", TOKEN);
 
         //Initialize locale json object and configure it.
         JsonObject localeJsonObject = new JsonObject();
@@ -119,10 +123,11 @@ public class MainActivity extends AppCompatActivity {
         localeJsonObject.addProperty("LocaleLanguage", LOCALE_LANGUAGE);
 
         //Add locale json object to user json object with "Locale" as key.
-        userJson.add("Locale", localeJsonObject);
+        initObjJson.add("Locale", localeJsonObject);
 
         //Add user json object to plugin entry json object with "initObj" as key.
-        pluginEntry.add("initObj", userJson);
+        paramsJson.add("initObj", initObjJson);
+        pluginEntry.add("params", paramsJson);
 
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(TVPAPIAnalyticsPlugin.factory.getName(), pluginEntry);
@@ -180,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Set media entry type. It could be Live,Vod or Unknown.
         //For now we will use Unknown.
-        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Unknown);
+        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
 
         //Create list that contains at least 1 media source.
         //Each media entry can contain a couple of different media sources.
@@ -215,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
         mediaSource.setUrl(SOURCE_URL);
 
         //Set the format of the source. In our case it will be hls.
-        mediaSource.setMediaFormat(PKMediaFormat.dash);
+        mediaSource.setMediaFormat(PKMediaFormat.hls);
 
         //Add media source to the list.
         mediaSources.add(mediaSource);

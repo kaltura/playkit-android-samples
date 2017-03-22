@@ -35,10 +35,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String ENTRY_ID = "entry_id";
     //The id of the source.
     private static final String MEDIA_SOURCE_ID = "source_id";
-    private static final String SESSION_ID = "your_session_id";
 
     //Analytics constants
     private static final String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";//Server url
+    private static final String SESSION_ID = "your_session_id";
     private static final int UI_CONF_ID = 12345; //your ui conf id here.
     private static final int PARTNER_ID = 12345; // your partner id here.
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).

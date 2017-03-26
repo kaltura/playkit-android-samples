@@ -10,7 +10,7 @@ import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.samples.basicpluginssetup.R;
+
 
 import java.util.ArrayList;
 import java.util.List;

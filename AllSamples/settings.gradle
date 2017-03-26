@@ -9,10 +9,14 @@ def samples = [
         'BasicPluginsSetup', 
         'TracksSelection', 
         'ChangeMedia',
-        'AnalyticsOTT', 
-        'IMASample', 
+        'IMASample',
         'Offline', 
         'Youbora',
+        'PhoenixAnalytics',
+        'KalturaLiveStats',
+        'KalturaStats',
+        'Providers',
+        'TVPapiStats'
 ]
 
 samples.each {

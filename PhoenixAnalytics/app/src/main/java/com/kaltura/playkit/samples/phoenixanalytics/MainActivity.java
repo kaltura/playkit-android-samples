@@ -22,7 +22,7 @@ import com.kaltura.playkit.backend.SessionProvider;
 import com.kaltura.playkit.backend.base.OnMediaLoadCompletion;
 import com.kaltura.playkit.backend.phoenix.PhoenixMediaProvider;
 import com.kaltura.playkit.connect.ResultElement;
-import com.kaltura.playkit.plugins.AnalyticsEvent;
+import com.kaltura.playkit.plugins.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.PhoenixAnalyticsPlugin;
 
 
@@ -101,14 +101,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onEvent(PKEvent event) {
                 //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                AnalyticsEvent.BaseAnalyticsReportEvent reportEvent = (AnalyticsEvent.BaseAnalyticsReportEvent) event;
+                PhoenixAnalyticsEvent.PhoenixAnalyticsReport reportEvent = (PhoenixAnalyticsEvent.PhoenixAnalyticsReport) event;
 
                 //Get the event name from the report.
                 String reportedEventName = reportEvent.getReportedEventName();
                 Log.i(TAG, "PhoenixAnalytics report sent. Reported event name: " + reportedEventName);
             }
             //Event subscription.
-        }, AnalyticsEvent.Type.PHOENIX_REPORT);
+        }, PhoenixAnalyticsEvent.Type.REPORT_SENT);
     }
 
 //    /**

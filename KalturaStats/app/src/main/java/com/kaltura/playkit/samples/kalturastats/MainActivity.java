@@ -16,7 +16,7 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.plugins.AnalyticsEvent;
+import com.kaltura.playkit.plugins.KalturaStatsEvent;
 import com.kaltura.playkit.plugins.KalturaStatsPlugin;
 
 import java.util.ArrayList;
@@ -117,14 +117,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onEvent(PKEvent event) {
                 //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                AnalyticsEvent.BaseAnalyticsReportEvent reportEvent = (AnalyticsEvent.BaseAnalyticsReportEvent) event;
+                KalturaStatsEvent.KalturaStatsReport reportEvent = (KalturaStatsEvent.KalturaStatsReport) event;
 
                 //Get the event name from the report.
                 String reportedEventName = reportEvent.getReportedEventName();
                 Log.i(TAG, "Kaltura stats report sent. Reported event name: " + reportedEventName);
             }
             //Event subscription.
-        }, AnalyticsEvent.Type.KALTURA_STATS_REPORT);
+        }, KalturaStatsEvent.Type.REPORT_SENT);
     }
 
     /**

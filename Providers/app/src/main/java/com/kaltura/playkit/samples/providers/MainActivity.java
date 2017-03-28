@@ -3,6 +3,8 @@ package com.kaltura.playkit.samples.providers;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.kaltura.playkit.PKMediaConfig;
@@ -13,10 +15,11 @@ import com.kaltura.playkit.backend.base.OnMediaLoadCompletion;
 import com.kaltura.playkit.backend.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.backend.ovp.SimpleOvpSessionProvider;
 import com.kaltura.playkit.connect.ResultElement;
-import com.kaltura.playkit.samples.basicpluginssetup.R;
 
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     //Put here your provider base url
     private static final String PROVIDER_BASE_URL = "your_provider_base_url";
@@ -28,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String ENTRY_ID = "your_entry_id";
 
     private Player player;
+    private PKMediaConfig mediaConfig;
+    private Button playPauseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +42,11 @@ public class MainActivity extends AppCompatActivity {
         //Create instance of the player.
         player = PlayKitManager.loadPlayer(this, null);
 
-        //Get the layout, where the player view will be placed.
-        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
-        //Add player view to the layout.
-        layout.addView(player.getView());
+        //Add player to the view hierarchy.
+        addPlayerToView();
+
+        //Add simple play/pause button.
+        addPlayPauseButton();
 
         //Create media provider and request media.
         createMediaProvider();
@@ -74,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     //If response was not successful print it to console with error message.
                     String error = "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : "");
-                    Log.e(MainActivity.class.getSimpleName(), error);
+                    Log.e(TAG, error);
                 }
             }
         });
@@ -82,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Prepare player and start playback.
+     *
      * @param mediaEntry - media entry we received from media provider.
      */
     private void preparePlayer(final PKMediaEntry mediaEntry) {
@@ -91,20 +98,55 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-                //Initialize empty mediaConfig object.
-                PKMediaConfig mediaConfig = new PKMediaConfig();
-
-                //Set media entry we received from provider.
-                mediaConfig.setMediaEntry(mediaEntry);
-
-                //Prepare player with media configurations.
-                player.prepare(mediaConfig);
-
-                //Start playback.
-                player.play();
+                //Initialize media config object.
+                createMediaConfig(mediaEntry);
             }
         });
 
+    }
+
+    private void createMediaConfig(final PKMediaEntry mediaEntry) {
+        //Initialize empty mediaConfig object.
+        mediaConfig = new PKMediaConfig();
+
+        //Set media entry we received from provider.
+        mediaConfig.setMediaEntry(mediaEntry);
+
+        //Prepare player with media configurations.
+        player.prepare(mediaConfig);
+    }
+
+    /**
+     * Will add player to the view.
+     */
+    private void addPlayerToView() {
+        //Get the layout, where the player view will be placed.
+        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
+        //Add player view to the layout.
+        layout.addView(player.getView());
+    }
+
+    /**
+     * Just add a simple button which will start/pause playback.
+     */
+    private void addPlayPauseButton() {
+        //Get reference to the play/pause button.
+        playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
+        //Add clickListener.
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()) {
+                    //If player is playing, change text of the button and pause.
+                    playPauseButton.setText(R.string.play_text);
+                    player.pause();
+                } else {
+                    //If player is not playing, change text of the button and play.
+                    playPauseButton.setText(R.string.pause_text);
+                    player.play();
+                }
+            }
+        });
     }
 
 }

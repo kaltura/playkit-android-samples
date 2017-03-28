@@ -16,8 +16,8 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.plugins.AnalyticsEvent;
 import com.kaltura.playkit.plugins.TVPAPIAnalyticsPlugin;
+import com.kaltura.playkit.plugins.TVPapiAnalyticsEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,14 +146,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onEvent(PKEvent event) {
                 //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                AnalyticsEvent.BaseAnalyticsReportEvent reportEvent = (AnalyticsEvent.BaseAnalyticsReportEvent) event;
+                TVPapiAnalyticsEvent.TVPapiAnalyticsReport reportEvent = (TVPapiAnalyticsEvent.TVPapiAnalyticsReport) event;
 
                 //Get the event name from the report.
                 String reportedEventName = reportEvent.getReportedEventName();
                 Log.i(TAG, "TVPapi stats report sent. Reported event name: " + reportedEventName);
             }
             //Event subscription.
-        }, AnalyticsEvent.Type.TVPAPI_REPORT);
+        }, TVPapiAnalyticsEvent.Type.REPORT_SENT);
     }
 
 

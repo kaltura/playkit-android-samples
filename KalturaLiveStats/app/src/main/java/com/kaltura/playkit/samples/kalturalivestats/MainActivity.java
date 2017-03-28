@@ -16,7 +16,7 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.plugins.AnalyticsEvent;
+import com.kaltura.playkit.plugins.KalturaLiveStatsEvent;
 import com.kaltura.playkit.plugins.KalturaLiveStatsPlugin;
 
 import java.util.ArrayList;
@@ -114,14 +114,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onEvent(PKEvent event) {
                 //Cast received event to AnalyticsEvent.KalturaLiveStatsReportEvent.
-                AnalyticsEvent.KalturaLiveStatsReportEvent liveReportEvent = (AnalyticsEvent.KalturaLiveStatsReportEvent) event;
+                KalturaLiveStatsEvent.KalturaLiveStatsReport liveReportEvent = (KalturaLiveStatsEvent.KalturaLiveStatsReport) event;
 
                 //Get the buffer time from the report.
                 long bufferTime = liveReportEvent.getBufferTime();
                 Log.i(TAG, "Live stats report sent. Buffer time: " + bufferTime);
             }
             //Event subscription.
-        }, AnalyticsEvent.Type.KALTURA_LIVE_STATS_REPORT);
+        }, KalturaLiveStatsEvent.Type.REPORT_SENT);
     }
 
     /**

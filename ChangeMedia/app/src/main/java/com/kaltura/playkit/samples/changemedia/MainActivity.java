@@ -10,10 +10,8 @@ import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
-import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.samples.basicpluginssetup.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Player player;
     private PKMediaConfig mediaConfig;
+    private Button playPauseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +45,14 @@ public class MainActivity extends AppCompatActivity {
         //First. Create PKMediaConfig object.
         mediaConfig = new PKMediaConfig();
 
-        //Create plugin config. In this sample we are not discussing plugins,
-        //so we will use a default instance of this object.
-        PKPluginConfigs pluginConfig = new PKPluginConfigs();
-
         //Create instance of the player.
-        player = PlayKitManager.loadPlayer(this, pluginConfig);
+        player = PlayKitManager.loadPlayer(this, null);
 
-        //Get the layout, where the player view will be placed.
-        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
-        //Add player view to the layout.
-        layout.addView(player.getView());
+        //Add player to the view hierarchy.
+        addPlayerToView();
+
+        //Add simple play/pause button.
+        addPlayPauseButton();
 
         //Init change media button which will switch between entries.
         initChangeMediaButton();
@@ -108,9 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
-
-        //Start playback.
-        player.play();
     }
 
     /**
@@ -125,9 +118,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
-
-        //Start playback.
-        player.play();
     }
 
     /**
@@ -242,5 +232,38 @@ public class MainActivity extends AppCompatActivity {
         mediaSources.add(mediaSource);
 
         return mediaSources;
+    }
+
+    /**
+     * Will add player to the view.
+     */
+    private void addPlayerToView() {
+        //Get the layout, where the player view will be placed.
+        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
+        //Add player view to the layout.
+        layout.addView(player.getView());
+    }
+
+    /**
+     * Just add a simple button which will start/pause playback.
+     */
+    private void addPlayPauseButton() {
+        //Get reference to the play/pause button.
+        playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
+        //Add clickListener.
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()) {
+                    //If player is playing, change text of the button and pause.
+                    playPauseButton.setText(R.string.play_text);
+                    player.pause();
+                } else {
+                    //If player is not playing, change text of the button and play.
+                    playPauseButton.setText(R.string.pause_text);
+                    player.play();
+                }
+            }
+        });
     }
 }

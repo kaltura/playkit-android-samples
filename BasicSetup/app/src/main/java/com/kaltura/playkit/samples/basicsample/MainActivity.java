@@ -2,6 +2,8 @@ package com.kaltura.playkit.samples.basicsample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.kaltura.playkit.PKMediaConfig;
@@ -26,13 +28,38 @@ public class MainActivity extends AppCompatActivity {
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
+    private Player player;
+    private PKMediaConfig mediaConfig;
+    private Button playPauseButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Initialize media config object.
+        createMediaConfig();
+
+        //Create instance of the player.
+        player = PlayKitManager.loadPlayer(this, null);
+
+        //Add player to the view hierarchy.
+        addPlayerToView();
+
+        //Add simple play/pause button.
+        addPlayPauseButton();
+
+        //Prepare player with media configuration.
+        player.prepare(mediaConfig);
+
+    }
+
+    /**
+     * Will create {@link PKMediaConfig} object.
+     */
+    private void createMediaConfig() {
         //First. Create PKMediaConfig object.
-        PKMediaConfig mediaConfig = new PKMediaConfig()
+        mediaConfig = new PKMediaConfig()
                 // You can configure the start position for it.
                 // by default it will be 0.
                 // If start position is grater then duration of the source it will be reset to 0.
@@ -43,20 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
-
-        //Create instance of the player.
-        Player player = PlayKitManager.loadPlayer(this, null);
-
-        //Get the layout, where the player view will be placed.
-        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
-        //Add player view to the layout.
-        layout.addView(player.getView());
-
-        //Prepare player with media configuration.
-        player.prepare(mediaConfig);
-
-        //Start playback.
-        player.play();
     }
 
     /**
@@ -114,5 +127,38 @@ public class MainActivity extends AppCompatActivity {
         mediaSources.add(mediaSource);
 
         return mediaSources;
+    }
+
+    /**
+     * Will add player to the view.
+     */
+    private void addPlayerToView() {
+        //Get the layout, where the player view will be placed.
+        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
+        //Add player view to the layout.
+        layout.addView(player.getView());
+    }
+
+    /**
+     * Just add a simple button which will start/pause playback.
+     */
+    private void addPlayPauseButton() {
+        //Get reference to the play/pause button.
+        playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
+        //Add clickListener.
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()) {
+                    //If player is playing, change text of the button and pause.
+                    playPauseButton.setText(R.string.play_text);
+                    player.pause();
+                } else {
+                    //If player is not playing, change text of the button and play.
+                    playPauseButton.setText(R.string.pause_text);
+                    player.play();
+                }
+            }
+        });
     }
 }

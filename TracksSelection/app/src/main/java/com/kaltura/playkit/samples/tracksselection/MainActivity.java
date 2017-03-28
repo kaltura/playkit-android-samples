@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
@@ -19,7 +20,6 @@ import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.TextTrack;
 import com.kaltura.playkit.player.VideoTrack;
-import com.kaltura.playkit.samples.basicpluginssetup.R;
 import com.kaltura.playkit.samples.tracksselection.tracks.TrackItem;
 import com.kaltura.playkit.samples.tracksselection.tracks.TrackItemAdapter;
 
@@ -37,8 +37,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
-    //Instance of the Player.
     private Player player;
+    private PKMediaConfig mediaConfig;
+    private Button playPauseButton;
 
     //Android Spinner view, that will actually hold and manipulate tracks selection.
     private Spinner videoSpinner, audioSpinner, textSpinner;
@@ -48,26 +49,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //First. Create PKMediaConfig object.
-        PKMediaConfig mediaConfig = new PKMediaConfig()
-                // You can configure the start position for it.
-                // by default it will be 0.
-                // If start position is grater then duration of the source it will be reset to 0.
-                .setStartPosition(START_POSITION);
-
-        //Second. Create PKMediaEntry object.
-        PKMediaEntry mediaEntry = createMediaEntry();
-
-        //Add it to the mediaConfig.
-        mediaConfig.setMediaEntry(mediaEntry);
+        //Initialize media config object.
+        createMediaConfig();
 
         //Create instance of the player.
         player = PlayKitManager.loadPlayer(this, null);
 
-        //Get the layout, where the player view will be placed.
-        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
-        //Add player view to the layout.
-        layout.addView(player.getView());
+        //Add player to the view hierarchy.
+        addPlayerToView();
+
+        //Add simple play/pause button.
+        addPlayPauseButton();
 
         //Initialize Android spinners view.
         initializeTrackSpinners();
@@ -78,8 +70,57 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
 
-        //Start playback.
-        player.play();
+    }
+
+    /**
+     * Will create {@link PKMediaConfig} object.
+     */
+    private void createMediaConfig() {
+        //First. Create PKMediaConfig object.
+        mediaConfig = new PKMediaConfig()
+                // You can configure the start position for it.
+                // by default it will be 0.
+                // If start position is grater then duration of the source it will be reset to 0.
+                .setStartPosition(START_POSITION);
+
+        //Second. Create PKMediaEntry object.
+        PKMediaEntry mediaEntry = createMediaEntry();
+
+        //Add it to the mediaConfig.
+        mediaConfig.setMediaEntry(mediaEntry);
+    }
+
+    /**
+     * Will add player to the view.
+     */
+    private void addPlayerToView() {
+        //Get the layout, where the player view will be placed.
+        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
+        //Add player view to the layout.
+        layout.addView(player.getView());
+    }
+
+    /**
+     * Just add a simple button which will start/pause playback.
+     */
+    private void addPlayPauseButton() {
+        //Get reference to the play/pause button.
+        playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
+        //Add clickListener.
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()) {
+                    //If player is playing, change text of the button and pause.
+                    playPauseButton.setText(R.string.play_text);
+                    player.pause();
+                } else {
+                    //If player is not playing, change text of the button and play.
+                    playPauseButton.setText(R.string.pause_text);
+                    player.play();
+                }
+            }
+        });
     }
 
     /**

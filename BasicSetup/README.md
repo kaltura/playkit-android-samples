@@ -8,7 +8,9 @@ For more info see [documentation](https://vpaas.kaltura.com/documentation/Mobile
 
 ## How to use
 
-
+1. Open BasicSetup project in Android Studio.
+2. Compile.
+3. See the result.
 
 ## License
 

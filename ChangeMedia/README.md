@@ -15,4 +15,4 @@ For more info see [documentation](https://vpaas.kaltura.com/documentation/Mobile
 
 ## License
 
-See [License and Copyright Information](https://github.com/kaltura/playkit-ios-samples#license-and-copyright-information)
+See [License and Copyright Information](https://github.com/kaltura/playkit-android-samples#license-and-copyright-information)

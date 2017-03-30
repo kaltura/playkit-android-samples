@@ -1,0 +1,15 @@
+# Basic Setup Sample
+
+## Purpose
+
+This PlayKit sample show how to create and setup PlayKit SDK player.
+
+For more info see [documentation](https://vpaas.kaltura.com/documentation/Mobile-Video-Player-SDKs/v3_Android_QuickStart.html)
+
+## How to use
+
+
+
+## License
+
+See [License and Copyright Information](https://github.com/kaltura/playkit-ios-samples#license-and-copyright-information)

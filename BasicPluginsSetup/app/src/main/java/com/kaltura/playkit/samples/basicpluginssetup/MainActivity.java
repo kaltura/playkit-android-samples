@@ -43,9 +43,6 @@ public class MainActivity extends AppCompatActivity {
         //Create plugin configurations.
         PKPluginConfigs pluginConfigs = createPluginConfigs();
 
-        //Register custom SamplePlugin to PlaykitManager.
-        PlayKitManager.registerPlugins(this, SamplePlugin.factory);
-
         //Create instance of the player with plugin configurations.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
 
@@ -75,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private PKPluginConfigs createPluginConfigs() {
+        //First register your SamplePlugin.
+        PlayKitManager.registerPlugins(this, SamplePlugin.factory);
+
         //Initialize plugin configuration object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
 

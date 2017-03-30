@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
@@ -116,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToPlayerEvents() {
 
-        //Add event listener. Note, taht it have two parameters.
+        //Add event listener. Note, that it have two parameters.
         // 1. PKEvent.Listener itself.
         // 2. Array of events you want to listen to.
         player.addEventListener(new PKEvent.Listener() {
@@ -140,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
                                                 //Player pause triggered.
                                                 case PAUSE:
                                                     Log.d(TAG, "event received: " + event.eventType().name());
-                                                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                                                     break;
 
                                                 //Tracks data is available.
@@ -153,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
                                                     //Then you can use the data object itself.
                                                     PKTracks tracks = tracksAvailable.getPKTracks();
-                                                    
+
                                                     //Print to log amount of video tracks that are available for this entry.
                                                     Log.d(TAG, "event received: " + event.eventType().name()
                                                             + ". Additional info: Available video tracks number: "

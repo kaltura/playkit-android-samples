@@ -9,8 +9,9 @@ For more info see [documentation](https://vpaas.kaltura.com/documentation/Mobile
 ## How to use
 
 1. Open KalturaLiveStats project in Android Studio.
-2. Compile.
-3. See logs for the result.
+2. Configure constant field, with your valid values.
+3. Compile.
+4. See logs for the result.
 
 ## License
 

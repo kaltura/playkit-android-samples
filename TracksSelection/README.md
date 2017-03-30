@@ -14,6 +14,7 @@ For more info see [documentation](https://vpaas.kaltura.com/documentation/Mobile
  * Video tracks.
  * Audio tracks
  * Text tracks.
+ 
 Selecting item from corresponding dropdown menu, will change the currently playing track.
 
 ## License

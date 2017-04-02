@@ -3,6 +3,7 @@ package com.kaltura.playkit.samples.offline;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private LocalAssetsManager localAssetsManager;
     private PKMediaEntry originMediaEntry = mediaEntry(ASSET_ID, ASSET_URL);
     private PKMediaSource originMediaSource = originMediaEntry.getSources().get(0);
+    private Handler mainHandler = new Handler(getMainLooper());
     
 
     private PKMediaEntry mediaEntry(String id, String url) {
@@ -131,6 +133,11 @@ public class MainActivity extends AppCompatActivity {
             public void onTracksAvailable(DownloadItem item, DownloadItem.TrackSelector trackSelector) {
                 Log.d(TAG, "tracks: " + item);
 
+                // Select lowest-resolution video
+                List<DownloadItem.Track> videoTracks = trackSelector.getAvailableTracks(DownloadItem.TrackType.VIDEO);
+                DownloadItem.Track minVideo = Collections.min(videoTracks, DownloadItem.Track.bitrateComparator);
+                trackSelector.setSelectedTracks(DownloadItem.TrackType.VIDEO, Collections.singletonList(minVideo));
+
             }
         });
         contentManager.start();
@@ -185,19 +192,29 @@ public class MainActivity extends AppCompatActivity {
     private void registerDownloadedAsset() {
         File localFile = contentManager.getLocalFile(ASSET_ID);
         localAssetsManager.registerAsset(originMediaSource, localFile.getAbsolutePath(), ASSET_ID, new LocalAssetsManager.AssetRegistrationListener() {
+            
             @Override
             public void onRegistered(String localAssetPath) {
-                Toast.makeText(context, "registered", Toast.LENGTH_LONG).show();
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "registered", Toast.LENGTH_LONG).show();
+                    }
+                });
             }
 
             @Override
             public void onFailed(String localAssetPath, Exception error) {
-                Toast.makeText(context, "failed", Toast.LENGTH_LONG).show();
-
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "failed", Toast.LENGTH_LONG).show();
+                    }
+                });
             }
         });
     }
-    
+
     private void removeDownload() {
         contentManager.removeItem(ASSET_ID);
     }

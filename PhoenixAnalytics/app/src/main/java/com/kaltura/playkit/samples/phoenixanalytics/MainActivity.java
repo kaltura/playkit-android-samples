@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.google.gson.JsonObject;
-import com.kaltura.playkit.MediaEntryProvider;
 import com.kaltura.playkit.OnCompletion;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
@@ -16,7 +15,6 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.backend.PrimitiveResult;
 import com.kaltura.playkit.backend.SessionProvider;
 import com.kaltura.playkit.backend.base.OnMediaLoadCompletion;
@@ -26,20 +24,23 @@ import com.kaltura.playkit.plugins.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.PhoenixAnalyticsPlugin;
 
 
-
-
 public class MainActivity extends AppCompatActivity {
 
     //Tag for logging.
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    public String baseUrl = "http://api-preprod.ott.kaltura.com/v4_2/api_v3/";
-    private PlayerEvent event;
-    private String fileId = "YOUR_FILE_ID";
-    private String partnerId = "YOUR_PARTNER_ID";
-    private String ks = "YOUR_KS";
-    private int timerInterval = 30;
+    //Phoenix analytics constants
+    private static final String PHOENIX_ANALYTICS_BASE_URL = "analytics_base_url";
+    private static final String PHOENIX_ANALYTICS_FILE_ID = "file_id";
+    private static final String PHOENIX_ANALYTICS_PARTNER_ID = "partner_id";
+    private static final String PHOENIX_ANALYTICS_KS = "ks";
+    private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
+    //Phoenix provider constans.
+    private static final String PHOENIX_PROVIDER_BASE_URL = "provider_base_url";
+    private static final String PHOENIX_PROVIDER_KS = "ks";
+    private static final int PHOENIX_PROVIDER_PARTNER_ID = 0;
+    private static final String ASSET_ID = "asset_id";
 
 
     private Player player;
@@ -52,10 +53,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        //Initialize PKPluginConfigs object with Youbora.
+        //Initialize PKPluginConfigs object with PhoenixAnalyticsPlugin.
         pluginConfigs = createPhoenixAnalyticsPlugin();
-        setPhoenixMediaProvider();
+
+        //Create instance of the player with specified pluginConfigs.
+        player = PlayKitManager.loadPlayer(this, pluginConfigs);
+
+        //Subscribe to analytics report event.
+        subscribePhoenixAnalyticsReportEvent();
+
+        //Add player to the view hierarchy.
+        addPlayerToView();
+
+        //Add simple play/pause button.
+        addPlayPauseButton();
+
+        //Initialize phoenix media provider.
+        createPhoenixMediaProvider();
 
     }
 
@@ -77,11 +91,12 @@ public class MainActivity extends AppCompatActivity {
         //PhoenixAnalyticsPlugin config json. Main config goes here.
         JsonObject phoenixPluginConfigJson = new JsonObject();
 
-        phoenixPluginConfigJson.addProperty("fileId", fileId);
-        phoenixPluginConfigJson.addProperty("baseUrl", baseUrl);
-        phoenixPluginConfigJson.addProperty("timerInterval", timerInterval);
-        phoenixPluginConfigJson.addProperty("ks", ks);
-        phoenixPluginConfigJson.addProperty("partnerId", partnerId);
+        //Set plugin properties.
+        phoenixPluginConfigJson.addProperty("fileId", PHOENIX_ANALYTICS_FILE_ID);
+        phoenixPluginConfigJson.addProperty("baseUrl", PHOENIX_ANALYTICS_BASE_URL);
+        phoenixPluginConfigJson.addProperty("timerInterval", ANALYTIC_TRIGGER_INTERVAL);
+        phoenixPluginConfigJson.addProperty("ks", PHOENIX_ANALYTICS_KS);
+        phoenixPluginConfigJson.addProperty("partnerId", PHOENIX_ANALYTICS_PARTNER_ID);
 
 
         //Set plugin entry to the plugin configs.
@@ -144,72 +159,91 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setPhoenixMediaProvider() {
+    /**
+     * Will create phoenix media provider, which will request for specified media entry.
+     */
+    private void createPhoenixMediaProvider() {
 
+        //Initialize provider.
+        PhoenixMediaProvider mediaProvider = new PhoenixMediaProvider();
 
-        SessionProvider sessionProvider = new SessionProvider() {
+        //Initialize session provider.
+        SessionProvider sessionProvider = createSessionProvider();
+
+        //Set entry id for the session provider.
+        mediaProvider.setAssetId(ASSET_ID);
+
+        //Set session provider to media provider.
+        mediaProvider.setSessionProvider(sessionProvider);
+
+        //Load media from media provider.
+        mediaProvider.load(new OnMediaLoadCompletion() {
+            @Override
+            public void onComplete(ResultElement<PKMediaEntry> response) {
+                //When response received, check if it was successful.
+                if (response.isSuccess()) {
+                    //If so, prepare player with received PKMediaEntry.
+                    preparePlayer(response.getResponse());
+                } else {
+                    //If response was not successful print it to console with error message.
+                    String error = "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : "");
+                    Log.e(TAG, error);
+                }
+            }
+        });
+
+    }
+
+    /**
+     * Will create {@link SessionProvider}.
+     *
+     * @return - {@link SessionProvider}
+     */
+    private SessionProvider createSessionProvider() {
+        return new SessionProvider() {
             @Override
             public String baseUrl() {
-                return baseUrl;
+                return PHOENIX_PROVIDER_BASE_URL;
             }
 
             @Override
             public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
-                completion.onComplete(new PrimitiveResult(ks));
+                completion.onComplete(new PrimitiveResult(PHOENIX_PROVIDER_KS));
             }
 
             @Override
             public int partnerId() {
-                return 198;
+                return PHOENIX_PROVIDER_PARTNER_ID;
             }
         };
-
-
-        String assetId = "485384";
-        String referenceType = "media";
-       // List<String> format = new ArrayList<>(converterPhoenixMediaProvider.getFormats());
-       // String[] formatVarargs = {"Mobile_Devices_Main_SD"};
-
-        MediaEntryProvider phoenixMediaProvider = new PhoenixMediaProvider().setSessionProvider(sessionProvider).setAssetId(assetId);
-
-        loadMediaProvider(phoenixMediaProvider);
-
     }
 
-    private void loadMediaProvider(MediaEntryProvider mediaEntryProvider) {
-
-        mediaEntryProvider.load(new OnMediaLoadCompletion() {
-
+    /**
+     * Prepare player and start playback.
+     *
+     * @param mediaEntry - media entry we received from media provider.
+     */
+    private void preparePlayer(final PKMediaEntry mediaEntry) {
+        //The preparePlayer is called from another thread. So first be shure
+        //that we are running on ui thread.
+        runOnUiThread(new Runnable() {
             @Override
-            public void onComplete(final ResultElement<PKMediaEntry> response) {
+            public void run() {
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        if (response.isSuccess()) {
-                            PKMediaEntry mediaEntry = response.getResponse();
-                            mediaConfig = new PKMediaConfig();
-                            //Add it to the mediaConfig.
-                            mediaConfig.setMediaEntry(mediaEntry);
-                            //Create instance of the player with specified pluginConfigs.
-                            player = PlayKitManager.loadPlayer(getApplicationContext(), pluginConfigs);
-
-                            //Subscribe to analytics report event.
-                            subscribePhoenixAnalyticsReportEvent();
-
-                            //Add player to the view hierarchy.
-                            addPlayerToView();
-
-                            //Add simple play/pause button.
-                            addPlayPauseButton();
-
-                            //Prepare player with media config.
-                            player.prepare(mediaConfig);
-                        }
-                    }
-                });
+                //Initialize media config object.
+                createMediaConfig(mediaEntry);
             }
         });
+    }
+
+    private void createMediaConfig(final PKMediaEntry mediaEntry) {
+        //Initialize empty mediaConfig object.
+        mediaConfig = new PKMediaConfig();
+
+        //Set media entry we received from provider.
+        mediaConfig.setMediaEntry(mediaEntry);
+
+        //Prepare player with media configurations.
+        player.prepare(mediaConfig);
     }
 }

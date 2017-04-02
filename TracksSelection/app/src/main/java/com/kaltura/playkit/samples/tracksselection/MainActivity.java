@@ -29,7 +29,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private static final int START_POSITION = 60; // one minute.
 
     //The url of the source to play
     private static final String SOURCE_URL = "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
@@ -77,11 +76,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      */
     private void createMediaConfig() {
         //First. Create PKMediaConfig object.
-        mediaConfig = new PKMediaConfig()
-                // You can configure the start position for it.
-                // by default it will be 0.
-                // If start position is grater then duration of the source it will be reset to 0.
-                .setStartPosition(START_POSITION);
+        mediaConfig = new PKMediaConfig();
 
         //Second. Create PKMediaEntry object.
         PKMediaEntry mediaEntry = createMediaEntry();

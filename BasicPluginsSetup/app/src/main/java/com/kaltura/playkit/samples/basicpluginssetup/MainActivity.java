@@ -1,21 +1,12 @@
 package com.kaltura.playkit.samples.basicpluginssetup;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.google.gson.JsonObject;
-import com.kaltura.playkit.PKEvent;
-import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -23,165 +14,81 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.player.PKTracks;
-import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.samples.basicpluginssetup.plugins.SamplePlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kaltura.playkit.PlayerEvent.Type.CAN_PLAY;
-import static com.kaltura.playkit.PlayerEvent.Type.ENDED;
-import static com.kaltura.playkit.PlayerEvent.Type.ERROR;
-import static com.kaltura.playkit.PlayerEvent.Type.PAUSE;
-import static com.kaltura.playkit.PlayerEvent.Type.PLAY;
-import static com.kaltura.playkit.PlayerEvent.Type.PLAYING;
-import static com.kaltura.playkit.PlayerEvent.Type.SEEKED;
-import static com.kaltura.playkit.PlayerEvent.Type.SEEKING;
-import static com.kaltura.playkit.PlayerEvent.Type.TRACKS_AVAILABLE;
-
-
 
 public class MainActivity extends AppCompatActivity {
-    private static final PKLog log = PKLog.get("BasicPluginSetup");
-
-    private static final int START_POSITION = 0;
 
     //The url of the source to play
     private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
-    private static final String STATS_KALTURA_COM = "https://stats.kaltura.com/api_v3/index.php";
-    public static final String ANALYTIC_TRIGGER_INTERVAL = "30"; // in seconds
 
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     private Player player;
-    private AdEvent.AdStartedEvent adStartedEventInfo;
+    private PKMediaConfig mediaConfig;
+    private Button playPauseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        PlayKitManager.registerPlugins(this, SamplePlugin.factory);
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showMenu();
-            }
-        });
+        //Initialize media config object.
+        createMediaConfig();
+
+        //Create plugin configurations.
+        PKPluginConfigs pluginConfigs = createPluginConfigs();
+
+        //Create instance of the player with plugin configurations.
+        player = PlayKitManager.loadPlayer(this, pluginConfigs);
+
+        //Add player to the view hierarchy.
+        addPlayerToView();
+
+        //Add simple play/pause button.
+        addPlayPauseButton();
+
+        //Prepare player with media configuration.
+        player.prepare(mediaConfig);
     }
 
-    @Override
-    protected void onPause() {
-        if (player != null) {
-            player.pause();
-            player.onApplicationPaused();
-        }
-        super.onPause();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (player != null) {
-            player.onApplicationResumed();
-            player.play();
-        }
-    }
-
-    void showMenu() {
-        final Context context = this;
-        new AlertDialog.Builder(context)
-                .setItems(new String[]{"Play", "Pause"}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Toast.makeText(context, "Selected " + which, Toast.LENGTH_SHORT).show();
-                        if (which == 0) {
-                            playDemoVideo();
-                        } else if (which == 1) {
-                            pauseDemoVideo();
-                        }
-                    }
-                })
-                .show();
-    }
-
-    private void pauseDemoVideo() {
-        if (player != null) {
-            player.pause();
-        }
-    }
-
-    private void playDemoVideo() {
-        if (player != null) {
-            player.play();
-            return;
-        }
-
-
-
+    /**
+     * Will create {@link PKMediaConfig} object.
+     */
+    private void createMediaConfig() {
         //First. Create PKMediaConfig object.
-        PKMediaConfig mediaConfig = new PKMediaConfig()
-                // You can configure the start position for it.
-                // by default it will be 0.
-                // If start position is grater then duration of the source it will be reset to 0.
-                .setStartPosition(START_POSITION);
+        mediaConfig = new PKMediaConfig();
 
         //Second. Create PKMediaEntry object.
         PKMediaEntry mediaEntry = createMediaEntry();
 
-
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
-
-
-        PKPluginConfigs pluginConfig = new PKPluginConfigs();
-        configureSamplePlugin(pluginConfig);
-
-        //Create instance of the player.
-        player = PlayKitManager.loadPlayer(this, pluginConfig);
-
-        //Get the layout, where the player view will be placed.
-        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
-        //Add player view to the layout.
-        layout.addView(player.getView());
-
-        //Prepare player with media configuration.
-        player.prepare(mediaConfig);
-
-        //Start playback.
-        player.play();
-
     }
 
+    private PKPluginConfigs createPluginConfigs() {
+        //First register your SamplePlugin.
+        PlayKitManager.registerPlugins(this, SamplePlugin.factory);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
+        //Initialize plugin configuration object.
+        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        //Initialize jsonObject which will hold custom parameters for plugin.
+        JsonObject jsonObject = new JsonObject();
+        //Add custom values.
+        jsonObject.addProperty("value1", 1200);
+        jsonObject.addProperty("value2", true);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        //Set jsonObject to the main pluginConfigs object.
+        pluginConfigs.setPluginConfig(SamplePlugin.factory.getName(), jsonObject);
 
-        return super.onOptionsItemSelected(item);
+        //Return created and populated object.
+        return pluginConfigs;
     }
 
     /**
@@ -241,94 +148,36 @@ public class MainActivity extends AppCompatActivity {
         return mediaSources;
     }
 
-    protected void setPlayerListeners() {
-        player.addStateChangeListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
+    /**
+     * Will add player to the view.
+     */
+    private void addPlayerToView() {
+        //Get the layout, where the player view will be placed.
+        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
+        //Add player view to the layout.
+        layout.addView(player.getView());
+    }
 
-                PlayerEvent.StateChanged stateChanged = (PlayerEvent.StateChanged) event;
-                log.v("addStateChangeListener " + event.eventType() + " = " + stateChanged.newState);
-                switch (stateChanged.newState) {
-                    case IDLE:
-                        log.d("StateChange Idle");
-                        break;
-                    case LOADING:
-                        log.d("StateChange Loading");
-                        break;
-                    case READY:
-                        log.d("StateChange Ready");
-                        break;
-                    case BUFFERING:
-                        log.d("StateChange Buffering");
-                        break;
+    /**
+     * Just add a simple button which will start/pause playback.
+     */
+    private void addPlayPauseButton() {
+        //Get reference to the play/pause button.
+        playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
+        //Add clickListener.
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()) {
+                    //If player is playing, change text of the button and pause.
+                    playPauseButton.setText(R.string.play_text);
+                    player.pause();
+                } else {
+                    //If player is not playing, change text of the button and play.
+                    playPauseButton.setText(R.string.pause_text);
+                    player.play();
                 }
             }
         });
-
-        player.addEventListener(new PKEvent.Listener() {
-
-                                    @Override
-                                    public void onEvent(PKEvent event) {
-                                        log.d("addEventListener " + event.eventType());
-                                        log.d("Player Total duration => " + player.getDuration());
-                                        log.d("Player Current duration => " + player.getCurrentPosition());
-
-
-                                        Enum receivedEventType = event.eventType();
-                                        if (event instanceof PlayerEvent) {
-                                            switch (((PlayerEvent) event).type) {
-                                                case CAN_PLAY:
-                                                    log.d("Received " + CAN_PLAY.name());
-                                                    break;
-                                                case PLAY:
-                                                    log.d("Received " + PLAY.name());
-                                                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                                    break;
-                                                case PLAYING:
-                                                    log.d("Received " + PLAYING.name());
-                                                    break;
-                                                case PAUSE:
-                                                    log.v("Received " + PAUSE.name());
-                                                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                                    break;
-                                                case SEEKING:
-                                                    log.d("Received " + SEEKING.name());
-                                                    break;
-                                                case SEEKED:
-                                                    log.d("Received " + SEEKED.name());
-                                                    break;
-                                                case ENDED:
-                                                    log.d("Received " + ENDED.name());
-                                                    break;
-                                                case TRACKS_AVAILABLE:
-                                                    PKTracks tracks = ((PlayerEvent.TracksAvailable) event).getPKTracks();
-                                                    log.d("Received " + TRACKS_AVAILABLE.name());
-                                                    break;
-                                                case ERROR:
-                                                    log.d("Received " + ERROR.name());
-                                                    PlayerEvent.ExceptionInfo exceptionInfo = (PlayerEvent.ExceptionInfo) event;
-                                                    String errorMsg = "Player error occurred.";
-                                                    if (exceptionInfo != null && exceptionInfo.getException() != null && exceptionInfo.getException().getMessage() != null) {
-                                                        errorMsg = exceptionInfo.getException().getMessage();
-                                                    }
-                                                    log.e("Player Error: " + errorMsg);
-
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                },
-                PlayerEvent.Type.PLAY, PlayerEvent.Type.PLAYING,
-                PlayerEvent.Type.PAUSE, PlayerEvent.Type.CAN_PLAY,
-                PlayerEvent.Type.SEEKING, PlayerEvent.Type.SEEKED,
-                PlayerEvent.Type.ENDED, PlayerEvent.Type.TRACKS_AVAILABLE,
-                PlayerEvent.Type.ERROR);
-    }
-
-    private void configureSamplePlugin(PKPluginConfigs pluginConfig) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("value1", 1200);
-        jsonObject.addProperty("value2", true);
-        pluginConfig.setPluginConfig(SamplePlugin.factory.getName(), jsonObject);
     }
 }

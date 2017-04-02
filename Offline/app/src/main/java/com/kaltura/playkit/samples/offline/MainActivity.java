@@ -17,6 +17,7 @@ import com.kaltura.dtg.ContentManager;
 import com.kaltura.dtg.DownloadItem;
 import com.kaltura.dtg.DownloadStateListener;
 import com.kaltura.playkit.LocalAssetsManager;
+import com.kaltura.playkit.PKDrmParams;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
@@ -25,6 +26,7 @@ import com.kaltura.playkit.Player;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -33,22 +35,31 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "Main";
     private static final String ASSET_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
     private static final String ASSET_ID = "asset1";
+    private static final String ASSET_LICENSE_URL = null;
+    
     final private Context context = this;   // for ease of use in inner classes
     private Player player;
     private ContentManager contentManager;
     private LocalAssetsManager localAssetsManager;
-    private PKMediaEntry originMediaEntry = mediaEntry(ASSET_ID, ASSET_URL);
+    private PKMediaEntry originMediaEntry = mediaEntry(ASSET_ID, ASSET_URL, ASSET_LICENSE_URL);
     private PKMediaSource originMediaSource = originMediaEntry.getSources().get(0);
     private Handler mainHandler = new Handler(getMainLooper());
-    
 
-    private PKMediaEntry mediaEntry(String id, String url) {
-        return new PKMediaEntry().setId(id)
-                .setSources(Collections.singletonList(
-                        new PKMediaSource()
-                                .setId(id)
-                                .setUrl(url)
-                ));
+
+    private PKMediaEntry mediaEntry(String id, String url, String licenseUrl) {
+
+        PKMediaSource source = new PKMediaSource()
+                .setId(id)
+                .setUrl(url);
+
+        if (licenseUrl != null) {
+            source.setDrmData(Collections.singletonList(
+                    new PKDrmParams(licenseUrl, PKDrmParams.Scheme.WidevineCENC)));
+        }
+
+        return new PKMediaEntry()
+                .setId(id)
+                .setSources(Collections.singletonList(source));
     }
 
     @Override

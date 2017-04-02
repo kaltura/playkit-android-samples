@@ -1,20 +1,14 @@
 package com.kaltura.playkit.samples.imasample;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKEvent;
-import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -22,166 +16,201 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.plugins.ads.AdError;
 import com.kaltura.playkit.plugins.ads.AdEvent;
+import com.kaltura.playkit.plugins.ads.AdInfo;
 import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kaltura.playkit.PlayerEvent.Type.CAN_PLAY;
-import static com.kaltura.playkit.PlayerEvent.Type.ENDED;
-import static com.kaltura.playkit.PlayerEvent.Type.ERROR;
-import static com.kaltura.playkit.PlayerEvent.Type.PAUSE;
-import static com.kaltura.playkit.PlayerEvent.Type.PLAY;
-import static com.kaltura.playkit.PlayerEvent.Type.PLAYING;
-import static com.kaltura.playkit.PlayerEvent.Type.SEEKED;
-import static com.kaltura.playkit.PlayerEvent.Type.SEEKING;
-import static com.kaltura.playkit.PlayerEvent.Type.TRACKS_AVAILABLE;
-
 
 public class MainActivity extends AppCompatActivity {
-    private static final PKLog log = PKLog.get("IMASample");
 
-    private static final int START_POSITION = 0;
+    //Tag for logging.
+    private static final String TAG = MainActivity.class.getSimpleName();
 
-    //The url of the source to play
+    //Media entry configuration constants.
     private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
-    private static final String AD_TAG_URL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-    private static final int PREFFERED_AD_BITRATE = 600;
-
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
+    //Ad configuration constants.
+    private static final String AD_TAG_URL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+    private static final String INCORRECT_AD_TAG_URL = "incorrect_ad_tag_url";
+    private static final int PREFERRED_AD_BITRATE = 600;
+
     private Player player;
-    private AdEvent.AdStartedEvent adStartedEventInfo;
+    private PKMediaConfig mediaConfig;
+    private Button playPauseButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showMenu();
-            }
-        });
-    }
+        //Initialize media config object.
+        createMediaConfig();
 
-    @Override
-    protected void onPause() {
-        if (player != null) {
-            player.pause();
-            player.onApplicationPaused();
-        }
-        super.onPause();
-    }
+        //Create plugin configurations.
+        PKPluginConfigs pluginConfigs = createIMAPlugin();
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (player != null) {
-            player.onApplicationResumed();
-            player.play();
-        }
-    }
+        //Create instance of the player with plugin configurations.
+        player = PlayKitManager.loadPlayer(this, pluginConfigs);
 
-    void showMenu() {
-        final Context context = this;
-        new AlertDialog.Builder(context)
-                .setItems(new String[]{"Play", "Pause"}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Toast.makeText(context, "Selected " + which, Toast.LENGTH_SHORT).show();
-                        if (which == 0) {
-                            playDemoVideo();
-                        } else if (which == 1) {
-                            pauseDemoVideo();
-                        }
-                    }
-                })
-                .show();
-    }
+        //Subscribe to the ad events.
+        subscribeToAdEvents();
 
-    private void pauseDemoVideo() {
-        if (player != null) {
-            player.pause();
-        }
-    }
+        //Subscribe to the ad error events.
+        subscribeToAdErrorEvents();
 
-    private void playDemoVideo() {
-        if (player != null) {
-            player.play();
-            return;
-        }
+        //Add player to the view hierarchy.
+        addPlayerToView();
 
-
-
-        //First. Create PKMediaConfig object.
-        PKMediaConfig mediaConfig = new PKMediaConfig()
-                // You can configure the start position for it.
-                // by default it will be 0.
-                // If start position is grater then duration of the source it will be reset to 0.
-                .setStartPosition(START_POSITION);
-
-        //Second. Create PKMediaEntry object.
-        PKMediaEntry mediaEntry = createMediaEntry();
-
-
-        //Add it to the mediaConfig.
-        mediaConfig.setMediaEntry(mediaEntry);
-
-
-        PKPluginConfigs pluginConfig = new PKPluginConfigs();
-        configureIMAPlugin(pluginConfig);
-
-
-        //Create instance of the player.
-        player = PlayKitManager.loadPlayer(this, pluginConfig);
-
-        //Get the layout, where the player view will be placed.
-        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
-        //Add player view to the layout.
-        layout.addView(player.getView());
+        //Add simple play/pause button.
+        addPlayPauseButton();
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
 
-        //Start playback.
-        player.play();
+    }
 
+    /**
+     * Create IMAPlugin object.
+     *
+     * @return - {@link PKPluginConfigs} object with IMAPlugin.
+     */
+    private PKPluginConfigs createIMAPlugin() {
+
+        //First register your IMAPlugin.
+        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+
+        //Initialize plugin configuration object.
+        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+
+        //Initialize imaConfigs object.
+        IMAConfig imaConfigs = new IMAConfig();
+
+        //Configure ima.
+        imaConfigs.setAdTagURL(AD_TAG_URL);
+        imaConfigs.setVideoBitrate(PREFERRED_AD_BITRATE);
+
+        //Convert imaConfigs to jsonObject.
+        JsonObject imaConfigJsonObject = imaConfigs.toJSONObject();
+
+        //Set jsonObject to the main pluginConfigs object.
+        pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfigJsonObject);
+
+        //Return created PluginConfigs object.
+        return pluginConfigs;
+    }
+
+    /**
+     * Will subscribe to ad events.
+     * For simplicity, in this example we will show subscription to the couple of events.
+     * For the full list of ad events you can check our documentation.
+     * !!!Note, we will receive only ad events, we subscribed to.
+     */
+    private void subscribeToAdEvents() {
+        // Add ad event listener. Note, that it have two parameters.
+        // 1. PKEvent.Listener itself.
+        // 2. Array of ad events you want to listen to.
+        player.addEventListener(new PKEvent.Listener() {
+                                    @Override
+                                    public void onEvent(PKEvent event) {
+
+                                        //First check if event is instance of the AdEvent.
+                                        if (event instanceof AdEvent) {
+
+                                            //Switch on the received events.
+                                            switch (((AdEvent) event).type) {
+
+                                                //Ad started event triggered.
+                                                case STARTED:
+                                                    //Some events holds additional data objects in them.
+                                                    //In order to get access to this object you need first cast event to
+                                                    //the object it belongs to. You can learn more about this kind of objects in
+                                                    //our documentation.
+                                                    AdEvent.AdStartedEvent adStartedEvent = (AdEvent.AdStartedEvent) event;
+
+                                                    //Then you can use the data object itself.
+                                                    AdInfo adInfo = adStartedEvent.adInfo;
+
+                                                    //Print to log content type of this ad.
+                                                    Log.d(TAG, "ad event received: " + event.eventType().name()
+                                                            + ". Additional info: ad content type is: "
+                                                            + adInfo.getAdContentType());
+                                                    break;
+
+                                                //Ad skipped triggered.
+                                                case SKIPPED:
+                                                    Log.d(TAG, "ad event received: " + event.eventType().name());
+                                                    break;
+                                                //Ad completed triggered.
+                                                case COMPLETED:
+                                                    Log.d(TAG, "ad event received: " + event.eventType().name());
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                },
+                //Subscribe to the ad events you are interested in.
+                AdEvent.Type.STARTED,
+                AdEvent.Type.SKIPPED,
+                AdEvent.Type.COMPLETED
+        );
+    }
+
+    /**
+     * Will subscribe to AddError events. In order to reproduce error, you can change
+     * the adTagUrl in createIMAPlugin() method from AD_TAG_URL to INCORRECT_AD_TAG_URL.
+     * (line 96 imaConfigs.setAdTagURL(AD_TAG_URL))
+     * This will produce ADS_REQUEST_NETWORK_ERROR, which can be seen in the following example.
+     * For simplicity, in this example we will show subscription to the one event.
+     * For the full list of ad error events you can check our documentation.
+     * !!!Note, we will receive only ad error events, we subscribed to.
+     */
+    private void subscribeToAdErrorEvents() {
+        //Add ad error event listener. Note, that it have two parameters.
+        // 1. PKEvent.Listener itself.
+        // 2. Array of ad error events you want to listen to.
+        player.addEventListener(new PKEvent.Listener() {
+                                    @Override
+                                    public void onEvent(PKEvent event) {
+
+                                        //First check if event is instance of the AdError.
+                                        if (event instanceof AdError) {
+
+                                            //Switch on the received events.
+                                            switch (((AdError) event).errorType) {
+
+                                                //Ads request network error triggered.
+                                                case ADS_REQUEST_NETWORK_ERROR:
+                                                    Log.d(TAG, "ad error event received: " + event.eventType().name());
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                },
+                //Subscribe to the ad error events you are interested in.
+                AdError.Type.ADS_REQUEST_NETWORK_ERROR);
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    /**
+     * Will create {@link PKMediaConfig} object.
+     */
+    private void createMediaConfig() {
+        //First. Create PKMediaConfig object.
+        mediaConfig = new PKMediaConfig();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        //Second. Create PKMediaEntry object.
+        PKMediaEntry mediaEntry = createMediaEntry();
 
-        return super.onOptionsItemSelected(item);
+        //Add it to the mediaConfig.
+        mediaConfig.setMediaEntry(mediaEntry);
     }
 
     /**
@@ -241,184 +270,38 @@ public class MainActivity extends AppCompatActivity {
         return mediaSources;
     }
 
-    protected void setPlayerListeners() {
-        player.addStateChangeListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
+    /**
+     * Will add player to the view.
+     */
+    private void addPlayerToView() {
+        //Get the layout, where the player view will be placed.
+        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
+        //Add player view to the layout.
+        layout.addView(player.getView());
+    }
 
-                PlayerEvent.StateChanged stateChanged = (PlayerEvent.StateChanged) event;
-                log.v("addStateChangeListener " + event.eventType() + " = " + stateChanged.newState);
-                switch (stateChanged.newState) {
-                    case IDLE:
-                        log.d("StateChange Idle");
-                        break;
-                    case LOADING:
-                        log.d("StateChange Loading");
-                        break;
-                    case READY:
-                        log.d("StateChange Ready");
-                        break;
-                    case BUFFERING:
-                        log.d("StateChange Buffering");
-                        break;
+    /**
+     * Just add a simple button which will start/pause playback.
+     */
+    private void addPlayPauseButton() {
+        //Get reference to the play/pause button.
+        playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
+        //Add clickListener.
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()) {
+                    //If player is playing, change text of the button and pause.
+                    playPauseButton.setText(R.string.play_text);
+                    player.pause();
+                } else {
+                    //If player is not playing, change text of the button and play.
+                    playPauseButton.setText(R.string.pause_text);
+                    player.play();
                 }
             }
         });
-
-        player.addEventListener(new PKEvent.Listener() {
-
-                                    @Override
-                                    public void onEvent(PKEvent event) {
-                                        log.d("addEventListener " + event.eventType());
-                                        log.d("Player Total duration => " + player.getDuration());
-                                        log.d("Player Current duration => " + player.getCurrentPosition());
-
-
-                                        Enum receivedEventType = event.eventType();
-                                        if (event instanceof PlayerEvent) {
-                                            switch (((PlayerEvent) event).type) {
-                                                case CAN_PLAY:
-                                                    log.d("Received " + CAN_PLAY.name());
-                                                    break;
-                                                case PLAY:
-                                                    log.d("Received " + PLAY.name());
-                                                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                                    break;
-                                                case PLAYING:
-                                                    log.d("Received " + PLAYING.name());
-                                                    break;
-                                                case PAUSE:
-                                                    log.v("Received " + PAUSE.name());
-                                                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                                    break;
-                                                case SEEKING:
-                                                    log.d("Received " + SEEKING.name());
-                                                    break;
-                                                case SEEKED:
-                                                    log.d("Received " + SEEKED.name());
-                                                    break;
-                                                case ENDED:
-                                                    log.d("Received " + ENDED.name());
-                                                    break;
-                                                case TRACKS_AVAILABLE:
-                                                    PKTracks tracks = ((PlayerEvent.TracksAvailable) event).getPKTracks();
-                                                    log.d("Received " + TRACKS_AVAILABLE.name());
-                                                    break;
-                                                case ERROR:
-                                                    log.d("Received " + ERROR.name());
-                                                    PlayerEvent.ExceptionInfo exceptionInfo = (PlayerEvent.ExceptionInfo) event;
-                                                    String errorMsg = "Player error occurred.";
-                                                    if (exceptionInfo != null && exceptionInfo.getException() != null && exceptionInfo.getException().getMessage() != null) {
-                                                        errorMsg = exceptionInfo.getException().getMessage();
-                                                    }
-                                                    log.e("Player Error: " + errorMsg);
-
-                                                    break;
-                                            }
-                                        } else if (event instanceof AdEvent) {
-                                            switch (((AdEvent) event).type) {
-                                                case LOADED:
-                                                    log.d("Received " + AdEvent.Type.LOADED.name());
-                                                    break;
-                                                case CUEPOINTS_CHANGED:
-                                                    log.d("Received " + AdEvent.Type.CUEPOINTS_CHANGED.name());
-                                                    break;
-                                                case ALL_ADS_COMPLETED:
-                                                    log.v("Received " + AdEvent.Type.ALL_ADS_COMPLETED.name());
-                                                    break;
-                                                case AD_BREAK_IGNORED:
-                                                    log.d("Received " + AdEvent.Type.AD_BREAK_IGNORED.name());
-                                                    player.play();
-                                                    break;
-                                                case CONTENT_PAUSE_REQUESTED:
-                                                    log.d("Received " + AdEvent.Type.CONTENT_PAUSE_REQUESTED.name());
-                                                    break;
-                                                // case AD_DISPLAYED_AFTER_CONTENT_PAUSE:
-                                                //     log.v("Received " + AdEvent.Type.AD_DISPLAYED_AFTER_CONTENT_PAUSE.name());
-                                                //     break;
-                                                case CONTENT_RESUME_REQUESTED:
-                                                    log.v("Received " + AdEvent.Type.CONTENT_RESUME_REQUESTED.name());
-                                                    break;
-                                                case STARTED:
-                                                    log.v("Received " + AdEvent.Type.STARTED.name());
-                                                    adStartedEventInfo = (AdEvent.AdStartedEvent) event;
-                                                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-                                                    break;
-                                                case PAUSED:
-                                                    log.d("Received " + AdEvent.Type.PAUSED.name());
-                                                    break;
-                                                case TAPPED:
-                                                    break;
-                                                case COMPLETED:
-                                                    log.d("Received " + AdEvent.Type.COMPLETED.name());
-                                                    break;
-                                                case SKIPPED:
-                                                    log.d("Received " + AdEvent.Type.SKIPPED.name());
-                                                    break;
-                                                case CLICKED:
-                                                    log.d("Received " + AdEvent.Type.CLICKED.name());
-                                                    break;
-                                            }
-                                        } else if (event instanceof AdError) {
-                                            switch (((AdError) event).errorType) {
-                                                case ADS_REQUEST_NETWORK_ERROR:
-                                                case INTERNAL_ERROR:
-                                                case VAST_MALFORMED_RESPONSE:
-                                                case UNKNOWN_AD_RESPONSE:
-                                                case VAST_LOAD_TIMEOUT:
-                                                case VAST_TOO_MANY_REDIRECTS:
-                                                case VIDEO_PLAY_ERROR:
-                                                case VAST_MEDIA_LOAD_TIMEOUT:
-                                                case VAST_LINEAR_ASSET_MISMATCH:
-                                                case OVERLAY_AD_PLAYING_FAILED:
-                                                case OVERLAY_AD_LOADING_FAILED:
-                                                case VAST_NONLINEAR_ASSET_MISMATCH:
-                                                case COMPANION_AD_LOADING_FAILED:
-                                                case UNKNOWN_ERROR:
-                                                case VAST_EMPTY_RESPONSE:
-                                                case FAILED_TO_REQUEST_ADS:
-                                                case VAST_ASSET_NOT_FOUND:
-                                                case INVALID_ARGUMENTS:
-                                                case QUIET_LOG_ERROR:
-                                                case PLAYLIST_NO_CONTENT_TRACKING:
-                                                    log.e("Player Error: Play Called");
-                                                    player.play();
-                                                    break;
-                                            }
-                                        }
-                                    }
-
-                                },
-                PlayerEvent.Type.PLAY, PLAYING,
-                PlayerEvent.Type.PAUSE, CAN_PLAY,
-                PlayerEvent.Type.SEEKING, PlayerEvent.Type.SEEKED,
-                PlayerEvent.Type.ENDED, PlayerEvent.Type.TRACKS_AVAILABLE,
-                PlayerEvent.Type.ERROR,
-
-                AdEvent.Type.LOADED, AdEvent.Type.SKIPPED,
-                AdEvent.Type.TAPPED, AdEvent.Type.CONTENT_PAUSE_REQUESTED,
-                AdEvent.Type.CONTENT_RESUME_REQUESTED, AdEvent.Type.STARTED,
-                AdEvent.Type.PAUSED, AdEvent.Type.RESUMED,
-                AdEvent.Type.COMPLETED, AdEvent.Type.ALL_ADS_COMPLETED,
-                AdEvent.Type.CUEPOINTS_CHANGED, AdEvent.Type.CLICKED,
-                AdEvent.Type.AD_BREAK_IGNORED, //AdEvent.Type.AD_DISPLAYED_AFTER_CONTENT_PAUSE,
-
-                AdError.Type.VAST_EMPTY_RESPONSE, AdError.Type.COMPANION_AD_LOADING_FAILED,
-                AdError.Type.FAILED_TO_REQUEST_ADS, AdError.Type.INTERNAL_ERROR, AdError.Type.OVERLAY_AD_LOADING_FAILED,
-                AdError.Type.PLAYLIST_NO_CONTENT_TRACKING, AdError.Type.UNKNOWN_ERROR,
-                AdError.Type.VAST_LINEAR_ASSET_MISMATCH, AdError.Type.VAST_MALFORMED_RESPONSE,
-                AdError.Type.QUIET_LOG_ERROR, AdError.Type.VAST_LOAD_TIMEOUT,
-                AdError.Type.ADS_REQUEST_NETWORK_ERROR, AdError.Type.INVALID_ARGUMENTS,
-                AdError.Type.VAST_TOO_MANY_REDIRECTS);
     }
-
-    private void configureIMAPlugin(PKPluginConfigs pluginConfig) {
-        //set the adTagURL, set the IMA to select mime type automaticaly, set the MAX bitrate of selected ad
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(AD_TAG_URL).setVideoMimeTypes(new ArrayList<String>()).setVideoBitrate(PREFFERED_AD_BITRATE);
-        pluginConfig.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
-    }
-
-
 
 
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -18,11 +19,11 @@ import com.kaltura.dtg.DownloadItem;
 import com.kaltura.dtg.DownloadStateListener;
 import com.kaltura.playkit.LocalAssetsManager;
 import com.kaltura.playkit.PKDrmParams;
-import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.PlayerConfig;
 
 import java.io.File;
 import java.util.Collections;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private LocalAssetsManager localAssetsManager;
     private PKMediaEntry originMediaEntry = mediaEntry(ASSET_ID, ASSET_URL, ASSET_LICENSE_URL);
     private PKMediaSource originMediaSource = originMediaEntry.getSources().get(0);
-    private Handler mainHandler = new Handler(getMainLooper());
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
 
     private PKMediaEntry mediaEntry(String id, String url, String licenseUrl) {
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (licenseUrl != null) {
             source.setDrmData(Collections.singletonList(
-                    new PKDrmParams(licenseUrl, PKDrmParams.Scheme.WidevineCENC)));
+                    new PKDrmParams(licenseUrl, PKDrmParams.Scheme.widevine_cenc)));
         }
 
         return new PKMediaEntry()
@@ -87,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         
         if (player == null) {
             //Create instance of the player.
-            player = PlayKitManager.loadPlayer(this, null);
+            player = PlayKitManager.loadPlayer(new PlayerConfig(), this);
 
             //Get the layout, where the player view will be placed.
             LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
@@ -196,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
         String path = contentManager.getLocalFile(ASSET_ID).getAbsolutePath();
         PKMediaSource mediaSource = localAssetsManager.getLocalMediaSource(ASSET_ID, path);
         
-        player.prepare(new PKMediaConfig().setMediaEntry(new PKMediaEntry().setSources(Collections.singletonList(mediaSource))));
+        player.prepare(new PlayerConfig.Media().setMediaEntry(new PKMediaEntry().setSources(Collections.singletonList(mediaSource))));
         player.play();
     }
 

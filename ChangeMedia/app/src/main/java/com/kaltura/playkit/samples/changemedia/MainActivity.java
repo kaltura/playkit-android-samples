@@ -82,15 +82,25 @@ public class MainActivity extends AppCompatActivity {
      * prepare the second one. Otherwise it will prepare the first one.
      */
     private void changeMedia() {
+
+        //Before changing media we must call stop on the player.
+        player.stop();
+
         //Check if id of the media entry that is set in mediaConfig.
-        if(mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)){
+        if (mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)) {
+
             //If first one is active, prepare second one.
             prepareSecondEntry();
-        }else {
+        } else {
             //If the second one is active, prepare the first one.
             prepareFirstEntry();
         }
+
+        //Just reset the playPauseButton text to "Play".
+        resetPlayPauseButtonToPlayText();
     }
+
+
 
     /**
      * Prepare the first entry.
@@ -265,5 +275,12 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    /**
+     * Just reset the play/pause button text to "Play".
+     */
+    private void resetPlayPauseButtonToPlayText() {
+        playPauseButton.setText(R.string.play_text);
     }
 }

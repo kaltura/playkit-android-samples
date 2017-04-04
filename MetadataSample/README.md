@@ -1,16 +1,16 @@
-# Basic Setup Sample
+# Metadata Sample
 
 ## Purpose
 
-This PlayKit sample show how to create and setup PlayKit SDK player.
+This PlayKit sample show how to retrieve media Metadata with PlayKit SDK.
 
-For more info see [documentation](https://vpaas.kaltura.com/documentation/Mobile-Video-Player-SDKs/v3_Android_QuickStart.html)
+For more info see [documentation update when ready]()
 
 ## How to use
 
-1. Open BasicSetup project in Android Studio.
+1. Open Metadata project in Android Studio.
 2. Compile.
-3. See the result.
+3. See the logs for result.
 
 ## License
 

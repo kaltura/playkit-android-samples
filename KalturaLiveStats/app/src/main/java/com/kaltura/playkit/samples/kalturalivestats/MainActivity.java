@@ -32,15 +32,18 @@ public class MainActivity extends AppCompatActivity {
     private static final String SOURCE_URL = "http://nasatv-lh.akamaihd.net/i/NASA_101@319270/master.m3u8";
 
     //The id of the entry.
-    private static final String ENTRY_ID = "entry_id";
+    private static final String ENTRY_ID = "id";
+
+    //The entry id of the media.
+    private static final String ANALYTICS_MEDIA_ENTRY_ID = "entryId"; // the meida's entryId both for OVP and OTT
+
     //The id of the source.
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     //Analytics constants
     private static final int PARTNER_ID = 12345; // your partner id here.
-    private static final String SESSION_ID = "your_session_id";
     private static final String KALTURA_LIVE_STATS_URL = "https://livestats.kaltura.com/api_v3/index.php"; //Server url
-    private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
+    private static final int ANALYTICS_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
     private Player player;
     private PKMediaConfig mediaConfig;
@@ -88,20 +91,23 @@ public class MainActivity extends AppCompatActivity {
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
         //Initialize Json object that will hold all the configurations for the plugin.
         JsonObject pluginEntry = new JsonObject();
-        //Put session id.
-        pluginEntry.addProperty("sessionId", SESSION_ID);
         //Put url to the kaltura stats server.
         pluginEntry.addProperty("baseUrl", KALTURA_LIVE_STATS_URL);
+
         //Put the partner id.
         pluginEntry.addProperty("partnerId", PARTNER_ID);
-        //Put interval with which analitcs reports would be triggered.
-        pluginEntry.addProperty("timerInterval", ANALYTIC_TRIGGER_INTERVAL);
+
+        //Put EntryId.
+        pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
+
+        //Put interval with which analytics reports would be triggered.
+        pluginEntry.addProperty("timerInterval", ANALYTICS_TRIGGER_INTERVAL);
+
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KalturaLiveStatsPlugin.factory.getName(), pluginEntry);
 
         return pluginConfigs;
     }
-
 
     /**
      * Subscribe to live stats report event.

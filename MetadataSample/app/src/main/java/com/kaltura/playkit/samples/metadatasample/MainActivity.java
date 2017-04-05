@@ -14,6 +14,7 @@ import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
+import com.kaltura.playkit.PKMetadata;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -80,11 +81,11 @@ public class MainActivity extends AppCompatActivity {
                 PlayerEvent.MetadataAvailable metadataAvailableEvent = (PlayerEvent.MetadataAvailable) event;
 
                 //Retrieve the metadata object itself.
-                Metadata metadata = metadataAvailableEvent.getMetadata();
+                PKMetadata metadata = metadataAvailableEvent.getMetadata();
 
                 //Iterate through all entries in metadata object.
-                for (int i = 0; i < metadata.length(); i++) {
-                    Metadata.Entry metadataEntry = metadata.get(i);
+                for (int i = 0; i < metadata.getMetadataEntries().size(); i++) {
+                    Metadata.Entry metadataEntry = metadata.getMetadataEntries().get(i);
 
                     //For simplicity, in this example, we are interested only in TextInformationFrame.
                     if (metadataEntry instanceof TextInformationFrame) {

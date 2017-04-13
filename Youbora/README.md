@@ -13,6 +13,8 @@ For more info see [documentation](https://vpaas.kaltura.com/documentation/Mobile
 3. Compile.
 4. See logs for the result.
 
+For more info regarding Youbora usage and configuration see [Youbora Developer site](http://developer.nicepeopleatwork.com/)
+
 ## License
 
 See [License and Copyright Information](https://github.com/kaltura/playkit-android-samples#license-and-copyright-information)

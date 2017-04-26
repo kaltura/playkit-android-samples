@@ -13,7 +13,6 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,16 +54,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Will create {@link PKMediaConfig} object.
+     * Will create {@link } object.
      */
     private void createMediaConfig() {
         //First. Create PKMediaConfig object.
-        mediaConfig = new PKMediaConfig()
-                // You can configure the start position for it.
-                // by default it will be 0.
-                // If start position is grater then duration of the source it will be reset to 0.
-                .setStartPosition(START_POSITION);
-
+        mediaConfig = new PKMediaConfig();
+        
         //Second. Create PKMediaEntry object.
         PKMediaEntry mediaEntry = createMediaEntry();
 

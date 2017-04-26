@@ -7,14 +7,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.kaltura.netkit.connect.response.ResultElement;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.backend.base.OnMediaLoadCompletion;
-import com.kaltura.playkit.backend.ovp.KalturaOvpMediaProvider;
-import com.kaltura.playkit.backend.ovp.SimpleOvpSessionProvider;
-import com.kaltura.playkit.connect.ResultElement;
+import com.kaltura.playkit.api.ovp.SimpleOvpSessionProvider;
+import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
+import com.kaltura.playkit.mediaproviders.ovp.KalturaOvpMediaProvider;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //Put here your provider base url
-    private static final String PROVIDER_BASE_URL = "your_provider_base_url";
+    private static final String PROVIDER_BASE_URL = "your_provider_url";
     //Put here your partner id.
     private static final int PARTNER_ID = 0;
     //Put here your KS.

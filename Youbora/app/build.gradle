@@ -30,7 +30,7 @@ dependencies {
     try {
         compile project(":playkit");
     } catch (UnknownProjectException ignored) {
-        compile 'com.kaltura.playkit:playkit:0.2.12'
+        compile 'com.kaltura.playkit:playkit:0.3.0'
     }
 
     compile fileTree(dir: 'libs', include: ['*.jar'])

@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private void createMediaConfig() {
         //First. Create PKMediaConfig object.
         mediaConfig = new PKMediaConfig();
-        
+
         //Second. Create PKMediaEntry object.
         PKMediaEntry mediaEntry = createMediaEntry();
 

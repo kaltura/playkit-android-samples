@@ -8,18 +8,18 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.google.gson.JsonObject;
-import com.kaltura.playkit.OnCompletion;
+import com.kaltura.netkit.connect.response.PrimitiveResult;
+import com.kaltura.netkit.connect.response.ResultElement;
+import com.kaltura.netkit.utils.OnCompletion;
+import com.kaltura.netkit.utils.SessionProvider;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.backend.PrimitiveResult;
-import com.kaltura.playkit.backend.SessionProvider;
-import com.kaltura.playkit.backend.base.OnMediaLoadCompletion;
-import com.kaltura.playkit.backend.phoenix.PhoenixMediaProvider;
-import com.kaltura.playkit.connect.ResultElement;
+import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
+import com.kaltura.playkit.mediaproviders.ott.PhoenixMediaProvider;
 import com.kaltura.playkit.plugins.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.PhoenixAnalyticsPlugin;
 

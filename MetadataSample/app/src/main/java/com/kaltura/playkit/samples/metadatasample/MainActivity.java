@@ -7,17 +7,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.google.android.exoplayer2.metadata.Metadata;
 import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
-import com.kaltura.playkit.PKMetadata;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
+import com.kaltura.playkit.player.metadata.PKMetadata;
+import com.kaltura.playkit.player.metadata.PKTextInformationFrame;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,18 +80,20 @@ public class MainActivity extends AppCompatActivity {
                 //Cast received event to MetadataAvailable event, which holds the data object with actual metadata.
                 PlayerEvent.MetadataAvailable metadataAvailableEvent = (PlayerEvent.MetadataAvailable) event;
 
-                //Retrieve the metadata object itself.
-                PKMetadata metadata = metadataAvailableEvent.getMetadata();
+                //Retrieve the list of metadata objects.
+                List<PKMetadata> metadataList = metadataAvailableEvent.getMetadataList();
 
                 //Iterate through all entries in metadata object.
-                for (int i = 0; i < metadata.getMetadataEntries().size(); i++) {
-                    Metadata.Entry metadataEntry = metadata.getMetadataEntries().get(i);
+                for (int i = 0; i < metadataList.size(); i++) {
 
-                    //For simplicity, in this example, we are interested only in TextInformationFrame.
-                    if (metadataEntry instanceof TextInformationFrame) {
+                    //Obtain the PKMetadata object.
+                    PKMetadata metadataEntry = metadataList.get(i);
 
-                        //Cast mediaEntry to TextInformationFrame.
-                        TextInformationFrame textInformationFrame = (TextInformationFrame) metadataEntry;
+                    //For simplicity, in this example, we are interested only in PKTextInformationFrame.
+                    if (metadataEntry instanceof PKTextInformationFrame) {
+
+                        //Cast mediaEntry to PKTextInformationFrame.
+                        PKTextInformationFrame textInformationFrame = (PKTextInformationFrame) metadataEntry;
 
                         //Print to log.
                         Log.d(TAG, "metadata text information: " + textInformationFrame.value);

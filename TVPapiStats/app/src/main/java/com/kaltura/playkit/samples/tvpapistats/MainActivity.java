@@ -40,18 +40,32 @@ public class MainActivity extends AppCompatActivity {
     private static final String TVPAPI_ANALYTICS_URL = "http://tvpapi-preprod.ott.kaltura.com/v3_9/gateways/jsonpostgw.aspx?"; //Server url
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
-    private static final String UDID = "your_udid";
-    private static final String TOKEN = "your_token";
-    private static final String FILE_ID = "12345"; //your file id here.
-    private static final String API_USER = "your_api_user";
-    private static final String API_PASS = "your_api_pass";
-    private static final String PLATFORM = "your_platform";
-    private static final String SITE_GUID = "123456";
-    private static final String DOMAIN_ID = "your_domain_id";
-    private static final String LOCALE_DEVICE = "your_locale_device";
-    private static final String LOCALE_COUNTRY = "your_locale_country";
-    private static final String LOCALE_LANGUAGE = "your_locale_language";
-    private static final String LOCALE_USER_STATE = "your_locale_user_state";
+//    private static final String UDID = "your_udid";
+//    private static final String TOKEN = "your_token";
+//    private static final String FILE_ID = "12345"; //your file id here.
+//    private static final String API_USER = "your_api_user";
+//    private static final String API_PASS = "your_api_pass";
+//    private static final String PLATFORM = "your_platform";
+//    private static final String SITE_GUID = "123456";
+//    private static final String DOMAIN_ID = "your_domain_id";
+//    private static final String LOCALE_DEVICE = "your_locale_device";
+//    private static final String LOCALE_COUNTRY = "your_locale_country";
+//    private static final String LOCALE_LANGUAGE = "your_locale_language";
+//    private static final String LOCALE_USER_STATE = "your_locale_user_state";
+
+
+    private static final String UDID = "e8aa934c-eae4-314f-b6a0-f55e96498786";
+    private static final String TOKEN = "";
+    private static final String FILE_ID = "464302"; //your file id here.
+    private static final String API_USER = "tvpapi_198";
+    private static final String API_PASS = "11111";
+    private static final String PLATFORM = "Cellular";
+    private static final String SITE_GUID = "716158";
+    private static final String DOMAIN_ID = "354531";
+    private static final String LOCALE_DEVICE = "";
+    private static final String LOCALE_COUNTRY = "";
+    private static final String LOCALE_LANGUAGE = "en";
+    private static final String LOCALE_USER_STATE = "Unknown";
 
     private Player player;
     private PKMediaConfig mediaConfig;
@@ -260,4 +274,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onPause() {
+        if (player != null) {
+//            player.play();
+           // player.pause();
+//            player.seekTo(1000);
+            player.destroy();
+            //player.onApplicationPaused();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (player != null) {
+            player.onApplicationResumed();
+            player.play();
+        }
+    }
+
 }

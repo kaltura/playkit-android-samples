@@ -176,7 +176,6 @@ public class MainActivity extends AppCompatActivity {
             JsonObject youboraConfigJson = new JsonObject();
             youboraConfigJson.addProperty("accountCode", ACCOUNT_CODE);
             youboraConfigJson.addProperty("username", USER_NAME);
-            youboraConfigJson.addProperty("username", USER_NAME);
             youboraConfigJson.addProperty("enableAnalytics", true);
             youboraConfigJson.addProperty("enableSmartAds", ENABLE_SMART_ADS);
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static final String TAG = "Main";
-    private static final String ASSET_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
+    private static final String ASSET_URL = "https://cdnapisec.kaltura.com/p/2215841/playManifest/entryId/1_w9zx2eti/protocol/https/format/mpegdash/a.mpd";
     private static final String ASSET_ID = "asset1";
     private static final String ASSET_LICENSE_URL = null;
     
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private LocalAssetsManager localAssetsManager;
     private PKMediaEntry originMediaEntry = mediaEntry(ASSET_ID, ASSET_URL, ASSET_LICENSE_URL);
     private PKMediaSource originMediaSource = originMediaEntry.getSources().get(0);
-    private Handler mainHandler = new Handler(getMainLooper());
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
 
     private PKMediaEntry mediaEntry(String id, String url, String licenseUrl) {
@@ -129,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onDownloadStop(DownloadItem item) {
-                Log.d(TAG, "stop: " + item);
+            public void onDownloadFailure(DownloadItem item, Exception error) {
+                Log.d(TAG, "failure: " + item);
 
             }
 
@@ -151,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        contentManager.start();
+        contentManager.start(null);
     }
 
     void showMenu() {

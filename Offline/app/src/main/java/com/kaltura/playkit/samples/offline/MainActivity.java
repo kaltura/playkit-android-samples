@@ -145,15 +145,57 @@ public class MainActivity extends AppCompatActivity {
             public void onTracksAvailable(DownloadItem item, DownloadItem.TrackSelector trackSelector) {
                 Log.d(TAG, "tracks: " + item);
 
-                // Select lowest-resolution video
+                // Select video track
                 List<DownloadItem.Track> videoTracks = trackSelector.getAvailableTracks(DownloadItem.TrackType.VIDEO);
-                DownloadItem.Track minVideo = Collections.min(videoTracks, DownloadItem.Track.bitrateComparator);
-                trackSelector.setSelectedTracks(DownloadItem.TrackType.VIDEO, Collections.singletonList(minVideo));
+                DownloadItem.Track selectedVideoTrack = null;
+                
+                // A few recipes, pick one or cook something else
+                // SD-ish track
+                selectedVideoTrack = getMinimumRequiredTrack(videoTracks, 600000, true);
 
+                // HD-ish 
+                selectedVideoTrack = getMinimumRequiredTrack(videoTracks, 1300000, true);
+                
+                // Select the highest-bitrate video
+                selectedVideoTrack = Collections.max(videoTracks, DownloadItem.Track.bitrateComparator);
+                
+                // Or settle for the lowest
+                selectedVideoTrack = Collections.min(videoTracks, DownloadItem.Track.bitrateComparator);
+
+                trackSelector.setSelectedTracks(DownloadItem.TrackType.VIDEO, Collections.singletonList(selectedVideoTrack));
+
+
+                // Select ALL audio tracks
+                trackSelector.setSelectedTracks(DownloadItem.TrackType.AUDIO, trackSelector.getAvailableTracks(DownloadItem.TrackType.AUDIO));
+
+                // Select ALL text tracks
+                trackSelector.setSelectedTracks(DownloadItem.TrackType.TEXT, trackSelector.getAvailableTracks(DownloadItem.TrackType.TEXT));
             }
         });
         contentManager.start(null);
     }
+
+    // Find the minimal "good enough" track. In other words, the track that has bitrate greater than or equal
+    // to the requested minimum.
+    private DownloadItem.Track getMinimumRequiredTrack(List<DownloadItem.Track> videoTracks, int minRequired, boolean settleForLess) {
+        
+        if (videoTracks == null || videoTracks.isEmpty()) {
+            return null;
+        }
+        
+        Collections.sort(videoTracks, DownloadItem.Track.bitrateComparator);
+        for (DownloadItem.Track videoTrack : videoTracks) {
+            if (videoTrack.getBitrate() >= minRequired) {
+                return videoTrack;
+            }
+        }
+        
+        if (settleForLess) {
+            return videoTracks.get(videoTracks.size()-1);
+        }
+        return null;
+    }
+
 
     void showMenu() {
         new AlertDialog.Builder(context)

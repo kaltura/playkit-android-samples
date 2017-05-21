@@ -40,7 +40,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String ACCOUNT_CODE = "your_account_code";
     public static final String USER_NAME = "your_user_name";
     public static final String MEDIA_TITLE = "your_media_title";
-    public static final String AD_TITLE = "your_ad_title";
+    public static final boolean IS_LIVE = false;
+    public static final boolean ENABLE_SMART_ADS = true;
     private static final String CAMPAIGN = "your_campaign_name";
     public static final String EXTRA_PARAM_1 = "playKitPlayer";
     public static final String EXTRA_PARAM_2 = "";
@@ -113,15 +114,17 @@ public class MainActivity extends AppCompatActivity {
         youboraConfigJson.addProperty("username", USER_NAME);
         youboraConfigJson.addProperty("haltOnError", true);
         youboraConfigJson.addProperty("enableAnalytics", true);
+        youboraConfigJson.addProperty("enableSmartAds", ENABLE_SMART_ADS);
+
 
         //Media entry json.
         JsonObject mediaEntryJson = new JsonObject();
+        mediaEntryJson.addProperty("isLive", IS_LIVE);
         mediaEntryJson.addProperty("title", MEDIA_TITLE);
 
         //Youbora ads configuration json.
         JsonObject adsJson = new JsonObject();
         adsJson.addProperty("adsExpected", true);
-        adsJson.addProperty("title", AD_TITLE);
         adsJson.addProperty("campaign", CAMPAIGN);
 
         //Configure custom properties here:
@@ -147,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
         extraParamJson.addProperty("param2", EXTRA_PARAM_2);
 
         //Add all the json objects created before to the pluginEntry json.
-        pluginEntry.add("youboraConfig", youboraConfigJson);
         pluginEntry.add("media", mediaEntryJson);
         pluginEntry.add("ads", adsJson);
         pluginEntry.add("properties", propertiesJson);

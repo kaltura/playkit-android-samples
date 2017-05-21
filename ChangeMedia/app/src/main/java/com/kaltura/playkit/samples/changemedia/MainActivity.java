@@ -30,12 +30,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //The url of the first source to play
-    private static final String FIRST_SOURCE_URL = "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
+    private static final String FIRST_SOURCE_URL = "http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_2hv7lhga/flavorIds/0_cxckre0q,0_yual4izy,0_qswhyfht,0_ozgle3np/format/applehttp/protocol/http/a.m3u8";//"http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_o757mkwo/flavorIds/0_ofkik57d,0_e44oqzzy,0_knkzmv8z,0_effkqka8/format/applehttp/protocol/http/a.m3u8?"; //"https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
     //The url of the second source to play
-    private static final String SECOND_SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
+    private static final String SECOND_SOURCE_URL = "http://www.html5videoplayer.net/videos/toystory.mp4";//"http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_kf6dw4jr/flavorIds/0_olodnwem,0_k1xomk0s,0_89mswgn1/format/applehttp/protocol/http/a.m3u8";//"https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
 
-    private static final String AD_TAG_URL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-    private static final String NEW_AD_TAG_URL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
+    private static final String AD_TAG_URL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpreonlybumper&cmsid=496&vid=short_onecue&correlator=";//"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+    private static final String NEW_AD_TAG_URL = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&cust_params=sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=[timestamp]";
+            //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&cust_params=sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=[timestamp]";//"https://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
     private static final int PREFERRED_AD_BITRATE = 600;
     //id of the first entry
     private static final String FIRST_ENTRY_ID = "entry_id_1";
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private Player player;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
-
+    private Button seek30;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Add simple play/pause button.
         addPlayPauseButton();
+        addSeek30Button();
 
         //Init change media button which will switch between entries.
         initChangeMediaButton();
@@ -173,11 +175,11 @@ public class MainActivity extends AppCompatActivity {
             JsonObject youboraPluginEntry = new JsonObject();
 
             //Youbora config json. Main config goes here.
-            JsonObject youboraConfigJson = new JsonObject();
-            youboraConfigJson.addProperty("accountCode", ACCOUNT_CODE);
-            youboraConfigJson.addProperty("username", USER_NAME);
-            youboraConfigJson.addProperty("enableAnalytics", true);
-            youboraConfigJson.addProperty("enableSmartAds", ENABLE_SMART_ADS);
+            //JsonObject youboraConfigJson = new JsonObject();
+            youboraPluginEntry.addProperty("accountCode", ACCOUNT_CODE);
+            youboraPluginEntry.addProperty("username", USER_NAME);
+            youboraPluginEntry.addProperty("enableAnalytics", true);
+            youboraPluginEntry.addProperty("enableSmartAds", ENABLE_SMART_ADS);
 
 
             //Media entry json.
@@ -213,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
             extraParamJson.addProperty("param2", "change_media12");
 
             //Add all the json objects created before to the pluginEntry json.
-            youboraPluginEntry.add("youboraConfig", youboraConfigJson);
+            //youboraPluginEntry.add("youboraConfig", youboraConfigJson);
             youboraPluginEntry.add("media", mediaEntryJson);
             youboraPluginEntry.add("ads", adsJson);
             youboraPluginEntry.add("properties", propertiesJson);
@@ -411,6 +413,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void addSeek30Button() {
+        //Get reference to the play/pause button.
+        seek30 = (Button) this.findViewById(R.id.button111);
+        //Add clickListener.
+        seek30.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (player != null) {
+                    player.seekTo(player.getCurrentPosition() + 30000);
+                }
+            }
+        });
+    }
+
     /**
      * Just reset the play/pause button text to "Play".
      */
@@ -429,12 +445,12 @@ public class MainActivity extends AppCompatActivity {
         JsonObject pluginEntry = new JsonObject();
 
         //Youbora config json. Main config goes here.
-        JsonObject youboraConfigJson = new JsonObject();
-        youboraConfigJson.addProperty("accountCode", ACCOUNT_CODE);
-        youboraConfigJson.addProperty("username", USER_NAME);
-        youboraConfigJson.addProperty("username", USER_NAME);
-        youboraConfigJson.addProperty("enableAnalytics", true);
-        youboraConfigJson.addProperty("enableSmartAds", ENABLE_SMART_ADS);
+        //JsonObject youboraConfigJson = new JsonObject();
+        pluginEntry.addProperty("accountCode", ACCOUNT_CODE);
+        pluginEntry.addProperty("username", USER_NAME);
+        pluginEntry.addProperty("username", USER_NAME);
+        pluginEntry.addProperty("enableAnalytics", true);
+        pluginEntry.addProperty("enableSmartAds", ENABLE_SMART_ADS);
 
 
         //Media entry json.
@@ -470,7 +486,7 @@ public class MainActivity extends AppCompatActivity {
         extraParamJson.addProperty("param2", EXTRA_PARAM_2);
 
         //Add all the json objects created before to the pluginEntry json.
-        pluginEntry.add("youboraConfig", youboraConfigJson);
+        //pluginEntry.add("youboraConfig", youboraConfigJson);
         pluginEntry.add("media", mediaEntryJson);
         pluginEntry.add("ads", adsJson);
         pluginEntry.add("properties", propertiesJson);

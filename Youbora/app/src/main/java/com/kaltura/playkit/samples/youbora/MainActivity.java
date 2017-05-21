@@ -108,11 +108,11 @@ public class MainActivity extends AppCompatActivity {
         JsonObject pluginEntry = new JsonObject();
 
         //Youbora config json. Main config goes here.
-        JsonObject youboraConfigJson = new JsonObject();
-        youboraConfigJson.addProperty("accountCode", ACCOUNT_CODE);
-        youboraConfigJson.addProperty("username", USER_NAME);
-        youboraConfigJson.addProperty("haltOnError", true);
-        youboraConfigJson.addProperty("enableAnalytics", true);
+        //JsonObject youboraConfigJson = new JsonObject();
+        pluginEntry.addProperty("accountCode", ACCOUNT_CODE);
+        pluginEntry.addProperty("username", USER_NAME);
+        pluginEntry.addProperty("haltOnError", true);
+        pluginEntry.addProperty("enableSmartAds", true);
 
         //Media entry json.
         JsonObject mediaEntryJson = new JsonObject();
@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         extraParamJson.addProperty("param2", EXTRA_PARAM_2);
 
         //Add all the json objects created before to the pluginEntry json.
-        pluginEntry.add("youboraConfig", youboraConfigJson);
+        //pluginEntry.add("youboraConfig", youboraConfigJson);
         pluginEntry.add("media", mediaEntryJson);
         pluginEntry.add("ads", adsJson);
         pluginEntry.add("properties", propertiesJson);

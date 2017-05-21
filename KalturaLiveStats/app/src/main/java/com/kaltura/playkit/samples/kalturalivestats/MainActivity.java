@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -18,6 +17,7 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.plugins.KalturaLiveStatsEvent;
 import com.kaltura.playkit.plugins.KalturaLiveStatsPlugin;
+import com.kaltura.playkit.plugins.configs.KalturaStatsConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //The url of the source to play
-    private static final String SOURCE_URL = "http://nasatv-lh.akamaihd.net/i/NASA_101@319270/master.m3u8";
+    private static final String SOURCE_URL = "https://nasa-i.akamaihd.net/hls/live/253565/NTV-Public1/master_2000.m3u8";
 
     //The id of the entry.
     private static final String ENTRY_ID = "id";
@@ -90,20 +90,22 @@ public class MainActivity extends AppCompatActivity {
         //Initialize PKPluginConfigs object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
         //Initialize Json object that will hold all the configurations for the plugin.
-        JsonObject pluginEntry = new JsonObject();
-        //Put url to the kaltura stats server.
-        pluginEntry.addProperty("baseUrl", KALTURA_LIVE_STATS_URL);
-
-        //Put the partner id.
-        pluginEntry.addProperty("partnerId", PARTNER_ID);
-
-        //Put EntryId.
-        pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
-
-        //Put interval with which analytics reports would be triggered.
-        pluginEntry.addProperty("timerInterval", ANALYTICS_TRIGGER_INTERVAL);
+//        JsonObject pluginEntry = new JsonObject();
+//        //Put url to the kaltura stats server.
+//        pluginEntry.addProperty("baseUrl", KALTURA_LIVE_STATS_URL);
+//
+//        //Put the partner id.
+//        pluginEntry.addProperty("partnerId", PARTNER_ID);
+//
+//        //Put EntryId.
+//        pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
+//
+//        //Put interval with which analytics reports would be triggered.
+//        pluginEntry.addProperty("timerInterval", ANALYTICS_TRIGGER_INTERVAL);
 
         //Set plugin entry to the plugin configs.
+        KalturaStatsConfig pluginEntry = new KalturaStatsConfig(33333,PARTNER_ID, ENTRY_ID);
+
         pluginConfigs.setPluginConfig(KalturaLiveStatsPlugin.factory.getName(), pluginEntry);
 
         return pluginConfigs;

@@ -18,6 +18,9 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.plugins.KalturaStatsEvent;
 import com.kaltura.playkit.plugins.KalturaStatsPlugin;
+import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.configs.KalturaStatsConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     //The url of the source to play
     private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/playManifest/entryId/1_w9zx2eti/format/mpegdash/protocol/https/a.mpd";
 
-    private static final String ENTRY_ID = "id";
+    private static final String ENTRY_ID = "1_xxx_id";
 
     //The entry id of the media.
     private static final String ANALYTICS_MEDIA_ENTRY_ID = "entryId"; // the meida's entryId both for OVP and OTT
@@ -44,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";//Server url
 
     private static final int UI_CONF_ID = 12345; //your ui conf id here.
-    private static final int PARTNER_ID = 12345; // your partner id here.
-    private static final int ANALYTICS_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
+    private static final int PARTNER_ID = 54321; // your partner id here.
+    private static final int ANALYTICS_TRIGGER_INTERVAL = 5000; //Interval in which analytics report should be triggered (in seconds).
 
     private Player player;
     private PKMediaConfig mediaConfig;
@@ -93,24 +96,47 @@ public class MainActivity extends AppCompatActivity {
         //Initialize PKPluginConfigs object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
         //Initialize Json object that will hold all the configurations for the plugin.
-        JsonObject pluginEntry = new JsonObject();
+//        JsonObject pluginEntry = new JsonObject();
+//
+//        //Put url to the kaltura stats server.
+//        pluginEntry.addProperty("baseUrl", KALTURA_STATS_URL);
+//
+//        //Put the partner id.
+//        pluginEntry.addProperty("partnerId", PARTNER_ID);
+//
+//        //Put ui conf id.
+//        pluginEntry.addProperty("uiconfId", UI_CONF_ID);
+//
+//        //Put entry id.
+//        //pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
+//
+//        //Put interval with which analitcs reports would be triggered.
+//        pluginEntry.addProperty("timerInterval", ANALYTICS_TRIGGER_INTERVAL);
+//        //Set plugin entry to the plugin configs.
+//
 
-        //Put url to the kaltura stats server.
-        pluginEntry.addProperty("baseUrl", KALTURA_STATS_URL);
+        //KalturaStatsConfig pluginEntry = new KalturaStatsConfig(UI_CONF_ID,PARTNER_ID, ENTRY_ID, KALTURA_STATS_URL, ANALYTICS_TRIGGER_INTERVAL);
+        KalturaStatsConfig pluginEntry = new KalturaStatsConfig(UI_CONF_ID,PARTNER_ID, ENTRY_ID);
 
-        //Put the partner id.
-        pluginEntry.addProperty("partnerId", PARTNER_ID);
-
-        //Put ui conf id.
-        pluginEntry.addProperty("uiconfId", UI_CONF_ID);
-
-        //Put entry id.
-        //pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
-
-        //Put interval with which analitcs reports would be triggered.
-        pluginEntry.addProperty("timerInterval", ANALYTICS_TRIGGER_INTERVAL);
-        //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KalturaStatsPlugin.factory.getName(), pluginEntry);
+
+        //First register your IMAPlugin.
+        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+
+
+        //Initialize imaConfigs object.
+        IMAConfig imaConfigs = new IMAConfig();
+
+        //Configure ima.
+         String AD_TAG_URL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+
+        imaConfigs.setAdTagURL(AD_TAG_URL);
+
+        //Convert imaConfigs to jsonObject.
+        JsonObject imaConfigJsonObject = imaConfigs.toJSONObject();
+
+        //Set jsonObject to the main pluginConfigs object.
+        pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfigJsonObject);
 
         return pluginConfigs;
     }

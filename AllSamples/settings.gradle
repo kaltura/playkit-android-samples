@@ -16,6 +16,7 @@ def samples = [
         'KalturaLiveStats',
         'KalturaStats',
         'Providers',
+        'AndroidTV',
         'TVPapiStats'
 ]
 

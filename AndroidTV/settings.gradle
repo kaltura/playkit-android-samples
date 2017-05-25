@@ -1,0 +1,3 @@
+include ':mobile', ':tv'
+include ':playkit-android'
+project(':playkit-android').projectDir = new File('../../playkit-sdk/playkit-android/playkit')

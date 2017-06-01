@@ -33,21 +33,29 @@ import android.widget.FrameLayout;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.kaltura.playkit.PKDrmParams;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
+import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.player.PKTracks;
+import com.kaltura.playkit.plugins.KalturaStatsPlugin;
+import com.kaltura.playkit.plugins.Youbora.YouboraPlugin;
 import com.kaltura.playkit.plugins.ads.AdError;
 import com.kaltura.playkit.plugins.ads.AdEvent;
-import com.kaltura.playkit.utils.Consts;
+import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * PlaybackOverlayActivity for video playback that loads PlaybackOverlayFragment
@@ -55,6 +63,7 @@ import java.util.List;
 public class PlaybackOverlayActivity extends Activity implements
         PlaybackOverlayFragment.OnPlayPauseClickedListener {
     private static final String TAG = "PlaybackOverlayActivity";
+    public static final String STATS_KALTURA_COM = "https://stats.kaltura.com/api_v3/index.php";
 
     //private VideoView mVideoView;
     protected Player player;
@@ -134,7 +143,10 @@ public class PlaybackOverlayActivity extends Activity implements
             String videoURL = movie.getVideoUrl();
             pkMediaSource.setMediaFormat(PKMediaFormat.valueOfUrl(videoURL));
             pkMediaSource.setUrl(videoURL);
-
+            List<PKDrmParams> pkDrmDataList = new ArrayList<>();
+            PKDrmParams pkDrmParams = new PKDrmParams(movie.getVideoLic(), PKDrmParams.Scheme.WidevineCENC);
+            pkDrmDataList.add(pkDrmParams);
+            pkMediaSource.setDrmData(pkDrmDataList);
             mediaSourceList.add(pkMediaSource);
             mediaEntry.setSources(mediaSourceList);
 
@@ -257,7 +269,15 @@ public class PlaybackOverlayActivity extends Activity implements
 
     private void loadViews() {
         if (player == null) {
-            player = PlayKitManager.loadPlayer(this, null);
+            //PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+            //PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
+            //PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
+
+            PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+            //addKalturaStatsPlugin(pluginConfigs);
+            //addIMAPluginConfig(pluginConfigs);
+            //addYouboraPlugin(pluginConfigs);
+            player = PlayKitManager.loadPlayer(this, pluginConfigs);
             setupCallbacks();
             getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
@@ -278,6 +298,80 @@ public class PlaybackOverlayActivity extends Activity implements
                 }
             });
         }
+    }
+
+    private void addYouboraPlugin(PKPluginConfigs pluginConfig) {
+        JsonPrimitive accountCode = new JsonPrimitive("XXXX");
+        JsonPrimitive username = new JsonPrimitive("YYYY");
+        JsonPrimitive haltOnError = new JsonPrimitive(true);
+        JsonPrimitive enableAnalytics = new JsonPrimitive(true);
+        JsonPrimitive enableSmartAds = new JsonPrimitive(true);
+
+        JsonObject mediaEntry = new JsonObject();
+        mediaEntry.addProperty("isLive", false);
+        mediaEntry.addProperty("title", "Media1");
+
+        JsonObject adsEntry = new JsonObject();
+        adsEntry.addProperty("campaign", "camp");
+
+        JsonObject extraParamEntry = new JsonObject();
+        extraParamEntry.addProperty("param1", "Mobile");
+        extraParamEntry.addProperty("param2", "playKitPlayer");
+
+        JsonObject propertiesEntry = new JsonObject();
+        propertiesEntry.addProperty("genre", "");
+        propertiesEntry.addProperty("type", "");
+        propertiesEntry.addProperty("transaction_type", "");
+        propertiesEntry.addProperty("year", "");
+        propertiesEntry.addProperty("cast", "");
+        propertiesEntry.addProperty("director", "");
+        propertiesEntry.addProperty("owner", "");
+        propertiesEntry.addProperty("parental", "");
+        propertiesEntry.addProperty("price", "");
+        propertiesEntry.addProperty("rating", "");
+        propertiesEntry.addProperty("audioType", "");
+        propertiesEntry.addProperty("audioChannels", "");
+        propertiesEntry.addProperty("device", "");
+        propertiesEntry.addProperty("quality", "");
+
+        ConverterYoubora converterYoubora = new ConverterYoubora(accountCode, username, haltOnError, enableAnalytics, enableSmartAds,
+                mediaEntry,
+                adsEntry, extraParamEntry, propertiesEntry);
+
+        pluginConfig.setPluginConfig(YouboraPlugin.factory.getName(), converterYoubora.toJson());
+    }
+
+    private void addKalturaStatsPlugin(PKPluginConfigs config) {
+        JsonObject pluginEntry = new JsonObject();
+        // pluginEntry.addProperty("sessionId", "b3460681-b994-6fad-cd8b-f0b65736e837"); // sent by playKit now since version v0.2.16
+        pluginEntry.addProperty("uiconfId", Integer.parseInt("12345"));
+        pluginEntry.addProperty("baseUrl", STATS_KALTURA_COM);
+        pluginEntry.addProperty("partnerId", Integer.parseInt("123444"));
+        /*int videoDuration = Integer.parseInt(mVideoDetailsModel.getDuration());
+        //int analyticReportInterval = (int)(videoDuration / 1000) * 0.1;*/
+        pluginEntry.addProperty("timerInterval", Integer.parseInt("15"));
+        pluginEntry.addProperty("entryId", "1_sssssss");
+
+        //config.setPluginConfig(KalturaStatsPlugin.factory.getName(), pluginEntry);
+    }
+
+    private void addIMAPluginConfig(PKPluginConfigs config) {
+        String adTagUrl = //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/youth/MTV&t=Content+Type=Highlights,Series+Title=MTV+Roadies+Rising,Gender=,GeoCity=,Age=,Carrier=,Media+ID=491591,Genre=Reality,SBU=MTV,Content+Name=Highlights%3A+Rannvijay+makes+his+choice,OEM=LGE,Language=Hindi,WiFi=Y,appversion=1.6.119,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=365.40002&rnd=8170019078998&cd=489&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=73274a17-920a-4666-b844-540ab8dd29f9&rt=vmap_1.0&pf=and_6.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d4d36fd0-e5e2-4b28-a225-ee0dca05d724&cp.optout=false&cp.deviceid=aa5e1b6c96988d68&cp.osversion=6.0";
+                //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=vmap&t=Content+Type=Full+Episode,Series+Title=MTV+Unplugged+S06,Gender=U,Media+ID=476975,Genre=Music,SBU=MTV,Content+Name=The+fusion+of+stars,OEM=LGE,Language=Hindi,WiFi=Y,appversion=0.1.102,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false,&tid=43cdeafd-77f5-11e6-bff1-02a55d5f3a8d&tt=p%2Cm%2Cpo%2Co&bp=336.0,681.0,1128.0,1464.0,1655.4,2052.0&rnd=8170019078998&cd=2485&rt=vmap_1.0&pf=and_6.0.1&rt=vmap_1.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d928acbe-4276-422e-b97a-9d9b681f94c3&cp.optout=false";
+                //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/youth/MTV&t=Content+Type=Highlights,Series+Title=MTV+Roadies+Rising,Gender=,GeoCity=,Age=,Carrier=,Media+ID=491591,Genre=Reality,SBU=MTV,Content+Name=Highlights%3A+Rannvijay+makes+his+choice,OEM=LGE,Language=Hindi,WiFi=Y,appversion=1.6.119,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=365.40002&rnd=8170019078998&cd=489&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=73274a17-920a-4666-b844-540ab8dd29f9&rt=vmap_1.0&pf=and_6.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d4d36fd0-e5e2-4b28-a225-ee0dca05d724&cp.optout=false&cp.deviceid=aa5e1b6c96988d68&cp.osversion=6.0";
+                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
+                //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostoptimizedpodbumper&cmsid=496&vid=short_onecue&correlator=";
+                //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
+        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
+        List<String> videoMimeTypes = new ArrayList<>();
+        //videoMimeTypes.add(MimeTypes.APPLICATION_MP4);
+        //videoMimeTypes.add(MimeTypes.APPLICATION_M3U8);
+        //Map<Double, String> tagTimesMap = new HashMap<>();
+        //tagTimesMap.put(2.0,"ADTAG");
+
+        IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl);//.enableDebugMode(true);
+        config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
     }
 
     private void setupCallbacks() {

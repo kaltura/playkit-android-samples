@@ -33,11 +33,20 @@ public class Movie implements Serializable {
     private String bgImageUrl;
     private String cardImageUrl;
     private String videoUrl;
+    private String videoLic;
     private String studio;
     private String category;
     private int duration;
 
     public Movie() {
+    }
+
+    public String getVideoLic() {
+        return videoLic;
+    }
+
+    public void setVideoLic(String videoLic) {
+        this.videoLic = videoLic;
     }
 
     public int getDuration() {

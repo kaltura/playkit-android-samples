@@ -17,8 +17,6 @@ package com.kaltura.playkit.samples.androidtv;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.media.MediaMetadataRetriever;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.widget.AbstractDetailsDescriptionPresenter;
@@ -57,7 +55,6 @@ import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.utils.Consts;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /*
@@ -349,15 +346,15 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     private int getDuration() {
         long duration = 0;
         Movie movie = mItems.get(mCurrentItem);
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            mmr.setDataSource(movie.getVideoUrl(), new HashMap<String, String>());
-        } else {
-            mmr.setDataSource(movie.getVideoUrl());
-        }
-        String time = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        duration = (mCallback.getDuration() > 0 ) ? mCallback.getDuration() : (Long.parseLong(time) > 0) ? Long.parseLong(time) : movie.getDuration();
-        return (int) duration;
+//        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+//            mmr.setDataSource(movie.getVideoUrl(), new HashMap<String, String>());
+//        } else {
+//            mmr.setDataSource(movie.getVideoUrl());
+//        }
+//        String time = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+//        duration = (mCallback.getDuration() > 0 ) ? mCallback.getDuration() : (Long.parseLong(time) > 0) ? Long.parseLong(time) : movie.getDuration();
+        return (int)  movie.getDuration();
     }
 
     private void addPlaybackControlsRow() {

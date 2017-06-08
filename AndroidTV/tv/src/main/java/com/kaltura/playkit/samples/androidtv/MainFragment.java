@@ -134,9 +134,6 @@ public class MainFragment extends BrowseFragment {
         gridRowAdapter.add(getString(R.string.error_fragment));
         gridRowAdapter.add(getResources().getString(R.string.personal_settings));
         mRowsAdapter.add(new ListRow(gridHeader, gridRowAdapter));
-
-
-
     }
 
     private void prepareBackgroundManager() {

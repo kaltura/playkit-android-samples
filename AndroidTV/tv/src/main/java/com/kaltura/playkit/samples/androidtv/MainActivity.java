@@ -55,11 +55,13 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
     }
 
-    private void onMediaLoaded(PKMediaEntry mediaEntry) {
+    private synchronized void onMediaLoaded(PKMediaEntry mediaEntry) {
+        Log.d(TAG, "onMediaLoaded");
         if (mediaEntry == null) {
-            Log.d(TAG, "mediaEntry == null");
+            Log.e(TAG, "mediaEntry == null");
             return;
         }
+
         if (movieIdex == 5) {
             Log.e(TAG, "movieIdex ALREADY == 5 return");
             return;

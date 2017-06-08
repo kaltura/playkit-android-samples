@@ -16,7 +16,6 @@ def samples = [
         'KalturaLiveStats',
         'KalturaStats',
         'Providers',
-        'AndroidTV',
         'TVPapiStats'
 ]
 
@@ -24,5 +23,7 @@ samples.each {
     def entry = ':' + it
     include entry
     project(entry).projectDir = new File ('../' + it + '/app')
-} 
-    
+}
+
+include ":AndroidTV"
+project(":AndroidTV").projectDir = new File ('../AndroidTV/tv')

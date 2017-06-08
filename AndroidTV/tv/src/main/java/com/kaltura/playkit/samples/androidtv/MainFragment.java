@@ -51,6 +51,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.kaltura.playkit.samples.androidtv.MainActivity.MOVIE_CATEGORY;
+import static com.kaltura.playkit.samples.androidtv.MainActivity.movieIdex;
+
 public class MainFragment extends BrowseFragment {
     private static final String TAG = "MainFragment";
 
@@ -59,7 +62,7 @@ public class MainFragment extends BrowseFragment {
     private static final int GRID_ITEM_HEIGHT = 200;
     private static final int NUM_ROWS = 3;
     private static final int NUM_COLS = 15;
-
+    private java.util.Timer timer = new java.util.Timer();
     private final Handler mHandler = new Handler();
     private ArrayObjectAdapter mRowsAdapter;
     private Drawable mDefaultBackground;
@@ -76,10 +79,23 @@ public class MainFragment extends BrowseFragment {
         prepareBackgroundManager();
 
         setupUIElements();
-
-        loadRows();
-
+        mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
+        setAdapter(mRowsAdapter);
         setupEventListeners();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Log.d(TAG,"onActivityCreated movieIdex = " + movieIdex);
+                if (movieIdex == 5) {
+                    loadRows();
+
+                    timer.cancel();
+                    timer = null;
+                }
+            }
+        }, 0, 1500);
+
     }
 
     @Override
@@ -92,21 +108,21 @@ public class MainFragment extends BrowseFragment {
     }
 
     private void loadRows() {
-        List<Movie> list = MovieList.setupMovies();
+        List<Movie> list = MainActivity.list;
 
-        mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
+
         CardPresenter cardPresenter = new CardPresenter();
 
         int i;
-        for (i = 0; i < NUM_ROWS; i++) {
+        for (i = 0; i < MOVIE_CATEGORY.length; i++) {
             if (i != 0) {
                 Collections.shuffle(list);
             }
             ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-            for (int j = 0; j < NUM_COLS; j++) {
-                listRowAdapter.add(list.get(j % 5));
+            for (int j = 0; j < list.size(); j++) {
+                listRowAdapter.add(list.get(j % (list.size())));
             }
-            HeaderItem header = new HeaderItem(i, MovieList.MOVIE_CATEGORY[i]);
+            HeaderItem header = new HeaderItem(i, MOVIE_CATEGORY[i]);
             mRowsAdapter.add(new ListRow(header, listRowAdapter));
         }
 
@@ -119,7 +135,7 @@ public class MainFragment extends BrowseFragment {
         gridRowAdapter.add(getResources().getString(R.string.personal_settings));
         mRowsAdapter.add(new ListRow(gridHeader, gridRowAdapter));
 
-        setAdapter(mRowsAdapter);
+
 
     }
 
@@ -264,5 +280,4 @@ public class MainFragment extends BrowseFragment {
         public void onUnbindViewHolder(ViewHolder viewHolder) {
         }
     }
-
 }

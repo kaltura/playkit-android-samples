@@ -35,6 +35,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.kaltura.netkit.connect.response.ResultElement;
 import com.kaltura.playkit.PKDrmParams;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
@@ -45,8 +46,10 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
+import com.kaltura.playkit.api.ovp.SimpleOvpSessionProvider;
+import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
+import com.kaltura.playkit.mediaproviders.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.player.PKTracks;
-import com.kaltura.playkit.plugins.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.Youbora.YouboraPlugin;
 import com.kaltura.playkit.plugins.ads.AdError;
 import com.kaltura.playkit.plugins.ads.AdEvent;
@@ -72,6 +75,7 @@ public class PlaybackOverlayActivity extends Activity implements
     private LeanbackPlaybackState mPlaybackState = LeanbackPlaybackState.IDLE;
     private MediaSession mSession;
     private PKTracks pkTracks;
+
 
     /**
      * Called when the activity is first created.
@@ -122,34 +126,13 @@ public class PlaybackOverlayActivity extends Activity implements
      * Implementation of OnPlayPauseClickedListener
      */
     public void onFragmentPlayPause(Movie movie, int position, Boolean playPause) {
-        Log.d("XXX", movie.getVideoUrl());
         if (currentMovie == null || !currentMovie.getVideoUrl().equals(movie.getVideoUrl())) {
-            Log.d("XXX", "NEW Movie " + mPlaybackState.name());
+            Log.d(TAG, "NEW Movie " + mPlaybackState.name());
             isFirstPlay = true;
             TracksUtils.clearSelectedTracks();
             currentMovie = movie;
-            PKMediaEntry mediaEntry = new PKMediaEntry();
-            mediaEntry.setId("1_zzzzzzz");
-            String duration = "60";
-            long mediaDuration = 0;
-            if (duration != null || !TextUtils.isEmpty(duration)) {
-                mediaDuration = Long.parseLong(duration);
-            }
-            mediaEntry.setDuration(mediaDuration * 1000); // Conversion from seconds to milliseconds
-
-            List<PKMediaSource> mediaSourceList = new ArrayList<>();
-            PKMediaSource pkMediaSource = new PKMediaSource();
-            pkMediaSource.setId("123455");
-            String videoURL = movie.getVideoUrl();
-            pkMediaSource.setMediaFormat(PKMediaFormat.valueOfUrl(videoURL));
-            pkMediaSource.setUrl(videoURL);
-            List<PKDrmParams> pkDrmDataList = new ArrayList<>();
-            PKDrmParams pkDrmParams = new PKDrmParams(movie.getVideoLic(), PKDrmParams.Scheme.WidevineCENC);
-            pkDrmDataList.add(pkDrmParams);
-            pkMediaSource.setDrmData(pkDrmDataList);
-            mediaSourceList.add(pkMediaSource);
-            mediaEntry.setSources(mediaSourceList);
-
+            PKMediaEntry mediaEntry = movie.getPkMediaEntry();//new PKMediaEntry();
+            currentMovie.setDuration((int) mediaEntry.getDuration());
             PKMediaConfig mediaConfig = new PKMediaConfig();
             mediaConfig.setMediaEntry(mediaEntry);
             mediaConfig.setStartPosition(position);
@@ -214,6 +197,13 @@ public class PlaybackOverlayActivity extends Activity implements
     public void replay() {
         if (player != null) {
             player.replay();
+        }
+    }
+
+    @Override
+    public void stop() {
+        if (player != null) {
+            player.stop();
         }
     }
 
@@ -411,7 +401,7 @@ public class PlaybackOverlayActivity extends Activity implements
                                                     break;
                                                 case ERROR:
                                                     String msg = "Player Error";
-                                                    Log.d("XXX", "ERROR");
+                                                    Log.d(TAG, "PLAYER ERROR");
 
                                                     player.stop();
                                                     mPlaybackState = LeanbackPlaybackState.IDLE;
@@ -567,7 +557,7 @@ public class PlaybackOverlayActivity extends Activity implements
 
     private void stopPlayback() {
         if (player != null) {
-            Log.d("XXX", "STOP");
+            Log.d(TAG, "STOP");
 
             player.stop();
         }

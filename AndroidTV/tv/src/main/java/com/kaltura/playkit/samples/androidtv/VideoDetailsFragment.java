@@ -78,8 +78,7 @@ public class VideoDetailsFragment extends DetailsFragment {
 
         prepareBackgroundManager();
 
-        mSelectedMovie = (Movie) getActivity().getIntent()
-                .getSerializableExtra(DetailsActivity.MOVIE);
+        mSelectedMovie = (Movie) getActivity().getIntent().getExtras().getParcelable(DetailsActivity.MOVIE);
         if (mSelectedMovie != null) {
             setupAdapter();
             setupDetailsOverviewRow();
@@ -152,10 +151,10 @@ public class VideoDetailsFragment extends DetailsFragment {
 
         row.addAction(new Action(ACTION_WATCH_TRAILER, getResources().getString(
                 R.string.watch_trailer_1), getResources().getString(R.string.watch_trailer_2)));
-        row.addAction(new Action(ACTION_RENT, getResources().getString(R.string.rent_1),
-                getResources().getString(R.string.rent_2)));
-        row.addAction(new Action(ACTION_BUY, getResources().getString(R.string.buy_1),
-                getResources().getString(R.string.buy_2)));
+        //row.addAction(new Action(ACTION_RENT, getResources().getString(R.string.rent_1),
+        //        getResources().getString(R.string.rent_2)));
+        //row.addAction(new Action(ACTION_BUY, getResources().getString(R.string.buy_1),
+        //        getResources().getString(R.string.buy_2)));
 
         mAdapter.add(row);
     }
@@ -188,12 +187,12 @@ public class VideoDetailsFragment extends DetailsFragment {
 
     private void setupMovieListRow() {
         String subcategories[] = {getString(R.string.related_movies)};
-        List<Movie> list = MovieList.list;
+        List<Movie> list = MainActivity.list;
 
         Collections.shuffle(list);
         ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new CardPresenter());
-        for (int j = 0; j < NUM_COLS; j++) {
-            listRowAdapter.add(list.get(j % 5));
+        for (int j = 0; j < list.size(); j++) {
+            listRowAdapter.add(list.get(j % (list.size())));
         }
 
         HeaderItem header = new HeaderItem(0, subcategories[0]);

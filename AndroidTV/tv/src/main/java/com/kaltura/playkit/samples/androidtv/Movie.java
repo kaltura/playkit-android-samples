@@ -14,9 +14,12 @@
 
 package com.kaltura.playkit.samples.androidtv;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
-import java.io.Serializable;
+import com.kaltura.playkit.PKMediaEntry;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -24,7 +27,7 @@ import java.net.URISyntaxException;
  * Movie class represents video entity with title, description, image thumbs and video url.
  *
  */
-public class Movie implements Serializable {
+public class Movie implements Parcelable {
     static final long serialVersionUID = 727566175075960653L;
     private static long count = 0;
     private long id;
@@ -33,20 +36,20 @@ public class Movie implements Serializable {
     private String bgImageUrl;
     private String cardImageUrl;
     private String videoUrl;
-    private String videoLic;
     private String studio;
     private String category;
     private int duration;
+    private PKMediaEntry pkMediaEntry;
 
     public Movie() {
     }
 
-    public String getVideoLic() {
-        return videoLic;
+    public PKMediaEntry getPkMediaEntry() {
+        return pkMediaEntry;
     }
 
-    public void setVideoLic(String videoLic) {
-        this.videoLic = videoLic;
+    public void setPkMediaEntry(PKMediaEntry pkMediaEntry) {
+        this.pkMediaEntry = pkMediaEntry;
     }
 
     public int getDuration() {
@@ -158,4 +161,48 @@ public class Movie implements Serializable {
                 ", cardImageUrl='" + cardImageUrl + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(this.id);
+        dest.writeString(this.title);
+        dest.writeString(this.description);
+        dest.writeString(this.bgImageUrl);
+        dest.writeString(this.cardImageUrl);
+        dest.writeString(this.videoUrl);
+        dest.writeString(this.studio);
+        dest.writeString(this.category);
+        dest.writeInt(this.duration);
+        dest.writeParcelable(this.pkMediaEntry, flags);
+    }
+
+    protected Movie(Parcel in) {
+        this.id = in.readLong();
+        this.title = in.readString();
+        this.description = in.readString();
+        this.bgImageUrl = in.readString();
+        this.cardImageUrl = in.readString();
+        this.videoUrl = in.readString();
+        this.studio = in.readString();
+        this.category = in.readString();
+        this.duration = in.readInt();
+        this.pkMediaEntry = in.readParcelable(PKMediaEntry.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }

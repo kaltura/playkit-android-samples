@@ -45,7 +45,6 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -103,10 +102,10 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         super.onCreate(savedInstanceState);
 
         mItems = new ArrayList<Movie>();
-        mSelectedMovie = (Movie) getActivity()
-                .getIntent().getSerializableExtra(DetailsActivity.MOVIE);
+        mSelectedMovie = (Movie) getActivity().getIntent().getExtras().getParcelable(DetailsActivity.MOVIE);
+               // .getIntent().getSerializableExtra(DetailsActivity.MOVIE);
 
-        List<Movie> movies = MovieList.list;
+        List<Movie> movies = MainActivity.list;
 
         for (int j = 0; j < movies.size(); j++) {
             mItems.add(movies.get(j));
@@ -164,7 +163,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
 
         playbackControlsRowPresenter.setOnActionClickedListener(new OnActionClickedListener() {
             public void onActionClicked(Action action) {
-                Log.d("XXX", "onActionClicked action.getId() = " + action.getId());
+                Log.d(TAG, "onActionClicked action.getId() = " + action.getId());
                 if (action.getId() == mRepeatAction.getId()) {
                     repeate();
                 } else if (action.getId() == mPlayPauseAction.getId()) {
@@ -174,12 +173,13 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
                 } else if (action.getId() == mSkipPreviousAction.getId()) {
                     prev();
                 } else if (action.getId() == mFastForwardAction.getId()) {
-                    mCallback.seekTo(mCallback.getPosition() + 30000);
+                    Log.d(TAG, "setOnActionClickedListener getPosition = " + mCallback.getPosition() + " getDuration " + mCallback.getDuration());
+                    mCallback.seekTo((mCallback.getPosition() + 15000 < mCallback.getDuration()) ? (mCallback.getPosition() + 15000) : mCallback.getDuration() - 500) ;
                 } else if (action.getId() == mRewindAction.getId()) {
-                    mCallback.seekTo(((mCallback.getPosition() - 30000) >= 0) ? mCallback.getPosition() - 30000 : 0);
+                    Log.d(TAG, "setOnActionClickedListener getPosition = " + mCallback.getPosition() + " getDuration " + mCallback.getDuration());
+                    mCallback.seekTo(((mCallback.getPosition() - 15000) >= 0) ? (mCallback.getPosition() - 15000) : 0);
                 } else if (action.getId() == mHighQualityAction.getId()) {
-                    Log.d("XXXXX", "mHighQualityAction");
-                    Toast.makeText(getActivity(), "TODO: mHighQualityAction", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "mHighQualityAction");
                     CharSequence[] items = null;
                     int itemIndex = 0;
                     PKTracks pkTracks = mCallback.onTracksAvailable();
@@ -192,7 +192,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
                             items[itemIndex++] = " " + cs + " ";
                         }
                         for (CharSequence cc : items) {
-                            Log.d("XXXXX", "items = " + cc);
+                            Log.d(TAG, "items = " + cc);
                         }
 
                         final ArrayList<Integer> seletedItem = new ArrayList<>(1);
@@ -221,8 +221,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
                     }
 
                 } else if (action.getId() == mClosedCaptioningAction.getId()) {
-                    Log.d("XXXXX", "mClosedCaptioningAction");
-                    Toast.makeText(getActivity(), "TODO: mClosedCaptioningAction", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "mClosedCaptioningAction");
                     CharSequence[] items = null;
                     int itemIndex = 0;
                     PKTracks pkTracks = mCallback.onTracksAvailable();
@@ -234,7 +233,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
                             items[itemIndex++] = " " + cs + " ";
                         }
                         for (CharSequence cc : items) {
-                            Log.d("XXXXX", "items = " + cc);
+                            Log.d(TAG, "items = " + cc);
                         }
 
                         final ArrayList<Integer> seletedItem = new ArrayList<>(1);
@@ -263,7 +262,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
                         dialog.show();
                     }
                 } else if (action.getId() == mThumbsUpAction.getId()) {
-                    Log.d("XXXXX", "mAudioTracks");
+                    Log.d(TAG, "mAudioTracks");
                     CharSequence[] items = null;
                     int itemIndex = 0;
                     PKTracks pkTracks = mCallback.onTracksAvailable();
@@ -275,7 +274,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
                             items[itemIndex++] = " " + cs + " ";
                         }
                         for (CharSequence cc : items) {
-                            Log.d("XXXXX", "items = " + cc);
+                            Log.d(TAG, "items = " + cc);
                         }
 
                         final ArrayList<Integer> seletedItem = new ArrayList<>(1);
@@ -346,15 +345,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     private int getDuration() {
         long duration = 0;
         Movie movie = mItems.get(mCurrentItem);
-//        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-//            mmr.setDataSource(movie.getVideoUrl(), new HashMap<String, String>());
-//        } else {
-//            mmr.setDataSource(movie.getVideoUrl());
-//        }
-//        String time = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-//        duration = (mCallback.getDuration() > 0 ) ? mCallback.getDuration() : (Long.parseLong(time) > 0) ? Long.parseLong(time) : movie.getDuration();
-        return (int)  movie.getDuration();
+        return (int) movie.getDuration();
     }
 
     private void addPlaybackControlsRow() {
@@ -462,13 +453,14 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
             @Override
             public void run() {
                 int updatePeriod = getUpdatePeriod();
-                int currentTime = mPlaybackControlsRow.getCurrentTime() + updatePeriod;
-                int totalTime   =  mPlaybackControlsRow.getTotalTime();
+
+                int currentTime = (int)mCallback.getPosition();//mPlaybackControlsRow.getCurrentTime() + updatePeriod;
+                int totalTime   = (int)mCallback.getDuration(); //mPlaybackControlsRow.getTotalTime();
+                Log.d(TAG, "startProgressAutomation currentTime = " + currentTime + " totalTime = " + totalTime);
                 mPlaybackControlsRow.setCurrentTime(currentTime);
                 mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
 
                 if (totalTime > 0 && totalTime <= currentTime) {
-
                     next();
                 }
                 mHandler.postDelayed(this, updatePeriod);
@@ -478,6 +470,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     }
 
     private void next() {
+        mCallback.stop();
         if (++mCurrentItem >= mItems.size()) {
             mCurrentItem = 0;
         }
@@ -491,6 +484,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
     }
 
     private void prev() {
+        mCallback.stop();
         if (--mCurrentItem < 0) {
             mCurrentItem = mItems.size() - 1;
         }
@@ -536,6 +530,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         long getPosition();
         long getDuration();
         void replay();
+        void stop();
     }
 
     static class DescriptionPresenter extends AbstractDetailsDescriptionPresenter {

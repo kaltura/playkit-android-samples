@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
         startSimpleOvpMediaLoading(playLoadedEntry, CDN_URL, PARTNER_ID, "1_b8ppdt98");
         startSimpleOvpMediaLoading(playLoadedEntry, CDN_URL, PARTNER_ID, "1_cwdmd8il");
         startSimpleOvpMediaLoading(playLoadedEntry, CDN_URL, PARTNER_ID, "1_nxyj6abx");
-        startSimpleOvpMediaLoading(playLoadedEntry, CDN_URL, PARTNER_ID, "1_f93tepsn");
+        startSimpleOvpMediaLoading(playLoadedEntry, CDN_URL, PARTNER_ID, "1_q81a5nbp");
 
 
 

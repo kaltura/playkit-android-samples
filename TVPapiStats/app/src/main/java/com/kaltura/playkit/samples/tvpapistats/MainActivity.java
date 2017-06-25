@@ -51,8 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private Player player;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

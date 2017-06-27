@@ -16,8 +16,8 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.plugins.TVPAPIAnalyticsPlugin;
-import com.kaltura.playkit.plugins.TVPapiAnalyticsEvent;
+import com.kaltura.playkit.plugins.ott.TVPAPIAnalyticsPlugin;
+import com.kaltura.playkit.plugins.ott.TVPAPIAnalyticsEvent;
 
 import java.util.ArrayList;
 import java.util.List;

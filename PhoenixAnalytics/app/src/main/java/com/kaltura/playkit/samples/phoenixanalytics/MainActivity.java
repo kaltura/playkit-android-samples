@@ -20,8 +20,8 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
 import com.kaltura.playkit.mediaproviders.ott.PhoenixMediaProvider;
-import com.kaltura.playkit.plugins.PhoenixAnalyticsEvent;
-import com.kaltura.playkit.plugins.PhoenixAnalyticsPlugin;
+import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
+import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
 
 
 public class MainActivity extends AppCompatActivity {

@@ -16,8 +16,8 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.plugins.Youbora.YouboraEvent;
-import com.kaltura.playkit.plugins.Youbora.YouboraPlugin;
+import com.kaltura.playkit.plugins.youbora.YouboraEvent;
+import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 YouboraEvent.YouboraReport reportEvent = (YouboraEvent.YouboraReport) event;
 
                 //Get the event name from the report.
-                String reportedEventName = reportEvent.getReportedEventName();
+                String reportedEventName = reportEvent.reportedEventName;
                 Log.i(TAG, "Youbora report sent. Reported event name: " + reportedEventName);
             }
             //Event subscription.

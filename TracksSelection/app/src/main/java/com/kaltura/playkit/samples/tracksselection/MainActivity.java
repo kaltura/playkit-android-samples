@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
 
                 //Obtain the actual tracks info from it.
-                PKTracks tracks = tracksAvailable.getPKTracks();
+                PKTracks tracks = tracksAvailable.tracksInfo;
 
                 //Populate Android spinner views with received data.
                 populateSpinnersWithTrackInfo(tracks);

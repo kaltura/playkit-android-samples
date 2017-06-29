@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                                                     PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
 
                                                     //Then you can use the data object itself.
-                                                    PKTracks tracks = tracksAvailable.getPKTracks();
+                                                    PKTracks tracks = tracksAvailable.tracksInfo;
 
                                                     //Print to log amount of video tracks that are available for this entry.
                                                     Log.d(TAG, "event received: " + event.eventType().name()

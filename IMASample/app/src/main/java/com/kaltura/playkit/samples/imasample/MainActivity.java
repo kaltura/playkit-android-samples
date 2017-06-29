@@ -16,7 +16,6 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.plugins.ads.AdError;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.AdInfo;
 import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
@@ -61,9 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Subscribe to the ad events.
         subscribeToAdEvents();
-
-        //Subscribe to the ad error events.
-        subscribeToAdErrorEvents();
 
         //Add player to the view hierarchy.
         addPlayerToView();
@@ -151,6 +147,11 @@ public class MainActivity extends AppCompatActivity {
                                                 case COMPLETED:
                                                     Log.d(TAG, "ad event received: " + event.eventType().name());
                                                     break;
+                                                case ERROR:
+                                                    AdEvent.Error errorEvent = (AdEvent.Error) event;
+                                                    //Print the type of the received error.
+                                                    Log.e(TAG, "Error: " + errorEvent.error.errorType.name());
+                                                    break;
                                             }
                                         }
                                     }
@@ -158,46 +159,10 @@ public class MainActivity extends AppCompatActivity {
                 //Subscribe to the ad events you are interested in.
                 AdEvent.Type.STARTED,
                 AdEvent.Type.SKIPPED,
-                AdEvent.Type.COMPLETED
+                AdEvent.Type.COMPLETED,
+                AdEvent.Type.ERROR
         );
     }
-
-    /**
-     * Will subscribe to AddError events. In order to reproduce error, you can change
-     * the adTagUrl in createIMAPlugin() method from AD_TAG_URL to INCORRECT_AD_TAG_URL.
-     * (line 96 imaConfigs.setAdTagURL(AD_TAG_URL))
-     * This will produce ADS_REQUEST_NETWORK_ERROR, which can be seen in the following example.
-     * For simplicity, in this example we will show subscription to the one event.
-     * For the full list of ad error events you can check our documentation.
-     * !!!Note, we will receive only ad error events, we subscribed to.
-     */
-    private void subscribeToAdErrorEvents() {
-        //Add ad error event listener. Note, that it have two parameters.
-        // 1. PKEvent.Listener itself.
-        // 2. Array of ad error events you want to listen to.
-        player.addEventListener(new PKEvent.Listener() {
-                                    @Override
-                                    public void onEvent(PKEvent event) {
-
-                                        //First check if event is instance of the AdError.
-                                        if (event instanceof AdError) {
-
-                                            //Switch on the received events.
-                                            switch (((AdError) event).errorType) {
-
-                                                //Ads request network error triggered.
-                                                case ADS_REQUEST_NETWORK_ERROR:
-                                                    Log.d(TAG, "ad error event received: " + event.eventType().name());
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                },
-                //Subscribe to the ad error events you are interested in.
-                AdError.Type.ADS_REQUEST_NETWORK_ERROR);
-    }
-
-
 
     /**
      * Will create {@link PKMediaConfig} object.

@@ -16,8 +16,8 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.plugins.KalturaStatsEvent;
-import com.kaltura.playkit.plugins.KalturaStatsPlugin;
+import com.kaltura.playkit.plugins.ovp.KalturaStatsEvent;
+import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 KalturaStatsEvent.KalturaStatsReport reportEvent = (KalturaStatsEvent.KalturaStatsReport) event;
 
                 //Get the event name from the report.
-                String reportedEventName = reportEvent.getReportedEventName();
+                String reportedEventName = reportEvent.reportedEventName;
                 Log.i(TAG, "Kaltura stats report sent. Reported event name: " + reportedEventName);
             }
             //Event subscription.

@@ -6,7 +6,8 @@ project(':playkit').projectDir = new File('../../playkit-android/playkit')
 def samples = [
         'BasicSetup', 
         'EventsRegistration', 
-        'BasicPluginsSetup', 
+        'ErHandling',
+        'BasicPluginsSetup',
         'TracksSelection', 
         'ChangeMedia',
         'IMASample',

@@ -1,6 +1,6 @@
 // PlayKit Library
 include ':playkit'
-project(':playkit').projectDir = new File('../../playkit-android/playkit')
+project(':playkit').projectDir = new File('../../Noggin/vicaom_noggin_android/Noggin/playkit-android/playkit')
 
 // Sample apps
 def samples = [
@@ -28,3 +28,5 @@ samples.each {
 
 include ":AndroidTV"
 project(":AndroidTV").projectDir = new File ('../AndroidTV/tv')
+include ":playkitDragScale"
+project(":playkitDragScale").projectDir = new File ('../playkitDragScale')

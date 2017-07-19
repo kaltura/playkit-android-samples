@@ -2,17 +2,13 @@ package com.kaltura.playkitdemo;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
-import com.google.gson.JsonObject;
 import com.kaltura.playkit.MediaEntryProvider;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
@@ -24,14 +20,10 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
-import com.kaltura.playkit.mediaproviders.mock.MockMediaProvider;
-import com.kaltura.playkit.plugins.SamplePlugin;
 import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
-import com.kaltura.playkitdemo.animation.ScaleDragBehavior;
 
 import java.util.ArrayList;
 import java.util.List;

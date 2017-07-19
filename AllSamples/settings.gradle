@@ -17,7 +17,8 @@ def samples = [
         'KalturaLiveStats',
         'KalturaStats',
         'Providers',
-        'TVPapiStats'
+        'TVPapiStats',
+        'playkitDragScale'
 ]
 
 samples.each {

@@ -11,7 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".PlayerActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode">
+                  android:screenOrientation="portrait"
+            android:configChanges="keyboard|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                     <action android:name="com.playkit.demo.MAIN"/>

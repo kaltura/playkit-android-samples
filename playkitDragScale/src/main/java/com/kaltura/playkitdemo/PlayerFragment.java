@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -34,7 +36,7 @@ import java.util.List;
 
 public class PlayerFragment extends Fragment {
 
-    private RelativeLayout root;
+    private ViewGroup root;
 
     private static final PKLog log = PKLog.get("Activity");
 
@@ -58,7 +60,7 @@ public class PlayerFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        root = (RelativeLayout)view.findViewById(R.id.root);
+        root = (ViewGroup) view.findViewById(R.id.root);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
         registerPlugins();
@@ -93,7 +95,9 @@ public class PlayerFragment extends Fragment {
             addIMAPluginConfig(pluginConfig);
 
             player = PlayKitManager.loadPlayer(getActivity(), pluginConfig);
-
+            player.getSettings().useTextureView(PlayerActivity.USE_TEXTURE);
+            /*SurfaceView view = player.getView();
+            view.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);*/
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
             root.addView(player.getView(), 0);
@@ -106,7 +110,8 @@ public class PlayerFragment extends Fragment {
     }
 
     private void addIMAPluginConfig(PKPluginConfigs config) {
-        String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+        //String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+        String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
         List<String> videoMimeTypes = new ArrayList<>();
         IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
@@ -190,6 +195,15 @@ public class PlayerFragment extends Fragment {
                 }
             }
         });
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                log.d("player play");
+                root.getLayoutParams().width = root.getWidth() + 1;
+                root.getLayoutParams().height = root.getHeight() + 1;
+                root.requestLayout();
+            }
+        }, PlayerEvent.Type.PLAY);
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {

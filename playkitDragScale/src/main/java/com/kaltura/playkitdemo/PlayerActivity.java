@@ -15,6 +15,7 @@
  */
 package com.kaltura.playkitdemo;
 
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -31,6 +32,8 @@ import com.github.pedrovgs.DraggablePanel;
  */
 public class PlayerActivity extends FragmentActivity {
 
+    public static boolean USE_TEXTURE = false;
+
   DraggablePanel draggablePanel;
 
  // private YouTubePlayer youtubePlayer;
@@ -43,6 +46,7 @@ public class PlayerActivity extends FragmentActivity {
   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_youtube_sample);
+      getWindow().setFormat(PixelFormat.TRANSLUCENT);
       draggablePanel = (DraggablePanel)findViewById(R.id.draggable_panel);
       findViewById(R.id.iv_thumbnail).setOnClickListener(new View.OnClickListener() {
           @Override
@@ -74,7 +78,7 @@ public class PlayerActivity extends FragmentActivity {
     moviePosterFragment.setPosterTitle(VIDEO_POSTER_TITLE);*/
       draggablePanel.setBottomFragment(moviePosterFragment);
       draggablePanel.initializeView();
-      draggablePanel.setTopFragmentResize(true);
+      draggablePanel.setTopFragmentResize(!USE_TEXTURE);
   }
 
   /**

@@ -1,7 +1,6 @@
 // PlayKit Library
 include ':playkit'
-project(':playkit').projectDir = new File('../../Noggin/vicaom_noggin_android/Noggin/playkit-android/playkit')
-
+project(':playkit').projectDir = new File('../../playkit-android/playkit')
 
 // Sample apps
 def samples = [

@@ -20,9 +20,20 @@ public class DragViewController implements DragGesturesDetector.OnDragViewListen
     private ScaleDragListener mScaleDragListener;
     private Rect mDragArea;
     private float minScaleFactor = 0.5f;
+    private boolean mIsResizing = true;
+    private int mOriginW, mOriginH;
 
-    public DragViewController(View view) {
+    public DragViewController(final View view) {
         mView = view;
+        mView.post(new Runnable() {
+            @Override
+            public void run() {
+                mOriginW = view.getWidth();
+                mOriginH = view.getHeight();
+                mView.setPivotY(0.5f);
+                mView.setPivotX(0.5f);
+            }
+        });
     }
 
     public void setDragArea(Rect dragArea, ScaleDragListener scaleDragListener) {
@@ -60,11 +71,24 @@ public class DragViewController implements DragGesturesDetector.OnDragViewListen
     }
 
     private void onUpdateScale(float scaleFactor) {
-        mView.setScaleX(scaleFactor);
-        mView.setScaleY(scaleFactor);
+        int w = (int)(scaleFactor * (float)mOriginW);
+        int h = (int)(scaleFactor * (float)mOriginH);
+        float d = 0.f;
+        if (mIsResizing) {
+            mView.getLayoutParams().width = w;
+            mView.getLayoutParams().height = h;
+            mView.requestLayout();
+            d = (mDragArea.right - w);
+        }
+        else {
+            mView.setScaleX(scaleFactor);
+            mView.setScaleY(scaleFactor);
+            d = (mDragArea.right - w) / 2;
+        }
+
         float scaledW = (float)mView.getWidth() * scaleFactor;
-        float d = (mDragArea.right - scaledW) / 2;
-        float offsetX = d * mView.getTranslationY() / (float)(mDragArea.bottom - mView.getHeight());
+        float offsetX = d * mView.getTranslationY() / (float)(mDragArea.bottom - h);
+        Log.v("new size","originW = "+mOriginW+" w = "+w+" h = "+h+" offsetX = "+offsetX);
 
         mView.setTranslationX(offsetX);
     }

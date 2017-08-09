@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         contentManager = ContentManager.getInstance(this);
-        contentManager.setMaxConcurrentDownloads(4);
+        contentManager.getSettings().maxConcurrentDownloads = 4;
 
         contentManager.addDownloadStateListener(new DownloadStateListener() {
             @Override
@@ -239,6 +239,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void playLocalAsset() {
         String path = contentManager.getLocalFile(ASSET_ID).getAbsolutePath();
+        if (path == null) {
+            Toast.makeText(context, "failed path is null", Toast.LENGTH_LONG).show();
+            return;
+        }
         PKMediaSource mediaSource = localAssetsManager.getLocalMediaSource(ASSET_ID, path);
         
         player.prepare(new PKMediaConfig().setMediaEntry(new PKMediaEntry().setSources(Collections.singletonList(mediaSource))));
@@ -247,6 +251,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void registerDownloadedAsset() {
         File localFile = contentManager.getLocalFile(ASSET_ID);
+        if (localFile == null) {
+            Toast.makeText(context, "failed localFile is null", Toast.LENGTH_LONG).show();
+            return;
+        }
         localAssetsManager.registerAsset(originMediaSource, localFile.getAbsolutePath(), ASSET_ID, new LocalAssetsManager.AssetRegistrationListener() {
             
             @Override

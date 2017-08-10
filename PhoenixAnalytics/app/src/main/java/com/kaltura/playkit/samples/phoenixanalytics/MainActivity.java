@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(PhoenixAnalyticsPlugin.factory.getName(), pluginEntry);
+        pluginConfigs.setPluginConfig(PhoenixAnalyticsPlugin.factory.getName(), phoenixPluginConfigJson);
 
         return pluginConfigs;
     }

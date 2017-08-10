@@ -12,13 +12,6 @@ import java.util.List;
 
 public class CastOptionsProvider implements OptionsProvider {
 
-//    @Override
-//    public CastOptions getCastOptions(Context context) {
-//        return new CastOptions.Builder()
-//                .setReceiverApplicationId(context.getString(R.string.receiver_application_id))
-//                .build();
-//    }
-
     @Override
     public List<SessionProvider> getAdditionalSessionProviders(Context context) {
         return null;
@@ -33,7 +26,7 @@ public class CastOptionsProvider implements OptionsProvider {
                 .build();
 
         return new CastOptions.Builder()
-                .setReceiverApplicationId(context.getString(R.string.receiver_application_id))
+                .setReceiverApplicationId(context.getString(R.string.receiver_application_id_ovp))
                 .setCastMediaOptions(mediaOptions)
                 .build();
     }

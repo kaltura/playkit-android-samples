@@ -17,17 +17,15 @@ public class KInitObjModel {
     }
 
     public JsonObject toJson() {
+        //JsonObject initObj = new JsonObject();
         JsonObject initObj = new JsonObject();
-        JsonObject obj = new JsonObject();
-            obj.addProperty("ApiPass", mApiPass);
-            obj.addProperty("ApiUser", mApiUser);
-            obj.addProperty("UDID", mUDID);
-            obj.addProperty("DomainID", mDomainID);
-            obj.addProperty("SiteGuid", mSiteGuid);
-            obj.addProperty("Platform", mPlatform);
-            obj.add("Locale", mLocale.toJson());
-            initObj.add("initObj", obj);
-
+        initObj.addProperty("ApiPass", mApiPass);
+        initObj.addProperty("ApiUser", mApiUser);
+        initObj.addProperty("UDID", mUDID);
+        initObj.addProperty("DomainID", mDomainID);
+        initObj.addProperty("SiteGuid", mSiteGuid);
+        initObj.addProperty("Platform", mPlatform);
+        initObj.add("Locale", mLocale.toJson());
         return initObj;
     }
 

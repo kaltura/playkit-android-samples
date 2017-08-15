@@ -174,7 +174,12 @@ public class MainActivity extends AppCompatActivity {
                 trackSelector.setSelectedTracks(DownloadItem.TrackType.TEXT, trackSelector.getAvailableTracks(DownloadItem.TrackType.TEXT));
             }
         });
-        contentManager.start(null);
+        contentManager.start(new ContentManager.OnStartedListener() {
+            @Override
+            public void onStarted() {
+                Log.d(TAG, "Download Service started");
+            }
+        });
     }
 
     // Find the minimal "good enough" track. In other words, the track that has bitrate greater than or equal

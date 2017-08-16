@@ -140,7 +140,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDownloadMetadata(DownloadItem item, Exception error) {
                 Log.d(TAG, "meta: " + item);
-                item.startDownload();
+                if (error == null) {
+                    item.startDownload();
+                } else {
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(context, "Error: Load Metdata Failed - check your network connection", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    Log.e(TAG, "onDownloadMetadata failure: " + error.getMessage());
+                    contentManager.removeItem(ASSET_ID);
+                }
             }
 
             @Override

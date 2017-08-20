@@ -2,23 +2,26 @@
 include ':playkit'
 project(':playkit').projectDir = new File('../../playkit-android/playkit')
 
+
+
 // Sample apps
 def samples = [
-        'BasicSetup', 
-        'EventsRegistration', 
+        'BasicSetup',
+        'EventsRegistration',
         'ErHandling',
         'BasicPluginsSetup',
-        'TracksSelection', 
+        'TracksSelection',
         'ChangeMedia',
         'IMASample',
-        'Offline', 
+        'Offline',
         'Youbora',
         'PhoenixAnalytics',
         'KalturaLiveStats',
         'KalturaStats',
         'Providers',
         'TVPapiStats',
-        'playkitDragScale'
+        'playkitDragScale',
+        'ChromecastSample'
 ]
 
 samples.each {

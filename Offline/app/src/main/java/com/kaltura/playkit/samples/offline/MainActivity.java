@@ -108,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         contentManager = ContentManager.getInstance(this);
+        contentManager.getSettings().maxConcurrentDownloads = 4;
+
         contentManager.addDownloadStateListener(new DownloadStateListener() {
             @Override
             public void onDownloadComplete(DownloadItem item) {
@@ -138,7 +140,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDownloadMetadata(DownloadItem item, Exception error) {
                 Log.d(TAG, "meta: " + item);
-                item.startDownload();
+                if (error == null) {
+                    item.startDownload();
+                } else {
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(context, "Error: Load Metdata Failed - check your network connection", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    Log.e(TAG, "onDownloadMetadata failure: " + error.getMessage());
+                    contentManager.removeItem(ASSET_ID);
+                }
             }
 
             @Override
@@ -172,7 +185,12 @@ public class MainActivity extends AppCompatActivity {
                 trackSelector.setSelectedTracks(DownloadItem.TrackType.TEXT, trackSelector.getAvailableTracks(DownloadItem.TrackType.TEXT));
             }
         });
-        contentManager.start(null);
+        contentManager.start(new ContentManager.OnStartedListener() {
+            @Override
+            public void onStarted() {
+                Log.d(TAG, "Download Service started");
+            }
+        });
     }
 
     // Find the minimal "good enough" track. In other words, the track that has bitrate greater than or equal
@@ -237,6 +255,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void playLocalAsset() {
         String path = contentManager.getLocalFile(ASSET_ID).getAbsolutePath();
+        if (path == null) {
+            Toast.makeText(context, "failed path is null", Toast.LENGTH_LONG).show();
+            return;
+        }
         PKMediaSource mediaSource = localAssetsManager.getLocalMediaSource(ASSET_ID, path);
         
         player.prepare(new PKMediaConfig().setMediaEntry(new PKMediaEntry().setSources(Collections.singletonList(mediaSource))));
@@ -245,6 +267,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void registerDownloadedAsset() {
         File localFile = contentManager.getLocalFile(ASSET_ID);
+        if (localFile == null) {
+            Toast.makeText(context, "failed localFile is null", Toast.LENGTH_LONG).show();
+            return;
+        }
         localAssetsManager.registerAsset(originMediaSource, localFile.getAbsolutePath(), ASSET_ID, new LocalAssetsManager.AssetRegistrationListener() {
             
             @Override

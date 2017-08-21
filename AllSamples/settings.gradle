@@ -20,7 +20,6 @@ def samples = [
         'KalturaStats',
         'Providers',
         'TVPapiStats',
-        'playkitDragScale',
         'ChromecastSample'
 ]
 
@@ -34,3 +33,4 @@ include ":AndroidTV"
 project(":AndroidTV").projectDir = new File ('../AndroidTV/tv')
 include ":playkitDragScale"
 project(":playkitDragScale").projectDir = new File ('../playkitDragScale')
+

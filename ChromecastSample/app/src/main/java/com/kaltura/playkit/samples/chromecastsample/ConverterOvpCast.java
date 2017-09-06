@@ -6,11 +6,11 @@ package com.kaltura.playkit.samples.chromecastsample;
 
 public class ConverterOvpCast extends ConverterGoogleCast {
 
-    String ks;
+    private String ks;
 
     public ConverterOvpCast(ReceiverEnvironmentType receiverEnvironmentType, String ks, String entryId, String adTagURL, String mwEmbedURL, String partnerId, String uiconfId, ConverterMediaMetadata mediaMetadata) {
         super(receiverEnvironmentType, entryId, adTagURL, mwEmbedURL, partnerId, uiconfId, mediaMetadata);
-    this.ks = ks;
+        this.ks = ks;
     }
 
     public ConverterOvpCast(ConverterGoogleCast converterGoogleCast, String ks) {

@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FullDemo</string>
+    <string name="other_videos">Videos List</string>
+    <string name="companionPlaceholder">Companion Ad Slot</string>
+    <string name="ad_ui_lang">en</string>
+    <string name="companion_height">90</string>
+    <string name="companion_width">728</string>
+    <string name="custom_ad_tag_value">custom</string>
+
+</resources>

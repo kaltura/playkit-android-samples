@@ -1,8 +1,9 @@
 // PlayKit Library
 include ':playkit'
-project(':playkit').projectDir = new File('../../playkit-android/playkit')
-
-
+//project(':playkit').projectDir = new File('../../playkit-android/playkit')
+project(':playkit').projectDir = new File('../../playkit-sdk/playkit-android/playkit')
+include ':admanager'
+project(':admanager').projectDir = new File('../../playkit-admanager-android/admanager')
 
 // Sample apps
 def samples = [
@@ -20,7 +21,8 @@ def samples = [
         'KalturaStats',
         'Providers',
         'TVPapiStats',
-        'ChromecastSample'
+        'ChromecastSample',
+        'FullDemo'
 ]
 
 samples.each {

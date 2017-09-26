@@ -3,6 +3,7 @@ package com.kaltura.playkit.samples.chromecastsample;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -15,6 +16,9 @@ import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.CastState;
+import com.google.android.gms.cast.framework.CastStateListener;
+import com.google.android.gms.cast.framework.IntroductoryOverlay;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
@@ -29,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Tag for logging.
     private static final String TAG = MainActivity.class.getSimpleName();
-
+    private IntroductoryOverlay mIntroductoryOverlay;
     //Media entry configuration constants.
     private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
     private static final String ENTRY_ID = "entry_id";
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private Player player;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
-
+    private CastStateListener mCastStateListener;
     private SessionManagerListener<CastSession> mSessionManagerListener;
     private CastContext mCastContext;
     private MenuItem mediaRouteMenuItem;
@@ -59,18 +63,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mCastStateListener = new CastStateListener() {
+            @Override
+            public void onCastStateChanged(int newState) {
+                if (newState != CastState.NO_DEVICES_AVAILABLE) {
+                    showIntroductoryOverlay();
+                }
+            }
+        };
+
         setupCastListener();
-
-
         mCastContext = CastContext.getSharedInstance(this);
         mCastContext.getSessionManager().addSessionManagerListener(
                 mSessionManagerListener, CastSession.class);
         mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
-       // mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
+
+
+        // mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
 
 
         addCastOvpButton();
         addCastOttButton();
+
 
     }
 
@@ -107,6 +121,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+
+
+    private void showIntroductoryOverlay() {
+        if (mIntroductoryOverlay != null) {
+            mIntroductoryOverlay.remove();
+        }
+        if ((mediaRouteMenuItem != null) && mediaRouteMenuItem.isVisible()) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    mIntroductoryOverlay = new IntroductoryOverlay.Builder(
+                            MainActivity.this, mediaRouteMenuItem)
+                            .setTitleText("Introducing Cast")
+                            .setSingleTime()
+                            .setOnOverlayDismissedListener(
+                                    new IntroductoryOverlay.OnOverlayDismissedListener() {
+                                        @Override
+                                        public void onOverlayDismissed() {
+                                            mIntroductoryOverlay = null;
+                                        }
+                                    })
+                            .build();
+                    mIntroductoryOverlay.show();
+                }
+            });
+        }
+    }
     private void setupCastListener() {
         mSessionManagerListener = new SessionManagerListener<CastSession>() {
 
@@ -397,5 +438,17 @@ public class MainActivity extends AppCompatActivity {
                 converterMediaMetadata);
 
         return converterOttCast;
+    }
+
+    @Override
+    protected void onResume() {
+        mCastContext.addCastStateListener(mCastStateListener);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mCastContext.removeCastStateListener(mCastStateListener);
+        super.onPause();
     }
 }

@@ -7,4 +7,5 @@
     <dimen name="margin_right">6dp</dimen>
     <dimen name="media_height">200dp</dimen>
     <dimen name="description_height">400dp</dimen>
+    <dimen name="player_controls_height">90dp</dimen>
 </resources>

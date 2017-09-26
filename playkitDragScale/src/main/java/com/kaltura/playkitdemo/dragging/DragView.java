@@ -14,14 +14,18 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+
+import com.kaltura.netkit.utils.OnCompletion;
 
 /**
  * Sample of TextView with added gesture controls.
  */
-public class DragView extends FrameLayout {
+public class DragView extends RelativeLayout {
 
     private DragGesturesDetector mDetector;
     private DragViewController mViewController;
+    private OnClickListener mOnClickListener;
 
     public DragView(Context context) {
         super(context);
@@ -40,8 +44,16 @@ public class DragView extends FrameLayout {
 
     protected void init() {
         mViewController = new DragViewController(this);
-        mViewController.setDragArea(getDragArea(), null);
         mDetector = new DragGesturesDetector(getContext(), mViewController);
+    }
+
+    public void setEventListener(final DragViewController.EventListener eventListener) {
+        post(new Runnable() {
+            @Override
+            public void run() {
+                    mViewController.setDragArea(getDragArea(), eventListener);
+                }
+        });
     }
 
     private Rect getDragArea() {
@@ -49,6 +61,11 @@ public class DragView extends FrameLayout {
         Point size = new Point();
         display.getSize(size);
         return new Rect(0, 0, size.x, size.y);
+    }
+
+    @Override
+    public void setOnClickListener(OnClickListener onClickListener) {
+        mOnClickListener = onClickListener;
     }
 
     @Override

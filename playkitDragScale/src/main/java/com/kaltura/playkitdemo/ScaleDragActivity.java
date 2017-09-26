@@ -1,13 +1,21 @@
 package com.kaltura.playkitdemo;
 
 import android.app.Activity;
+import android.content.res.Resources;
+import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.kaltura.playkit.MediaEntryProvider;
 import com.kaltura.playkit.PKEvent;
@@ -24,6 +32,8 @@ import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
+import com.kaltura.playkitdemo.dragging.DragView;
+import com.kaltura.playkitdemo.dragging.DragViewController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,26 +44,81 @@ import java.util.List;
 
 public class ScaleDragActivity extends Activity {
 
-    private ViewGroup root;
+    private FrameLayout root;
 
     private static final PKLog log = PKLog.get("Activity");
+
+    private static final int TIME_SHOW_CONTROLS = 5000;
 
     private Player player;
     private MediaEntryProvider mediaProvider;
     private PlaybackControlsView controlsView;
+    private DragView mDragView;
     private boolean nowPlaying;
+    private boolean mIsShowing;
+    private Handler mHandler;
     ProgressBar progressBar;
+
+    private Runnable mHideControlsRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mIsShowing = false;
+            mHandler.removeCallbacks(mHideControlsRunnable);
+            controlsView.setVisibility(View.GONE);
+        }
+    };
+
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mHandler = new Handler();
         setContentView(R.layout.scale_drag_activity);
-        root = (ViewGroup) findViewById(R.id.player_root);
+        root = (FrameLayout) findViewById(R.id.player_root);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
+        controlsView = (PlaybackControlsView) findViewById(R.id.playerControls);
         registerPlugins();
         onMediaLoaded(createMediaEntry());
+        mDragView = (DragView)findViewById(R.id.drag_view);
+        mDragView.setEventListener(new DragViewController.EventListener() {
+
+            @Override
+            public void onClick() {
+                if (!mIsShowing) {
+                    mIsShowing = true;
+                    controlsView.setVisibility(View.VISIBLE);
+                    mHandler.postDelayed(mHideControlsRunnable, TIME_SHOW_CONTROLS);
+                }
+                else {
+                    mIsShowing = false;
+                    mHandler.removeCallbacks(mHideControlsRunnable);
+                    controlsView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onUpdateViewSize(float scaleFactor, int originW, int originH) {
+                int bottom = (int)(getResources().getDimension(R.dimen.player_controls_height) * scaleFactor);
+                controlsView.setPivotY(0);
+                controlsView.setScaleY(scaleFactor);
+                controlsView.getLayoutParams().height = bottom;
+                root.setPadding(0, 0, 0, bottom);
+            }
+        });
     }
+
+    /*private int convertDpToPixel(int dp) {
+        Resources r = getResources();
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
+    }
+
+    private int getScreenWidth() {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        return size.x;
+    }*/
 
     private PKMediaEntry createMediaEntry() {
         PKMediaEntry entry = new PKMediaEntry();
@@ -80,9 +145,9 @@ public class ScaleDragActivity extends Activity {
             player = PlayKitManager.loadPlayer(this, pluginConfig);
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
-            root.addView(player.getView(), 0);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            root.addView(player.getView(), params);
 
-            controlsView = (PlaybackControlsView) root.findViewById(R.id.playerControls);
             controlsView.setPlayer(player);
         }
         player.prepare(mediaConfig);
@@ -179,9 +244,7 @@ public class ScaleDragActivity extends Activity {
             @Override
             public void onEvent(PKEvent event) {
                 log.d("player play");
-                root.getLayoutParams().width = root.getWidth() + 1;
-                root.getLayoutParams().height = root.getHeight() + 1;
-                root.requestLayout();
+
             }
         }, PlayerEvent.Type.PLAY);
         player.addEventListener(new PKEvent.Listener() {

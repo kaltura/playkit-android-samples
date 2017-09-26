@@ -14,13 +14,13 @@ import android.view.View;
  */
 
 @TargetApi(Build.VERSION_CODES.FROYO)
-public class DragGesturesDetector implements GestureDetector.OnGestureListener,
-        View.OnTouchListener {
+public class DragGesturesDetector implements View.OnTouchListener {
 
     public interface OnDragViewListener {
         void onMove(float transitionXPos, float transitionYPos, float touchXPos, float touchYPos);
         void onMoveStart(float transitionXPos, float transitionYPos, float touchXPos, float touchYPos);
         void onMoveEnd(float transitionXPos, float transitionYPos, float touchXPos, float touchYPos);
+        void onClick();
     }
 
     private OnDragViewListener mOnEditorViewListener;
@@ -35,37 +35,6 @@ public class DragGesturesDetector implements GestureDetector.OnGestureListener,
 
     public DragGesturesDetector(Context context, OnDragViewListener onEditorViewListener) {
         mOnEditorViewListener = onEditorViewListener;
-    }
-
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return true;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return true;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-
-        return false;
     }
 
     @Override
@@ -128,6 +97,9 @@ public class DragGesturesDetector implements GestureDetector.OnGestureListener,
             mPrevXPos = X1;
             mPrevYPos = Y1;
             mOnEditorViewListener.onMove(mXPos, mYPos, event.getRawX(), event.getRawY());
+            if (!mIsMoving) {
+                mOnEditorViewListener.onClick();
+            }
             return true;
         }
         return false;

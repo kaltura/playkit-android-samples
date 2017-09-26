@@ -11,13 +11,13 @@ import android.view.View;
 
 public class DragViewController implements DragGesturesDetector.OnDragViewListener{
 
-    public interface ScaleDragListener {
-        void onUpdateSize(int w, int h, float scaleFactor);
-        void onUpdatePosition(int x, int y);
+    public interface EventListener {
+        void onClick();
+        void onUpdateViewSize(float scaleFactor, int originW, int originH);
     }
 
     private View mView;
-    private ScaleDragListener mScaleDragListener;
+    private EventListener mScaleDragListener;
     private Rect mDragArea;
     private float minScaleFactor = 0.5f;
     private boolean mIsResizing = true;
@@ -36,7 +36,7 @@ public class DragViewController implements DragGesturesDetector.OnDragViewListen
         });
     }
 
-    public void setDragArea(Rect dragArea, ScaleDragListener scaleDragListener) {
+    public void setDragArea(Rect dragArea, EventListener scaleDragListener) {
         mDragArea = dragArea;
         mScaleDragListener = scaleDragListener;
     }
@@ -65,12 +65,19 @@ public class DragViewController implements DragGesturesDetector.OnDragViewListen
 
     }
 
+    @Override
+    public void onClick() {
+        mScaleDragListener.onClick();
+    }
+
     private void onUpdatePosition(int x, int y) {
         mView.setTranslationX(x);
         mView.setTranslationY(y);
     }
 
     private void onUpdateScale(float scaleFactor) {
+        mScaleDragListener.onUpdateViewSize(scaleFactor, mOriginW, mOriginH);
+
         int w = (int)(scaleFactor * (float)mOriginW);
         int h = (int)(scaleFactor * (float)mOriginH);
         float d = 0.f;

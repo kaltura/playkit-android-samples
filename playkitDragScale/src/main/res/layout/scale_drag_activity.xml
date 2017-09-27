@@ -28,7 +28,7 @@
             android:id="@+id/playerControls"
             android:layout_width="match_parent"
             android:layout_height="@dimen/player_controls_height"
-            android:visibility="visible"
+            android:visibility="gone"
             android:layout_alignParentBottom="true"
             />
 

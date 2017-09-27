@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -62,9 +63,7 @@ public class ScaleDragActivity extends Activity {
     private Runnable mHideControlsRunnable = new Runnable() {
         @Override
         public void run() {
-            mIsShowing = false;
-            mHandler.removeCallbacks(mHideControlsRunnable);
-            controlsView.setVisibility(View.GONE);
+            showControls(false);
         }
     };
 
@@ -85,27 +84,46 @@ public class ScaleDragActivity extends Activity {
 
             @Override
             public void onClick() {
-                if (!mIsShowing) {
-                    mIsShowing = true;
-                    controlsView.setVisibility(View.VISIBLE);
-                    mHandler.postDelayed(mHideControlsRunnable, TIME_SHOW_CONTROLS);
-                }
-                else {
-                    mIsShowing = false;
-                    mHandler.removeCallbacks(mHideControlsRunnable);
-                    controlsView.setVisibility(View.GONE);
-                }
+                Log.v("event", "onClick");
+                showControls(!mIsShowing);
             }
 
             @Override
             public void onUpdateViewSize(float scaleFactor, int originW, int originH) {
+                Log.v("event", "onUpdateSize");
                 int bottom = (int)(getResources().getDimension(R.dimen.player_controls_height) * scaleFactor);
                 controlsView.setPivotY(0);
                 controlsView.setScaleY(scaleFactor);
                 controlsView.getLayoutParams().height = bottom;
                 root.setPadding(0, 0, 0, bottom);
             }
+
+            @Override
+            public void onDragStart() {
+                Log.v("event", "onStart");
+                showControls(false);
+            }
+
+            @Override
+            public void onDragEnd() {
+                Log.v("event", "onEnd");
+                showControls(true);
+            }
         });
+    }
+
+    private void showControls(boolean isShow) {
+        if (isShow) {
+            mIsShowing = true;
+            controlsView.setVisibility(View.VISIBLE);
+            mHandler.removeCallbacks(mHideControlsRunnable);
+            mHandler.postDelayed(mHideControlsRunnable, TIME_SHOW_CONTROLS);
+        }
+        else {
+            mIsShowing = false;
+            mHandler.removeCallbacks(mHideControlsRunnable);
+            controlsView.setVisibility(View.GONE);
+        }
     }
 
     /*private int convertDpToPixel(int dp) {

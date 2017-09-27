@@ -1,12 +1,16 @@
 package com.kaltura.playkit.samples.fulldemo;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -35,15 +39,16 @@ import java.util.List;
 public class VideoFragment extends Fragment {
     private static final String TAG = VideoFragment.class.getSimpleName();
 
-    //private VideoPlayerController mVideoPlayerController;
     private VideoItem mVideoItem;
     private TextView mVideoTitle;
-    FrameLayout playerLayout;
-    RelativeLayout adSkin;
+    private FrameLayout playerLayout;
+    private RelativeLayout adSkin;
     private Player player;
     private PlaybackControlsView controlsView;
     private boolean nowPlaying;
-    ProgressBar progressBar;
+    private ProgressBar progressBar;
+    private boolean isFullScreen;
+    private AppCompatImageView fullScreenBtn;
     private PKMediaConfig mediaConfig;
     private Logger mLog;
     private OnVideoFragmentViewCreatedListener mViewCreatedCallback;
@@ -59,10 +64,12 @@ public class VideoFragment extends Fragment {
     public void onAttach(Activity activity) {
         try {
             mViewCreatedCallback = (OnVideoFragmentViewCreatedListener) activity;
+
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement " + OnVideoFragmentViewCreatedListener.class.getName());
         }
+
         super.onAttach(activity);
     }
 
@@ -115,46 +122,6 @@ public class VideoFragment extends Fragment {
 
 
     private void addAdPluginConfig(PKPluginConfigs config, FrameLayout layout, RelativeLayout adSkin) {
-
-        String error_ad = "https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/hindi/COH&t=Content+Type=Full+Episode,Series+Title=Shani,Gender=,GeoCity=,Age=,Carrier=,Media+ID=490060,Genre=Mythology,SBU=COH,Content+Name=From+royalty+to+rubble,OEM=LGE,Language=Hindi,WiFi=Y,appversion=0.5.119,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=366.6,727.2,1095.6&rnd=8170019078998&cd=1224&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=62952433-ccf0-4952-8bef-27920bfd739a&rt=vmap_1.0&pf=and_6.0.1&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d928acbe-4276-422e-b97a-9d9b681f94c3&cp.optout=false&cp.deviceid=3a6cabcc961b0229&cp.osversion=6.0.1";
-        String multi_ad_vast = "https://pubads.g.doubleclick.net/gampad/ads?slotname=/124319096/external/ad_rule_samples&sz=640x480&ciu_szs=300x250&unviewed_position_start=1&output=xml_vast3&impl=s&env=vp&gdfp_req=1&ad_rule=0&cue=15000&vad_type=linear&vpos=midroll&pod=2&mridx=1&pmnd=0&pmxd=31000&pmad=-1&vrid=6616&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostoptimizedpod&url=https://developers.google.com/interactive-media-ads/docs/sdks/html5/tags&video_doc_id=short_onecue&cmsid=496&kfa=0&tfcd=0";
-        String skip_ad = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-        String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostoptimizedpodbumper&cmsid=496&vid=short_onecue&correlator=";
-        String v18_ad_vmap = "https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=VORG&t=Language=Hindi,Series%20Title=Yo%20Ke%20Hua%20Bro,Genre=Drama,SBU=VORG,Content%20Type=Full%20Episode,Media%20ID=524406,Age=,Gender=&tt=p,m,po&rt=vmap_1.0&rnd=0.15867538995841546&pf=html5&cd=1435000&bp=464,764,1100";
-        String ad_hls = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F57869717%2FDeportes%2FDeportes_Videos&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&url=http%3A%2F%2Fcdnapi.kaltura.com%2Fhtml5%2Fhtml5lib%2Fv2.59%2FmwEmbedFrame.php%2Fp%2F1901501%2Fuiconf_id%2F28709932%2Fentry_id%2F0_lpgr4luv%3Fwid%3D_1901501%26iframeembed%3Dtrue%26playerId%3Dkaltura_player_1448321939%26entry_id%3D0_lpgr4luv%26flashvars%255BstreamerType%255D%3Dauto&description_url=%5Bdescription_url%5D&correlator=3547248123560359&sdkv=h.3.176.0&sdki=3c0d&scor=2332314844558947&adk=333819758&u_so=l&osd=2&frm=0&sdr=1&mpt=kaltura%2FmwEmbed&mpv=2.59&afvsz=200x200%2C250x250%2C300x250%2C336x280%2C450x50%2C468x60%2C480x70%2C728x90&ged=ve4_td2_tt0_pd2_la2000_er0.0.153.300_vi0.0.916.1127_vp100_eb24171";
-        String honda_ad =  "http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
-        String google_ad = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
-        String two_comp  = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=";
-
-        String ps_pwc = "https://pubads.g.doubleclick.net/gampad/ads?sz=1920x1080&iu=%2F210325652%2FK00001&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&url=https%3A%2F%2Fwww.kocowa.com&description_url=https%3A%2F%2Fwww.kocowa.com&correlator=1500328110&ad_rule=1&cmsid=2456701&vid=0_9yjd6dhw";
-
-
-        String wrapper = "https://kaltura.github.io/playkit-admanager-samples/vast-wrapper.xml";
-        String pods_noam = "https://kaltura.github.io/playkit-admanager-samples/vast-pod-inline-someskip.xml";
-        String vmap_preroll = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpreonly&cmsid=496&vid=short_onecue&correlator=";
-        String vmap_pre_bump = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpreonlybumper&cmsid=496&vid=short_onecue&correlator=";
-        String vmap_single_pmp = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
-        String vmap_pods = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
-        String vmap_postroll_bump = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpostonlybumper&cmsid=496&vid=short_onecue&correlator=";
-        String complicatedVmap = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostoptimizedpodbumper&cmsid=496&vid=short_onecue&correlator=";
-        String veryComplicatedVmap = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostlongpod&cmsid=496&vid=short_tencue&correlator=";
-
-        String voot1 = "https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/hindi/COH&t=Content+Type=Full+Episode,Series+Title=KASAM,Gender=,GeoCity=,Age=,Carrier=,Media+ID=491766,Genre=Romance,SBU=COH,Content+Name=Rishi+is+done+with+Tanuja,OEM=samsung,Language=Hindi,WiFi=Y,appversion=1.6.119,useragent=Android+Samsung+GT-I9195,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=368.4,724.19995,1093.2&rnd=8170019078998&cd=1219&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=c18b43e8-53c1-49cb-9a82-1d3b67259cab&rt=vmap_1.0&pf=and_4.4.2&cp.useragent=Android+Samsung+GT-I9195&cp.adid=cp.optout&cp.optout=true&cp.deviceid=b2c02520d06e1bfe&cp.osversion=4.4.2";
-        String voot2 = "https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/hindi/COH&t=Content+Type=Full+Episode,Series+Title=Shani,Gender=,GeoCity=,Age=,Carrier=,Media+ID=490060,Genre=Mythology,SBU=COH,Content+Name=From+royalty+to+rubble,OEM=LGE,Language=Hindi,WiFi=Y,appversion=0.5.119,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=366.6,727.2,1095.6&rnd=8170019078998&cd=1224&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=62952433-ccf0-4952-8bef-27920bfd739a&rt=vmap_1.0&pf=and_6.0.1&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d928acbe-4276-422e-b97a-9d9b681f94c3&cp.optout=false&cp.deviceid=3a6cabcc961b0229&cp.osversion=6.0.1";
-        String voot3 = "https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/youth/MTV&t=Content+Type=Full+Episode,Series+Title=MTV+Roadies+Rising,Gender=,GeoCity=,Age=,Carrier=,Media+ID=489557,Genre=Reality,SBU=MTV,Content+Name=Ball+baby+ball%21,OEM=LYF,Language=Hindi,WiFi=Y,appversion=1.6.119,useragent=Android+LYF+LS-5015,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=376.80002,732.0,1149.0,1527.0,1887.6,2178.0&rnd=8170019078998&cd=2514&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=c11ce254-6fcb-4706-a6ed-9a8509988e81&rt=vmap_1.0&pf=and_5.1.1&cp.useragent=Android+LYF+LS-5015&cp.adid=e767741e-4fc5-433c-bc44-56c84c764124&cp.optout=false&cp.deviceid=edc0fb87a291cef0&cp.osversion=5.1.1";
-
-        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
-        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
-        List<String> videoMimeTypes = new ArrayList<>();
-        //videoMimeTypes.add(MimeTypes.APPLICATION_MP4);
-        //videoMimeTypes.add(MimeTypes.APPLICATION_M3U8);
-        //Map<Double, String> tagTimesMap = new HashMap<>();
-        //tagTimesMap.put(2.0,"ADTAG");
-
-        //IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl);
-        //config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
-
         ADConfig adsConfig = new ADConfig().setAdTagURL(mVideoItem.getAdTagUrl()).setPlayerViewContainer(layout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90).setStartAdFromPosition(0);
         config.setPluginConfig(ADPlugin.factory.getName(), adsConfig);
     }
@@ -242,15 +209,28 @@ public class VideoFragment extends Fragment {
 
     private void initUi(View rootView) {
 
-        //View playButton = rootView.findViewById(R.id.playButton);
-        View playPauseToggle = rootView.findViewById(R.id.player_root);
-        ViewGroup companionAdSlot = (ViewGroup) rootView.findViewById(R.id.companionAdSlot);
         mVideoTitle = (TextView) rootView.findViewById(R.id.video_title);
         playerLayout = (FrameLayout) rootView.findViewById(R.id.player_root);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarSpinner);
         controlsView = (PlaybackControlsView) rootView.findViewById(R.id.playerControls);
         progressBar.setVisibility(View.INVISIBLE);
         adSkin = (RelativeLayout) rootView.findViewById(R.id.ad_skin);
+        fullScreenBtn = (AppCompatImageView)rootView.findViewById(R.id.full_screen_switcher);
+        fullScreenBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int orient;
+                if (isFullScreen) {
+                    orient = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+                    setFullScreen(false);
+                }
+                else {
+                    orient = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+                    setFullScreen(true);
+                }
+                getActivity().setRequestedOrientation(orient);
+            }
+        });
 
         final TextView logText = (TextView) rootView.findViewById(R.id.logText);
         final ScrollView logScroll = (ScrollView) rootView.findViewById(R.id.logScroll);
@@ -274,10 +254,6 @@ public class VideoFragment extends Fragment {
             }
         };
 
-//        mVideoPlayerController = new VideoPlayerController(this.getActivity(),
-//                null, playPauseToggle,
-//                getString(R.string.ad_ui_lang), companionAdSlot, logger);
-
         // If we've already selected a video, load it now.
         mLog = logger;
         if (mVideoItem != null) {
@@ -285,43 +261,21 @@ public class VideoFragment extends Fragment {
         }
     }
 
-    /**
-     * Shows or hides all non-video UI elements to make the video as large as possible.
-     */
-    public void makeFullscreen(boolean isFullscreen) {
-//        for (int i = 0; i < mVideoExampleLayout.getChildCount(); i++) {
-//            View view = mVideoExampleLayout.getChildAt(i);
-//            // If it's not the video element, hide or show it, depending on fullscreen status.
-//            if (view.getId() != R.id.player_root) {
-//                if (isFullscreen) {
-//                    view.setVisibility(View.GONE);
-//                } else {
-//                    view.setVisibility(View.VISIBLE);
-//                }
-//            }
-//        }
-    }
 
-    //public VideoPlayerController getVideoPlayerController() {
-   //     return mVideoPlayerController;
-   // }
+    public void makeFullscreen(boolean isFullscreen) {
+        setFullScreen(isFullscreen);
+    }
 
     @Override
     public void onPause() {
-        //if (mVideoPlayerController != null) {
-        //    mVideoPlayerController.pause();
-        //}
-        super.onPause();
         if (player != null) {
             player.onApplicationPaused();
         }
+        super.onPause();
     }
 
     @Override
     public void onResume() {
-        //if (mVideoPlayerController != null) {
-        //    mVideoPlayerController.resume();
-        //}
         super.onResume();
         if (player != null) {
             player.onApplicationResumed();
@@ -334,9 +288,9 @@ public class VideoFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log("CONTENT_RESUME_REQUESTED");
+                log("ADS_PLAYBACK_ENDED");
             }
-        }, AdPluginEvent.Type.CONTENT_RESUME_REQUESTED);
+        }, AdPluginEvent.Type.ADS_PLAYBACK_ENDED);
 
 
         player.addEventListener(new PKEvent.Listener() {
@@ -360,7 +314,7 @@ public class VideoFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                AdPluginErrorEvent.AdErrorEvent adError = (AdPluginErrorEvent.AdErrorEvent) event;
+                //AdPluginErrorEvent.AdErrorEvent adError = (AdPluginErrorEvent.AdErrorEvent) event;
                 log("AD_ERROR");// + adError.adErrorEvent.type + " "  + adError.adErrorMessage);
             }
         }, AdPluginErrorEvent.Type.AD_ERROR);
@@ -369,20 +323,20 @@ public class VideoFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log("CONTENT_PAUSE_REQUESTED");
+                log("AD_BREAK_STARTED");
                 appProgressBar.setVisibility(View.VISIBLE);
             }
-        }, AdPluginEvent.Type.CONTENT_PAUSE_REQUESTED);
+        }, AdPluginEvent.Type.AD_BREAK_STARTED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                AdPluginEvent.CuePointsChangedEvent cuePointsList = (AdPluginEvent.CuePointsChangedEvent) event;
+                //AdPluginEvent.CuePointsChangedEvent cuePointsList = (AdPluginEvent.CuePointsChangedEvent) event;
                 //AdCuePoints adCuePoints = new AdCuePoints(cuePointsList.cuePoints);
                 //if (adCuePoints != null) {
                     log("CUEPOINTS_CHANGED");//"Has Postroll = " + adCuePoints.hasPostRoll());
                 //}
-                onCuepointChanged();
+                onCuePointChanged();
             }
         }, AdPluginEvent.Type.CUEPOINTS_CHANGED);
 
@@ -523,7 +477,7 @@ public class VideoFragment extends Fragment {
             @Override
             public void onEvent(PKEvent event) {
                 //When the track data available, this event occurs. It brings the info object with it.
-                PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
+                //PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
                 //populateSpinnersWithTrackInfo(tracksAvailable.tracksInfo);
                 //log("PLAYER TRACKS_AVAILABLE");
 
@@ -534,7 +488,7 @@ public class VideoFragment extends Fragment {
             @Override
             public void onEvent(PKEvent event) {
                 //When the track data available, this event occurs. It brings the info object with it.
-                PlayerEvent.PlayheadUpdated playheadUpdated = (PlayerEvent.PlayheadUpdated) event;
+                //PlayerEvent.PlayheadUpdated playheadUpdated = (PlayerEvent.PlayheadUpdated) event;
                 //log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
 
             }
@@ -542,11 +496,12 @@ public class VideoFragment extends Fragment {
     }
 
 
-    private void onCuepointChanged() {
+    private void onCuePointChanged() {
 
         ((View) adSkin).findViewById(R.id.skip_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (player != null && player.getAdController() != null)
                 player.getAdController().skipAd();
             }
         });
@@ -554,7 +509,9 @@ public class VideoFragment extends Fragment {
         ((View) adSkin).findViewById(R.id.learn_more_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                player.getAdController().openLearnMore();
+                if (player != null && player.getAdController() != null) {
+                    player.getAdController().openLearnMore();
+                }
             }
         });
 
@@ -562,9 +519,37 @@ public class VideoFragment extends Fragment {
         ((View) companionAdPlaceHolder).findViewById(R.id.imageViewCompanion).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                player.getAdController().openCompanionAdLearnMore();
+                if (player != null && player.getAdController() != null) {
+                    player.getAdController().openCompanionAdLearnMore();
+                }
             }
         });
+    }
+
+    private void setFullScreen(boolean isFullScreen) {
+        if (player != null && player.getAdController() != null) {
+            player.getAdController().screenOrientationChanged(isFullScreen);
+        }
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)playerLayout.getLayoutParams();
+        // Checks the orientation of the screen
+        this.isFullScreen = isFullScreen;
+        if (isFullScreen) {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().hide();
+            getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            fullScreenBtn.setImageResource(R.drawable.ic_no_fullscreen);
+            params.height = RelativeLayout.LayoutParams.MATCH_PARENT;
+            params.width = RelativeLayout.LayoutParams.MATCH_PARENT;
+
+        } else {
+            ((AppCompatActivity)getActivity()).getSupportActionBar().show();
+            getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            fullScreenBtn.setImageResource(R.drawable.ic_fullscreen);
+
+            params.height = (int)getResources().getDimension(R.dimen.player_height);
+            params.width = RelativeLayout.LayoutParams.MATCH_PARENT;
+        }
+        playerLayout.requestLayout();
     }
 
     public interface Logger {

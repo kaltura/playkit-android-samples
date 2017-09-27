@@ -16,6 +16,11 @@ import static com.kaltura.playkit.samples.fulldemo.MainActivity.SOURCE_URL1;
 
 
 public enum VideoMetadata {
+    CUSTOM(
+            SOURCE_URL1,
+            "Custom Ad Tag ",
+            "custom",
+            R.drawable.k_image),
 
     PRE_ROLL_NO_SKIP(
             SOURCE_URL1,
@@ -27,13 +32,6 @@ public enum VideoMetadata {
             SOURCE_URL1,
             "Pre-roll, linear, skippable",
             AD_2,
-            R.drawable.k_image),
-
-    POST_ROLL(
-            SOURCE_URL1,
-            "Post-roll",
-            AD_3,
-
             R.drawable.k_image),
     VMAP(
             SOURCE_URL1,
@@ -66,11 +64,10 @@ public enum VideoMetadata {
             "Google Search",
             AD_GOOGLE_SEARCH,
             R.drawable.k_image),
-
-    CUSTOM(
+    POST_ROLL(
             SOURCE_URL1,
-            "Custom Ad Tag ",
-            "custom",
+            "Post-roll",
+            AD_3,
             R.drawable.k_image);
 
 

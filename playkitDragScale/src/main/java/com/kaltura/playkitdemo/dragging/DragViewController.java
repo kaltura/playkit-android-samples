@@ -14,6 +14,8 @@ public class DragViewController implements DragGesturesDetector.OnDragViewListen
     public interface EventListener {
         void onClick();
         void onUpdateViewSize(float scaleFactor, int originW, int originH);
+        void onDragStart();
+        void onDragEnd();
     }
 
     private View mView;
@@ -57,12 +59,12 @@ public class DragViewController implements DragGesturesDetector.OnDragViewListen
 
     @Override
     public void onMoveStart(float transitionXPos, float transitionYPos, float touchXPos, float touchYPos) {
-
+        mScaleDragListener.onDragStart();
     }
 
     @Override
     public void onMoveEnd(float transitionXPos, float transitionYPos, float touchXPos, float touchYPos) {
-
+        mScaleDragListener.onDragEnd();
     }
 
     @Override

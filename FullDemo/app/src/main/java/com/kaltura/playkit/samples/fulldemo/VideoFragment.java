@@ -30,6 +30,7 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
+import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
@@ -440,11 +441,10 @@ public class VideoFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                //AdEvent.CuePointsChangedEvent cuePointsList = (AdEvent.CuePointsChangedEvent) event;
-                //AdCuePoints adCuePoints = new AdCuePoints(cuePointsList.cuePoints);
-                //if (adCuePoints != null) {
-                    log("CUE_POINTS_CHANGED");//"Has Postroll = " + adCuePoints.hasPostRoll());
-                //}
+                AdEvent.AdCuePointsChangedEvent cuePointsList = (AdEvent.AdCuePointsChangedEvent) event;
+                AdCuePoints adCuePoints = new AdCuePoints(cuePointsList.adCuePoints.getAdCuePoints());
+                Log.d(TAG, "XXX Has Postroll = " + adCuePoints.hasPostRoll());
+                log("CUE_POINTS_CHANGED");
                 onCuePointChanged();
             }
         }, AdEvent.Type.CUEPOINTS_CHANGED);

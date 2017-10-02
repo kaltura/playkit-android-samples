@@ -1,4 +1,4 @@
-package com.kaltura.playkit.samples.androidtv;
+package com.kaltura.playkit.samples.fulldemo;
 
 import com.google.gson.JsonObject;
 

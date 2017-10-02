@@ -123,20 +123,25 @@ public class MainActivity extends AppCompatActivity {
                                             switch (((AdEvent) event).type) {
 
                                                 //Ad started event triggered.
-                                                case STARTED:
+                                                case LOADED:
                                                     //Some events holds additional data objects in them.
                                                     //In order to get access to this object you need first cast event to
                                                     //the object it belongs to. You can learn more about this kind of objects in
                                                     //our documentation.
-                                                    AdEvent.AdStartedEvent adStartedEvent = (AdEvent.AdStartedEvent) event;
 
-                                                    //Then you can use the data object itself.
-                                                    AdInfo adInfo = adStartedEvent.adInfo;
+                                                        AdEvent.AdLoadedEvent adLoadedEvent = (AdEvent.AdLoadedEvent) event;
 
-                                                    //Print to log content type of this ad.
-                                                    Log.d(TAG, "ad event received: " + event.eventType().name()
-                                                            + ". Additional info: ad content type is: "
-                                                            + adInfo.getAdContentType());
+                                                        //Then you can use the data object itself.
+                                                        AdInfo adInfo = adLoadedEvent.adInfo;
+
+                                                        //Print to log content type of this ad.
+                                                        Log.d(TAG, "ad event received: " + event.eventType().name()
+                                                                + ". Additional info: ad content type is: "
+                                                                + adInfo.getAdContentType());
+
+                                                    break;
+                                                case STARTED:
+
                                                     break;
 
                                                 //Ad skipped triggered.
@@ -157,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 },
                 //Subscribe to the ad events you are interested in.
+                AdEvent.Type.LOADED,
                 AdEvent.Type.STARTED,
                 AdEvent.Type.SKIPPED,
                 AdEvent.Type.COMPLETED,

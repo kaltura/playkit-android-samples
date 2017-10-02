@@ -18,6 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -28,16 +30,48 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
+import com.kaltura.playkit.plugins.ads.AdEvent;
+import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
 import com.kaltura.playkit.plugins.ads.kaltura.ADConfig;
 import com.kaltura.playkit.plugins.ads.kaltura.ADPlugin;
-import com.kaltura.playkit.plugins.ads.kaltura.events.AdPluginErrorEvent;
-import com.kaltura.playkit.plugins.ads.kaltura.events.AdPluginEvent;
+import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
+import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VideoFragment extends Fragment {
     private static final String TAG = VideoFragment.class.getSimpleName();
+    public static final String STATS_KALTURA_URL = "https://stats.kaltura.com/api_v3/index.php";
+    public static final String ANALYTIC_TRIGGER_INTERVAL = "10";
+
+    //Youbora analytics Constants
+    public static final String ACCOUNT_CODE = "your_account_code";
+    public static final String USER_NAME = "your_user_name";
+    public static final String MEDIA_TITLE = "your_media_title";
+    public static final boolean IS_LIVE = false;
+    public static final boolean ENABLE_SMART_ADS = true;
+    private static final String CAMPAIGN = "your_campaign_name";
+    public static final String EXTRA_PARAM_1 = "playKitPlayer";
+    public static final String EXTRA_PARAM_2 = "XXX";
+    public static final String GENRE = "your_genre";
+    public static final String TYPE = "your_type";
+    public static final String TRANSACTION_TYPE = "your_trasnsaction_type";
+    public static final String YEAR = "your_year";
+    public static final String CAST = "your_cast";
+    public static final String DIRECTOR = "your_director";
+    private static final String OWNER = "your_owner";
+    public static final String PARENTAL = "your_parental";
+    public static final String PRICE = "your_price";
+    public static final String RATING = "your_rating";
+    public static final String AUDIO_TYPE = "your_audio_type";
+    public static final String AUDIO_CHANNELS = "your_audoi_channels";
+    public static final String DEVICE = "your_device";
+    public static final String QUALITY = "your_quality";
+
+
+
 
     private VideoItem mVideoItem;
     private TextView mVideoTitle;
@@ -99,8 +133,16 @@ public class VideoFragment extends Fragment {
         //Initialize media config object.
         createMediaConfig();
         PlayKitManager.registerPlugins(this.getActivity(), ADPlugin.factory);
+        //PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
+        PlayKitManager.registerPlugins(this.getActivity(), KalturaStatsPlugin.factory);
+        PlayKitManager.registerPlugins(getActivity(), YouboraPlugin.factory);
+
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         addAdPluginConfig(pluginConfig, playerLayout, adSkin);
+        //addIMAPluginConfig(pluginConfig, mVideoItem.getAdTagUrl());
+        addKalturaStatsPlugin(pluginConfig);
+        addYouboraPlugin(pluginConfig);
+
         //Create instance of the player.
         player = PlayKitManager.loadPlayer(this.getActivity(), pluginConfig);
         addPlayerListeners(progressBar);
@@ -124,6 +166,73 @@ public class VideoFragment extends Fragment {
     private void addAdPluginConfig(PKPluginConfigs config, FrameLayout layout, RelativeLayout adSkin) {
         ADConfig adsConfig = new ADConfig().setAdTagURL(mVideoItem.getAdTagUrl()).setPlayerViewContainer(layout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90).setStartAdFromPosition(0);
         config.setPluginConfig(ADPlugin.factory.getName(), adsConfig);
+    }
+
+    private void addIMAPluginConfig(PKPluginConfigs config, String adTagUrl) {
+
+        List<String> videoMimeTypes = new ArrayList<>();
+        //videoMimeTypes.add(MimeTypes.APPLICATION_MP4);
+        //videoMimeTypes.add(MimeTypes.APPLICATION_M3U8);
+        //Map<Double, String> tagTimesMap = new HashMap<>();
+        //tagTimesMap.put(2.0,"ADTAG");
+
+        IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl);
+        config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
+    }
+
+    private void addKalturaStatsPlugin(PKPluginConfigs config) {
+        JsonObject pluginEntry = new JsonObject();
+        pluginEntry.addProperty("uiconfId", "123456");
+        pluginEntry.addProperty("baseUrl", STATS_KALTURA_URL);
+        pluginEntry.addProperty("partnerId", Integer.parseInt("123456"));
+        pluginEntry.addProperty("timerInterval", Integer.parseInt(ANALYTIC_TRIGGER_INTERVAL));
+        pluginEntry.addProperty("entryId", "1_abcdefg");
+
+        config.setPluginConfig(KalturaStatsPlugin.factory.getName(), pluginEntry);
+    }
+
+
+    private void addYouboraPlugin(PKPluginConfigs pluginConfigs) {
+        JsonPrimitive accountCode = new JsonPrimitive(ACCOUNT_CODE);
+        JsonPrimitive username = new JsonPrimitive(USER_NAME);
+        JsonPrimitive haltOnError = new JsonPrimitive(true);
+        JsonPrimitive enableAnalytics = new JsonPrimitive(true);
+        JsonPrimitive enableSmartAds = new JsonPrimitive(ENABLE_SMART_ADS);
+
+        JsonObject mediaEntry = new JsonObject();
+        mediaEntry.addProperty("isLive", false);
+        mediaEntry.addProperty("title", MEDIA_TITLE);
+
+        JsonObject adsEntry = new JsonObject();
+        adsEntry.addProperty("campaign", CAMPAIGN);
+
+        JsonObject extraParamEntry = new JsonObject();
+        extraParamEntry.addProperty("param1", "mobile");
+        extraParamEntry.addProperty("param2", EXTRA_PARAM_2);
+        extraParamEntry.addProperty("param3", "CCC");
+
+        JsonObject propertiesEntry = new JsonObject();
+        propertiesEntry.addProperty("genre", GENRE);
+        propertiesEntry.addProperty("type", TYPE);
+        propertiesEntry.addProperty("transaction_type", TRANSACTION_TYPE);
+        propertiesEntry.addProperty("year", YEAR);
+        propertiesEntry.addProperty("cast", CAST);
+        propertiesEntry.addProperty("director", DIRECTOR);
+        propertiesEntry.addProperty("owner", OWNER);
+        propertiesEntry.addProperty("parental", PARENTAL);
+        propertiesEntry.addProperty("price", PRICE);
+        propertiesEntry.addProperty("rating", RATING);
+        propertiesEntry.addProperty("audioType", AUDIO_TYPE);
+        propertiesEntry.addProperty("audioChannels", AUDIO_CHANNELS);
+        propertiesEntry.addProperty("device", DEVICE);
+        propertiesEntry.addProperty("quality", QUALITY);
+
+
+        ConverterYoubora converterYoubora = new ConverterYoubora(accountCode, username, haltOnError, enableAnalytics, enableSmartAds,
+                mediaEntry,
+                adsEntry, extraParamEntry, propertiesEntry);
+
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), converterYoubora.toJson());
     }
 
     /**
@@ -235,7 +344,6 @@ public class VideoFragment extends Fragment {
         final TextView logText = (TextView) rootView.findViewById(R.id.logText);
         final ScrollView logScroll = (ScrollView) rootView.findViewById(R.id.logScroll);
 
-        // Provide an implementation of a logger so we can output SDK events to the UI.
         Logger logger = new Logger() {
             @Override
             public void log(String message) {
@@ -290,34 +398,35 @@ public class VideoFragment extends Fragment {
             public void onEvent(PKEvent event) {
                 log("ADS_PLAYBACK_ENDED");
             }
-        }, AdPluginEvent.Type.ADS_PLAYBACK_ENDED);
+        }, AdEvent.Type.ADS_PLAYBACK_ENDED);
 
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                AdPluginEvent.AdRequestedEvent adRequestEvent = (AdPluginEvent.AdRequestedEvent) event;
+                AdEvent.AdRequestedEvent adRequestEvent = (AdEvent.AdRequestedEvent) event;
                 log("AD_REQUESTED");// adtag = " + adRequestEvent.adTagUrl);
             }
-        }, AdPluginEvent.Type.AD_REQUESTED);
+        }, AdEvent.Type.AD_REQUESTED);
 
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                AdPluginEvent.ProgressUpdateEvent adPluginEventProress = (AdPluginEvent.ProgressUpdateEvent) event;
-                //log.d("received NEW AD_PROGRESS_UPDATE " + adPluginEventProress.currentPosition + "/" +  adPluginEventProress.duration);
+                AdEvent.AdProgressUpdateEvent aEventProress = (AdEvent.AdProgressUpdateEvent) event;
+                //log.d("received NEW AD_PROGRESS_UPDATE " + adEventProress.currentPosition + "/" +  adEventProress.duration);
             }
-        }, AdPluginEvent.Type.AD_PROGRESS_UPDATE);
+        }, AdEvent.Type.AD_PROGRESS_UPDATE);
 
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                //AdPluginErrorEvent.AdErrorEvent adError = (AdPluginErrorEvent.AdErrorEvent) event;
-                log("AD_ERROR");// + adError.adErrorEvent.type + " "  + adError.adErrorMessage);
+                AdEvent.Error adError = (AdEvent.Error) event;
+                Log.d(TAG, "AD_ERROR " + adError.type + " "  + adError.error.message);
+                log("AD_ERROR");
             }
-        }, AdPluginErrorEvent.Type.AD_ERROR);
+        }, AdEvent.Type.ERROR);
 
 
         player.addEventListener(new PKEvent.Listener() {
@@ -326,19 +435,19 @@ public class VideoFragment extends Fragment {
                 log("AD_BREAK_STARTED");
                 appProgressBar.setVisibility(View.VISIBLE);
             }
-        }, AdPluginEvent.Type.AD_BREAK_STARTED);
+        }, AdEvent.Type.AD_BREAK_STARTED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                //AdPluginEvent.CuePointsChangedEvent cuePointsList = (AdPluginEvent.CuePointsChangedEvent) event;
+                //AdEvent.CuePointsChangedEvent cuePointsList = (AdEvent.CuePointsChangedEvent) event;
                 //AdCuePoints adCuePoints = new AdCuePoints(cuePointsList.cuePoints);
                 //if (adCuePoints != null) {
-                    log("CUEPOINTS_CHANGED");//"Has Postroll = " + adCuePoints.hasPostRoll());
+                    log("CUE_POINTS_CHANGED");//"Has Postroll = " + adCuePoints.hasPostRoll());
                 //}
                 onCuePointChanged();
             }
-        }, AdPluginEvent.Type.CUEPOINTS_CHANGED);
+        }, AdEvent.Type.CUEPOINTS_CHANGED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -346,14 +455,14 @@ public class VideoFragment extends Fragment {
                 log("AD_STARTED");
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
-        }, AdPluginEvent.Type.STARTED);
+        }, AdEvent.Type.STARTED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
                 log("AD COMPLETED");
             }
-        }, AdPluginEvent.Type.COMPLETED);
+        }, AdEvent.Type.COMPLETED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -362,7 +471,7 @@ public class VideoFragment extends Fragment {
                 nowPlaying = true;
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
-        }, AdPluginEvent.Type.RESUMED);
+        }, AdEvent.Type.RESUMED);
 
 
         player.addEventListener(new PKEvent.Listener() {
@@ -372,7 +481,7 @@ public class VideoFragment extends Fragment {
                 nowPlaying = true;
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
-        }, AdPluginEvent.Type.PAUSED);
+        }, AdEvent.Type.PAUSED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -380,7 +489,7 @@ public class VideoFragment extends Fragment {
                 log("AD_ALL_ADS_COMPLETED");
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
-        }, AdPluginEvent.Type.ALL_ADS_COMPLETED);
+        }, AdEvent.Type.ALL_ADS_COMPLETED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -413,28 +522,36 @@ public class VideoFragment extends Fragment {
                 log("SKIPPED");
                 nowPlaying = false;
             }
-        }, AdPluginEvent.Type.SKIPPED);
+        }, AdEvent.Type.SKIPPED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
                 log("FIRST_QUARTILE");
             }
-        }, AdPluginEvent.Type.FIRST_QUARTILE);
+        }, AdEvent.Type.FIRST_QUARTILE);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
                 log("MIDPOINT");
             }
-        }, AdPluginEvent.Type.MIDPOINT);
+        }, AdEvent.Type.MIDPOINT);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
                 log("THIRD_QUARTILE");
             }
-        }, AdPluginEvent.Type.THIRD_QUARTILE);
+        }, AdEvent.Type.THIRD_QUARTILE);
+
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                log("AD_BREAK_ENDED");
+            }
+        }, AdEvent.Type.AD_BREAK_ENDED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -442,16 +559,16 @@ public class VideoFragment extends Fragment {
                 log("CLICKED");
                 nowPlaying = true;
             }
-        }, AdPluginEvent.Type.CLICKED);
+        }, AdEvent.Type.CLICKED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                AdPluginEvent.AdBufferEvent buffEvent = (AdPluginEvent.AdBufferEvent) event;
+                AdEvent.AdBufferEvent buffEvent = (AdEvent.AdBufferEvent) event;
                 log("AD_BUFFER show = " + buffEvent.show);
 
             }
-        }, AdPluginEvent.Type.AD_BUFFER);
+        }, AdEvent.Type.AD_BUFFER);
 
 
         player.addStateChangeListener(new PKEvent.Listener() {
@@ -498,7 +615,7 @@ public class VideoFragment extends Fragment {
 
     private void onCuePointChanged() {
 
-        ((View) adSkin).findViewById(R.id.skip_btn).setOnClickListener(new View.OnClickListener() {
+        (adSkin).findViewById(R.id.skip_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (player != null && player.getAdController() != null)
@@ -506,7 +623,7 @@ public class VideoFragment extends Fragment {
             }
         });
 
-        ((View) adSkin).findViewById(R.id.learn_more_btn).setOnClickListener(new View.OnClickListener() {
+        (adSkin).findViewById(R.id.learn_more_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (player != null && player.getAdController() != null) {
@@ -516,7 +633,7 @@ public class VideoFragment extends Fragment {
         });
 
         LinearLayout companionAdPlaceHolder = (LinearLayout) adSkin.findViewById(R.id.companionAdSlot);
-        ((View) companionAdPlaceHolder).findViewById(R.id.imageViewCompanion).setOnClickListener(new View.OnClickListener() {
+        (companionAdPlaceHolder).findViewById(R.id.imageViewCompanion).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (player != null && player.getAdController() != null) {

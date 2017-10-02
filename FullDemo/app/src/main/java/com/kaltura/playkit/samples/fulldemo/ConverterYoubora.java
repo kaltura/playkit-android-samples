@@ -1,7 +1,8 @@
-package com.kaltura.playkit.samples.androidtv;
+package com.kaltura.playkit.samples.fulldemo;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+
 
 public class ConverterYoubora extends ConverterPlugin {
     private JsonPrimitive accountCode;
@@ -51,4 +52,3 @@ public class ConverterYoubora extends ConverterPlugin {
         return jsonObject;
     }
 }
-

@@ -72,7 +72,7 @@ public enum VideoMetadata {
 
 
     public static final List<VideoMetadata> APP_VIDEOS =
-            Arrays.asList(PRE_ROLL_NO_SKIP, PRE_ROLL_SKIP, POST_ROLL, VMAP, VMAP_PODS, WRAPPER, VMAP_PODS_BUMP1, VMAP_PODS_BUMP2, GOOGLE_SEARCH, CUSTOM);
+            Arrays.asList(CUSTOM, PRE_ROLL_NO_SKIP, PRE_ROLL_SKIP, POST_ROLL, VMAP, VMAP_PODS, WRAPPER, VMAP_PODS_BUMP1, VMAP_PODS_BUMP2, GOOGLE_SEARCH);
 
     /** The thumbnail image for the video. **/
     public final int thumbnail;

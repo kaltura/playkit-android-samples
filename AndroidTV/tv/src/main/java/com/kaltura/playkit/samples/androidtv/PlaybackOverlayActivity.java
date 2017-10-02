@@ -21,7 +21,6 @@ import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -35,26 +34,18 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.kaltura.netkit.connect.response.ResultElement;
-import com.kaltura.playkit.PKDrmParams;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
-import com.kaltura.playkit.PKMediaFormat;
-import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.api.ovp.SimpleOvpSessionProvider;
-import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
-import com.kaltura.playkit.mediaproviders.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.player.PKTracks;
-import com.kaltura.playkit.plugins.Youbora.YouboraPlugin;
-import com.kaltura.playkit.plugins.ads.AdError;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -208,8 +199,11 @@ public class PlaybackOverlayActivity extends Activity implements
     }
 
     private void updatePlaybackState(int position) {
-        PlaybackState.Builder stateBuilder = new PlaybackState.Builder()
-                .setActions(getAvailableActions());
+        long actions = PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PLAY_FROM_MEDIA_ID | PlaybackState.ACTION_PLAY_FROM_SEARCH;
+        if (mPlaybackState == LeanbackPlaybackState.PLAYING) {
+            actions |= PlaybackState.ACTION_PAUSE;
+        }
+        PlaybackState.Builder stateBuilder = new PlaybackState.Builder().setActions(actions);
         int state = PlaybackState.STATE_PLAYING;
         if (mPlaybackState == LeanbackPlaybackState.PAUSED) {
             state = PlaybackState.STATE_PAUSED;
@@ -218,17 +212,6 @@ public class PlaybackOverlayActivity extends Activity implements
         mSession.setPlaybackState(stateBuilder.build());
     }
 
-    private long getAvailableActions() {
-        long actions = PlaybackState.ACTION_PLAY |
-                PlaybackState.ACTION_PLAY_FROM_MEDIA_ID |
-                PlaybackState.ACTION_PLAY_FROM_SEARCH;
-
-        if (mPlaybackState == LeanbackPlaybackState.PLAYING) {
-            actions |= PlaybackState.ACTION_PAUSE;
-        }
-
-        return actions;
-    }
 
     private void updateMetadata(final Movie movie) {
         final MediaMetadata.Builder metadataBuilder = new MediaMetadata.Builder();
@@ -370,8 +353,6 @@ public class PlaybackOverlayActivity extends Activity implements
                                     @Override
                                     public void onEvent(PKEvent event) {
 
-
-
                                         Enum receivedEventType = event.eventType();
                                         if (event instanceof PlayerEvent) {
                                             switch (((PlayerEvent) event).type) {
@@ -397,7 +378,7 @@ public class PlaybackOverlayActivity extends Activity implements
                                                     mPlaybackState = LeanbackPlaybackState.IDLE;
                                                     break;
                                                 case TRACKS_AVAILABLE:
-                                                    pkTracks = ((PlayerEvent.TracksAvailable) event).getPKTracks();
+                                                    pkTracks = ((PlayerEvent.TracksAvailable) event).tracksInfo;
                                                     break;
                                                 case ERROR:
                                                     String msg = "Player Error";
@@ -421,7 +402,7 @@ public class PlaybackOverlayActivity extends Activity implements
                                                 case AD_BREAK_IGNORED:
 
                                                     break;
-                                                case CONTENT_PAUSE_REQUESTED:
+                                                case AD_BREAK_STARTED:
                                                     //isAdStarted = true;
                                                     //showOrHideContentLoaderProgress(false);
                                                     //hideSbuLogo();
@@ -430,9 +411,6 @@ public class PlaybackOverlayActivity extends Activity implements
                                                 //    VideoPlaybackTimer.getInstance().stopTimer();
                                                 //    showOrHideContentLoaderProgress(false);
                                                 //    break;
-                                                case CONTENT_RESUME_REQUESTED:
-
-                                                    break;
                                                 case STARTED:
 
                                                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -450,44 +428,19 @@ public class PlaybackOverlayActivity extends Activity implements
                                                     break;
                                                 case CLICKED:
                                                     break;
-                                            }
-                                        } else if (event instanceof AdError) {
-                                            switch (((AdError) event).errorType) {
-                                                case ADS_REQUEST_NETWORK_ERROR:
-                                                case INTERNAL_ERROR:
-                                                case VAST_MALFORMED_RESPONSE:
-                                                case UNKNOWN_AD_RESPONSE:
-                                                case VAST_LOAD_TIMEOUT:
-                                                case VAST_TOO_MANY_REDIRECTS:
-                                                case VIDEO_PLAY_ERROR:
-                                                case VAST_MEDIA_LOAD_TIMEOUT:
-                                                case VAST_LINEAR_ASSET_MISMATCH:
-                                                case OVERLAY_AD_PLAYING_FAILED:
-                                                case OVERLAY_AD_LOADING_FAILED:
-                                                case VAST_NONLINEAR_ASSET_MISMATCH:
-                                                case COMPANION_AD_LOADING_FAILED:
-                                                case UNKNOWN_ERROR:
-                                                case VAST_EMPTY_RESPONSE:
-                                                case FAILED_TO_REQUEST_ADS:
-                                                case VAST_ASSET_NOT_FOUND:
-                                                case INVALID_ARGUMENTS:
-                                                case QUIET_LOG_ERROR:
-                                                case PLAYLIST_NO_CONTENT_TRACKING:
+                                                case ERROR:
+                                                    AdEvent.Error adError = (AdEvent.Error) event;
+                                                    Log.d(TAG, "Error =" + adError.type);
                                                     break;
                                             }
                                         }
-
                                     }
 
                                 }, PlayerEvent.Type.PLAY, PlayerEvent.Type.PAUSE, PlayerEvent.Type.CAN_PLAY, PlayerEvent.Type.SEEKING, PlayerEvent.Type.SEEKED, PlayerEvent.Type.PLAYING,
                 PlayerEvent.Type.ENDED, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.ERROR,
-                AdEvent.Type.LOADED, AdEvent.Type.SKIPPED, AdEvent.Type.TAPPED, AdEvent.Type.CONTENT_PAUSE_REQUESTED, AdEvent.Type.CONTENT_RESUME_REQUESTED, AdEvent.Type.STARTED, AdEvent.Type.PAUSED, AdEvent.Type.RESUMED,
-                AdEvent.Type.COMPLETED, AdEvent.Type.ALL_ADS_COMPLETED, AdError.Type.ADS_REQUEST_NETWORK_ERROR,
-                AdEvent.Type.CUEPOINTS_CHANGED, AdEvent.Type.CLICKED, AdEvent.Type.AD_BREAK_IGNORED,
-                AdError.Type.VAST_EMPTY_RESPONSE, AdError.Type.COMPANION_AD_LOADING_FAILED, AdError.Type.FAILED_TO_REQUEST_ADS,
-                AdError.Type.INTERNAL_ERROR, AdError.Type.OVERLAY_AD_LOADING_FAILED, AdError.Type.PLAYLIST_NO_CONTENT_TRACKING,
-                AdError.Type.UNKNOWN_ERROR, AdError.Type.VAST_LINEAR_ASSET_MISMATCH, AdError.Type.VAST_MALFORMED_RESPONSE, AdError.Type.QUIET_LOG_ERROR,
-                AdError.Type.VAST_LOAD_TIMEOUT, AdError.Type.INVALID_ARGUMENTS, AdError.Type.VAST_TOO_MANY_REDIRECTS);
+                AdEvent.Type.LOADED, AdEvent.Type.SKIPPED, AdEvent.Type.TAPPED, AdEvent.Type.ERROR, AdEvent.Type.ADS_PLAYBACK_ENDED, AdEvent.Type.STARTED, AdEvent.Type.PAUSED, AdEvent.Type.RESUMED,
+                AdEvent.Type.COMPLETED, AdEvent.Type.ALL_ADS_COMPLETED,
+                AdEvent.Type.CUEPOINTS_CHANGED, AdEvent.Type.CLICKED, AdEvent.Type.AD_BREAK_IGNORED);
 //        mVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 //
 //            @Override

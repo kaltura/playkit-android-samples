@@ -553,10 +553,22 @@ public class VideoFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log("CLICKED");
-                nowPlaying = true;
+                log("AD_CLICKED");
+                AdEvent.AdClickEvent advtClickEvent = (AdEvent.AdClickEvent) event;
+                Log.d(TAG, "AD_CLICKED url = " + advtClickEvent.advtLink);
+                nowPlaying = false;
             }
         }, AdEvent.Type.AD_CLICKED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                log("COMPANION_AD_CLICKED");
+                AdEvent.CompanionAdClickEvent advtCompanionClickEvent = (AdEvent.CompanionAdClickEvent) event;
+                Log.d(TAG, "COMPANION_AD_CLICKED url = " + advtCompanionClickEvent.advtCompanionLink);
+                nowPlaying = false;
+            }
+        }, AdEvent.Type.COMPANION_AD_CLICKED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override

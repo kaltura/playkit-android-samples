@@ -443,7 +443,7 @@ public class VideoFragment extends Fragment {
             public void onEvent(PKEvent event) {
                 AdEvent.AdCuePointsChangedEvent cuePointsList = (AdEvent.AdCuePointsChangedEvent) event;
                 Log.d(TAG, "Has Postroll = " + cuePointsList.adCuePoints.hasPostRoll());
-                log("CUE_POINTS_CHANGED");
+                log("AD_CUEPOINTS_UPDATED");
                 onCuePointChanged();
             }
         }, AdEvent.Type.AD_CUEPOINTS_UPDATED);
@@ -461,9 +461,9 @@ public class VideoFragment extends Fragment {
             public void onEvent(PKEvent event) {
                 AdEvent.AdEndedEvent adEndedEvent = (AdEvent.AdEndedEvent) event;
                 if (adEndedEvent.adEndedReason == PKAdEndedReason.COMPLETED) {
-                    log("AD COMPLETED");
+                    log("AD_ENDED-" + adEndedEvent.adEndedReason);
                 } else if (adEndedEvent.adEndedReason == PKAdEndedReason.SKIPPED) {
-                    log("AD SKIPPED");
+                    log("AD_ENDED-" + adEndedEvent.adEndedReason);
                     nowPlaying = false;
                 }
             }
@@ -561,14 +561,18 @@ public class VideoFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log("AD_BUFFER show = true");
+                log("AD_STARTED_BUFFERING");
+                appProgressBar.setVisibility(View.VISIBLE);
+
             }
         }, AdEvent.Type.AD_STARTED_BUFFERING);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log("AD_BUFFER show = " + false);
+                log("AD_PLAYBACK_READY");
+                appProgressBar.setVisibility(View.INVISIBLE);
+
             }
         }, AdEvent.Type.AD_PLAYBACK_READY);
 

@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                                             switch (((AdEvent) event).type) {
 
                                                 //Ad started event triggered.
-                                                case LOADED:
+                                                case AD_LOADED:
                                                     //Some events holds additional data objects in them.
                                                     //In order to get access to this object you need first cast event to
                                                     //the object it belongs to. You can learn more about this kind of objects in
@@ -140,17 +140,14 @@ public class MainActivity extends AppCompatActivity {
                                                                 + adInfo.getAdContentType());
 
                                                     break;
-                                                case STARTED:
+                                                case AD_STARTED:
 
                                                     break;
 
                                                 //Ad skipped triggered.
-                                                case SKIPPED:
-                                                    Log.d(TAG, "ad event received: " + event.eventType().name());
-                                                    break;
-                                                //Ad completed triggered.
-                                                case COMPLETED:
-                                                    Log.d(TAG, "ad event received: " + event.eventType().name());
+                                                case AD_ENDED:
+                                                    AdEvent.AdEndedEvent adEndedEvent = (AdEvent.AdEndedEvent)event;
+                                                    Log.d(TAG, "ad event received: " + event.eventType().name() + " reason = " + adEndedEvent.adEndedReason);
                                                     break;
                                                 case ERROR:
                                                     AdEvent.Error errorEvent = (AdEvent.Error) event;
@@ -162,10 +159,9 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 },
                 //Subscribe to the ad events you are interested in.
-                AdEvent.Type.LOADED,
-                AdEvent.Type.STARTED,
-                AdEvent.Type.SKIPPED,
-                AdEvent.Type.COMPLETED,
+                AdEvent.Type.AD_LOADED,
+                AdEvent.Type.AD_STARTED,
+                AdEvent.Type.AD_ENDED,
                 AdEvent.Type.ERROR
         );
     }

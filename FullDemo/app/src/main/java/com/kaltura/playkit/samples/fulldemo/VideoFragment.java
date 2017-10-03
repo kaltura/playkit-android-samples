@@ -30,6 +30,7 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
+import com.kaltura.playkit.ads.PKAdEndedReason;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
@@ -164,7 +165,7 @@ public class VideoFragment extends Fragment {
 
 
     private void addAdPluginConfig(PKPluginConfigs config, FrameLayout layout, RelativeLayout adSkin) {
-        ADConfig adsConfig = new ADConfig().setAdTagURL(mVideoItem.getAdTagUrl()).setPlayerViewContainer(layout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90).setStartAdFromPosition(0);
+        ADConfig adsConfig = new ADConfig().setAdTagURL(mVideoItem.getAdTagUrl()).setPlayerViewContainer(layout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
         config.setPluginConfig(ADPlugin.factory.getName(), adsConfig);
     }
 
@@ -416,7 +417,7 @@ public class VideoFragment extends Fragment {
                 AdEvent.AdProgressUpdateEvent aEventProress = (AdEvent.AdProgressUpdateEvent) event;
                 //log.d("received NEW AD_PROGRESS_UPDATE " + adEventProress.currentPosition + "/" +  adEventProress.duration);
             }
-        }, AdEvent.Type.AD_PROGRESS_UPDATE);
+        }, AdEvent.Type.AD_POSITION_UPDATED);
 
 
         player.addEventListener(new PKEvent.Listener() {
@@ -445,7 +446,7 @@ public class VideoFragment extends Fragment {
                 log("CUE_POINTS_CHANGED");
                 onCuePointChanged();
             }
-        }, AdEvent.Type.CUEPOINTS_CHANGED);
+        }, AdEvent.Type.AD_CUEPOINTS_UPDATED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -453,14 +454,20 @@ public class VideoFragment extends Fragment {
                 log("AD_STARTED");
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
-        }, AdEvent.Type.STARTED);
+        }, AdEvent.Type.AD_STARTED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log("AD COMPLETED");
+                AdEvent.AdEndedEvent adEndedEvent = (AdEvent.AdEndedEvent) event;
+                if (adEndedEvent.adEndedReason == PKAdEndedReason.COMPLETED) {
+                    log("AD COMPLETED");
+                } else if (adEndedEvent.adEndedReason == PKAdEndedReason.SKIPPED) {
+                    log("AD SKIPPED");
+                    nowPlaying = false;
+                }
             }
-        }, AdEvent.Type.COMPLETED);
+        }, AdEvent.Type.AD_ENDED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -469,7 +476,7 @@ public class VideoFragment extends Fragment {
                 nowPlaying = true;
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
-        }, AdEvent.Type.RESUMED);
+        }, AdEvent.Type.AD_RESUMED);
 
 
         player.addEventListener(new PKEvent.Listener() {
@@ -479,7 +486,7 @@ public class VideoFragment extends Fragment {
                 nowPlaying = true;
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
-        }, AdEvent.Type.PAUSED);
+        }, AdEvent.Type.AD_PAUSED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -517,14 +524,6 @@ public class VideoFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log("SKIPPED");
-                nowPlaying = false;
-            }
-        }, AdEvent.Type.SKIPPED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
                 log("FIRST_QUARTILE");
             }
         }, AdEvent.Type.FIRST_QUARTILE);
@@ -557,17 +556,21 @@ public class VideoFragment extends Fragment {
                 log("CLICKED");
                 nowPlaying = true;
             }
-        }, AdEvent.Type.CLICKED);
+        }, AdEvent.Type.AD_CLICKED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                AdEvent.AdBufferEvent buffEvent = (AdEvent.AdBufferEvent) event;
-                log("AD_BUFFER show = " + buffEvent.show);
-
+                log("AD_BUFFER show = true");
             }
-        }, AdEvent.Type.AD_BUFFER);
+        }, AdEvent.Type.AD_STARTED_BUFFERING);
 
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                log("AD_BUFFER show = " + false);
+            }
+        }, AdEvent.Type.AD_PLAYBACK_READY);
 
         player.addStateChangeListener(new PKEvent.Listener() {
             @Override

@@ -6,13 +6,16 @@ public final class VideoItem {
     private final String mTitle;
     private final String mVideoUrl;
     private final String mAdTagUrl;
+    private final String mVideoLic;
 
-    public VideoItem(String videoUrl, String title,  String adTagUrl, int thumbnailResourceId) {
+    public VideoItem(String videoUrl, String videoLic, String title,  String adTagUrl, int thumbnailResourceId) {
         super();
+        mVideoUrl = videoUrl;
+        mVideoLic = videoLic;
         mThumbnailResourceId = thumbnailResourceId;
         mTitle = title;
         mAdTagUrl = adTagUrl;
-        mVideoUrl = videoUrl;
+
     }
 
     /**
@@ -41,5 +44,12 @@ public final class VideoItem {
      */
     public String getAdTagUrl() {
         return mAdTagUrl;
+    }
+
+    /**
+     * Returns the Video lic url for the video.
+     */
+    public String getVideoLic() {
+        return mVideoLic;
     }
 }

@@ -18,7 +18,10 @@ public class MainActivity extends AppCompatActivity  implements VideoListFragmen
     private static final String VIDEO_PLAYLIST_FRAGMENT_TAG = "video_playlist_fragment_tag";
     private static final String VIDEO_EXAMPLE_FRAGMENT_TAG = "video_example_fragment_tag";
     public static final String SOURCE_URL1 = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
+    public static final String LIC_URL1 = "";
 
+    public static final String SOURCE_URL2 = "https://cdnapisec.kaltura.com/p/2222401/sp/222240100/playManifest/entryId/1_f93tepsn/protocol/https/format/url/flavorIds/0_n80ojk1z,0_pke26hka/a.wvm";
+    public static final String LIC_URL2 = "https://udrmv3.kaltura.com//widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJPVlAiLCJ1c2VyX3Rva2VuIjoiZGpKOE1qSXlNalF3TVh4cF90ajBCRlpHOE5MdUNiV0VBenFUV0NiS1RaREpscTROWTlYSGd1dW5HV3d4dUxDY3VoUUZLeDRvTFdEV0NyLWxEUUhxbU1JcDFMbVg4NnYydXhkLS0ySDU5bWszVnhZLUtpaWFrZTl3Y0E9PSIsImFjY291bnRfaWQiOjIyMjI0MDEsImNvbnRlbnRfaWQiOiIxX2Y5M3RlcHNuIiwiZmlsZXMiOiIwX244MG9qazF6LDBfcGtlMjZoa2EifQ%3D%3D&signature=o1EUbBf%2BGRXaS2tUwdYPbGXgeEo%3D";
 
     public static final String AD_1 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
     public static final String AD_2 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity  implements VideoListFragmen
     public static final String AD_7 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostoptimizedpodbumper&cmsid=496&vid=short_onecue&correlator=";
     public static final String AD_8 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostlongpod&cmsid=496&vid=short_tencue&correlator=";
     public static final String AD_GOOGLE_SEARCH = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
+    public static final String AD_SENSE = "http://googleads.g.doubleclick.net/pagead/ads?client=ca-video-afvtest&ad_type=video";
     private OrientationManager mOrientationManager;
 
 

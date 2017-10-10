@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.kaltura.playkit.PKDrmParams;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -261,10 +263,13 @@ public class VideoFragment extends Fragment {
 
         //Set id for the entry.
         mediaEntry.setId("1_w9zx2eti");
-
+        mediaEntry.setDuration(883 * 1000);
         //Set media entry type. It could be Live,Vod or Unknown.
         //For now we will use Unknown.
         mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
+
+
+
 
         //Create list that contains at least 1 media source.
         //Each media entry can contain a couple of different media sources.
@@ -295,11 +300,26 @@ public class VideoFragment extends Fragment {
         //Set the id.
         mediaSource.setId("11111");
 
+        if (!TextUtils.isEmpty(mVideoItem.getVideoLic())) {
+            List<PKDrmParams> pkDrmDataList = new ArrayList<>();
+            PKDrmParams pkDrmParams = null;
+            if (mVideoItem.getVideoUrl().endsWith("mpd")) {
+                pkDrmParams = new PKDrmParams(mVideoItem.getVideoLic(), PKDrmParams.Scheme.WidevineCENC);
+                mediaSource.setMediaFormat(PKMediaFormat.dash);
+            } else {
+                pkDrmParams = new PKDrmParams(mVideoItem.getVideoLic(), PKDrmParams.Scheme.WidevineClassic);
+                mediaSource.setMediaFormat(PKMediaFormat.wvm);
+            }
+            pkDrmDataList.add(pkDrmParams);
+            mediaSource.setDrmData(pkDrmDataList);
+
+        } else {
+            //Set the format of the source. In our case it will be hls.
+            mediaSource.setMediaFormat(PKMediaFormat.hls);
+        }
         //Set the content url. In our case it will be link to hls source(.m3u8).
         mediaSource.setUrl(mVideoItem.getVideoUrl());
 
-        //Set the format of the source. In our case it will be hls.
-        mediaSource.setMediaFormat(PKMediaFormat.hls);
 
         //Add media source to the list.
         mediaSources.add(mediaSource);
@@ -451,7 +471,16 @@ public class VideoFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log("AD_STARTED");
+                AdEvent.AdLoadedEvent adLoadedEvent = (AdEvent.AdLoadedEvent) event;
+                log("AD_LOADED " + adLoadedEvent.adInfo.getAdIndexInPod() + "/" + adLoadedEvent.adInfo.getTotalAdsInPod());
+                appProgressBar.setVisibility(View.INVISIBLE);
+            }
+        }, AdEvent.Type.AD_LOADED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                log("AD_STARTED ");
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
         }, AdEvent.Type.AD_STARTED);
@@ -466,6 +495,7 @@ public class VideoFragment extends Fragment {
                     log("AD_ENDED-" + adEndedEvent.adEndedReason);
                     nowPlaying = false;
                 }
+                appProgressBar.setVisibility(View.INVISIBLE);
             }
         }, AdEvent.Type.AD_ENDED);
 
@@ -519,6 +549,7 @@ public class VideoFragment extends Fragment {
                 appProgressBar.setVisibility(View.INVISIBLE);
                 nowPlaying = false;
             }
+
         }, PlayerEvent.Type.ENDED);
 
         player.addEventListener(new PKEvent.Listener() {

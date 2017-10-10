@@ -15,6 +15,10 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kaltura.playkit.samples.fulldemo.R.id.customTag;
+import static com.kaltura.playkit.samples.fulldemo.R.id.mediaLic;
+import static com.kaltura.playkit.samples.fulldemo.R.id.mediaUrl;
+
 
 public class VideoListFragment extends Fragment {
 
@@ -91,8 +95,15 @@ public class VideoListFragment extends Fragment {
 
     private void getCustomAdTag(VideoItem originalVideoItem) {
         View dialogueView = mInflater.inflate(R.layout.custom_ad_tag, mContainer, false);
-        final EditText txtUrl = (EditText) dialogueView.findViewById(R.id.customTag);
-        txtUrl.setHint("Ad Tag URL");
+
+        final EditText videoUrl = (EditText) dialogueView.findViewById(mediaUrl);
+        videoUrl.setHint("Media URL");
+
+        final EditText licUrl = (EditText) dialogueView.findViewById(mediaLic);
+        licUrl.setHint("Media Lic URL");
+
+        final EditText adUrl = (EditText) dialogueView.findViewById(customTag);
+        adUrl.setHint("Ad Tag URL");
         final VideoItem videoItem = originalVideoItem;
 
         new AlertDialog.Builder(this.getActivity())
@@ -100,8 +111,10 @@ public class VideoListFragment extends Fragment {
                 .setView(dialogueView)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        String customAdTagUrl = txtUrl.getText().toString();
-                        VideoItem customAdTagVideoItem = new VideoItem(videoItem.getVideoUrl(),
+                        String customMediaUrl = videoUrl.getText().toString();
+                        String customMediaLicUrl = (licUrl.getText() != null) ? licUrl.getText().toString() : "";
+                        String customAdTagUrl = adUrl.getText().toString();
+                        VideoItem customAdTagVideoItem = new VideoItem(customMediaUrl,  customMediaLicUrl,
                                 videoItem.getTitle(), customAdTagUrl, videoItem.getImageResource());
 
                         if (mSelectedCallback != null) {
@@ -122,7 +135,7 @@ public class VideoListFragment extends Fragment {
         // Iterate through the videos' metadata and add video items to list.
         for (int i = 0; i < VideoMetadata.APP_VIDEOS.size(); i++) {
             VideoMetadata videoMetadata = VideoMetadata.APP_VIDEOS.get(i);
-            videoItems.add(new VideoItem(videoMetadata.videoUrl, videoMetadata.title,
+            videoItems.add(new VideoItem(videoMetadata.videoUrl, videoMetadata.videoLic, videoMetadata.title,
                     videoMetadata.adTagUrl, videoMetadata.thumbnail));
         }
 

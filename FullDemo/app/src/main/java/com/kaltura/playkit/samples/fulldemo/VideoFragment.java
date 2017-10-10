@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -44,10 +45,30 @@ import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_7;
+
 public class VideoFragment extends Fragment {
     private static final String TAG = VideoFragment.class.getSimpleName();
     public static final String STATS_KALTURA_URL = "https://stats.kaltura.com/api_v3/index.php";
     public static final String ANALYTIC_TRIGGER_INTERVAL = "10";
+
+    //private static final String FIRST_SOURCE_URL = "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
+    //private static final String SECOND_SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
+
+    private static final String FIRST_SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/1_sf5ovm7u/flavorIds/1_d2uwy7vv,1_jl7y56al/format/applehttp/protocol/http/a.m3u8";
+    private static final String SECOND_SOURCE_URL = "http://cdnapi.kaltura.com/p/2219501/sp/221950100/playManifest/entryId/1_f9a2uz7t/format/applehttp/tags/dash/protocol/http/f/a.m3u8";
+
+
+
+    //id of the first entry
+    private static final String FIRST_ENTRY_ID = "entry_id_1";
+    //id of the second entry
+    private static final String SECOND_ENTRY_ID = "entry_id_2";
+    //id of the first media source.
+    private static final String FIRST_MEDIA_SOURCE_ID = "source_id_1";
+    //id of the second media source.
+    private static final String SECOND_MEDIA_SOURCE_ID = "source_id_2";
+
 
     //Youbora analytics Constants
     public static final String ACCOUNT_CODE = "your_account_code";
@@ -123,8 +144,166 @@ public class VideoFragment extends Fragment {
         if (mViewCreatedCallback != null) {
             mViewCreatedCallback.onVideoFragmentViewCreated();
         }
+
         return rootView;
     }
+
+    private void changeMedia() {
+
+        //Before changing media we must call stop on the player.
+        player.stop();
+
+
+        //Check if id of the media entry that is set in mediaConfig.
+        if (mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)) {
+            String AD_HOND = "http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
+            ADConfig adsConfig = new ADConfig().setAdTagURL(AD_HOND).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
+
+            player.updatePluginConfig(ADPlugin.factory.getName(), adsConfig);
+            //If first one is active, prepare second one.
+            prepareSecondEntry();
+        } else {
+
+            ADConfig adsConfig = new ADConfig().setAdTagURL(AD_7).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
+
+            player.updatePluginConfig(ADPlugin.factory.getName(), adsConfig);
+            //If the second one is active, prepare the first one.
+            prepareFirstEntry();
+        }
+    }
+
+
+
+    /**
+     * Prepare the first entry.
+     */
+    private void prepareFirstEntry() {
+        //Second. Create PKMediaEntry object.
+        PKMediaEntry mediaEntry = createFirstMediaEntry();
+
+        //Add it to the mediaConfig.
+        mediaConfig.setMediaEntry(mediaEntry);
+
+        //Prepare player with media configuration.
+        player.prepare(mediaConfig);
+    }
+
+    /**
+     * Prepare the second entry.
+     */
+    private void prepareSecondEntry() {
+        //Second. Create PKMediaEntry object.
+        PKMediaEntry mediaEntry = createSecondMediaEntry();
+
+        //Add it to the mediaConfig.
+        mediaConfig.setMediaEntry(mediaEntry);
+
+        //Prepare player with media configuration.
+        player.prepare(mediaConfig);
+    }
+
+    private PKMediaEntry createFirstMediaEntry() {
+        //Create media entry.
+        PKMediaEntry mediaEntry = new PKMediaEntry();
+
+        //Set id for the entry.
+        mediaEntry.setId(FIRST_ENTRY_ID);
+
+        //Set media entry type. It could be Live,Vod or Unknown.
+        //For now we will use Unknown.
+        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
+
+        //Create list that contains at least 1 media source.
+        //Each media entry can contain a couple of different media sources.
+        //All of them represent the same content, the difference is in it format.
+        //For example same entry can contain PKMediaSource with dash and another
+        // PKMediaSource can be with hls. The player will decide by itself which source is
+        // preferred for playback.
+        List<PKMediaSource> mediaSources = createFirstMediaSources();
+
+        //Set media sources to the entry.
+        mediaEntry.setSources(mediaSources);
+
+        return mediaEntry;
+    }
+
+    /**
+     * Create {@link PKMediaEntry} with minimum necessary data.
+     *
+     * @return - the {@link PKMediaEntry} object.
+     */
+    private PKMediaEntry createSecondMediaEntry() {
+        //Create media entry.
+        PKMediaEntry mediaEntry = new PKMediaEntry();
+
+        //Set id for the entry.
+        mediaEntry.setId(SECOND_ENTRY_ID);
+
+        //Set media entry type. It could be Live,Vod or Unknown.
+        //For now we will use Unknown.
+        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
+
+        //Create list that contains at least 1 media source.
+        //Each media entry can contain a couple of different media sources.
+        //All of them represent the same content, the difference is in it format.
+        //For example same entry can contain PKMediaSource with dash and another
+        // PKMediaSource can be with hls. The player will decide by itself which source is
+        // preferred for playback.
+        List<PKMediaSource> mediaSources = createSecondMediaSources();
+
+        //Set media sources to the entry.
+        mediaEntry.setSources(mediaSources);
+
+        return mediaEntry;
+    }
+
+    private List<PKMediaSource> createFirstMediaSources() {
+        //Init list which will hold the PKMediaSources.
+        List<PKMediaSource> mediaSources = new ArrayList<>();
+
+        //Create new PKMediaSource instance.
+        PKMediaSource mediaSource = new PKMediaSource();
+
+        //Set the id.
+        mediaSource.setId(FIRST_MEDIA_SOURCE_ID);
+
+        //Set the content url. In our case it will be link to hls source(.m3u8).
+        mediaSource.setUrl(FIRST_SOURCE_URL);
+
+        //Set the format of the source. In our case it will be hls.
+        mediaSource.setMediaFormat(PKMediaFormat.hls);
+
+        //Add media source to the list.
+        mediaSources.add(mediaSource);
+
+        return mediaSources;
+    }
+
+    /**
+     * Create list of {@link PKMediaSource}.
+     *
+     * @return - the list of sources.
+     */
+    private List<PKMediaSource> createSecondMediaSources() {
+        //Init list which will hold the PKMediaSources.
+        List<PKMediaSource> mediaSources = new ArrayList<>();
+
+        //Create new PKMediaSource instance.
+        PKMediaSource mediaSource = new PKMediaSource();
+
+        //Set the id.
+        mediaSource.setId(SECOND_MEDIA_SOURCE_ID);
+
+        mediaSource.setUrl(SECOND_SOURCE_URL);
+
+        mediaSource.setMediaFormat(PKMediaFormat.hls);
+
+        //Add media source to the list.
+        mediaSources.add(mediaSource);
+
+        return mediaSources;
+    }
+
 
     public void loadVideo(VideoItem videoItem) {
         if (mViewCreatedCallback == null) {
@@ -339,6 +518,15 @@ public class VideoFragment extends Fragment {
 
     private void initUi(View rootView) {
 
+        Button changeMediaButton = (Button)rootView.findViewById(R.id.changeMedia);
+        //Set click listener.
+        changeMediaButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Change media.
+                changeMedia();
+            }
+        });
         mVideoTitle = (TextView) rootView.findViewById(R.id.video_title);
         playerLayout = (FrameLayout) rootView.findViewById(R.id.player_root);
         progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarSpinner);
@@ -445,6 +633,7 @@ public class VideoFragment extends Fragment {
             public void onEvent(PKEvent event) {
                 AdEvent.Error adError = (AdEvent.Error) event;
                 Log.d(TAG, "AD_ERROR " + adError.type + " "  + adError.error.message);
+                appProgressBar.setVisibility(View.INVISIBLE);
                 log("AD_ERROR");
             }
         }, AdEvent.Type.ERROR);
@@ -551,6 +740,14 @@ public class VideoFragment extends Fragment {
             }
 
         }, PlayerEvent.Type.ENDED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                appProgressBar.setVisibility(View.INVISIBLE);
+                nowPlaying = false;
+            }
+        }, PlayerEvent.Type.ERROR);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override

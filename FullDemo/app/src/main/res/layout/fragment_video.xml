@@ -14,7 +14,8 @@
         android:gravity="center"
         android:textAlignment="center"
         android:id="@+id/companionAdSlot"
-        android:background="#DDDDDD">
+        android:background="#DDDDDD"
+        android:orientation="horizontal">
 
     </LinearLayout>
 
@@ -69,17 +70,6 @@
                 android:src="@drawable/ic_fullscreen"
                 android:padding="10dp"
                 />
-
-            <!--<android.support.v7.widget.AppCompatImageView-->
-            <!--android:id="@+id/full_screen_switcher"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_marginTop="10dp"-->
-            <!--android:layout_marginRight="5dp"-->
-            <!--android:src="@drawable/ic_fullscreen"-->
-            <!--android:padding="10dp"-->
-            <!--/>-->
         </RelativeLayout>
     </RelativeLayout>
 
@@ -113,4 +103,15 @@
 
         </TextView>
     </ScrollView>
+
+    <Button
+        android:id="@+id/changeMedia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/companionAdSlot"
+        android:layout_marginLeft="14dp"
+        android:layout_marginStart="14dp"
+        android:text="Change Media" />
 </RelativeLayout>

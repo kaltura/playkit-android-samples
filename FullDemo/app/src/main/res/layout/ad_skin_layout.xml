@@ -60,14 +60,5 @@
             android:id="@+id/imageViewCompanion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-        <!--<TextView-->
-            <!--android:id="@+id/companionPlaceholder"-->
-            <!--android:text="@string/companionPlaceholder"-->
-            <!--android:textAlignment="center"-->
-            <!--android:gravity="center_horizontal"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:textSize="@dimen/font_size" />-->
     </LinearLayout>
-
 </RelativeLayout>

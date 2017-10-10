@@ -12,7 +12,6 @@ import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_6;
 import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_7;
 import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_8;
 import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_GOOGLE_SEARCH;
-import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_SENSE;
 import static com.kaltura.playkit.samples.fulldemo.MainActivity.LIC_URL1;
 import static com.kaltura.playkit.samples.fulldemo.MainActivity.SOURCE_URL1;
 
@@ -70,12 +69,6 @@ public enum VideoMetadata {
             AD_8,
             R.drawable.k_image),
 
-    ADSENSE(SOURCE_URL1,
-            LIC_URL1,
-            "AdSense",
-            AD_SENSE,
-            R.drawable.k_image),
-
     GOOGLE_SEARCH(SOURCE_URL1,
             LIC_URL1,
             "Google Search",
@@ -90,7 +83,7 @@ public enum VideoMetadata {
 
 
     public static final List<VideoMetadata> APP_VIDEOS =
-            Arrays.asList(CUSTOM, PRE_ROLL_NO_SKIP, PRE_ROLL_SKIP, POST_ROLL, VMAP, VMAP_PODS, WRAPPER, VMAP_PODS_BUMP1, VMAP_PODS_BUMP2, GOOGLE_SEARCH, ADSENSE);
+            Arrays.asList(CUSTOM, PRE_ROLL_NO_SKIP, PRE_ROLL_SKIP, POST_ROLL, VMAP, VMAP_PODS, WRAPPER, VMAP_PODS_BUMP1, VMAP_PODS_BUMP2, GOOGLE_SEARCH);
 
     /** The thumbnail image for the video. **/
     public final int thumbnail;

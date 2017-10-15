@@ -56,9 +56,7 @@ public class VideoFragment extends Fragment {
     //private static final String SECOND_SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
 
     private static final String FIRST_SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/1_sf5ovm7u/flavorIds/1_d2uwy7vv,1_jl7y56al/format/applehttp/protocol/http/a.m3u8";
-    private static final String SECOND_SOURCE_URL = "http://cdnapi.kaltura.com/p/2219501/sp/221950100/playManifest/entryId/1_f9a2uz7t/format/applehttp/tags/dash/protocol/http/f/a.m3u8";
-
-
+    private static final String SECOND_SOURCE_URL = "http://fastly.kastatic.org/KA-youtube-converted/PEeUTQ0Gri8.m3u8/PEeUTQ0Gri8.m3u8";
 
     //id of the first entry
     private static final String FIRST_ENTRY_ID = "entry_id_1";
@@ -622,7 +620,7 @@ public class VideoFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                AdEvent.AdProgressUpdateEvent aEventProress = (AdEvent.AdProgressUpdateEvent) event;
+                AdEvent.AdProgressUpdateEvent adEventProress = (AdEvent.AdProgressUpdateEvent) event;
                 //log.d("received NEW AD_PROGRESS_UPDATE " + adEventProress.currentPosition + "/" +  adEventProress.duration);
             }
         }, AdEvent.Type.AD_POSITION_UPDATED);

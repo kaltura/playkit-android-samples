@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.kaltura.playkit.samples.fulldemo.MainActivity.SOURCE_URL1;
 import static com.kaltura.playkit.samples.fulldemo.R.id.customTag;
 import static com.kaltura.playkit.samples.fulldemo.R.id.mediaLic;
 import static com.kaltura.playkit.samples.fulldemo.R.id.mediaUrl;
@@ -111,8 +113,8 @@ public class VideoListFragment extends Fragment {
                 .setView(dialogueView)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        String customMediaUrl = videoUrl.getText().toString();
-                        String customMediaLicUrl = (licUrl.getText() != null) ? licUrl.getText().toString() : "";
+                        String customMediaUrl = (!TextUtils.isEmpty(videoUrl.getText().toString())) ? videoUrl.getText().toString() : SOURCE_URL1;
+                        String customMediaLicUrl = (!TextUtils.isEmpty(licUrl.getText())) ? licUrl.getText().toString() : "";
                         String customAdTagUrl = adUrl.getText().toString();
                         VideoItem customAdTagVideoItem = new VideoItem(customMediaUrl,  customMediaLicUrl,
                                 videoItem.getTitle(), customAdTagUrl, videoItem.getImageResource());

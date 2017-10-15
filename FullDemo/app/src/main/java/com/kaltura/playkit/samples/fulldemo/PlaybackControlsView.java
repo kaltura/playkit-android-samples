@@ -105,7 +105,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         // Remove scheduled updates.
         removeCallbacks(updateProgressAction);
         // Schedule an update if necessary.
-        if (playerState != PlayerState.IDLE || (player.getAdController() != null && player.getAdController().getAdCurrentPosition() > 0)) {
+        if (playerState != PlayerState.IDLE || (player.getAdController() != null && player.getAdController().getAdCurrentPosition() >= 0)) {
             long delayMs = 1000;
             postDelayed(updateProgressAction, delayMs);
         }

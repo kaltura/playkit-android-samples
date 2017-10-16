@@ -344,7 +344,12 @@ public class VideoFragment extends Fragment {
 
 
     private void addAdPluginConfig(PKPluginConfigs config, FrameLayout layout, RelativeLayout adSkin) {
-        ADConfig adsConfig = new ADConfig().setAdTagURL(mVideoItem.getAdTagUrl()).setPlayerViewContainer(layout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
+
+        String adtag = mVideoItem.getAdTagUrl();
+        if (adtag.endsWith("correlator=")) {
+            adtag += System.currentTimeMillis() + 100000;
+        }
+        ADConfig adsConfig = new ADConfig().setAdTagURL(adtag).setPlayerViewContainer(layout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
         config.setPluginConfig(ADPlugin.factory.getName(), adsConfig);
     }
 

@@ -887,6 +887,10 @@ public class VideoFragment extends Fragment {
     }
 
     private void setFullScreen(boolean isFullScreen) {
+        if (isFullScreen == this.isFullScreen) {
+            return;
+        }
+
         if (player != null && player.getAdController() != null) {
             player.getAdController().screenOrientationChanged(isFullScreen);
         }

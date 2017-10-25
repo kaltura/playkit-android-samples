@@ -150,7 +150,7 @@ public class VideoFragment extends Fragment {
 
         //Before changing media we must call stop on the player.
         player.stop();
-
+        clearLog();
 
         //Check if id of the media entry that is set in mediaConfig.
         if (mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)) {
@@ -310,6 +310,7 @@ public class VideoFragment extends Fragment {
         }
 
         mVideoItem = videoItem;
+        clearLog();
         //Initialize media config object.
         createMediaConfig();
         PlayKitManager.registerPlugins(this.getActivity(), ADPlugin.factory);
@@ -570,6 +571,13 @@ public class VideoFragment extends Fragment {
                             logScroll.fullScroll(View.FOCUS_DOWN);
                         }
                     });
+                }
+            }
+
+            @Override
+            public void clearLog() {
+                if (logText != null) {
+                    logText.setText("");
                 }
             }
         };
@@ -923,11 +931,18 @@ public class VideoFragment extends Fragment {
 
     public interface Logger {
         void log(String logMessage);
+        void clearLog();
     }
 
     private void log(String message) {
         if (mLog != null) {
             mLog.log(message + "\n");
+        }
+    }
+
+    private void clearLog() {
+        if (mLog != null) {
+            mLog.clearLog();
         }
     }
 }

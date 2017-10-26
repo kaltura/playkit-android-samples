@@ -33,14 +33,14 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
+import com.kaltura.playkit.ads.AdEvent;
 import com.kaltura.playkit.ads.PKAdEndedReason;
-import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
-import com.kaltura.playkit.plugins.ads.kaltura.ADConfig;
-import com.kaltura.playkit.plugins.ads.kaltura.ADPlugin;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
+import com.kaltura.plugins.adsmanager.AdsConfig;
+import com.kaltura.plugins.adsmanager.AdsPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,16 +155,16 @@ public class VideoFragment extends Fragment {
         //Check if id of the media entry that is set in mediaConfig.
         if (mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)) {
             String AD_HOND = "http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
-            ADConfig adsConfig = new ADConfig().setAdTagURL(AD_HOND).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
+            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_HOND).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
 
-            player.updatePluginConfig(ADPlugin.factory.getName(), adsConfig);
+            player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             //If first one is active, prepare second one.
             prepareSecondEntry();
         } else {
 
-            ADConfig adsConfig = new ADConfig().setAdTagURL(AD_7).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
+            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_7).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
 
-            player.updatePluginConfig(ADPlugin.factory.getName(), adsConfig);
+            player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             //If the second one is active, prepare the first one.
             prepareFirstEntry();
         }
@@ -313,7 +313,7 @@ public class VideoFragment extends Fragment {
         clearLog();
         //Initialize media config object.
         createMediaConfig();
-        PlayKitManager.registerPlugins(this.getActivity(), ADPlugin.factory);
+        PlayKitManager.registerPlugins(this.getActivity(), AdsPlugin.factory);
         //PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
         PlayKitManager.registerPlugins(this.getActivity(), KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(getActivity(), YouboraPlugin.factory);
@@ -350,8 +350,8 @@ public class VideoFragment extends Fragment {
         if (adtag.endsWith("correlator=")) {
             adtag += System.currentTimeMillis() + 100000;
         }
-        ADConfig adsConfig = new ADConfig().setAdTagURL(adtag).setPlayerViewContainer(layout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
-        config.setPluginConfig(ADPlugin.factory.getName(), adsConfig);
+        AdsConfig adsConfig = new AdsConfig().setAdTagURL(adtag).setPlayerViewContainer(layout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
+        config.setPluginConfig(AdsPlugin.factory.getName(), adsConfig);
     }
 
     private void addIMAPluginConfig(PKPluginConfigs config, String adTagUrl) {

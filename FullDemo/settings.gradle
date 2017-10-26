@@ -1,1 +1,7 @@
 include ':app'
+include ':playkit'
+project(':playkit').projectDir = new File(settingsDir, '../../playkit-android/playkit')
+include ':admanager'
+project(':admanager').projectDir = new File(settingsDir, '../../playkit-admanager-android/admanager')
+include ':adsplugin'
+project(':adsplugin').projectDir = new File(settingsDir, '../../playkit-android-ads-plugin/adsplugin')

@@ -45,7 +45,7 @@ import com.kaltura.plugins.adsmanager.AdsPlugin;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_7;
+import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_GOOGLE_SEARCH;
 
 public class VideoFragment extends Fragment {
     private static final String TAG = VideoFragment.class.getSimpleName();
@@ -154,7 +154,8 @@ public class VideoFragment extends Fragment {
 
         //Check if id of the media entry that is set in mediaConfig.
         if (mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)) {
-            String AD_HOND = "http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
+            String AD_HOND = "http://externaltests.dev.kaltura.com/player/Vast_xml/alexs.qacore-vast3-rol_02.xml";
+                    //"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
             AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_HOND).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
 
             player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
@@ -162,7 +163,7 @@ public class VideoFragment extends Fragment {
             prepareSecondEntry();
         } else {
 
-            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_7).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
+            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_GOOGLE_SEARCH).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
 
             player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             //If the second one is active, prepare the first one.
@@ -340,9 +341,6 @@ public class VideoFragment extends Fragment {
         //Start playback.
         player.play();
     }
-
-
-
 
     private void addAdPluginConfig(PKPluginConfigs config, FrameLayout layout, RelativeLayout adSkin) {
 

@@ -44,14 +44,12 @@
         android:layout_alignParentEnd="true" />
 
     <LinearLayout
-
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="center_horizontal"
         android:gravity="center"
         android:textAlignment="center"
         android:id="@+id/companionAdSlot"
-        android:background="#DDDDDD"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true">

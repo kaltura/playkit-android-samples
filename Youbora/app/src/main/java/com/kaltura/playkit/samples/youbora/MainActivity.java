@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Youbora analytics Constants
     public static final String ACCOUNT_CODE = "your_account_code";
-    public static final String USER_NAME = "your_user_name";
+    public static final String UNIQUE_USER_NAME = "your_app_logged_in_user_email_or_userId";
     public static final String MEDIA_TITLE = "your_media_title";
     public static final boolean IS_LIVE = false;
     public static final boolean ENABLE_SMART_ADS = true;
@@ -106,12 +106,11 @@ public class MainActivity extends AppCompatActivity {
         //Initialize PKPluginConfigs object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
         //Initialize Json object that will hold all the configurations for the plugin.
-        JsonObject pluginEntry = new JsonObject();
 
         //Youbora config json. Main config goes here.
         JsonObject youboraConfigJson = new JsonObject();
         youboraConfigJson.addProperty("accountCode", ACCOUNT_CODE);
-        youboraConfigJson.addProperty("username", USER_NAME);
+        youboraConfigJson.addProperty("username", UNIQUE_USER_NAME);
         youboraConfigJson.addProperty("haltOnError", true);
         youboraConfigJson.addProperty("enableAnalytics", true);
         youboraConfigJson.addProperty("enableSmartAds", ENABLE_SMART_ADS);
@@ -150,13 +149,13 @@ public class MainActivity extends AppCompatActivity {
         extraParamJson.addProperty("param2", EXTRA_PARAM_2);
 
         //Add all the json objects created before to the pluginEntry json.
-        pluginEntry.add("media", mediaEntryJson);
-        pluginEntry.add("ads", adsJson);
-        pluginEntry.add("properties", propertiesJson);
-        pluginEntry.add("extraParams", extraParamJson);
+        youboraConfigJson.add("media", mediaEntryJson);
+        youboraConfigJson.add("ads", adsJson);
+        youboraConfigJson.add("properties", propertiesJson);
+        youboraConfigJson.add("extraParams", extraParamJson);
 
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), youboraConfigJson);
 
         return pluginConfigs;
     }

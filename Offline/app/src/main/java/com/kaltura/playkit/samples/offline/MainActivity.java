@@ -21,6 +21,7 @@ import com.kaltura.playkit.LocalAssetsManager;
 import com.kaltura.playkit.PKDrmParams;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
+import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
@@ -33,11 +34,12 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
 
-    private static final String TAG = "Main";
+    private static final String TAG = "MainActivity";
     private static final String ASSET_URL = "https://cdnapisec.kaltura.com/p/2215841/playManifest/entryId/1_w9zx2eti/protocol/https/format/mpegdash/a.mpd";
     private static final String ASSET_ID = "asset1";
     private static final String ASSET_LICENSE_URL = null;
-    
+    private static final long MIN_EXP_SEC = 10;
+
     final private Context context = this;   // for ease of use in inner classes
     private Player player;
     private ContentManager contentManager;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
         PKMediaSource source = new PKMediaSource()
                 .setId(id)
+                .setMediaFormat(PKMediaFormat.valueOfUrl(url))
                 .setUrl(url);
 
         if (licenseUrl != null) {
@@ -217,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
 
     void showMenu() {
         new AlertDialog.Builder(context)
-                .setItems(new String[]{"Download", "Register", "Play Local", "Unregister", "Remove"}, new DialogInterface.OnClickListener() {
+                .setItems(new String[]{"Download", "Register", "Play Local", "Unregister", "Remove", "Refresh"}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
@@ -235,6 +238,9 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case 4: // remove
                                 removeDownload();
+                                break;
+                            case 5: // refresh
+                                refreshLicense();
                                 break;
                         }
                         Toast.makeText(context, "Selected " + which, Toast.LENGTH_SHORT).show();
@@ -254,13 +260,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void playLocalAsset() {
-        String path = contentManager.getLocalFile(ASSET_ID).getAbsolutePath();
+        final String path = contentManager.getLocalFile(ASSET_ID).getAbsolutePath();
         if (path == null) {
-            Toast.makeText(context, "failed path is null", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Error path is null", Toast.LENGTH_LONG).show();
             return;
         }
+
+        localAssetsManager.checkAssetStatus(path, ASSET_ID, new LocalAssetsManager.AssetStatusListener() {
+            @Override
+            public void onStatus(String localAssetPath, long expiryTimeSeconds, long availableTimeSeconds, boolean isRegistered) {
+                if (expiryTimeSeconds > MIN_EXP_SEC) {
+                    playOfflineVideo(path);
+                } else {
+                    Toast.makeText(context, "Error License Expired need to refresh it while in online mode", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        });
+
+    }
+
+    private void playOfflineVideo(String path) {
         PKMediaSource mediaSource = localAssetsManager.getLocalMediaSource(ASSET_ID, path);
-        
+
         player.prepare(new PKMediaConfig().setMediaEntry(new PKMediaEntry().setSources(Collections.singletonList(mediaSource))));
         player.play();
     }
@@ -297,6 +319,35 @@ public class MainActivity extends AppCompatActivity {
 
     private void removeDownload() {
         contentManager.removeItem(ASSET_ID);
+    }
+
+    private void refreshLicense() {
+        final String path = contentManager.getLocalFile(ASSET_ID).getAbsolutePath();
+        if (path == null) {
+            Toast.makeText(context, "Error path is null", Toast.LENGTH_LONG).show();
+            return;
+        }
+        localAssetsManager.refreshDrmAsset(path, ASSET_ID, new PKDrmParams(ASSET_LICENSE_URL, PKDrmParams.Scheme.WidevineCENC), new LocalAssetsManager.AssetRegistrationListener() {
+            @Override
+            public void onRegistered(String localAssetPath) {
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "refreshed", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailed(String localAssetPath, Exception error) {
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "failed", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
     }
 
     private void download() {

@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String ASSET_URL = "https://cdnapisec.kaltura.com/p/2215841/playManifest/entryId/1_w9zx2eti/protocol/https/format/mpegdash/a.mpd";
     private static final String ASSET_ID = "asset1";
     private static final String ASSET_LICENSE_URL = null;
+
     private static final long MIN_EXP_SEC = 10;
 
     final private Context context = this;   // for ease of use in inner classes
@@ -269,10 +270,11 @@ public class MainActivity extends AppCompatActivity {
         localAssetsManager.checkAssetStatus(path, ASSET_ID, new LocalAssetsManager.AssetStatusListener() {
             @Override
             public void onStatus(String localAssetPath, long expiryTimeSeconds, long availableTimeSeconds, boolean isRegistered) {
-                if (expiryTimeSeconds > MIN_EXP_SEC) {
+                //  check if DRM content valid                           or clear content
+                if ((expiryTimeSeconds >= MIN_EXP_SEC && isRegistered) || (expiryTimeSeconds == Long.MAX_VALUE && availableTimeSeconds == Long.MAX_VALUE)) {
                     playOfflineVideo(path);
                 } else {
-                    Toast.makeText(context, "Error License Expired need to refresh it while in online mode", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Error License Expired or not registerd please refresh it while in online mode", Toast.LENGTH_LONG).show();
                     return;
                 }
             }

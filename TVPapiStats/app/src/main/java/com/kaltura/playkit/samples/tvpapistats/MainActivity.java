@@ -98,10 +98,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize PKPluginConfigs object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
-        JsonObject pluginEntry = new JsonObject();
+        //JsonObject pluginEntry = new JsonObject();
 
         JsonObject paramsJson = new JsonObject();
-        paramsJson.addProperty("fileId", FILE_ID);
         paramsJson.addProperty("baseUrl", TVPAPI_ANALYTICS_URL);
         paramsJson.addProperty("timerInterval", ANALYTIC_TRIGGER_INTERVAL);
 
@@ -127,10 +126,10 @@ public class MainActivity extends AppCompatActivity {
 
         //Add user json object to plugin entry json object with "initObj" as key.
         paramsJson.add("initObj", initObjJson);
-        pluginEntry.add("params", paramsJson);
+        //pluginEntry.add("params", paramsJson);
 
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(TVPAPIAnalyticsPlugin.factory.getName(), pluginEntry);
+        pluginConfigs.setPluginConfig(TVPAPIAnalyticsPlugin.factory.getName(), paramsJson);
 
         return pluginConfigs;
     }

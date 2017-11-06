@@ -279,7 +279,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
     private void playOfflineVideo(String path) {

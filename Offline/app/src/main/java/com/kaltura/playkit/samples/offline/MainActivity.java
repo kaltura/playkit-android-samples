@@ -328,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(context, "Error path is null", Toast.LENGTH_LONG).show();
             return;
         }
-        localAssetsManager.refreshDrmAsset(originMediaSource, path, ASSET_ID, new LocalAssetsManager.AssetRegistrationListener() {
+        localAssetsManager.refreshAsset(originMediaSource, path, ASSET_ID, new LocalAssetsManager.AssetRegistrationListener() {
             @Override
             public void onRegistered(String localAssetPath) {
                 mainHandler.post(new Runnable() {

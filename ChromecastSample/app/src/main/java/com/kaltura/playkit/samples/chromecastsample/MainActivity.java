@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
             public void onAdBreakStatusUpdated() {
             }
         });
-
+        remoteMediaClient.load()
         remoteMediaClient.load(getOttCastMediaInfo(getConverterCastForOtt(), false), autoPlay, position);
     }
 

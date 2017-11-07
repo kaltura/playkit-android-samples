@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         mCastContext = CastContext.getSharedInstance(this);
         mCastContext.getSessionManager().addSessionManagerListener(
                 mSessionManagerListener, CastSession.class);
-        mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
+        //mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
 
 
         // mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
@@ -294,7 +294,6 @@ public class MainActivity extends AppCompatActivity {
             public void onAdBreakStatusUpdated() {
             }
         });
-        remoteMediaClient.load()
         remoteMediaClient.load(getOttCastMediaInfo(getConverterCastForOtt(), false), autoPlay, position);
     }
 

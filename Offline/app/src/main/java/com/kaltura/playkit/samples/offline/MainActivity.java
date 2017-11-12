@@ -21,6 +21,7 @@ import com.kaltura.playkit.LocalAssetsManager;
 import com.kaltura.playkit.PKDrmParams;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
+import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
@@ -33,11 +34,13 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
 
-    private static final String TAG = "Main";
+    private static final String TAG = "MainActivity";
     private static final String ASSET_URL = "https://cdnapisec.kaltura.com/p/2215841/playManifest/entryId/1_w9zx2eti/protocol/https/format/mpegdash/a.mpd";
     private static final String ASSET_ID = "asset1";
     private static final String ASSET_LICENSE_URL = null;
-    
+
+    private static final long MIN_EXP_SEC = 10;
+
     final private Context context = this;   // for ease of use in inner classes
     private Player player;
     private ContentManager contentManager;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         PKMediaSource source = new PKMediaSource()
                 .setId(id)
+                .setMediaFormat(PKMediaFormat.valueOfUrl(url))
                 .setUrl(url);
 
         if (licenseUrl != null) {
@@ -140,7 +144,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDownloadMetadata(DownloadItem item, Exception error) {
                 Log.d(TAG, "meta: " + item);
-                item.startDownload();
+                if (error == null) {
+                    item.startDownload();
+                } else {
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(context, "Error: Load Metdata Failed - check your network connection", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    Log.e(TAG, "onDownloadMetadata failure: " + error.getMessage());
+                    contentManager.removeItem(ASSET_ID);
+                }
             }
 
             @Override
@@ -174,7 +189,12 @@ public class MainActivity extends AppCompatActivity {
                 trackSelector.setSelectedTracks(DownloadItem.TrackType.TEXT, trackSelector.getAvailableTracks(DownloadItem.TrackType.TEXT));
             }
         });
-        contentManager.start(null);
+        contentManager.start(new ContentManager.OnStartedListener() {
+            @Override
+            public void onStarted() {
+                Log.d(TAG, "Download Service started");
+            }
+        });
     }
 
     // Find the minimal "good enough" track. In other words, the track that has bitrate greater than or equal
@@ -201,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
 
     void showMenu() {
         new AlertDialog.Builder(context)
-                .setItems(new String[]{"Download", "Register", "Play Local", "Unregister", "Remove"}, new DialogInterface.OnClickListener() {
+                .setItems(new String[]{"Download", "Register", "Play Local", "Unregister", "Remove", "Refresh"}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
@@ -219,6 +239,9 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case 4: // remove
                                 removeDownload();
+                                break;
+                            case 5: // refresh
+                                refreshLicense();
                                 break;
                         }
                         Toast.makeText(context, "Selected " + which, Toast.LENGTH_SHORT).show();
@@ -238,13 +261,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void playLocalAsset() {
-        String path = contentManager.getLocalFile(ASSET_ID).getAbsolutePath();
+        final String path = contentManager.getLocalFile(ASSET_ID).getAbsolutePath();
         if (path == null) {
-            Toast.makeText(context, "failed path is null", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Error path is null", Toast.LENGTH_LONG).show();
             return;
         }
+
+        localAssetsManager.checkAssetStatus(path, ASSET_ID, new LocalAssetsManager.AssetStatusListener() {
+            @Override
+            public void onStatus(String localAssetPath, long expiryTimeSeconds, long availableTimeSeconds, boolean isRegistered) {
+                //  check if DRM content valid                           or clear content
+                if ((expiryTimeSeconds >= MIN_EXP_SEC && isRegistered) || (expiryTimeSeconds == Long.MAX_VALUE && availableTimeSeconds == Long.MAX_VALUE)) {
+                    playOfflineVideo(path);
+                } else {
+                    Toast.makeText(context, "Error License Expired or not registerd please refresh it while in online mode", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+        });
+    }
+
+    private void playOfflineVideo(String path) {
         PKMediaSource mediaSource = localAssetsManager.getLocalMediaSource(ASSET_ID, path);
-        
+
         player.prepare(new PKMediaConfig().setMediaEntry(new PKMediaEntry().setSources(Collections.singletonList(mediaSource))));
         player.play();
     }
@@ -281,6 +320,35 @@ public class MainActivity extends AppCompatActivity {
 
     private void removeDownload() {
         contentManager.removeItem(ASSET_ID);
+    }
+
+    private void refreshLicense() {
+        final String path = contentManager.getLocalFile(ASSET_ID).getAbsolutePath();
+        if (path == null) {
+            Toast.makeText(context, "Error path is null", Toast.LENGTH_LONG).show();
+            return;
+        }
+        localAssetsManager.refreshAsset(originMediaSource, path, ASSET_ID, new LocalAssetsManager.AssetRegistrationListener() {
+            @Override
+            public void onRegistered(String localAssetPath) {
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "refreshed", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onFailed(String localAssetPath, Exception error) {
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, "failed", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
     }
 
     private void download() {

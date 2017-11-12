@@ -16,6 +16,7 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.ads.AdEvent;
 import com.kaltura.playkit.ads.AdInfo;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
@@ -36,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     //Ad configuration constants.
-    private static final String AD_TAG_URL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+    private static final String AD_TAG_URL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
+    //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
+            //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
     private static final String INCORRECT_AD_TAG_URL = "incorrect_ad_tag_url";
     private static final int PREFERRED_AD_BITRATE = 600;
 
@@ -91,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         //Configure ima.
         imaConfigs.setAdTagURL(AD_TAG_URL);
         imaConfigs.setVideoBitrate(PREFERRED_AD_BITRATE);
+        imaConfigs.enableDebugMode(true);
 
         //Convert imaConfigs to jsonObject.
         JsonObject imaConfigJsonObject = imaConfigs.toJSONObject();
@@ -115,7 +119,12 @@ public class MainActivity extends AppCompatActivity {
         player.addEventListener(new PKEvent.Listener() {
                                     @Override
                                     public void onEvent(PKEvent event) {
-
+                                        if (event.eventType() == PlayerEvent.Type.ERROR) {
+                                            //In case of PlayerEvent.Type.ERROR cast the event object to PlayerEvent.Error
+                                            PlayerEvent.Error errorEvent = (PlayerEvent.Error) event;
+                                            //Print the type of the received error.
+                                            Log.e(TAG, "Player Error: " + errorEvent.error.errorType.name());
+                                        }
                                         //First check if event is instance of the AdEvent.
                                         if (event instanceof AdEvent) {
 
@@ -157,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 },
                 //Subscribe to the ad events you are interested in.
+                PlayerEvent.Type.ERROR,
                 AdEvent.Type.STARTED,
                 AdEvent.Type.SKIPPED,
                 AdEvent.Type.COMPLETED,

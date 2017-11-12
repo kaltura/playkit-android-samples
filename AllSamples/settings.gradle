@@ -1,7 +1,8 @@
 // PlayKit Library
-include ':playkit'
+include ':playkit', ':youbora', ':ima'
 project(':playkit').projectDir = new File('../../playkit-android/playkit')
-
+project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
+project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
 
 
 // Sample apps

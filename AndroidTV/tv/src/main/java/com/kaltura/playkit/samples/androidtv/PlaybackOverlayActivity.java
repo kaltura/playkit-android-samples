@@ -21,7 +21,6 @@ import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -35,29 +34,38 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.kaltura.netkit.connect.response.ResultElement;
-import com.kaltura.playkit.PKDrmParams;
+import com.kaltura.playkit.PKError;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
-import com.kaltura.playkit.PKMediaFormat;
-import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.api.ovp.SimpleOvpSessionProvider;
-import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
-import com.kaltura.playkit.mediaproviders.ovp.KalturaOvpMediaProvider;
+import com.kaltura.playkit.ads.AdEvent;
+import com.kaltura.playkit.ads.PKAdErrorType;
 import com.kaltura.playkit.player.PKTracks;
-import com.kaltura.playkit.plugins.Youbora.YouboraPlugin;
-import com.kaltura.playkit.plugins.ads.AdError;
-import com.kaltura.playkit.plugins.ads.AdEvent;
-import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
-import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kaltura.playkit.ads.PKAdErrorType.ADS_REQUEST_NETWORK_ERROR;
+import static com.kaltura.playkit.ads.PKAdErrorType.COMPANION_AD_LOADING_FAILED;
+import static com.kaltura.playkit.ads.PKAdErrorType.FAILED_TO_REQUEST_ADS;
+import static com.kaltura.playkit.ads.PKAdErrorType.INTERNAL_ERROR;
+import static com.kaltura.playkit.ads.PKAdErrorType.INVALID_ARGUMENTS;
+import static com.kaltura.playkit.ads.PKAdErrorType.OVERLAY_AD_LOADING_FAILED;
+import static com.kaltura.playkit.ads.PKAdErrorType.PLAYLIST_NO_CONTENT_TRACKING;
+import static com.kaltura.playkit.ads.PKAdErrorType.QUIET_LOG_ERROR;
+import static com.kaltura.playkit.ads.PKAdErrorType.UNKNOWN_ERROR;
+import static com.kaltura.playkit.ads.PKAdErrorType.VAST_EMPTY_RESPONSE;
+import static com.kaltura.playkit.ads.PKAdErrorType.VAST_LINEAR_ASSET_MISMATCH;
+import static com.kaltura.playkit.ads.PKAdErrorType.VAST_LOAD_TIMEOUT;
+import static com.kaltura.playkit.ads.PKAdErrorType.VAST_MALFORMED_RESPONSE;
+import static com.kaltura.playkit.ads.PKAdErrorType.VAST_TOO_MANY_REDIRECTS;
 
 
 /**
@@ -208,26 +216,20 @@ public class PlaybackOverlayActivity extends Activity implements
     }
 
     private void updatePlaybackState(int position) {
-        PlaybackState.Builder stateBuilder = new PlaybackState.Builder()
-                .setActions(getAvailableActions());
+        long actions = PlaybackState.ACTION_PLAY |
+                PlaybackState.ACTION_PLAY_FROM_MEDIA_ID |
+                PlaybackState.ACTION_PLAY_FROM_SEARCH;
+        if (mPlaybackState == LeanbackPlaybackState.PLAYING) {
+            actions |= PlaybackState.ACTION_PAUSE;
+        }
+
+        PlaybackState.Builder stateBuilder = new PlaybackState.Builder().setActions(actions);
         int state = PlaybackState.STATE_PLAYING;
         if (mPlaybackState == LeanbackPlaybackState.PAUSED) {
             state = PlaybackState.STATE_PAUSED;
         }
         stateBuilder.setState(state, position, 1.0f);
         mSession.setPlaybackState(stateBuilder.build());
-    }
-
-    private long getAvailableActions() {
-        long actions = PlaybackState.ACTION_PLAY |
-                PlaybackState.ACTION_PLAY_FROM_MEDIA_ID |
-                PlaybackState.ACTION_PLAY_FROM_SEARCH;
-
-        if (mPlaybackState == LeanbackPlaybackState.PLAYING) {
-            actions |= PlaybackState.ACTION_PAUSE;
-        }
-
-        return actions;
     }
 
     private void updateMetadata(final Movie movie) {
@@ -369,9 +371,6 @@ public class PlaybackOverlayActivity extends Activity implements
 
                                     @Override
                                     public void onEvent(PKEvent event) {
-
-
-
                                         Enum receivedEventType = event.eventType();
                                         if (event instanceof PlayerEvent) {
                                             switch (((PlayerEvent) event).type) {
@@ -397,7 +396,7 @@ public class PlaybackOverlayActivity extends Activity implements
                                                     mPlaybackState = LeanbackPlaybackState.IDLE;
                                                     break;
                                                 case TRACKS_AVAILABLE:
-                                                    pkTracks = ((PlayerEvent.TracksAvailable) event).getPKTracks();
+                                                    pkTracks = ((PlayerEvent.TracksAvailable) event).tracksInfo;
                                                     break;
                                                 case ERROR:
                                                     String msg = "Player Error";
@@ -451,8 +450,10 @@ public class PlaybackOverlayActivity extends Activity implements
                                                 case CLICKED:
                                                     break;
                                             }
-                                        } else if (event instanceof AdError) {
-                                            switch (((AdError) event).errorType) {
+                                        } else if (event instanceof AdEvent.Error) {
+                                            PKError pkError = ((AdEvent.Error)event).error;
+                                            PKAdErrorType errorType = (PKAdErrorType)pkError.errorType;
+                                            switch (errorType) {
                                                 case ADS_REQUEST_NETWORK_ERROR:
                                                 case INTERNAL_ERROR:
                                                 case VAST_MALFORMED_RESPONSE:
@@ -482,12 +483,12 @@ public class PlaybackOverlayActivity extends Activity implements
                                 }, PlayerEvent.Type.PLAY, PlayerEvent.Type.PAUSE, PlayerEvent.Type.CAN_PLAY, PlayerEvent.Type.SEEKING, PlayerEvent.Type.SEEKED, PlayerEvent.Type.PLAYING,
                 PlayerEvent.Type.ENDED, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.ERROR,
                 AdEvent.Type.LOADED, AdEvent.Type.SKIPPED, AdEvent.Type.TAPPED, AdEvent.Type.CONTENT_PAUSE_REQUESTED, AdEvent.Type.CONTENT_RESUME_REQUESTED, AdEvent.Type.STARTED, AdEvent.Type.PAUSED, AdEvent.Type.RESUMED,
-                AdEvent.Type.COMPLETED, AdEvent.Type.ALL_ADS_COMPLETED, AdError.Type.ADS_REQUEST_NETWORK_ERROR,
+                AdEvent.Type.COMPLETED, AdEvent.Type.ALL_ADS_COMPLETED, ADS_REQUEST_NETWORK_ERROR,
                 AdEvent.Type.CUEPOINTS_CHANGED, AdEvent.Type.CLICKED, AdEvent.Type.AD_BREAK_IGNORED,
-                AdError.Type.VAST_EMPTY_RESPONSE, AdError.Type.COMPANION_AD_LOADING_FAILED, AdError.Type.FAILED_TO_REQUEST_ADS,
-                AdError.Type.INTERNAL_ERROR, AdError.Type.OVERLAY_AD_LOADING_FAILED, AdError.Type.PLAYLIST_NO_CONTENT_TRACKING,
-                AdError.Type.UNKNOWN_ERROR, AdError.Type.VAST_LINEAR_ASSET_MISMATCH, AdError.Type.VAST_MALFORMED_RESPONSE, AdError.Type.QUIET_LOG_ERROR,
-                AdError.Type.VAST_LOAD_TIMEOUT, AdError.Type.INVALID_ARGUMENTS, AdError.Type.VAST_TOO_MANY_REDIRECTS);
+                VAST_EMPTY_RESPONSE, COMPANION_AD_LOADING_FAILED, FAILED_TO_REQUEST_ADS,
+                INTERNAL_ERROR, OVERLAY_AD_LOADING_FAILED, PLAYLIST_NO_CONTENT_TRACKING,
+                UNKNOWN_ERROR, VAST_LINEAR_ASSET_MISMATCH, VAST_MALFORMED_RESPONSE, QUIET_LOG_ERROR,
+                VAST_LOAD_TIMEOUT, INVALID_ARGUMENTS, VAST_TOO_MANY_REDIRECTS);
 //        mVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 //
 //            @Override

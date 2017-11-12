@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.chromecastsample"
         minSdkVersion 17
@@ -23,7 +23,7 @@ android {
 }
 
 dependencies {
-    compile project(":playkit");
+    compile project(":playkit")
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

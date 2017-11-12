@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.androidtv"
         minSdkVersion 21
@@ -20,8 +20,8 @@ android {
 
 dependencies {
     compile project(':playkit')
-    compile project(':ima')
-    compile project(':youbora')
+    compile 'com.kaltura:playkit-android-youbora:master-SNAPSHOT'
+    compile 'com.kaltura:playkit-android-ima:master-SNAPSHOT'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:leanback-v17:25.4.0'
     compile 'com.android.support:appcompat-v7:25.4.0'

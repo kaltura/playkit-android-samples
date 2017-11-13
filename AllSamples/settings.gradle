@@ -1,7 +1,10 @@
 // PlayKit Library
 include ':playkit'
 project(':playkit').projectDir = new File('../../playkit-android/playkit')
-
+include ':ima'
+project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
+include ':youbora'
+project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
 
 // Sample apps
 def samples = [

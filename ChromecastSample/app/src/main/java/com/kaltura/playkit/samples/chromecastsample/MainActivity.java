@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         mCastContext = CastContext.getSharedInstance(this);
         mCastContext.getSessionManager().addSessionManagerListener(
                 mSessionManagerListener, CastSession.class);
-        mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
+        //mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
 
 
         // mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
@@ -294,7 +294,6 @@ public class MainActivity extends AppCompatActivity {
             public void onAdBreakStatusUpdated() {
             }
         });
-
         remoteMediaClient.load(getOttCastMediaInfo(getConverterCastForOtt(), false), autoPlay, position);
     }
 
@@ -335,6 +334,7 @@ public class MainActivity extends AppCompatActivity {
         MediaInfo mediaInfo = basicCastBuilder
                 .setMwEmbedUrl(converterGoogleCast.getMwEmbedURL())
                 .setPartnerId(converterGoogleCast.getPartnerId())
+                .setAdTagUrl(converterGoogleCast.getAdTagURL())
                 .setUiConfId(converterGoogleCast.getUiconfId())
                 .setMediaEntryId(converterGoogleCast.getEntryId())
                 .setStreamType(BasicCastBuilder.StreamType.VOD)
@@ -399,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
                 ConverterGoogleCast.ReceiverEnvironmentType.RECEIVER_OVP_ENVIRONMENT,
                 "", //ks
                 "0_uka1msg4",
-                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=",
+                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
                 "", //mwEmbed
                 "243342",
                 "21099702",
@@ -431,7 +431,7 @@ public class MainActivity extends AppCompatActivity {
                 initObj.toJson(),
                 "Web_HD_Dash",
                 "480097",
-                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=",
+                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
                 "https://player-preprod.ott.kaltura.com/v2.58/mwEmbed/",
                 "198",
                 "8413355",

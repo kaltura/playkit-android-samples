@@ -1,9 +1,12 @@
 // PlayKit Library
 include ':playkit'
-//project(':playkit').projectDir = new File('../../playkit-android/playkit')
-project(':playkit').projectDir = new File('../../playkit-sdk/playkit-android/playkit')
+project(':playkit').projectDir = new File('../../playkit-android/playkit')
 include ':admanager'
 project(':admanager').projectDir = new File('../../playkit-admanager-android/admanager')
+include ':ima'
+project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
+include ':youbora'
+project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
 
 // Sample apps
 def samples = [
@@ -19,10 +22,11 @@ def samples = [
         'PhoenixAnalytics',
         'KalturaLiveStats',
         'KalturaStats',
+        'KavaAnalytics',
         'Providers',
         'TVPapiStats',
         'ChromecastSample',
-        'FullDemo'
+        'MediaSession'
 ]
 
 samples.each {

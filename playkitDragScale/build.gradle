@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "com.kaltura.playkitdemo"
@@ -26,8 +26,17 @@ repositories {
 
 dependencies {
     compile project(path: ':playkit')
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:support-v4:25.0.0'
+    compile 'com.android.support:appcompat-v7:26.1.0'
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.android.support:support-v4:26.1.0'
     compile 'com.nineoldandroids:library:2.4.0'
 }
+
+repositories {
+    maven { url 'https://jitpack.io' }
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
+}
+

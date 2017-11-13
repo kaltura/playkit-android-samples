@@ -34,6 +34,7 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.kaltura.playkit.PKError;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -41,14 +42,30 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
+import com.kaltura.playkit.ads.AdEvent;
+import com.kaltura.playkit.ads.PKAdErrorType;
 import com.kaltura.playkit.player.PKTracks;
-import com.kaltura.playkit.plugins.ads.AdEvent;
-import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
-import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ima.IMAPlugin;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kaltura.playkit.ads.PKAdErrorType.ADS_REQUEST_NETWORK_ERROR;
+import static com.kaltura.playkit.ads.PKAdErrorType.COMPANION_AD_LOADING_FAILED;
+import static com.kaltura.playkit.ads.PKAdErrorType.FAILED_TO_REQUEST_ADS;
+import static com.kaltura.playkit.ads.PKAdErrorType.INTERNAL_ERROR;
+import static com.kaltura.playkit.ads.PKAdErrorType.INVALID_ARGUMENTS;
+import static com.kaltura.playkit.ads.PKAdErrorType.OVERLAY_AD_LOADING_FAILED;
+import static com.kaltura.playkit.ads.PKAdErrorType.PLAYLIST_NO_CONTENT_TRACKING;
+import static com.kaltura.playkit.ads.PKAdErrorType.QUIET_LOG_ERROR;
+import static com.kaltura.playkit.ads.PKAdErrorType.UNKNOWN_ERROR;
+import static com.kaltura.playkit.ads.PKAdErrorType.VAST_EMPTY_RESPONSE;
+import static com.kaltura.playkit.ads.PKAdErrorType.VAST_LINEAR_ASSET_MISMATCH;
+import static com.kaltura.playkit.ads.PKAdErrorType.VAST_LOAD_TIMEOUT;
+import static com.kaltura.playkit.ads.PKAdErrorType.VAST_MALFORMED_RESPONSE;
+import static com.kaltura.playkit.ads.PKAdErrorType.VAST_TOO_MANY_REDIRECTS;
 
 
 /**
@@ -199,10 +216,13 @@ public class PlaybackOverlayActivity extends Activity implements
     }
 
     private void updatePlaybackState(int position) {
-        long actions = PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PLAY_FROM_MEDIA_ID | PlaybackState.ACTION_PLAY_FROM_SEARCH;
+        long actions = PlaybackState.ACTION_PLAY |
+                PlaybackState.ACTION_PLAY_FROM_MEDIA_ID |
+                PlaybackState.ACTION_PLAY_FROM_SEARCH;
         if (mPlaybackState == LeanbackPlaybackState.PLAYING) {
             actions |= PlaybackState.ACTION_PAUSE;
         }
+
         PlaybackState.Builder stateBuilder = new PlaybackState.Builder().setActions(actions);
         int state = PlaybackState.STATE_PLAYING;
         if (mPlaybackState == LeanbackPlaybackState.PAUSED) {
@@ -211,7 +231,6 @@ public class PlaybackOverlayActivity extends Activity implements
         stateBuilder.setState(state, position, 1.0f);
         mSession.setPlaybackState(stateBuilder.build());
     }
-
 
     private void updateMetadata(final Movie movie) {
         final MediaMetadata.Builder metadataBuilder = new MediaMetadata.Builder();
@@ -352,7 +371,6 @@ public class PlaybackOverlayActivity extends Activity implements
 
                                     @Override
                                     public void onEvent(PKEvent event) {
-
                                         Enum receivedEventType = event.eventType();
                                         if (event instanceof PlayerEvent) {
                                             switch (((PlayerEvent) event).type) {
@@ -390,10 +408,10 @@ public class PlaybackOverlayActivity extends Activity implements
                                             }
                                         } else if (event instanceof AdEvent) {
                                             switch (((AdEvent) event).type) {
-                                                case AD_LOADED:
+                                                case LOADED:
 
                                                     break;
-                                                case AD_CUEPOINTS_UPDATED:
+                                                case CUEPOINTS_CHANGED:
 
                                                     break;
                                                 case ALL_ADS_COMPLETED:
@@ -402,7 +420,7 @@ public class PlaybackOverlayActivity extends Activity implements
                                                 case AD_BREAK_IGNORED:
 
                                                     break;
-                                                case AD_BREAK_STARTED:
+                                                case CONTENT_PAUSE_REQUESTED:
                                                     //isAdStarted = true;
                                                     //showOrHideContentLoaderProgress(false);
                                                     //hideSbuLogo();
@@ -411,32 +429,66 @@ public class PlaybackOverlayActivity extends Activity implements
                                                 //    VideoPlaybackTimer.getInstance().stopTimer();
                                                 //    showOrHideContentLoaderProgress(false);
                                                 //    break;
-                                                case AD_STARTED:
+                                                case CONTENT_RESUME_REQUESTED:
+
+                                                    break;
+                                                case STARTED:
 
                                                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                                                     break;
-                                                case AD_PAUSED:
+                                                case PAUSED:
 
                                                     break;
-                                                case AD_TOUCHED:
+                                                case TAPPED:
                                                     break;
-                                                case AD_ENDED:
+                                                case COMPLETED:
+
                                                     break;
-                                                case AD_CLICKED:
+                                                case SKIPPED:
+
                                                     break;
-                                                case ERROR:
-                                                    AdEvent.Error adError = (AdEvent.Error) event;
-                                                    Log.d(TAG, "Error =" + adError.type);
+                                                case CLICKED:
+                                                    break;
+                                            }
+                                        } else if (event instanceof AdEvent.Error) {
+                                            PKError pkError = ((AdEvent.Error)event).error;
+                                            PKAdErrorType errorType = (PKAdErrorType)pkError.errorType;
+                                            switch (errorType) {
+                                                case ADS_REQUEST_NETWORK_ERROR:
+                                                case INTERNAL_ERROR:
+                                                case VAST_MALFORMED_RESPONSE:
+                                                case UNKNOWN_AD_RESPONSE:
+                                                case VAST_LOAD_TIMEOUT:
+                                                case VAST_TOO_MANY_REDIRECTS:
+                                                case VIDEO_PLAY_ERROR:
+                                                case VAST_MEDIA_LOAD_TIMEOUT:
+                                                case VAST_LINEAR_ASSET_MISMATCH:
+                                                case OVERLAY_AD_PLAYING_FAILED:
+                                                case OVERLAY_AD_LOADING_FAILED:
+                                                case VAST_NONLINEAR_ASSET_MISMATCH:
+                                                case COMPANION_AD_LOADING_FAILED:
+                                                case UNKNOWN_ERROR:
+                                                case VAST_EMPTY_RESPONSE:
+                                                case FAILED_TO_REQUEST_ADS:
+                                                case VAST_ASSET_NOT_FOUND:
+                                                case INVALID_ARGUMENTS:
+                                                case QUIET_LOG_ERROR:
+                                                case PLAYLIST_NO_CONTENT_TRACKING:
                                                     break;
                                             }
                                         }
+
                                     }
 
                                 }, PlayerEvent.Type.PLAY, PlayerEvent.Type.PAUSE, PlayerEvent.Type.CAN_PLAY, PlayerEvent.Type.SEEKING, PlayerEvent.Type.SEEKED, PlayerEvent.Type.PLAYING,
                 PlayerEvent.Type.ENDED, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.ERROR,
-                AdEvent.Type.AD_LOADED, AdEvent.Type.AD_TOUCHED, AdEvent.Type.ERROR, AdEvent.Type.ADS_PLAYBACK_ENDED, AdEvent.Type.AD_STARTED, AdEvent.Type.AD_PAUSED, AdEvent.Type.AD_RESUMED,
-                AdEvent.Type.AD_ENDED, AdEvent.Type.ALL_ADS_COMPLETED,
-                AdEvent.Type.AD_CUEPOINTS_UPDATED, AdEvent.Type.AD_CLICKED, AdEvent.Type.AD_BREAK_IGNORED);
+                AdEvent.Type.LOADED, AdEvent.Type.SKIPPED, AdEvent.Type.TAPPED, AdEvent.Type.CONTENT_PAUSE_REQUESTED, AdEvent.Type.CONTENT_RESUME_REQUESTED, AdEvent.Type.STARTED, AdEvent.Type.PAUSED, AdEvent.Type.RESUMED,
+                AdEvent.Type.COMPLETED, AdEvent.Type.ALL_ADS_COMPLETED, ADS_REQUEST_NETWORK_ERROR,
+                AdEvent.Type.CUEPOINTS_CHANGED, AdEvent.Type.CLICKED, AdEvent.Type.AD_BREAK_IGNORED,
+                VAST_EMPTY_RESPONSE, COMPANION_AD_LOADING_FAILED, FAILED_TO_REQUEST_ADS,
+                INTERNAL_ERROR, OVERLAY_AD_LOADING_FAILED, PLAYLIST_NO_CONTENT_TRACKING,
+                UNKNOWN_ERROR, VAST_LINEAR_ASSET_MISMATCH, VAST_MALFORMED_RESPONSE, QUIET_LOG_ERROR,
+                VAST_LOAD_TIMEOUT, INVALID_ARGUMENTS, VAST_TOO_MANY_REDIRECTS);
 //        mVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
 //
 //            @Override

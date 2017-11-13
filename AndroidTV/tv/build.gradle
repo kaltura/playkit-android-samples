@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.androidtv"
         minSdkVersion 21
@@ -20,9 +20,21 @@ android {
 
 dependencies {
     compile project(':playkit')
+    compile project(':ima')
+
+    //compile 'com.kaltura:playkit-android-youbora:master-SNAPSHOT'
+    //compile 'com.kaltura:playkit-android-ima:master-SNAPSHOT'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:leanback-v17:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:leanback-v17:26.1.0'
+    compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
+}
+
+repositories {
+    maven { url 'https://jitpack.io' }
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
 }

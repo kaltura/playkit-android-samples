@@ -1,5 +1,6 @@
 // PlayKit Library
 include ':playkit'
+
 //project(':playkit').projectDir = new File('../../playkit-android/playkit')
 project(':playkit').projectDir = new File('../../playkit-sdk/playkit-android/playkit')
 include ':admanager'
@@ -19,10 +20,13 @@ def samples = [
         'PhoenixAnalytics',
         'KalturaLiveStats',
         'KalturaStats',
+        'KavaAnalytics',
         'Providers',
         'TVPapiStats',
         'ChromecastSample',
-        'FullDemo'
+        'FullDemo',
+        'MediaSession'
+
 ]
 
 samples.each {
@@ -35,4 +39,3 @@ include ":AndroidTV"
 project(":AndroidTV").projectDir = new File ('../AndroidTV/tv')
 include ":playkitDragScale"
 project(":playkitDragScale").projectDir = new File ('../playkitDragScale')
-

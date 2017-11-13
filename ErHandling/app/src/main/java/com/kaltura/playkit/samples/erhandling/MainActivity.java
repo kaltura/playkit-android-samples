@@ -1,7 +1,7 @@
 package com.kaltura.playkit.samples.erhandling;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,8 +17,9 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.plugins.ads.AdEvent;
-import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
+import com.kaltura.playkit.ads.AdEvent;
+import com.kaltura.playkit.plugins.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ima.IMAPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     private PKPluginConfigs createIMAPlugin() {
 
         //First register your IMAPlugin.
-        PlayKitManager.registerPlugins(this, com.kaltura.playkit.plugins.ads.ima.IMAPlugin.factory);
+        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
 
         //Initialize plugin configuration object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         JsonObject imaConfigJsonObject = imaConfigs.toJSONObject();
 
         //Set jsonObject to the main pluginConfigs object.
-        pluginConfigs.setPluginConfig(com.kaltura.playkit.plugins.ads.ima.IMAPlugin.factory.getName(), imaConfigJsonObject);
+        pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfigJsonObject);
 
         //Return created PluginConfigs object.
         return pluginConfigs;
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                                             //In case of AdEvent.Type.ERROR cast the event object to AdEvent.Error
                                             AdEvent.Error errorEvent = (AdEvent.Error) event;
                                             //Print the type of the received error.
-                                            Log.e(TAG, "Error: " + errorEvent.error.errorType.name());
+                                            Log.e(TAG, "Ad Error: " + errorEvent.error.errorType.name());
                                         }
                                     }
                                 },

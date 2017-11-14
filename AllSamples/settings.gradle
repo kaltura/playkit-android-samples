@@ -7,6 +7,8 @@ include ':ima'
 project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
 include ':youbora'
 project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
+include ':kava'
+project(':kava').projectDir = new File('../../playkit-android-kava/kavaplugin')
 
 // Sample apps
 def samples = [

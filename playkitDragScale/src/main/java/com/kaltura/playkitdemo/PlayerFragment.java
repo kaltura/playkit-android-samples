@@ -22,10 +22,11 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.plugins.ads.AdCuePoints;
-import com.kaltura.playkit.plugins.ads.AdEvent;
-import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
-import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
+import com.kaltura.playkit.ads.AdCuePoints;
+import com.kaltura.playkit.ads.AdEvent;
+import com.kaltura.playkit.plugins.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ima.IMAPlugin;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,27 +126,27 @@ public class PlayerFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log.d("AD_CONTENT_PAUSE_REQUESTED");
+                log.d("AD_BREAK_STARTED");
                 appProgressBar.setVisibility(View.VISIBLE);
             }
-        }, AdEvent.Type.CONTENT_PAUSE_REQUESTED);
+        }, AdEvent.Type.AD_BREAK_STARTED);
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                AdEvent.AdCuePointsUpdateEvent cuePointsList = (AdEvent.AdCuePointsUpdateEvent) event;
-                AdCuePoints adCuePoints = cuePointsList.cuePoints;
+                AdEvent.AdCuePointsChangedEvent cuePointsEvent = (AdEvent.AdCuePointsChangedEvent) event;
+                AdCuePoints adCuePoints = cuePointsEvent.adCuePoints;
                 if (adCuePoints != null) {
                     log.d("Has Postroll = " + adCuePoints.hasPostRoll());
                 }
             }
-        }, AdEvent.Type.CUEPOINTS_CHANGED);
+        }, AdEvent.Type.AD_CUEPOINTS_UPDATED);
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
                 log.d("AD_STARTED");
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
-        }, AdEvent.Type.STARTED);
+        }, AdEvent.Type.AD_STARTED);
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
@@ -153,7 +154,7 @@ public class PlayerFragment extends Fragment {
                 nowPlaying = true;
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
-        }, AdEvent.Type.RESUMED);
+        }, AdEvent.Type.AD_RESUMED);
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
@@ -178,9 +179,11 @@ public class PlayerFragment extends Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                nowPlaying = true;
+                AdEvent.AdEndedEvent adEndedEvent = (AdEvent.AdEndedEvent) event;
+                log.d("AdEnded event reason = " + adEndedEvent.adEndedReason.name());
+                nowPlaying = false;
             }
-        }, AdEvent.Type.SKIPPED);
+        }, AdEvent.Type.AD_ENDED);
 
         player.addStateChangeListener(new PKEvent.Listener() {
             @Override

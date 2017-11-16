@@ -23,6 +23,7 @@ dependencies {
     implementation 'com.kaltura:playkit-android:develop-SNAPSHOT'
     implementation 'com.kaltura:playkit-android-youbora:master-SNAPSHOT'
     implementation 'com.kaltura:playkit-android-ima:master-SNAPSHOT'
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:leanback-v17:26.1.0'
     implementation 'com.android.support:appcompat-v7:26.1.0'

@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     //Analytics constants
-    private static final String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";//Server url
+    private static final String KAVA_BASE_URL = "https://analytics.kaltura.com/api_v3/index.php";
 
     private static final int UI_CONF_ID = 24997472; //your ui conf id here.
     private static final int PARTNER_ID = 1281471; // your partner id here.
@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         JsonObject pluginEntry = new JsonObject();
 
         //Put url to the kaltura stats server.
-        pluginEntry.addProperty("baseUrl", KALTURA_STATS_URL);
+        pluginEntry.addProperty("baseUrl", KAVA_BASE_URL);
 
         //Put the partner id.
         pluginEntry.addProperty("partnerId", PARTNER_ID);
@@ -108,8 +108,7 @@ public class MainActivity extends AppCompatActivity {
         //Put entry id.
         //pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
 
-        //Put interval with which analitcs reports would be triggered.
-        pluginEntry.addProperty("timerInterval", ANALYTICS_TRIGGER_INTERVAL);
+
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), pluginEntry);
 

@@ -31,9 +31,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
-    private Player player;
+    public Player player;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
+    public EventListener mEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
+
+        if (mEventListener != null) {
+            mEventListener.onPlayerInit();
+        }
 
     }
 
@@ -245,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
     private void addPlayerToView() {
         //Get the layout, where the player view will be placed.
         LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
+
         //Add player view to the layout.
         layout.addView(player.getView());
     }

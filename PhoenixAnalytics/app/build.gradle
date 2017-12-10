@@ -24,16 +24,13 @@ android {
 
 repositories {
     maven { url 'https://jitpack.io' }
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
+    google()
 }
 
 dependencies {
 
-    //implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
-    compile project(':playkit')
+    implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
+    //compile project(':playkit')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {

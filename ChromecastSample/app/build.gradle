@@ -23,10 +23,13 @@ android {
 }
 
 dependencies {
-    //implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
-    compile project(':playkit')
-    compile project(':ima')
-    compile project(':youbora')
+    implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
+    implementation ('com.kaltura:playkit-android-ima:master-SNAPSHOT')
+    implementation ('com.kaltura:playkit-android-youbora:master-SNAPSHOT')
+
+    //compile project(':playkit')
+    //compile project(':ima')
+    //compile project(':youbora')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -40,8 +43,5 @@ dependencies {
 
 repositories {
     maven { url 'https://jitpack.io' }
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
+    google()
 }

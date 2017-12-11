@@ -19,6 +19,7 @@ import static android.support.test.espresso.action.ViewActions.*;
 import static android.support.test.espresso.assertion.ViewAssertions.*;
 import static android.support.test.espresso.matcher.ViewMatchers.*;
 
+import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.samples.eventsregistration.R;
 
 import org.hamcrest.Description;
@@ -32,6 +33,8 @@ import org.junit.runner.RunWith;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -47,12 +50,21 @@ public class MainActivityTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }*/
-        /*mActivityTestRule.getActivity().mEventListener = new EventListener() {
+        mActivityTestRule.getActivity().mEventListener = new EventListener() {
             @Override
             public void onPlayerInit() {
-                mActivityTestRule.getActivity().player.play();
+                //mActivityTestRule.getActivity().player.play();
             }
-        };*/
+
+            @Override
+            public void onPlayerStart(PlayerEvent event) {
+                switch (event.type) {
+                    case PLAYING:
+                        assertTrue(mActivityTestRule.getActivity().player.isPlaying());
+                        break;
+                }
+            }
+        };
 
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.play_pause_button), withText("Play"),

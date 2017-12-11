@@ -131,7 +131,9 @@ public class MainActivity extends AppCompatActivity {
 
                                         //First check if event is instance of the PlayerEvent.
                                         if (event instanceof PlayerEvent) {
-
+                                            if (mEventListener != null) {
+                                                mEventListener.onPlayerStart((PlayerEvent) event);
+                                            }
                                             //Switch on the received events.
                                             switch (((PlayerEvent) event).type) {
 

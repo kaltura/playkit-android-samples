@@ -38,6 +38,10 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 repositories {
     maven { url 'https://jitpack.io' }
     google()

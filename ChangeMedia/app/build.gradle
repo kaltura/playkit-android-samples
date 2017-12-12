@@ -24,6 +24,10 @@ repositories {
     google()
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
     implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
     //compile project(":playkit")

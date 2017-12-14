@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -196,8 +197,10 @@ public class MainActivity extends AppCompatActivity {
                                 },
                 //Subscribe to the events you are interested in.
                 PlayerEvent.Type.PLAY,
+                PlayerEvent.Type.PLAYING,
                 PlayerEvent.Type.PAUSE,
                 PlayerEvent.Type.PLAYBACK_RATE_CHANGED,
+                PlayerEvent.Type.SEEKED,
                 PlayerEvent.Type.TRACKS_AVAILABLE
         );
     }
@@ -278,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void addPlayerToView() {
         //Get the layout, where the player view will be placed.
-        LinearLayout layout = (LinearLayout) findViewById(R.id.player_root);
+        FrameLayout layout = findViewById(R.id.player_root);
         //Add player view to the layout.
         layout.addView(player.getView());
     }
@@ -348,8 +351,6 @@ public class MainActivity extends AppCompatActivity {
         public void onNothingSelected(AdapterView<?> parent) {
 
         }
-
-
     }
 }
 

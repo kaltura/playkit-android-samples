@@ -34,23 +34,26 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest {
 
+    private static final long SEEK_POSITION = 30000;
+
+    private MainActivity mActivity;
+    private ViewInteraction playButton;
+
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
     public void mainActivityTest() {
-        /*try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-        mActivityTestRule.getActivity().mEventListener = new EventListener() {
+        mActivity = mActivityTestRule.getActivity();
+
+        mActivity.mEventListener = new EventListener() {
             @Override
             public void onPlayerInit() {
                 //mActivityTestRule.getActivity().player.play();
@@ -60,30 +63,60 @@ public class MainActivityTest {
             public void onPlayerStart(PlayerEvent event) {
                 switch (event.type) {
                     case PLAYING:
-                        assertTrue(mActivityTestRule.getActivity().player.isPlaying());
+                        assertTrue(mActivity.player.isPlaying());
+                        break;
+                    case PAUSE:
+                        assertFalse(mActivity.player.isPlaying());
+                        break;
+                    case SEEKED:
+                        assertEquals(SEEK_POSITION, mActivity.player.getCurrentPosition());
+                        break;
+                    case PLAYBACK_RATE_CHANGED:
+                        PlayerEvent.PlaybackRateChanged playbackRateChanged = (PlayerEvent.PlaybackRateChanged) event;
+                        //TODO there are no way to get rate from player
+                        //assertEquals(playbackRateChanged.rate, mActivity.player.);
                         break;
                 }
             }
         };
 
-        ViewInteraction appCompatButton = onView(
+        playButton = onView(
                 allOf(withId(R.id.play_pause_button), withText("Play"),
                         childAtPosition(
-                                allOf(withId(R.id.activity_main),
+                                allOf(withId(R.id.buttons_container),
                                         childAtPosition(
-                                                withId(android.R.id.content),
-                                                0)),
-                                1),
+                                                withId(R.id.activity_main),
+                                                1)),
+                                0),
                         isDisplayed()));
-        appCompatButton.perform(click());
-
+        playButton.perform(click());
 
         try {
-            Thread.sleep(10000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        //pressBack();
+        playButton = onView(
+                allOf(withId(R.id.play_pause_button), withText("Pause"),
+                        childAtPosition(
+                                allOf(withId(R.id.buttons_container),
+                                        childAtPosition(
+                                                withId(R.id.activity_main),
+                                                1)),
+                                0),
+                        isDisplayed()));
+        playButton.perform(click());
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        mActivity.player.seekTo(SEEK_POSITION);
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 

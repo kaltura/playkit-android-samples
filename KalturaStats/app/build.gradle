@@ -24,10 +24,11 @@ android {
 
 repositories {
     maven { url 'https://jitpack.io' }
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
+    google()
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 dependencies {

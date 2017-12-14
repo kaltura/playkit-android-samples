@@ -24,6 +24,11 @@ android {
 
 dependencies {
     //implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
+    //implementation ('com.kaltura:playkit-android-ima:master-SNAPSHOT')
+    //implementation ('com.kaltura:playkit-android-youbora:master-SNAPSHOT')
+    implementation 'com.kaltura:playkit-android-googlecast:master-SNAPSHOT'
+
+
     compile project(':playkit')
     compile project(':ima')
     compile project(':youbora')
@@ -38,10 +43,11 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 repositories {
     maven { url 'https://jitpack.io' }
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
+    google()
 }

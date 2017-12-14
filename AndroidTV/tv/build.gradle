@@ -9,6 +9,7 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+
     }
     buildTypes {
         release {
@@ -19,12 +20,14 @@ android {
 }
 
 dependencies {
-    compile project(':playkit')
-    compile project(':ima')
-    compile project(':youbora')
+
     //implementation 'com.kaltura:playkit-android:develop-SNAPSHOT'
     //implementation 'com.kaltura:playkit-android-youbora:master-SNAPSHOT'
     //implementation 'com.kaltura:playkit-android-ima:master-SNAPSHOT'
+
+    compile project(':playkit')
+    compile project(':ima')
+    compile project(':youbora')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:leanback-v17:26.1.0'
@@ -32,10 +35,11 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:3.7.0'
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 repositories {
     maven { url 'https://jitpack.io' }
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
+    google()
 }

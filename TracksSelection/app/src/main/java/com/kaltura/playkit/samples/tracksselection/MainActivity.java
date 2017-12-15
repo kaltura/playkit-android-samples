@@ -39,7 +39,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final String MEDIA_SOURCE_ID = "source_id";
 
 
-    private Player player;
+    public Player player;
+    public EventListener eventListener;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
 
@@ -155,10 +156,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onEvent(PKEvent event) {
                 if (event instanceof PlayerEvent.VideoTrackChanged) {
                     Log.d(TAG, "Event VideoTrackChanged");
+                    if (eventListener != null) {
+                        eventListener.onVideoTrackChanged((PlayerEvent.VideoTrackChanged)event);
+                    }
                 } else if (event instanceof PlayerEvent.AudioTrackChanged) {
                     Log.d(TAG, "Event AudioTrackChanged");
+                    if (eventListener != null) {
+                        eventListener.onAudioTrackChanged((PlayerEvent.AudioTrackChanged)event);
+                    }
                 } else if (event instanceof PlayerEvent.TextTrackChanged) {
                     Log.d(TAG, "Event TextTrackChanged");
+                    if (eventListener != null) {
+                        eventListener.onTextTrackChanged((PlayerEvent.TextTrackChanged)event);
+                    }
                 } else if (event instanceof PlayerEvent.TracksAvailable) {
                     Log.d(TAG, "Event TRACKS_AVAILABLE");
 

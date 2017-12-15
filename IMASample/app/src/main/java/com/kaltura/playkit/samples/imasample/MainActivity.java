@@ -43,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String INCORRECT_AD_TAG_URL = "incorrect_ad_tag_url";
     private static final int PREFERRED_AD_BITRATE = 600;
 
-    private Player player;
+    public Player player;
+    public EventListener mEventListener;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
 
@@ -127,7 +128,9 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                         //First check if event is instance of the AdEvent.
                                         if (event instanceof AdEvent) {
-
+                                            if (mEventListener != null) {
+                                                mEventListener.onAdEvent((AdEvent) event);
+                                            }
                                             //Switch on the received events.
                                             switch (((AdEvent) event).type) {
 
@@ -155,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
                                                 //Ad completed triggered.
                                                 case COMPLETED:
                                                     Log.d(TAG, "ad event received: " + event.eventType().name());
+                                                    Log.d(TAG,"position = "+player.getCurrentPosition());
                                                     break;
                                                 case ERROR:
                                                     AdEvent.Error errorEvent = (AdEvent.Error) event;

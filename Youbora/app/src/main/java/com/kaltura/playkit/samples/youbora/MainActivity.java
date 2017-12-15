@@ -61,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String QUALITY = "your_quality";
 
 
-    private Player player;
+    public Player player;
+    public EventListener mEventListener;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
 
@@ -172,7 +173,9 @@ public class MainActivity extends AppCompatActivity {
             public void onEvent(PKEvent event) {
                 //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
                 YouboraEvent.YouboraReport reportEvent = (YouboraEvent.YouboraReport) event;
-
+                if (mEventListener != null) {
+                    mEventListener.onYouboraEvent(reportEvent);
+                }
                 //Get the event name from the report.
                 String reportedEventName = reportEvent.reportedEventName;
                 Log.i(TAG, "Youbora report sent. Reported event name: " + reportedEventName);

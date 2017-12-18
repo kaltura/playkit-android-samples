@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import com.kaltura.netkit.connect.response.ResultElement;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -18,6 +19,9 @@ import com.kaltura.playkit.PKTrackConfig;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
+import com.kaltura.playkit.api.ovp.SimpleOvpSessionProvider;
+import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
+import com.kaltura.playkit.mediaproviders.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.TextTrack;
@@ -75,9 +79,75 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
         player.play();
+        //createMediaProvider();
 
     }
 
+    private void createMediaProvider() {
+        /*new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleOvpSessionProvider("https://cdnapisec.kaltura.com",
+                        2267831, Globals.ks.toString()))
+                .setEntryId(bumper)
+                .load(completion);*/
+        //Initialize provider.
+        KalturaOvpMediaProvider mediaProvider = new KalturaOvpMediaProvider();
+
+        //Initialize ovp session provider.
+        SimpleOvpSessionProvider sessionProvider = new SimpleOvpSessionProvider("https://cdnapisec.kaltura.com", 2267831, "");
+
+        //Set entry id for the session provider.
+        mediaProvider.setEntryId("1_t0cw5f5x");
+
+        //Set session provider to media provider.
+        mediaProvider.setSessionProvider(sessionProvider);
+
+        //Load media from media provider.
+        mediaProvider.load(new OnMediaLoadCompletion() {
+            @Override
+            public void onComplete(ResultElement<PKMediaEntry> response) {
+                //When response received check if it was successful.
+                if (response.isSuccess()) {
+                    //If so, prepare player with received PKMediaEntry.
+                    preparePlayer(response.getResponse());
+                } else {
+                    //If response was not successful print it to console with error message.
+                    String error = "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : "");
+                    Log.e(TAG, error);
+                }
+            }
+        });
+    }
+
+    /**
+     * Prepare player and start playback.
+     *
+     * @param mediaEntry - media entry we received from media provider.
+     */
+    private void preparePlayer(final PKMediaEntry mediaEntry) {
+        //The preparePlayer is called from another thread. So first be shure
+        //that we are running on ui thread.
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                //Initialize media config object.
+                createMediaConfig(mediaEntry);
+            }
+        });
+
+    }
+
+    private void createMediaConfig(final PKMediaEntry mediaEntry) {
+        //Initialize empty mediaConfig object.
+        mediaConfig = new PKMediaConfig();
+
+        //Set media entry we received from provider.
+        mediaConfig.setMediaEntry(mediaEntry);
+
+        //Prepare player with media configurations.
+        player.prepare(mediaConfig);
+        player.play();
+    }
     /**
      * Will create {@link PKMediaConfig} object.
      */

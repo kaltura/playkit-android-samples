@@ -47,7 +47,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int PARTNER_ID = 12345; // your partner id here.
     private static final int ANALYTICS_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
-    private Player player;
+    public Player player;
+    public EventListener eventListener;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
 
@@ -127,7 +128,9 @@ public class MainActivity extends AppCompatActivity {
             public void onEvent(PKEvent event) {
                 //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
                 KalturaStatsEvent.KalturaStatsReport reportEvent = (KalturaStatsEvent.KalturaStatsReport) event;
-
+                if (eventListener != null) {
+                    eventListener.onReportEvent(reportEvent);
+                }
                 //Get the event name from the report.
                 String reportedEventName = reportEvent.reportedEventName;
                 Log.i(TAG, "Kaltura stats report sent. Reported event name: " + reportedEventName);

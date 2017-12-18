@@ -6,12 +6,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.PlayerEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +22,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     //The url of the first source to play
-    private static final String FIRST_SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8";
+    public static final String FIRST_SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8";
     //The url of the second source to play
-    private static final String SECOND_SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
+    public static final String SECOND_SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
 
     //id of the first entry
     private static final String FIRST_ENTRY_ID = "entry_id_1";
@@ -33,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     //id of the second media source.
     private static final String SECOND_MEDIA_SOURCE_ID = "source_id_2";
 
-    private Player player;
+    public Player player;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
 
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Prepare the first entry.
         prepareFirstEntry();
+
+
     }
 
     /**

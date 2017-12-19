@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private static final long MIN_EXP_SEC = 10;
 
     final private Context context = this;   // for ease of use in inner classes
-    private Player player;
+    public Player player;
     private ContentManager contentManager;
     private LocalAssetsManager localAssetsManager;
     private PKMediaEntry originMediaEntry = mediaEntry(ASSET_ID, ASSET_URL, ASSET_LICENSE_URL);

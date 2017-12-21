@@ -19,6 +19,9 @@ import static android.support.test.espresso.action.ViewActions.*;
 import static android.support.test.espresso.assertion.ViewAssertions.*;
 import static android.support.test.espresso.matcher.ViewMatchers.*;
 
+import com.kaltura.dtg.DownloadItem;
+import com.kaltura.dtg.DownloadState;
+import com.kaltura.dtg.DownloadStateListener;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.samples.offline.R;
@@ -55,6 +58,44 @@ public class OfflineTest {
                 assertTrue(mainActivity.player.isPlaying());
             }
         }, PlayerEvent.Type.PLAYING);
+
+        mainActivity.contentManager.addDownloadStateListener(new DownloadStateListener() {
+            @Override
+            public void onDownloadComplete(DownloadItem item) {
+                assertTrue(item.getDownloadedSizeBytes() >= item.getEstimatedSizeBytes());
+                assertTrue(item.getState() == DownloadState.COMPLETED);
+            }
+
+            @Override
+            public void onProgressChange(DownloadItem item, long downloadedBytes) {
+
+            }
+
+            @Override
+            public void onDownloadStart(DownloadItem item) {
+                assertTrue(item.getState() == DownloadState.IN_PROGRESS);
+            }
+
+            @Override
+            public void onDownloadPause(DownloadItem item) {
+                assertTrue(item.getState() == DownloadState.PAUSED);
+            }
+
+            @Override
+            public void onDownloadFailure(DownloadItem item, Exception error) {
+                assertTrue(item.getState() == DownloadState.FAILED);
+            }
+
+            @Override
+            public void onDownloadMetadata(DownloadItem item, Exception error) {
+                assertTrue(item.getState() == DownloadState.INFO_LOADED);
+            }
+
+            @Override
+            public void onTracksAvailable(DownloadItem item, DownloadItem.TrackSelector trackSelector) {
+
+            }
+        });
 
         try {
             Thread.sleep(1000);

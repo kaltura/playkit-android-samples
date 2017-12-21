@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     final private Context context = this;   // for ease of use in inner classes
     public Player player;
-    private ContentManager contentManager;
+    public ContentManager contentManager;
     private LocalAssetsManager localAssetsManager;
     private PKMediaEntry originMediaEntry = mediaEntry(ASSET_ID, ASSET_URL, ASSET_LICENSE_URL);
     private PKMediaSource originMediaSource = originMediaEntry.getSources().get(0);

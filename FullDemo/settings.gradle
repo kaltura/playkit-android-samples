@@ -9,3 +9,5 @@ include ':youbora'
 project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
 include ':ima'
 project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
+include ':googlecast'
+project(':googlecast').projectDir = new File('../../playkit-android-googlecast/googlecast')

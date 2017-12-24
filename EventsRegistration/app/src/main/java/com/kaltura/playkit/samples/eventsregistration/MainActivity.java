@@ -4,8 +4,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private Player player;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
+    private Spinner speedSpinner;
+    private boolean userIsInteracting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize media config object.
         createMediaConfig();
-
+        addItemsOnSpeedSpinner();
         //Create instance of the player.
         player = PlayKitManager.loadPlayer(this, null);
 
@@ -60,6 +66,23 @@ public class MainActivity extends AppCompatActivity {
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
+
+    }
+
+    public void addItemsOnSpeedSpinner() {
+
+        speedSpinner = findViewById(R.id.sppedSpinner);
+        List<Float> list = new ArrayList();
+        list.add(0.5f);
+        list.add(1.0f);
+        list.add(1.5f);
+        list.add(2.0f);
+        ArrayAdapter<Float> dataAdapter = new ArrayAdapter(this,
+                android.R.layout.simple_spinner_item, list);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        speedSpinner.setAdapter(dataAdapter);
+        speedSpinner.setOnItemSelectedListener(new CustomOnItemSelectedListener());
+        speedSpinner.setSelection(1);
 
     }
 
@@ -129,7 +152,10 @@ public class MainActivity extends AppCompatActivity {
 
                                             //Switch on the received events.
                                             switch (((PlayerEvent) event).type) {
-
+                                                case PLAYBACK_RATE_CHANGED:
+                                                    PlayerEvent.PlaybackRateChanged playbackRateChanged = (PlayerEvent.PlaybackRateChanged) event;
+                                                    Log.d(TAG, "event received: " + event.eventType().name() + "Rate = " + playbackRateChanged.rate);
+                                                    break;
                                                 //Player play triggered.
                                                 case PLAY:
                                                     //Print to log.
@@ -164,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
                 //Subscribe to the events you are interested in.
                 PlayerEvent.Type.PLAY,
                 PlayerEvent.Type.PAUSE,
+                PlayerEvent.Type.PLAYBACK_RATE_CHANGED,
                 PlayerEvent.Type.TRACKS_AVAILABLE
         );
     }
@@ -270,6 +297,52 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        userIsInteracting = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (player != null) {
+            player.onApplicationPaused();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+
+        if (player != null && player.getView() != null &&  player.getView().getChildCount() > 0) {
+            player.onApplicationResumed();
+            player.play();
+        }
+    }
+
+    class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
+
+        public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+            if (userIsInteracting) {
+                Toast.makeText(parent.getContext(),
+                        "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString() + "X",
+                        Toast.LENGTH_SHORT).show();
+                if (player != null) {
+                    player.setPlaybackRate((float) parent.getItemAtPosition(pos));
+                }
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+
+
     }
 }
 

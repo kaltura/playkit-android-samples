@@ -22,13 +22,19 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //Put here your provider base url
-    private static final String PROVIDER_BASE_URL = "https://cdnapisec.kaltura.com";
+
+    private static final String PROVIDER_BASE_URL = "https://cdnapisec.kaltura.com"; //"your_provider_url"
     //Put here your partner id.
+
     private static final int PARTNER_ID = 2222401; // your PARTNER ID
     //Put here your KS.
+
     private static final String KS = ""; // your KS
+
     //Put here your entry id.
     private static final String ENTRY_ID = "1_f93tepsn"; // SELECTED ENTERY ID
+
+
 
     private Player player;
     private PKMediaConfig mediaConfig;

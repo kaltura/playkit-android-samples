@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity  implements AudioManager.OnA
                 Log.e("XXX", "onConnected");
                 mMediaControllerCompat = new MediaControllerCompat(MainActivity.this, mMediaSessionCompat.getSessionToken());
                 mMediaControllerCompat.registerCallback(mMediaControllerCompatCallback);
-                setSupportMediaController(mMediaControllerCompat);
+                MediaControllerCompat.setMediaController(MainActivity.this , mMediaControllerCompat);
                 //getSupportMediaController().getTransportControls().playFromMediaId(String.valueOf(R.raw.warner_tautz_off_broadway), null);
 
             } catch( RemoteException e ) {
@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity  implements AudioManager.OnA
             e.printStackTrace();
         }
         mMediaControllerCompat.registerCallback(mMediaControllerCompatCallback);
-        setSupportMediaController(mMediaControllerCompat);
+        MediaControllerCompat.setMediaController(this, mMediaControllerCompat);
 //        try {
 //            MediaControllerCompat controller = new MediaControllerCompat(this, mMediaSessionCompat.getSessionToken());
 //            controller.sendCommand();

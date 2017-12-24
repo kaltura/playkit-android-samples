@@ -2,6 +2,7 @@ package com.kaltura.playkit.samples.tracksselection;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -13,6 +14,7 @@ import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
+import com.kaltura.playkit.PKTrackConfig;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -29,12 +31,13 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-
+    private static final String TAG = "MainActivity";
     //The url of the source to play
-    private static final String SOURCE_URL = "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
+    private static final String SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8";
 
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
+
 
     private Player player;
     private PKMediaConfig mediaConfig;
@@ -42,6 +45,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     //Android Spinner view, that will actually hold and manipulate tracks selection.
     private Spinner videoSpinner, audioSpinner, textSpinner;
+    private boolean userIsInteracting;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
+        player.play();
 
     }
 
@@ -83,6 +89,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
+
+        // --->  SELECTING preferred AUDIO/TEXT TRACKS
+        //mediaConfig.setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.OFF)); // no text tracks
+        mediaConfig.setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO)); // select the track by locale if does not exist manifest default
+        //mediaConfig.setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.EXPLICIT).setTrackLanguage("rus")); // select specific track lang if not exist select manifest default
+        mediaConfig.setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO));
     }
 
     /**
@@ -141,18 +153,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                //Cast event to the TracksAvailable object that is actually holding the necessary data.
-                PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
+                if (event instanceof PlayerEvent.VideoTrackChanged) {
+                    Log.d(TAG, "Event VideoTrackChanged");
+                } else if (event instanceof PlayerEvent.AudioTrackChanged) {
+                    Log.d(TAG, "Event AudioTrackChanged");
+                } else if (event instanceof PlayerEvent.TextTrackChanged) {
+                    Log.d(TAG, "Event TextTrackChanged");
+                } else if (event instanceof PlayerEvent.TracksAvailable) {
+                    Log.d(TAG, "Event TRACKS_AVAILABLE");
 
-                //Obtain the actual tracks info from it.
-                PKTracks tracks = tracksAvailable.tracksInfo;
+                    //Cast event to the TracksAvailable object that is actually holding the necessary data.
+                    PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
 
-                //Populate Android spinner views with received data.
-                populateSpinnersWithTrackInfo(tracks);
+                    //Obtain the actual tracks info from it.
+                    PKTracks tracks = tracksAvailable.tracksInfo;
+                    int defaultAudioTrackIndex = tracks.getDefaultAudioTrackIndex();
+                    int defaultTextTrackIndex = tracks.getDefaultTextTrackIndex();
+                    if (tracks.getAudioTracks().size() > 0) {
+                        Log.d(TAG, "Default Audio langae = " + tracks.getAudioTracks().get(defaultAudioTrackIndex).getLabel());
+                    }
+                    if (tracks.getTextTracks().size() > 0) {
+                        Log.d(TAG, "Default Text langae = " + tracks.getTextTracks().get(defaultTextTrackIndex).getLabel());
+                    }
+                    if (tracks.getVideoTracks().size() > 0) {
+                        Log.d(TAG, "Default video isAdaptive = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).isAdaptive() + " bitrate = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).getBitrate());
+                    }
+                    //player.changeTrack(tracksAvailable.tracksInfo.getVideoTracks().get(1).getUniqueId());
+                    //Populate Android spinner views with received data.
+                    populateSpinnersWithTrackInfo(tracks);
 
+                }
             }
             //Event that will be sent when tracks data is available.
-        }, PlayerEvent.Type.TRACKS_AVAILABLE);
+        }, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.AUDIO_TRACK_CHANGED, PlayerEvent.Type.TEXT_TRACK_CHANGED, PlayerEvent.Type.VIDEO_TRACK_CHANGED);
     }
 
     /**
@@ -209,9 +242,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 //If it is not adaptive track, build readable name based on width and height of the track.
                 StringBuilder nameStringBuilder = new StringBuilder();
-                nameStringBuilder.append(videoTrackInfo.getWidth())
-                        .append("x")
-                        .append(videoTrackInfo.getHeight());
+                nameStringBuilder.append(videoTrackInfo.getBitrate());
 
                 //Initialize TrackItem.
                 trackItems[i] = new TrackItem(nameStringBuilder.toString(), videoTrackInfo.getUniqueId());
@@ -358,14 +389,43 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         //Get the selected TrackItem from adapter.
-        TrackItem trackItem = (TrackItem) parent.getItemAtPosition(position);
+        if (userIsInteracting) {
+            TrackItem trackItem = (TrackItem) parent.getItemAtPosition(position);
 
-        //Important! This will actually do the switch between tracks.
-        player.changeTrack(trackItem.getUniqueId());
+            //Important! This will actually do the switch between tracks.
+            player.changeTrack(trackItem.getUniqueId());
+        }
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        userIsInteracting = true;
+    }
+
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause");
+        super.onPause();
+        if (player != null) {
+            player.onApplicationPaused();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+
+        if (player != null && player.getView() != null &&  player.getView().getChildCount() > 0) {
+            player.onApplicationResumed();
+            player.play();
+        }
     }
 }

@@ -1,14 +1,14 @@
-// PlayKit Library
+////PlayKit Library
 include ':playkit'
 project(':playkit').projectDir = new File('../../playkit-android/playkit')
-include ':admanager'
-project(':admanager').projectDir = new File('../../playkit-admanager-android/admanager')
 include ':ima'
 project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
 include ':youbora'
 project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
 include ':kava'
 project(':kava').projectDir = new File('../../playkit-android-kava/kavaplugin')
+include ':googlecast'
+project(':googlecast').projectDir = new File(settingsDir,'../../playkit-android-googlecast/googlecast')
 
 // Sample apps
 def samples = [
@@ -39,6 +39,3 @@ samples.each {
 
 include ":AndroidTV"
 project(":AndroidTV").projectDir = new File ('../AndroidTV/tv')
-include ":playkitDragScale"
-project(":playkitDragScale").projectDir = new File ('../playkitDragScale')
-

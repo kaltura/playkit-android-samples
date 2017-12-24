@@ -7,6 +7,8 @@ include ':youbora'
 project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
 include ':kava'
 project(':kava').projectDir = new File('../../playkit-android-kava/kavaplugin')
+include ':googlecast'
+project(':googlecast').projectDir = new File(settingsDir,'../../playkit-android-googlecast/googlecast')
 
 // Sample apps
 def samples = [

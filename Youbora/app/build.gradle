@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.youbora"
         minSdkVersion 17
@@ -22,11 +21,6 @@ android {
     }
 }
 
-repositories {
-    maven { url 'https://jitpack.io' }
-    google()
-}
-
 dependencies {
 
     implementation 'com.kaltura:playkit-android:develop-SNAPSHOT'
@@ -42,4 +36,13 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support:design:26.1.0'
     testImplementation 'junit:junit:4.12'
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+repositories {
+    maven { url 'https://jitpack.io' }
+    google()
 }

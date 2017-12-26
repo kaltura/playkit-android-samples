@@ -24,9 +24,9 @@ import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.addon.cast.BasicCastBuilder;
-import com.kaltura.playkit.addon.cast.OVPCastBuilder;
-import com.kaltura.playkit.addon.cast.TVPAPICastBuilder;
+import com.kaltura.playkit.plugins.googlecast.BasicCastBuilder;
+import com.kaltura.playkit.plugins.googlecast.OVPCastBuilder;
+import com.kaltura.playkit.plugins.googlecast.TVPAPICastBuilder;
 
 
 public class MainActivity extends AppCompatActivity {

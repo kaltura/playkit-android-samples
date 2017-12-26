@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         pluginEntry.addProperty("uiconfId", UI_CONF_ID);
 
         //Put entry id.
-        //pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
+        pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
 
         //Put interval with which analitcs reports would be triggered.
         pluginEntry.addProperty("timerInterval", ANALYTICS_TRIGGER_INTERVAL);

@@ -428,7 +428,6 @@ public class VideoFragment extends Fragment {
         config.setPluginConfig(KalturaStatsPlugin.factory.getName(), pluginEntry);
     }
 
-
     private void addYouboraPlugin(PKPluginConfigs pluginConfigs) {
         JsonPrimitive accountCode = new JsonPrimitive(ACCOUNT_CODE);
         JsonPrimitive username = new JsonPrimitive(USER_NAME);

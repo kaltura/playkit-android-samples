@@ -34,10 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String ENTRY_ID = "id";
 
-    //The entry id of the media.
-    private static final String ANALYTICS_MEDIA_ENTRY_ID = "entryId"; // the meida's entryId both for OVP and OTT
-
-
     //The id of the source.
     private static final String MEDIA_SOURCE_ID = "source_id";
 
@@ -104,10 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Put ui conf id.
         pluginEntry.addProperty("uiconfId", UI_CONF_ID);
-
-        //Put entry id.
-        //pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
-
 
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), pluginEntry);

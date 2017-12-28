@@ -109,6 +109,15 @@ public class VideoFragment extends Fragment {
     private Logger mLog;
     private OnVideoFragmentViewCreatedListener mViewCreatedCallback;
 
+    private boolean isAutoPlay;
+    private int startPosition;
+    private int adLoadTimeOut;
+    private String videoMimeType;
+    private int videoBitrate;
+    private int companionAdWidth;
+    private int companionAdHeight;
+    private int minAdDurationForSkipButton;
+
     /**
      * Listener called when the fragment's onCreateView is fired.
      */
@@ -137,6 +146,15 @@ public class VideoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        isAutoPlay    = getArguments().getBoolean(MainActivity.AUTO_PLAY);
+        startPosition = getArguments().getInt(MainActivity.START_FROM);
+        adLoadTimeOut = getArguments().getInt(MainActivity.AD_LOAD_TIMEOUT);
+        videoMimeType = getArguments().getString(MainActivity.MIME_TYPE);
+        videoBitrate  = getArguments().getInt(MainActivity.PREFERRED_BITRATE);
+        companionAdWidth  = getArguments().getInt(MainActivity.COMPANION_AD_WIDTH);
+        companionAdHeight = getArguments().getInt(MainActivity.COMPANION_AD_HEIGHT);
+        minAdDurationForSkipButton = getArguments().getInt(MainActivity.MIN_AD_DURATION_FOR_SKIP_BUTTON);
+
         View rootView = inflater.inflate(R.layout.fragment_video, container, false);
         initUi(rootView);
         if (mViewCreatedCallback != null) {
@@ -156,14 +174,31 @@ public class VideoFragment extends Fragment {
         if (mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)) {
             String AD_HOND = "http://externaltests.dev.kaltura.com/player/Vast_xml/alexs.qacore-vast3-rol_02.xml";
                     //"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
-            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_HOND).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
+            AdsConfig adsConfig = new AdsConfig().
+                    setAdTagURL(AD_HOND).
+                    setPlayerViewContainer(playerLayout).
+                    setAdSkinContainer(adSkin).
+                    setAdLoadTimeOut(adLoadTimeOut).
+                    setVideoMimeTypes(PKMediaFormat.valueOf(videoMimeType)).
+                    setVideoBitrate(videoBitrate).
+                    setMinAdDurationForSkipButton(minAdDurationForSkipButton).
+                    setCompanionAdWidth(companionAdWidth).
+                    setCompanionAdHeight(companionAdHeight);
 
             player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             //If first one is active, prepare second one.
             prepareSecondEntry();
         } else {
 
-            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_GOOGLE_SEARCH).setPlayerViewContainer(playerLayout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
+            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_GOOGLE_SEARCH).
+                    setPlayerViewContainer(playerLayout).
+                    setAdSkinContainer(adSkin).
+                    setAdLoadTimeOut(adLoadTimeOut).
+                    setVideoMimeTypes(PKMediaFormat.valueOf(videoMimeType)).
+                    setVideoBitrate(videoBitrate).
+                    setMinAdDurationForSkipButton(minAdDurationForSkipButton).
+                    setCompanionAdWidth(companionAdWidth).
+                    setCompanionAdHeight(companionAdHeight);
 
             player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             //If the second one is active, prepare the first one.
@@ -182,7 +217,7 @@ public class VideoFragment extends Fragment {
 
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
-
+        mediaConfig.setStartPosition(startPosition);
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
     }
@@ -196,6 +231,7 @@ public class VideoFragment extends Fragment {
 
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
+        mediaConfig.setStartPosition(startPosition);
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
@@ -339,7 +375,9 @@ public class VideoFragment extends Fragment {
         player.prepare(mediaConfig);
 
         //Start playback.
-        player.play();
+        if (isAutoPlay) {
+            player.play();
+        }
     }
 
     private void addAdPluginConfig(PKPluginConfigs config, FrameLayout layout, RelativeLayout adSkin) {
@@ -348,7 +386,22 @@ public class VideoFragment extends Fragment {
         if (adtag.endsWith("correlator=")) {
             adtag += System.currentTimeMillis() + 100000;
         }
-        AdsConfig adsConfig = new AdsConfig().setAdTagURL(adtag).setPlayerViewContainer(layout).setAdSkinContainer(adSkin).setCompanionAdWidth(728).setCompanionAdHeight(90);
+
+        videoMimeType = (isPKMediaFormatContains(videoMimeType)) ? videoMimeType : "mp4";
+        AdsConfig adsConfig = new AdsConfig().
+                setPlayerViewContainer(layout).
+                setAdSkinContainer(adSkin).
+                setAdLoadTimeOut(adLoadTimeOut).
+                setVideoMimeTypes(PKMediaFormat.valueOf(videoMimeType)).
+                setVideoBitrate(videoBitrate).
+                setMinAdDurationForSkipButton(minAdDurationForSkipButton).
+                setCompanionAdWidth(companionAdWidth).
+                setCompanionAdHeight(companionAdHeight);
+        if (adtag.startsWith("http")) {
+            adsConfig.setAdTagURL(adtag);
+        } else {
+            adsConfig.setAdTagXML(adtag);
+        }
         config.setPluginConfig(AdsPlugin.factory.getName(), adsConfig);
     }
 
@@ -419,6 +472,14 @@ public class VideoFragment extends Fragment {
         pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), converterYoubora.toJson());
     }
 
+    public static boolean isPKMediaFormatContains(String playbackFormat) {
+        for (PKMediaFormat format : PKMediaFormat.values()) {
+            if (format.name().equals(playbackFormat)) {
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * Will create {@link } object.
      */
@@ -431,6 +492,8 @@ public class VideoFragment extends Fragment {
 
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
+        mediaConfig.setStartPosition(startPosition);
+
     }
 
     /**

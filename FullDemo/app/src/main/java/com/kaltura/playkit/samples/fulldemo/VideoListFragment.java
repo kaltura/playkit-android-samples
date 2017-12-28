@@ -28,6 +28,15 @@ public class VideoListFragment extends Fragment {
     LayoutInflater mInflater;
     ViewGroup mContainer;
 
+    private int minAdDurationForSkipButton;
+    private boolean isAutoPlay;
+    private int startPosition;
+    private int adLoadTimeOut;
+    private String videoMimeType;
+    private int videoBitrate;
+    private int companionAdWidth;
+    private int companionAdHeight;
+
     /**
      * Listener called when the user selects a video from the list.
      * Container activity must implement this interface.
@@ -68,6 +77,16 @@ public class VideoListFragment extends Fragment {
                              Bundle savedInstanceState) {
         mInflater = inflater;
         mContainer = container;
+
+        isAutoPlay    = getArguments().getBoolean(MainActivity.AUTO_PLAY);
+        startPosition = getArguments().getInt(MainActivity.START_FROM);
+        minAdDurationForSkipButton = getArguments().getInt(MainActivity.MIN_AD_DURATION_FOR_SKIP_BUTTON);
+        adLoadTimeOut = getArguments().getInt(MainActivity.AD_LOAD_TIMEOUT);
+        videoMimeType = getArguments().getString(MainActivity.MIME_TYPE);
+        videoBitrate  = getArguments().getInt(MainActivity.PREFERRED_BITRATE);
+        companionAdWidth  = getArguments().getInt(MainActivity.COMPANION_AD_WIDTH);
+        companionAdHeight = getArguments().getInt(MainActivity.COMPANION_AD_HEIGHT);
+
         View rootView = inflater.inflate(R.layout.fragment_video_list, container, false);
 
         final ListView listView = (ListView) rootView.findViewById(R.id.videoListView);
@@ -85,7 +104,10 @@ public class VideoListFragment extends Fragment {
                     if (selectedVideo.getAdTagUrl().equals(getString(
                             R.string.custom_ad_tag_value))) {
                         getCustomAdTag(selectedVideo);
-                    } else {
+                    } else if (selectedVideo.getAdTagUrl().equals(getString(
+                            R.string.custom_xml_ad_tag_value))) {
+                        getCustomXMLAdTag(selectedVideo);
+                    }else {
                         mSelectedCallback.onVideoSelected(selectedVideo);
                     }
                 }
@@ -121,6 +143,42 @@ public class VideoListFragment extends Fragment {
 
                         if (mSelectedCallback != null) {
                             mSelectedCallback.onVideoSelected(customAdTagVideoItem);
+                        }
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                    }
+                })
+                .show();
+    }
+
+    private void getCustomXMLAdTag(VideoItem originalVideoItem) {
+        View dialogueView = mInflater.inflate(R.layout.custom_ad_tag, mContainer, false);
+
+        final EditText videoUrl = (EditText) dialogueView.findViewById(mediaUrl);
+        videoUrl.setHint("Media URL");
+
+        final EditText licUrl = (EditText) dialogueView.findViewById(mediaLic);
+        licUrl.setHint("Media Lic URL");
+
+        final EditText adUrl = (EditText) dialogueView.findViewById(customTag);
+        adUrl.setHint("Ad Tag XML as plain text");
+        final VideoItem videoItem = originalVideoItem;
+
+        new AlertDialog.Builder(this.getActivity())
+                .setTitle("Custom XML Ad Tag")
+                .setView(dialogueView)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        String customMediaUrl = (!TextUtils.isEmpty(videoUrl.getText().toString())) ? videoUrl.getText().toString() : SOURCE_URL1;
+                        String customMediaLicUrl = (!TextUtils.isEmpty(licUrl.getText())) ? licUrl.getText().toString() : "";
+                        String customAdTagXML = adUrl.getText().toString();
+                        VideoItem customXMLAdTagVideoItem = new VideoItem(customMediaUrl,  customMediaLicUrl,
+                                videoItem.getTitle(), customAdTagXML, videoItem.getImageResource());
+
+                        if (mSelectedCallback != null) {
+                            mSelectedCallback.onVideoSelected(customXMLAdTagVideoItem);
                         }
                     }
                 })

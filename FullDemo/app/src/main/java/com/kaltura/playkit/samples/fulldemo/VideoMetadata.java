@@ -13,8 +13,10 @@ import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_7;
 import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_8;
 import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_9;
 import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_GOOGLE_SEARCH;
+import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_VOOT1;
 import static com.kaltura.playkit.samples.fulldemo.MainActivity.LIC_URL1;
 import static com.kaltura.playkit.samples.fulldemo.MainActivity.SOURCE_URL1;
+import static com.kaltura.playkit.samples.fulldemo.MainActivity.VOOT_URL1;
 
 
 public enum VideoMetadata {
@@ -23,6 +25,12 @@ public enum VideoMetadata {
             LIC_URL1,
             "Custom Ad Tag ",
             "custom",
+            R.drawable.k_image),
+    CUSTOM_XML(
+            SOURCE_URL1,
+            LIC_URL1,
+            "Custom XML Ad Tag ",
+            "xml custom",
             R.drawable.k_image),
 
     PRE_ROLL_NO_SKIP1(
@@ -82,6 +90,11 @@ public enum VideoMetadata {
             "Google Search",
             AD_GOOGLE_SEARCH,
             R.drawable.k_image),
+    VOOT(VOOT_URL1,
+            LIC_URL1,
+            "voot ad",
+            AD_VOOT1,
+            R.drawable.k_image),
     POST_ROLL(
             SOURCE_URL1,
             LIC_URL1,
@@ -91,7 +104,7 @@ public enum VideoMetadata {
 
 
     public static final List<VideoMetadata> APP_VIDEOS =
-            Arrays.asList(CUSTOM, PRE_ROLL_NO_SKIP1, PRE_ROLL_NO_SKIP, PRE_ROLL_SKIP, POST_ROLL, VMAP, VMAP_PODS, WRAPPER, VMAP_PODS_BUMP1, VMAP_PODS_BUMP2, GOOGLE_SEARCH);
+            Arrays.asList(CUSTOM_XML, CUSTOM, PRE_ROLL_NO_SKIP1, PRE_ROLL_NO_SKIP, PRE_ROLL_SKIP, POST_ROLL, VMAP, VMAP_PODS, WRAPPER, VMAP_PODS_BUMP1, VMAP_PODS_BUMP2, GOOGLE_SEARCH, VOOT);
 
     /** The thumbnail image for the video. **/
     public final int thumbnail;

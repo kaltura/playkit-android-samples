@@ -383,6 +383,9 @@ public class VideoFragment extends Fragment {
     private void addAdPluginConfig(PKPluginConfigs config, FrameLayout layout, RelativeLayout adSkin) {
 
         String adtag = mVideoItem.getAdTagUrl();
+        if (adtag == null) {
+            return;
+        }
         if (adtag.endsWith("correlator=")) {
             adtag += System.currentTimeMillis() + 100000;
         }

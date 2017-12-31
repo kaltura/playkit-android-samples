@@ -104,10 +104,7 @@ public class VideoListFragment extends Fragment {
                     if (selectedVideo.getAdTagUrl().equals(getString(
                             R.string.custom_ad_tag_value))) {
                         getCustomAdTag(selectedVideo);
-                    } else if (selectedVideo.getAdTagUrl().equals(getString(
-                            R.string.custom_xml_ad_tag_value))) {
-                        getCustomXMLAdTag(selectedVideo);
-                    }else {
+                    } else {
                         mSelectedCallback.onVideoSelected(selectedVideo);
                     }
                 }
@@ -127,58 +124,23 @@ public class VideoListFragment extends Fragment {
         licUrl.setHint("Media Lic URL");
 
         final EditText adUrl = (EditText) dialogueView.findViewById(customTag);
-        adUrl.setHint("Ad Tag URL");
+        adUrl.setHint("Ad Tag URL/XML");
         final VideoItem videoItem = originalVideoItem;
 
         new AlertDialog.Builder(this.getActivity())
-                .setTitle("Custom Ad Tag URL")
+                .setTitle("Custom Ad Tag URL/XML(plaint text)")
                 .setView(dialogueView)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String customMediaUrl = (!TextUtils.isEmpty(videoUrl.getText().toString())) ? videoUrl.getText().toString() : SOURCE_URL1;
                         String customMediaLicUrl = (!TextUtils.isEmpty(licUrl.getText())) ? licUrl.getText().toString() : "";
                         String customAdTagUrl = adUrl.getText().toString();
+
                         VideoItem customAdTagVideoItem = new VideoItem(customMediaUrl,  customMediaLicUrl,
                                 videoItem.getTitle(), customAdTagUrl, videoItem.getImageResource());
 
                         if (mSelectedCallback != null) {
                             mSelectedCallback.onVideoSelected(customAdTagVideoItem);
-                        }
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                    }
-                })
-                .show();
-    }
-
-    private void getCustomXMLAdTag(VideoItem originalVideoItem) {
-        View dialogueView = mInflater.inflate(R.layout.custom_ad_tag, mContainer, false);
-
-        final EditText videoUrl = (EditText) dialogueView.findViewById(mediaUrl);
-        videoUrl.setHint("Media URL");
-
-        final EditText licUrl = (EditText) dialogueView.findViewById(mediaLic);
-        licUrl.setHint("Media Lic URL");
-
-        final EditText adUrl = (EditText) dialogueView.findViewById(customTag);
-        adUrl.setHint("Ad Tag XML as plain text");
-        final VideoItem videoItem = originalVideoItem;
-
-        new AlertDialog.Builder(this.getActivity())
-                .setTitle("Custom XML Ad Tag")
-                .setView(dialogueView)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String customMediaUrl = (!TextUtils.isEmpty(videoUrl.getText().toString())) ? videoUrl.getText().toString() : SOURCE_URL1;
-                        String customMediaLicUrl = (!TextUtils.isEmpty(licUrl.getText())) ? licUrl.getText().toString() : "";
-                        String customAdTagXML = adUrl.getText().toString();
-                        VideoItem customXMLAdTagVideoItem = new VideoItem(customMediaUrl,  customMediaLicUrl,
-                                videoItem.getTitle(), customAdTagXML, videoItem.getImageResource());
-
-                        if (mSelectedCallback != null) {
-                            mSelectedCallback.onVideoSelected(customXMLAdTagVideoItem);
                         }
                     }
                 })

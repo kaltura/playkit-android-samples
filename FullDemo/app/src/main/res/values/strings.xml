@@ -86,7 +86,7 @@
 
     <string name="action_settings">Settings</string>
     <string name="pref_show_true">Auto Play</string>
-    <string name="pref_show_false">No Auto Play</string>
+    <string name="pref_show_false">Auto Play OFF</string>
 
     <!--&lt;!&ndash; Strings related to Settings &ndash;&gt;-->
 

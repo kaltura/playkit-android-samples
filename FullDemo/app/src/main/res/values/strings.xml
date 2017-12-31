@@ -85,7 +85,7 @@
     <string name="pref_companion_728_90_value" translatable="false">728x90</string>
 
     <string name="action_settings">Settings</string>
-    <string name="pref_show_true">Auto Play</string>
+    <string name="pref_show_true">Auto Play ON</string>
     <string name="pref_show_false">Auto Play OFF</string>
 
     <!--&lt;!&ndash; Strings related to Settings &ndash;&gt;-->

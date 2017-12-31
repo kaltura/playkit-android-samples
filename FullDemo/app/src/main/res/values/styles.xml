@@ -8,7 +8,6 @@
     <style name="Title" parent="@android:style/TextAppearance.Medium">
         <item name="android:textSize">18dp</item>
     </style>
-
     <style name="ListTitle" parent="Title">
         <item name="android:textColor">#DDDDDD</item>
         <item name="android:textSize">15dp</item>
@@ -21,6 +20,13 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+    </style>
+    <style name="AppTheme1" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>

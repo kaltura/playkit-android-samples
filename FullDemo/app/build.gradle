@@ -27,6 +27,7 @@ dependencies {
     compile project(":adsplugin")
     compile project(":youbora")
     compile project(":ima")
+    compile project(":kava")
     compile project(":googlecast")
 
     compile fileTree(dir: 'libs', include: ['*.jar'])

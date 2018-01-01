@@ -37,6 +37,9 @@ import com.kaltura.playkit.ads.AdEvent;
 import com.kaltura.playkit.ads.PKAdEndedReason;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
+import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 import com.kaltura.plugins.adsmanager.AdsConfig;
@@ -50,6 +53,8 @@ import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_GOOGLE_SEARCH
 public class VideoFragment extends Fragment {
     private static final String TAG = VideoFragment.class.getSimpleName();
     public static final String STATS_KALTURA_URL = "https://stats.kaltura.com/api_v3/index.php";
+    private static final String KAVA_BASE_URL = "https://analytics.kaltura.com/api_v3/index.php";
+
     public static final String ANALYTIC_TRIGGER_INTERVAL = "10";
 
     //private static final String FIRST_SOURCE_URL = "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
@@ -185,7 +190,18 @@ public class VideoFragment extends Fragment {
                     setCompanionAdWidth(companionAdWidth).
                     setCompanionAdHeight(companionAdHeight);
 
+            int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
+            String referrer = "app://NonDefaultReferrer1/"  + getContext().getPackageName();
+
+            KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
+                    .setBaseUrl(KAVA_BASE_URL)
+                    .setPartnerId(2222401)
+                    .setUiConfId(39487581)
+                    .setReferrer(referrer)
+                    .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
+
             player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
+            player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
             //If first one is active, prepare second one.
             prepareSecondEntry();
         } else {
@@ -200,7 +216,18 @@ public class VideoFragment extends Fragment {
                     setCompanionAdWidth(companionAdWidth).
                     setCompanionAdHeight(companionAdHeight);
 
+            int DISTANCE_FROM_LIVE_THRESHOLD = 150000; // 2.5 min
+            String referrer = "app://NonDefaultReferrer2/"  + getContext().getPackageName();
+
+            KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
+                    .setBaseUrl(KAVA_BASE_URL)
+                    .setPartnerId(2222401)
+                    .setUiConfId(40125321)
+                    .setReferrer(referrer)
+                    .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
+
             player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
+            player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
             //If the second one is active, prepare the first one.
             prepareFirstEntry();
         }
@@ -354,11 +381,13 @@ public class VideoFragment extends Fragment {
         //PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
         PlayKitManager.registerPlugins(this.getActivity(), KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(getActivity(), YouboraPlugin.factory);
+        PlayKitManager.registerPlugins(getActivity(), KavaAnalyticsPlugin.factory);
 
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         addAdPluginConfig(pluginConfig, playerLayout, adSkin);
         //addIMAPluginConfig(pluginConfig, mVideoItem.getAdTagUrl());
         addKalturaStatsPlugin(pluginConfig);
+        addKavaPlugin(pluginConfig);
         addYouboraPlugin(pluginConfig);
 
         //Create instance of the player.
@@ -421,15 +450,30 @@ public class VideoFragment extends Fragment {
     }
 
     private void addKalturaStatsPlugin(PKPluginConfigs config) {
-        JsonObject pluginEntry = new JsonObject();
-        pluginEntry.addProperty("uiconfId", "123456");
-        pluginEntry.addProperty("baseUrl", STATS_KALTURA_URL);
-        pluginEntry.addProperty("partnerId", Integer.parseInt("123456"));
-        pluginEntry.addProperty("timerInterval", Integer.parseInt(ANALYTIC_TRIGGER_INTERVAL));
-        pluginEntry.addProperty("entryId", "1_abcdefg");
-
-        config.setPluginConfig(KalturaStatsPlugin.factory.getName(), pluginEntry);
+        KalturaStatsConfig kalturaStatsPluginConfig = new KalturaStatsConfig(true)
+        .setBaseUrl(STATS_KALTURA_URL)
+        .setUiconfId(38713161)
+        .setPartnerId(2222401)
+        .setEntryId("1_f93tepsn")
+        .setTimerInterval(Integer.parseInt(ANALYTIC_TRIGGER_INTERVAL))
+        .setUserId("TestUser");
+        config.setPluginConfig(KalturaStatsPlugin.factory.getName(), kalturaStatsPluginConfig);
     }
+
+    private void addKavaPlugin(PKPluginConfigs config) {
+
+        int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
+        String referrer = "app://NonDefaultReferrer/"  + getContext().getPackageName();
+
+        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
+                .setBaseUrl(KAVA_BASE_URL)
+                .setPartnerId(2222401)
+                .setUiConfId(38713161)
+                .setReferrer(referrer)
+                .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
+        config.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
+    }
+
 
     private void addYouboraPlugin(PKPluginConfigs pluginConfigs) {
         JsonPrimitive accountCode = new JsonPrimitive(ACCOUNT_CODE);

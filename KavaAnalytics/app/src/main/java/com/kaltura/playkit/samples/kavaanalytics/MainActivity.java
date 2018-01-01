@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -16,6 +15,7 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsEvent;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
@@ -90,19 +90,18 @@ public class MainActivity extends AppCompatActivity {
         //Initialize PKPluginConfigs object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
         //Initialize Json object that will hold all the configurations for the plugin.
-        JsonObject pluginEntry = new JsonObject();
+        int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
+        String referrer = "app://NonDefaultReferrer1/"  + this.getPackageName();
+        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
+                .setBaseUrl(KAVA_BASE_URL)
+                .setPartnerId(PARTNER_ID)
+                .setUiConfId(UI_CONF_ID)
+                .setReferrer(referrer)
+                .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
 
-        //Put url to the kaltura stats server.
-        pluginEntry.addProperty("baseUrl", KAVA_BASE_URL);
-
-        //Put the partner id.
-        pluginEntry.addProperty("partnerId", PARTNER_ID);
-
-        //Put ui conf id.
-        pluginEntry.addProperty("uiconfId", UI_CONF_ID);
 
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), pluginEntry);
+        pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
 
         return pluginConfigs;
     }

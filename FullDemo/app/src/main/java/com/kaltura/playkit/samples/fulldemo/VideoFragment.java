@@ -62,6 +62,7 @@ public class VideoFragment extends Fragment {
 
     private static final String FIRST_SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/1_sf5ovm7u/flavorIds/1_d2uwy7vv,1_jl7y56al/format/applehttp/protocol/http/a.m3u8";
     private static final String SECOND_SOURCE_URL = "http://fastly.kastatic.org/KA-youtube-converted/PEeUTQ0Gri8.m3u8/PEeUTQ0Gri8.m3u8";
+    private static int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
 
     //id of the first entry
     private static final String FIRST_ENTRY_ID = "entry_id_1";
@@ -189,16 +190,10 @@ public class VideoFragment extends Fragment {
                     setMinAdDurationForSkipButton(minAdDurationForSkipButton).
                     setCompanionAdWidth(companionAdWidth).
                     setCompanionAdHeight(companionAdHeight);
-
-            int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
+            
             String referrer = "app://NonDefaultReferrer1/"  + getContext().getPackageName();
+            KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(39487581, referrer, DISTANCE_FROM_LIVE_THRESHOLD + 30000);
 
-            KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
-                    .setBaseUrl(KAVA_BASE_URL)
-                    .setPartnerId(2222401)
-                    .setUiConfId(39487581)
-                    .setReferrer(referrer)
-                    .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
 
             player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
@@ -216,15 +211,9 @@ public class VideoFragment extends Fragment {
                     setCompanionAdWidth(companionAdWidth).
                     setCompanionAdHeight(companionAdHeight);
 
-            int DISTANCE_FROM_LIVE_THRESHOLD = 150000; // 2.5 min
             String referrer = "app://NonDefaultReferrer2/"  + getContext().getPackageName();
+            KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(40125321, referrer, DISTANCE_FROM_LIVE_THRESHOLD + 60000);
 
-            KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
-                    .setBaseUrl(KAVA_BASE_URL)
-                    .setPartnerId(2222401)
-                    .setUiConfId(40125321)
-                    .setReferrer(referrer)
-                    .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
 
             player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
@@ -461,17 +450,19 @@ public class VideoFragment extends Fragment {
     }
 
     private void addKavaPlugin(PKPluginConfigs config) {
-
-        int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
         String referrer = "app://NonDefaultReferrer/"  + getContext().getPackageName();
+        KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(38713161, referrer, DISTANCE_FROM_LIVE_THRESHOLD);
+        config.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
+    }
 
-        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
+    private KavaAnalyticsConfig getKavaAnalyticsConfig(int uiconfId, String referrer, int distanceFromLiveThesholdMili) {
+
+        return new KavaAnalyticsConfig()
                 .setBaseUrl(KAVA_BASE_URL)
                 .setPartnerId(2222401)
-                .setUiConfId(38713161)
+                .setUiConfId(uiconfId)
                 .setReferrer(referrer)
-                .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
-        config.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
+                .setDvrThreshold(distanceFromLiveThesholdMili);
     }
 
 

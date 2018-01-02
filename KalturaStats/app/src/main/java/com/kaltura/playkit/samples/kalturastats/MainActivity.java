@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -16,6 +15,7 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsEvent;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 
@@ -93,25 +93,16 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize PKPluginConfigs object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
-        //Initialize Json object that will hold all the configurations for the plugin.
-        JsonObject pluginEntry = new JsonObject();
+        KalturaStatsConfig kalturaStatsPluginConfig = new KalturaStatsConfig(true)
+                .setBaseUrl(KALTURA_STATS_URL)
+                .setUiconfId(UI_CONF_ID)
+                .setPartnerId(PARTNER_ID)
+                .setEntryId(ANALYTICS_MEDIA_ENTRY_ID)
+                .setTimerInterval(ANALYTICS_TRIGGER_INTERVAL)
+                .setUserId("TestUser");
 
-        //Put url to the kaltura stats server.
-        pluginEntry.addProperty("baseUrl", KALTURA_STATS_URL);
-
-        //Put the partner id.
-        pluginEntry.addProperty("partnerId", PARTNER_ID);
-
-        //Put ui conf id.
-        pluginEntry.addProperty("uiconfId", UI_CONF_ID);
-
-        //Put entry id.
-        //pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
-
-        //Put interval with which analitcs reports would be triggered.
-        pluginEntry.addProperty("timerInterval", ANALYTICS_TRIGGER_INTERVAL);
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(KalturaStatsPlugin.factory.getName(), pluginEntry);
+        pluginConfigs.setPluginConfig(KalturaStatsPlugin.factory.getName(), kalturaStatsPluginConfig);
 
         return pluginConfigs;
     }

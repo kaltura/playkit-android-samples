@@ -28,9 +28,10 @@ dependencies {
     implementation 'com.kaltura:playkit-android-googlecast:master-SNAPSHOT'
 
 
-    compile project(':playkit')
-    compile project(':ima')
-    compile project(':youbora')
+    implementation project(':playkit')
+    implementation project(':ima')
+    implementation project(':youbora')
+    implementation project(':googlecast')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {

@@ -27,8 +27,8 @@ dependencies {
     //implementation 'com.kaltura:playkit-android:develop-SNAPSHOT'
     //implementation 'com.kaltura:playkit-android-ima:master-SNAPSHOT'
 
-    compile project(':playkit')
-    compile project(':ima')
+    implementation project(':playkit')
+    implementation project(':ima')
 
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'

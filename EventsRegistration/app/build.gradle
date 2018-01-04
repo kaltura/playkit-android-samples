@@ -24,7 +24,7 @@ android {
 dependencies {
 
     //implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
-    compile project(":playkit")
+    implementation project(":playkit")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {

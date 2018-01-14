@@ -29,6 +29,7 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
+import com.kaltura.playkit.PKTrackConfig;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -48,21 +49,12 @@ import com.kaltura.plugins.adsmanager.AdsPlugin;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kaltura.playkit.samples.fulldemo.MainActivity.AD_GOOGLE_SEARCH;
+import static com.kaltura.playkit.samples.fulldemo.Consts.*;
 
 public class VideoFragment extends Fragment {
     private static final String TAG = VideoFragment.class.getSimpleName();
-    public static final String STATS_KALTURA_URL = "https://stats.kaltura.com/api_v3/index.php";
-    private static final String KAVA_BASE_URL = "https://analytics.kaltura.com/api_v3/index.php";
 
-    public static final String ANALYTIC_TRIGGER_INTERVAL = "10";
 
-    //private static final String FIRST_SOURCE_URL = "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
-    //private static final String SECOND_SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
-
-    private static final String FIRST_SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/1_sf5ovm7u/flavorIds/1_d2uwy7vv,1_jl7y56al/format/applehttp/protocol/http/a.m3u8";
-    private static final String SECOND_SOURCE_URL = "http://fastly.kastatic.org/KA-youtube-converted/PEeUTQ0Gri8.m3u8/PEeUTQ0Gri8.m3u8";
-    private static int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
 
     //id of the first entry
     private static final String FIRST_ENTRY_ID = "entry_id_1";
@@ -152,14 +144,14 @@ public class VideoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        isAutoPlay    = getArguments().getBoolean(MainActivity.AUTO_PLAY);
-        startPosition = getArguments().getInt(MainActivity.START_FROM);
-        adLoadTimeOut = getArguments().getInt(MainActivity.AD_LOAD_TIMEOUT);
-        videoMimeType = getArguments().getString(MainActivity.MIME_TYPE);
-        videoBitrate  = getArguments().getInt(MainActivity.PREFERRED_BITRATE);
-        companionAdWidth  = getArguments().getInt(MainActivity.COMPANION_AD_WIDTH);
-        companionAdHeight = getArguments().getInt(MainActivity.COMPANION_AD_HEIGHT);
-        minAdDurationForSkipButton = getArguments().getInt(MainActivity.MIN_AD_DURATION_FOR_SKIP_BUTTON);
+        isAutoPlay    = getArguments().getBoolean(AUTO_PLAY);
+        startPosition = getArguments().getInt(START_FROM);
+        adLoadTimeOut = getArguments().getInt(AD_LOAD_TIMEOUT);
+        videoMimeType = getArguments().getString(MIME_TYPE);
+        videoBitrate  = getArguments().getInt(PREFERRED_BITRATE);
+        companionAdWidth  = getArguments().getInt(COMPANION_AD_WIDTH);
+        companionAdHeight = getArguments().getInt(COMPANION_AD_HEIGHT);
+        minAdDurationForSkipButton = getArguments().getInt(MIN_AD_DURATION_FOR_SKIP_BUTTON);
 
         View rootView = inflater.inflate(R.layout.fragment_video, container, false);
         initUi(rootView);
@@ -177,8 +169,10 @@ public class VideoFragment extends Fragment {
         clearLog();
 
         //Check if id of the media entry that is set in mediaConfig.
+        String AD_HONDA2 = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=" + System.currentTimeMillis();//"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
+
         if (mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)) {
-            String AD_HOND = "http://externaltests.dev.kaltura.com/player/Vast_xml/alexs.qacore-vast3-rol_02.xml";
+            String AD_HOND = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";//"http://externaltests.dev.kaltura.com/player/Vast_xml/alexs.qacore-vast3-rol_02.xml";
                     //"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
             AdsConfig adsConfig = new AdsConfig().
                     setAdTagURL(AD_HOND).
@@ -190,7 +184,7 @@ public class VideoFragment extends Fragment {
                     setMinAdDurationForSkipButton(minAdDurationForSkipButton).
                     setCompanionAdWidth(companionAdWidth).
                     setCompanionAdHeight(companionAdHeight);
-            
+
             String referrer = "app://NonDefaultReferrer1/"  + getContext().getPackageName();
             KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(39487581, referrer, DISTANCE_FROM_LIVE_THRESHOLD + 30000);
 
@@ -201,7 +195,7 @@ public class VideoFragment extends Fragment {
             prepareSecondEntry();
         } else {
 
-            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_GOOGLE_SEARCH).
+            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_HONDA2).
                     setPlayerViewContainer(playerLayout).
                     setAdSkinContainer(adSkin).
                     setAdLoadTimeOut(adLoadTimeOut).
@@ -319,10 +313,10 @@ public class VideoFragment extends Fragment {
         mediaSource.setId(FIRST_MEDIA_SOURCE_ID);
 
         //Set the content url. In our case it will be link to hls source(.m3u8).
-        mediaSource.setUrl(FIRST_SOURCE_URL);
+        mediaSource.setUrl(HLS_URL2);
 
         //Set the format of the source. In our case it will be hls.
-        mediaSource.setMediaFormat(PKMediaFormat.hls);
+        mediaSource.setMediaFormat(PKMediaFormat.valueOfUrl(HLS_URL2));
 
         //Add media source to the list.
         mediaSources.add(mediaSource);
@@ -345,9 +339,9 @@ public class VideoFragment extends Fragment {
         //Set the id.
         mediaSource.setId(SECOND_MEDIA_SOURCE_ID);
 
-        mediaSource.setUrl(SECOND_SOURCE_URL);
+        mediaSource.setUrl(HLS_URL);
 
-        mediaSource.setMediaFormat(PKMediaFormat.hls);
+        mediaSource.setMediaFormat(PKMediaFormat.valueOfUrl(SECOND_MEDIA_SOURCE_ID));
 
         //Add media source to the list.
         mediaSources.add(mediaSource);
@@ -381,6 +375,9 @@ public class VideoFragment extends Fragment {
 
         //Create instance of the player.
         player = PlayKitManager.loadPlayer(this.getActivity(), pluginConfig);
+        player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.SELECTION).setTrackLanguage("zho"));
+        //player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.SELECTION).setTrackLanguage("eng"));
+
         addPlayerListeners(progressBar);
         //Add player to the view hierarchy.
         addPlayerToView();
@@ -444,7 +441,7 @@ public class VideoFragment extends Fragment {
         .setUiconfId(38713161)
         .setPartnerId(2222401)
         .setEntryId("1_f93tepsn")
-        .setTimerInterval(Integer.parseInt(ANALYTIC_TRIGGER_INTERVAL))
+        .setTimerInterval(150000)
         .setUserId("TestUser");
         config.setPluginConfig(KalturaStatsPlugin.factory.getName(), kalturaStatsPluginConfig);
     }
@@ -459,10 +456,10 @@ public class VideoFragment extends Fragment {
 
         return new KavaAnalyticsConfig()
                 .setBaseUrl(KAVA_BASE_URL)
-                .setPartnerId(2222401)
-                .setUiConfId(uiconfId)
+                .setPartnerId(1281471)
+                .setUiConfId(24997472)
                 .setReferrer(referrer)
-                .setDvrThreshold(distanceFromLiveThesholdMili);
+                .setDvrThreshold(150000);
     }
 
 
@@ -523,7 +520,6 @@ public class VideoFragment extends Fragment {
     private void createMediaConfig() {
         //First. Create PKMediaConfig object.
         mediaConfig = new PKMediaConfig();
-
         //Second. Create PKMediaEntry object.
         PKMediaEntry mediaEntry = createMediaEntry();
 
@@ -586,20 +582,16 @@ public class VideoFragment extends Fragment {
             PKDrmParams pkDrmParams = null;
             if (mVideoItem.getVideoUrl().endsWith("mpd")) {
                 pkDrmParams = new PKDrmParams(mVideoItem.getVideoLic(), PKDrmParams.Scheme.WidevineCENC);
-                mediaSource.setMediaFormat(PKMediaFormat.dash);
             } else {
                 pkDrmParams = new PKDrmParams(mVideoItem.getVideoLic(), PKDrmParams.Scheme.WidevineClassic);
-                mediaSource.setMediaFormat(PKMediaFormat.wvm);
             }
             pkDrmDataList.add(pkDrmParams);
             mediaSource.setDrmData(pkDrmDataList);
 
-        } else {
-            //Set the format of the source. In our case it will be hls.
-            mediaSource.setMediaFormat(PKMediaFormat.hls);
         }
         //Set the content url. In our case it will be link to hls source(.m3u8).
         mediaSource.setUrl(mVideoItem.getVideoUrl());
+        mediaSource.setMediaFormat(PKMediaFormat.valueOfUrl(mVideoItem.getVideoUrl()));
 
 
         //Add media source to the list.

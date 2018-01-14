@@ -8,7 +8,7 @@ public final class VideoItem {
     private final String mAdTagUrl;
     private final String mVideoLic;
 
-    public VideoItem(String videoUrl, String videoLic, String title,  String adTagUrl, int thumbnailResourceId) {
+    public VideoItem(String title, String videoUrl, String videoLic, String adTagUrl, int thumbnailResourceId) {
         super();
         mVideoUrl = videoUrl;
         mVideoLic = videoLic;

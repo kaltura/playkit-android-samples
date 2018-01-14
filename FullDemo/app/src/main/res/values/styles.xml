@@ -25,6 +25,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+
     </style>
     <style name="AppTheme1" parent="Theme.AppCompat">
         <!-- Customize your theme here. -->
@@ -32,6 +33,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="android:windowBackground">@android:color/black</item>
+
     </style>
 </resources>
 

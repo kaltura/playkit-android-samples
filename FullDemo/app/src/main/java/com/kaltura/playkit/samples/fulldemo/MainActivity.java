@@ -17,39 +17,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import static com.kaltura.playkit.samples.fulldemo.Consts.*;
+
 public class MainActivity extends AppCompatActivity  implements VideoListFragment.OnVideoSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener,
         VideoListFragment.OnVideoListFragmentResumedListener,
         VideoFragment.OnVideoFragmentViewCreatedListener ,OrientationManager.OrientationListener {
-
-    private static final String VIDEO_PLAYLIST_FRAGMENT_TAG = "video_playlist_fragment_tag";
-    private static final String VIDEO_EXAMPLE_FRAGMENT_TAG = "video_example_fragment_tag";
-    public static final String SOURCE_URL1 = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
-    public static final String VOOT_URL1 = "https://cdnapisec.kaltura.com/p/1982551/sp/198255100/playManifest/entryId/0_akiyt8xz/format/applehttp/tags/iphonenew/protocol/https/f/a.m3u8";
-    public static final String LIC_URL1 = "";
-
-    public static final String SOURCE_URL2 = "https://cdnapisec.kaltura.com/p/2222401/sp/222240100/playManifest/entryId/1_f93tepsn/protocol/https/format/url/flavorIds/0_n80ojk1z,0_pke26hka/a.wvm";
-    public static final String LIC_URL2 = "https://udrmv3.kaltura.com//widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJPVlAiLCJ1c2VyX3Rva2VuIjoiZGpKOE1qSXlNalF3TVh4cF90ajBCRlpHOE5MdUNiV0VBenFUV0NiS1RaREpscTROWTlYSGd1dW5HV3d4dUxDY3VoUUZLeDRvTFdEV0NyLWxEUUhxbU1JcDFMbVg4NnYydXhkLS0ySDU5bWszVnhZLUtpaWFrZTl3Y0E9PSIsImFjY291bnRfaWQiOjIyMjI0MDEsImNvbnRlbnRfaWQiOiIxX2Y5M3RlcHNuIiwiZmlsZXMiOiIwX244MG9qazF6LDBfcGtlMjZoa2EifQ%3D%3D&signature=o1EUbBf%2BGRXaS2tUwdYPbGXgeEo%3D";
-
-    public static final String AD_1 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
-    public static final String AD_2 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-    public static final String AD_3 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpostonly&cmsid=496&vid=short_onecue&correlator=";
-    public static final String AD_4 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
-    public static final String AD_5 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
-    public static final String AD_6 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dredirectlinear&correlator=";
-    public static final String AD_7 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostoptimizedpodbumper&cmsid=496&vid=short_onecue&correlator=";
-    public static final String AD_8 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostlongpod&cmsid=496&vid=short_tencue&correlator=";
-    public static final String AD_9 = "http://pubads.g.doubleclick.net/gampad/ads?slotname=/3510761/adRulesSampleTags&sz=640x480&ciu_szs=160x600,300x250,728x90&cust_params=adrule%3Dpremidpostwithpod&url=%5Breferrer_url%5D&unviewed_position_start=1&impl=s&env=vp&gdfp_req=1&ad_rule=0&output=xml_vast2&vad_type=linear&vpos=postroll&pod=2&vrid=6961&max_ad_duration=30000&min_ad_duration=0&video_doc_id=12345&cmsid=3601&kfa=0&tfcd=0";
-    public static final String AD_GOOGLE_SEARCH = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
-    public static final String AD_VOOT1 = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x480&iu=%2F21633895671%2FAndroid_App_Video&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear&cmsid=2467608&vid=0_9ryp89yj&ad_rule=1&correlator=11588";
-    public static final String AD_VOOT2 = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x480&iu=%2F21633895671%2FAndroid_App_Video&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear&cmsid=2466114&vid=0_akiyt8xz&ad_rule=1&correlator=12732";
-    public static final String AUTO_PLAY = "AUTO_PLAY";
-    public static final String START_FROM = "START_FROM";
-    public static final String MIN_AD_DURATION_FOR_SKIP_BUTTON = "MIN_AD_DURATION_FOR_SKIP_BUTTON";
-    public static final String AD_LOAD_TIMEOUT = "AD_LOAD_TIMEOUT";
-    public static final String MIME_TYPE = "MIME_TYPE";
-    public static final String PREFERRED_BITRATE = "PREFERRED_BITRATE";
-    public static final String COMPANION_AD_WIDTH = "COMPANION_AD_WIDTH";
-    public static final String COMPANION_AD_HEIGHT = "COMPANION_AD_HEIGHT";
 
     private OrientationManager mOrientationManager;
     private int minAdDurationForSkipButton;
@@ -110,9 +82,13 @@ public class MainActivity extends AppCompatActivity  implements VideoListFragmen
 
         videoBitrate = Integer.valueOf(sharedPreferences.getString(getString(R.string.pref_bitrate_key),
                 "" + Integer.valueOf(getString(R.string.pref_bitrate_value))));
+        String currentStartPosition = sharedPreferences.getString(getString(R.string.pref_start_from_key),
+                "" + Integer.valueOf(getString(R.string.pref_start_from_default)));
 
-        startPosition = Integer.valueOf(sharedPreferences.getString(getString(R.string.pref_start_from_key),
-                "" + Integer.valueOf(getString(R.string.pref_start_from_default))));
+        if ("".equals(currentStartPosition)) {
+            currentStartPosition = "0";
+        }
+        startPosition = Integer.valueOf(currentStartPosition);
 
         isAutoPlay = sharedPreferences.getBoolean(getString(R.string.pref_auto_play_key),
                 getResources().getBoolean(R.bool.pref_auto_play_default));
@@ -282,7 +258,11 @@ public class MainActivity extends AppCompatActivity  implements VideoListFragmen
         } else if (key.equals(getString(R.string.pref_auto_play_key))) {
             isAutoPlay = sharedPreferences.getBoolean(getString(R.string.pref_auto_play_key), getResources().getBoolean(R.bool.pref_auto_play_default));
         } else if (key.equals(getString(R.string.pref_start_from_key))) {
-            startPosition = Integer.valueOf(sharedPreferences.getString(getString(R.string.pref_start_from_key), getString(R.string.pref_start_from_default)));
+            String startFrom = "0";
+            if (!"".equals(sharedPreferences.getString(getString(R.string.pref_start_from_key), getString(R.string.pref_start_from_default)))) {
+                startFrom = sharedPreferences.getString(getString(R.string.pref_start_from_key), getString(R.string.pref_start_from_default));
+            }
+            startPosition = Integer.valueOf(startFrom);
         } else if (key.equals(getString(R.string.pref_bitrate_key))) {
             videoBitrate = Integer.valueOf(sharedPreferences.getString(getString(R.string.pref_bitrate_key), getString(R.string.pref_bitrate_value)));
         } else if (key.equals(getString(R.string.pref_companion_key))) {
@@ -302,4 +282,6 @@ public class MainActivity extends AppCompatActivity  implements VideoListFragmen
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
+
+
 }

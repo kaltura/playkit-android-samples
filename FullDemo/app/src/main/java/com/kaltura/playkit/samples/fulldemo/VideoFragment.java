@@ -115,6 +115,7 @@ public class VideoFragment extends Fragment {
     private int companionAdWidth;
     private int companionAdHeight;
     private int minAdDurationForSkipButton;
+    private boolean firstLaunch = true;
 
     /**
      * Listener called when the fragment's onCreateView is fired.
@@ -125,6 +126,7 @@ public class VideoFragment extends Fragment {
 
     @Override
     public void onAttach(Activity activity) {
+        firstLaunch = true;
         try {
             mViewCreatedCallback = (OnVideoFragmentViewCreatedListener) activity;
 
@@ -191,6 +193,7 @@ public class VideoFragment extends Fragment {
 
             player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
+            player.updatePluginConfig(YouboraPlugin.factory.getName(), getConverterYoubora(MEDIA_TITLE + "_changeMedia1", false).toJson());
             //If first one is active, prepare second one.
             prepareSecondEntry();
         } else {
@@ -211,6 +214,8 @@ public class VideoFragment extends Fragment {
 
             player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
+            player.updatePluginConfig(YouboraPlugin.factory.getName(), getConverterYoubora(MEDIA_TITLE + "_changeMedia2", false).toJson());
+
             //If the second one is active, prepare the first one.
             prepareFirstEntry();
         }
@@ -464,6 +469,12 @@ public class VideoFragment extends Fragment {
 
 
     private void addYouboraPlugin(PKPluginConfigs pluginConfigs) {
+       ConverterYoubora converterYoubora = getConverterYoubora(MEDIA_TITLE, false);
+
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), converterYoubora.toJson());
+    }
+
+    private ConverterYoubora getConverterYoubora(String mediaTitle, boolean isLive) {
         JsonPrimitive accountCode = new JsonPrimitive(ACCOUNT_CODE);
         JsonPrimitive username = new JsonPrimitive(USER_NAME);
         JsonPrimitive haltOnError = new JsonPrimitive(true);
@@ -471,8 +482,8 @@ public class VideoFragment extends Fragment {
         JsonPrimitive enableSmartAds = new JsonPrimitive(ENABLE_SMART_ADS);
 
         JsonObject mediaEntry = new JsonObject();
-        mediaEntry.addProperty("isLive", false);
-        mediaEntry.addProperty("title", MEDIA_TITLE);
+        mediaEntry.addProperty("isLive", isLive);
+        mediaEntry.addProperty("title", mediaTitle);
 
         JsonObject adsEntry = new JsonObject();
         adsEntry.addProperty("campaign", CAMPAIGN);
@@ -502,10 +513,8 @@ public class VideoFragment extends Fragment {
         ConverterYoubora converterYoubora = new ConverterYoubora(accountCode, username, haltOnError, enableAnalytics, enableSmartAds,
                 mediaEntry,
                 adsEntry, extraParamEntry, propertiesEntry);
-
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), converterYoubora.toJson());
+        return  converterYoubora;
     }
-
     public static boolean isPKMediaFormatContains(String playbackFormat) {
         for (PKMediaFormat format : PKMediaFormat.values()) {
             if (format.name().equals(playbackFormat)) {
@@ -686,6 +695,7 @@ public class VideoFragment extends Fragment {
 
     @Override
     public void onPause() {
+
         if (player != null) {
             player.onApplicationPaused();
         }
@@ -695,6 +705,10 @@ public class VideoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (firstLaunch) {
+            firstLaunch = false;
+            return;
+        }
         if (player != null) {
             player.onApplicationResumed();
             //player.play();

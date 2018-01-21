@@ -23,7 +23,7 @@ dependencies {
     //implementation 'com.kaltura:playkit-android:develop-SNAPSHOT'
     //implementation 'com.kaltura:playkit-android-youbora:master-SNAPSHOT'
     //implementation 'com.kaltura:playkit-android-ima:master-SNAPSHOT'
-
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.6.1'
     compile project(':playkit')
     compile project(':ima')
     compile project(':youbora')

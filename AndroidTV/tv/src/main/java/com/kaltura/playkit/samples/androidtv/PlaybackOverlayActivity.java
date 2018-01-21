@@ -408,10 +408,10 @@ public class PlaybackOverlayActivity extends Activity implements
                                             }
                                         } else if (event instanceof AdEvent) {
                                             switch (((AdEvent) event).type) {
-                                                case LOADED:
+                                                case AD_LOADED:
 
                                                     break;
-                                                case CUEPOINTS_CHANGED:
+                                                case AD_CUEPOINTS_UPDATED:
 
                                                     break;
                                                 case ALL_ADS_COMPLETED:
@@ -420,7 +420,7 @@ public class PlaybackOverlayActivity extends Activity implements
                                                 case AD_BREAK_IGNORED:
 
                                                     break;
-                                                case CONTENT_PAUSE_REQUESTED:
+                                                case AD_BREAK_STARTED:
                                                     //isAdStarted = true;
                                                     //showOrHideContentLoaderProgress(false);
                                                     //hideSbuLogo();
@@ -429,25 +429,21 @@ public class PlaybackOverlayActivity extends Activity implements
                                                 //    VideoPlaybackTimer.getInstance().stopTimer();
                                                 //    showOrHideContentLoaderProgress(false);
                                                 //    break;
-                                                case CONTENT_RESUME_REQUESTED:
+                                                case ADS_PLAYBACK_ENDED:
 
                                                     break;
-                                                case STARTED:
+                                                case AD_STARTED:
 
                                                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                                                     break;
-                                                case PAUSED:
+                                                case AD_PAUSED:
 
                                                     break;
-                                                case TAPPED:
+                                                case AD_TOUCHED:
                                                     break;
-                                                case COMPLETED:
-
+                                                case AD_ENDED:
                                                     break;
-                                                case SKIPPED:
-
-                                                    break;
-                                                case CLICKED:
+                                                case AD_CLICKED:
                                                     break;
                                             }
                                         } else if (event instanceof AdEvent.Error) {
@@ -482,9 +478,9 @@ public class PlaybackOverlayActivity extends Activity implements
 
                                 }, PlayerEvent.Type.PLAY, PlayerEvent.Type.PAUSE, PlayerEvent.Type.CAN_PLAY, PlayerEvent.Type.SEEKING, PlayerEvent.Type.SEEKED, PlayerEvent.Type.PLAYING,
                 PlayerEvent.Type.ENDED, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.ERROR,
-                AdEvent.Type.LOADED, AdEvent.Type.SKIPPED, AdEvent.Type.TAPPED, AdEvent.Type.CONTENT_PAUSE_REQUESTED, AdEvent.Type.CONTENT_RESUME_REQUESTED, AdEvent.Type.STARTED, AdEvent.Type.PAUSED, AdEvent.Type.RESUMED,
-                AdEvent.Type.COMPLETED, AdEvent.Type.ALL_ADS_COMPLETED, ADS_REQUEST_NETWORK_ERROR,
-                AdEvent.Type.CUEPOINTS_CHANGED, AdEvent.Type.CLICKED, AdEvent.Type.AD_BREAK_IGNORED,
+                AdEvent.Type.AD_LOADED, AdEvent.Type.AD_TOUCHED, AdEvent.Type.AD_BREAK_STARTED, AdEvent.Type.ADS_PLAYBACK_ENDED, AdEvent.Type.AD_STARTED, AdEvent.Type.AD_PAUSED, AdEvent.Type.AD_RESUMED,
+                AdEvent.Type.AD_ENDED, AdEvent.Type.ALL_ADS_COMPLETED, ADS_REQUEST_NETWORK_ERROR,
+                AdEvent.Type.AD_CUEPOINTS_UPDATED, AdEvent.Type.AD_CLICKED, AdEvent.Type.AD_BREAK_IGNORED,
                 VAST_EMPTY_RESPONSE, COMPANION_AD_LOADING_FAILED, FAILED_TO_REQUEST_ADS,
                 INTERNAL_ERROR, OVERLAY_AD_LOADING_FAILED, PLAYLIST_NO_CONTENT_TRACKING,
                 UNKNOWN_ERROR, VAST_LINEAR_ASSET_MISMATCH, VAST_MALFORMED_RESPONSE, QUIET_LOG_ERROR,

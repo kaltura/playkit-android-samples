@@ -70,6 +70,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Subscribe to the event which will notify us when track data is available.
         subscribeToTracksAvailableEvent();
+        
+        // --->  SELECTING preferred AUDIO/TEXT TRACKS
+        //player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.OFF)); // no text tracks
+        player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO)); // select the track by locale if does not exist manifest default
+        //player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.EXPLICIT).setTrackLanguage("rus")); // select specific track lang if not exist select manifest default
+        player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO));
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
@@ -89,12 +95,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
-
-        // --->  SELECTING preferred AUDIO/TEXT TRACKS
-        //mediaConfig.setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.OFF)); // no text tracks
-        mediaConfig.setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO)); // select the track by locale if does not exist manifest default
-        //mediaConfig.setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.EXPLICIT).setTrackLanguage("rus")); // select specific track lang if not exist select manifest default
-        mediaConfig.setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO));
     }
 
     /**

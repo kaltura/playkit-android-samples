@@ -27,9 +27,9 @@ dependencies {
     //implementation 'com.kaltura:playkit-android-kava:master-SNAPSHOT'
     //implementation 'com.kaltura:playkit-android-ima:master-SNAPSHOT'
 
-    compile project(':playkit')
-    compile project(':kava')
-    compile project(':ima')
+    implementation project(':playkit')
+    implementation project(':kava')
+    implementation project(':ima')
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

@@ -25,7 +25,7 @@ dependencies {
     //implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
     //implementation ('com.kaltura:playkit-android-ima:master-SNAPSHOT')
     //implementation ('com.kaltura:playkit-android-youbora:master-SNAPSHOT')
-    implementation 'com.kaltura:playkit-android-googlecast:master-SNAPSHOT'
+    //implementation 'com.kaltura:playkit-android-googlecast:master-SNAPSHOT'
 
 
     implementation project(':playkit')

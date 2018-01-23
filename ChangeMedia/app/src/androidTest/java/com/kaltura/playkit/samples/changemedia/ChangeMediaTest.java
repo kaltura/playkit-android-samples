@@ -106,7 +106,7 @@ public class ChangeMediaTest {
             e.printStackTrace();
         }
 
-        pressBack();
+        //pressBack();
 
     }
 

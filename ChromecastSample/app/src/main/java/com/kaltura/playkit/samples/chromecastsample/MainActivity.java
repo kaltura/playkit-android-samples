@@ -54,6 +54,9 @@ public class MainActivity extends AppCompatActivity {
     private PlaybackLocation mLocation;
     private CastSession mCastSession;
     private MediaInfo mSelectedMedia;
+
+    public EventListener mEventListener;
+
     public enum PlaybackLocation {
         LOCAL,
         REMOTE
@@ -219,6 +222,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadRemoteMediaOvp(int position, boolean autoPlay) {
+        if (mEventListener != null) {
+            mEventListener.onInitMediaInfo(getOvpCastMediaInfo(getConverterCastForOvp(), false));
+        }
         if (mCastSession == null) {
             return;
         }
@@ -391,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private ConverterOvpCast getConverterCastForOvp() {
+    /*private ConverterOvpCast getConverterCastForOvp() {
         ConverterMediaMetadata converterMediaMetadata = new ConverterMediaMetadata("Cofee", "Folgers",
                 new ConverterImageUrl("https://cfvod.kaltura.com/p/243342/sp/24334200/thumbnail/entry_id/0_uka1msg4/version/100007/width/1200/hight/780",1200, 780));
 
@@ -405,6 +411,17 @@ public class MainActivity extends AppCompatActivity {
                 "21099702",
                 converterMediaMetadata);
 
+        return converterOvpCast;
+    }*/
+
+    private ConverterOvpCast getConverterCastForOvp() {
+        ConverterMediaMetadata converterMediaMetadata = new ConverterMediaMetadata("Cofee", "Folers",
+                new ConverterImageUrl("https://cfvod.kaltura.com/p/243342/sp/24334200/thumbnail/entry_id/0_uka1ms4/version/100007/width/1200/hiht/780", 1200, 780));
+        ConverterOvpCast converterOvpCast = new ConverterOvpCast(ConverterGoogleCast.ReceiverEnvironmentType.RECEIVER_OVP_ENVIRONMENT,
+                "", //ks
+                "1_j09ivavh", "https://pubads..doubleclick.net/ampad/ads?sz=640x480&iu=/124319096/external/sinle_ad_samples&ciu_szs=300x250&impl=s&dfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
+                "", //mwEmbed
+                "2215841", "40279611", converterMediaMetadata);
         return converterOvpCast;
     }
 

@@ -2,6 +2,7 @@ package com.kaltura.playkit.samples.offline;
 
 
 import android.support.test.espresso.DataInteraction;
+import android.support.test.espresso.Espresso;
 import android.support.test.espresso.ViewInteraction;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -51,7 +52,7 @@ public class OfflineTest {
     @Test
     public void offlineTest() {
         mainActivity = mActivityTestRule.getActivity();
-
+        //Espresso.co
         mainActivity.player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {

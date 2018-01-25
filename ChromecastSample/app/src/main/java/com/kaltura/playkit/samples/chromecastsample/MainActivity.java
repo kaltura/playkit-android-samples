@@ -44,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String INCORRECT_AD_TAG_URL = "incorrect_ad_tag_url";
     private static final int PREFERRED_AD_BITRATE = 600;
 
+    public static final String OVP_PARTNER_ID = "2215841";
+    public static final String OVP_ENTRY_ID = "1_j09ivavh";
+    public static final String OVP_UICONF_ID = "40279611";
+
     private Player player;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
@@ -419,9 +423,9 @@ public class MainActivity extends AppCompatActivity {
                 new ConverterImageUrl("https://cfvod.kaltura.com/p/243342/sp/24334200/thumbnail/entry_id/0_uka1ms4/version/100007/width/1200/hiht/780", 1200, 780));
         ConverterOvpCast converterOvpCast = new ConverterOvpCast(ConverterGoogleCast.ReceiverEnvironmentType.RECEIVER_OVP_ENVIRONMENT,
                 "", //ks
-                "1_j09ivavh", "https://pubads..doubleclick.net/ampad/ads?sz=640x480&iu=/124319096/external/sinle_ad_samples&ciu_szs=300x250&impl=s&dfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
+                OVP_ENTRY_ID, "https://pubads..doubleclick.net/ampad/ads?sz=640x480&iu=/124319096/external/sinle_ad_samples&ciu_szs=300x250&impl=s&dfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
                 "", //mwEmbed
-                "2215841", "40279611", converterMediaMetadata);
+                OVP_PARTNER_ID, OVP_UICONF_ID, converterMediaMetadata);
         return converterOvpCast;
     }
 

@@ -31,6 +31,8 @@ dependencies {
     //compile project(':playkit')
     //compile project(':ima')
     //compile project(':youbora')
+    //compile project(':googlecast')
+
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {

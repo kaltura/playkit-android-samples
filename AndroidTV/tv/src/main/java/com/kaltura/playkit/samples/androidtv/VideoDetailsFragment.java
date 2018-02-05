@@ -43,6 +43,7 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -188,11 +189,11 @@ public class VideoDetailsFragment extends DetailsFragment {
     private void setupMovieListRow() {
         String subcategories[] = {getString(R.string.related_movies)};
         List<Movie> list = MainActivity.list;
-
+        Collections.sort(list);
         Collections.shuffle(list);
         ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(new CardPresenter());
         for (int j = 0; j < list.size(); j++) {
-            listRowAdapter.add(list.get(j % (list.size())));
+            listRowAdapter.add(list.get(j));
         }
 
         HeaderItem header = new HeaderItem(0, subcategories[0]);

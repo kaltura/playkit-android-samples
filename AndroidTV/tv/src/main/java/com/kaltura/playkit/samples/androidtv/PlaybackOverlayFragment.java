@@ -54,6 +54,7 @@ import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.utils.Consts;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /*
@@ -106,7 +107,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
                // .getIntent().getSerializableExtra(DetailsActivity.MOVIE);
 
         List<Movie> movies = MainActivity.list;
-
+        Collections.sort(movies);
         for (int j = 0; j < movies.size(); j++) {
             mItems.add(movies.get(j));
             if (mSelectedMovie.getTitle().contentEquals(movies.get(j).getTitle())) {
@@ -420,7 +421,7 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
         if (mPlaybackControlsRow.getItem() != null) {
             Movie item = (Movie) mPlaybackControlsRow.getItem();
             item.setTitle(mItems.get(mCurrentItem).getTitle());
-            item.setStudio(mItems.get(mCurrentItem).getStudio());
+            item.setStudio(mItems.get(mCurrentItem).getStudio() + " " + mItems.get(mCurrentItem).getPkMediaEntry().getId());
         }
         if (SHOW_IMAGE) {
             updateVideoImage(mItems.get(mCurrentItem).getCardImageURI().toString());
@@ -459,11 +460,12 @@ public class PlaybackOverlayFragment extends android.support.v17.leanback.app.Pl
                 Log.d(TAG, "startProgressAutomation currentTime = " + currentTime + " totalTime = " + totalTime);
                 mPlaybackControlsRow.setCurrentTime(currentTime);
                 mPlaybackControlsRow.setBufferedProgress(currentTime + SIMULATED_BUFFERED_TIME);
-
-                if (totalTime > 0 && totalTime <= currentTime) {
-                    next();
-                }
-                mHandler.postDelayed(this, updatePeriod);
+                 if (!PlaybackOverlayActivity.adsPlaying) {
+                     if (totalTime > 0 && totalTime <= currentTime) {
+                         next();
+                     }
+                 }
+                 mHandler.postDelayed(this, updatePeriod);
             }
         };
         mHandler.postDelayed(mRunnable, getUpdatePeriod());

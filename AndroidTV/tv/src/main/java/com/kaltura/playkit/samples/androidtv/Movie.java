@@ -16,6 +16,7 @@ package com.kaltura.playkit.samples.androidtv;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.kaltura.playkit.PKMediaEntry;
@@ -27,7 +28,7 @@ import java.net.URISyntaxException;
  * Movie class represents video entity with title, description, image thumbs and video url.
  *
  */
-public class Movie implements Parcelable {
+public class Movie implements Parcelable, Comparable<Movie> {
     static final long serialVersionUID = 727566175075960653L;
     private static long count = 0;
     private long id;
@@ -40,6 +41,15 @@ public class Movie implements Parcelable {
     private String category;
     private int duration;
     private PKMediaEntry pkMediaEntry;
+    public int index;
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
 
     public Movie() {
     }
@@ -205,4 +215,15 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+    @Override
+    public int compareTo(@NonNull Movie movie) {
+        if ( this.getIndex() > movie.getIndex() )
+            return 1;
+        else if ( this.getIndex() < movie.getIndex() )
+            return -1;
+        else {
+            return  0;
+        }
+    }
 }

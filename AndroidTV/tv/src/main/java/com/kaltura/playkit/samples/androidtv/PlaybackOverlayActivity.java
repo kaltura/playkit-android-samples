@@ -28,6 +28,8 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -38,6 +40,7 @@ import com.kaltura.playkit.PKError;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
+import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
@@ -47,7 +50,10 @@ import com.kaltura.playkit.ads.PKAdErrorType;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +81,9 @@ public class PlaybackOverlayActivity extends Activity implements
         PlaybackOverlayFragment.OnPlayPauseClickedListener {
     private static final String TAG = "PlaybackOverlayActivity";
     public static final String STATS_KALTURA_COM = "https://stats.kaltura.com/api_v3/index.php";
+    private static final String PRE_ROLL_AD = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
+    private static final String PRE_MID_POST = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";//"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
+    String KAVA_BASE_URL = "https://analytics.kaltura.com/api_v3/index.php";
 
     //private VideoView mVideoView;
     protected Player player;
@@ -83,6 +92,9 @@ public class PlaybackOverlayActivity extends Activity implements
     private LeanbackPlaybackState mPlaybackState = LeanbackPlaybackState.IDLE;
     private MediaSession mSession;
     private PKTracks pkTracks;
+    //private AdsConfig adsConfig;
+    private IMAConfig imaAdsConfig;
+    public static boolean adsPlaying;
 
 
     /**
@@ -93,11 +105,14 @@ public class PlaybackOverlayActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playback_controls);
         loadViews();
-        setupCallbacks();
+        //setupCallbacks();
         mSession = new MediaSession(this, "LeanbackSampleApp");
         mSession.setCallback(new MediaSessionCallback());
         mSession.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+
+
 
         mSession.setActive(true);
     }
@@ -124,7 +139,7 @@ public class PlaybackOverlayActivity extends Activity implements
                 } else {
                     playbackOverlayFragment.togglePlayback(true);
                 }
-                return true;
+                 return true;
             default:
                 return super.onKeyUp(keyCode, event);
         }
@@ -145,6 +160,12 @@ public class PlaybackOverlayActivity extends Activity implements
             mediaConfig.setMediaEntry(mediaEntry);
             mediaConfig.setStartPosition(position);
             if (isFirstPlay) {
+                player.stop();
+                //String ad = (imaAdsConfig.getAdTagURL().contains("premidpostpod")) ?  PRE_ROLL_AD : PRE_MID_POST;
+                imaAdsConfig.setAdTagURL(PRE_ROLL_AD + System.currentTimeMillis());
+                player.updatePluginConfig(IMAPlugin.factory.getName(), imaAdsConfig);
+                //adsConfig.setAdTagURL(PRE_ROLL_AD + System.currentTimeMillis());
+                //player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
                 player.prepare(mediaConfig);
                 isFirstPlay = false;
             }
@@ -261,13 +282,18 @@ public class PlaybackOverlayActivity extends Activity implements
 
     private void loadViews() {
         if (player == null) {
-            //PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+            //PlayKitManager.registerPlugins(this, AdsPlugin.factory);
+            PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
+            PlayKitManager.registerPlugins(this, IMAPlugin.factory);
             //PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
             //PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
-
+            final FrameLayout playerKitViewContainer = findViewById(R.id.player_root);
+            RelativeLayout adSkin = findViewById(R.id.ad_skin);
             PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+            //addAdPluginConfig(pluginConfigs, playerKitViewContainer, adSkin);
+            addKalturaStatsPlugin(pluginConfigs);
             //addKalturaStatsPlugin(pluginConfigs);
-            //addIMAPluginConfig(pluginConfigs);
+            addIMAPluginConfig(pluginConfigs);
             //addYouboraPlugin(pluginConfigs);
             player = PlayKitManager.loadPlayer(this, pluginConfigs);
             setupCallbacks();
@@ -275,7 +301,7 @@ public class PlaybackOverlayActivity extends Activity implements
                 @Override
                 public void onGlobalLayout() {
                     getWindow().getDecorView().getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                    final FrameLayout playerKitViewContainer = (FrameLayout) findViewById(R.id.player_root);
+
                     ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(getWindow().getDecorView().getMeasuredWidth(),
                             getWindow().getDecorView().getMeasuredHeight());
 
@@ -290,6 +316,30 @@ public class PlaybackOverlayActivity extends Activity implements
                 }
             });
         }
+    }
+
+    private void addKavaPlugin(PKPluginConfigs config) {
+
+        //First register your plugin.
+        PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
+
+        //Initialize PKPluginConfigs object.
+        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+        //Initialize Json object that will hold all the configurations for the plugin.
+        int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
+        String referrer = "app://AndoidTV/"  + this.getPackageName();
+
+        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
+                .setBaseUrl(KAVA_BASE_URL)
+                .setPartnerId(MainActivity.QA_PARTNER_ID)
+                .setUiConfId(MainActivity.QA_UICONF_ID)
+                .setReferrer(referrer)
+                .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
+
+
+        //Set plugin entry to the plugin configs.
+        config.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
+
     }
 
     private void addYouboraPlugin(PKPluginConfigs pluginConfig) {
@@ -348,12 +398,18 @@ public class PlaybackOverlayActivity extends Activity implements
     }
 
     private void addIMAPluginConfig(PKPluginConfigs config) {
-        String adTagUrl = //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/youth/MTV&t=Content+Type=Highlights,Series+Title=MTV+Roadies+Rising,Gender=,GeoCity=,Age=,Carrier=,Media+ID=491591,Genre=Reality,SBU=MTV,Content+Name=Highlights%3A+Rannvijay+makes+his+choice,OEM=LGE,Language=Hindi,WiFi=Y,appversion=1.6.119,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=365.40002&rnd=8170019078998&cd=489&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=73274a17-920a-4666-b844-540ab8dd29f9&rt=vmap_1.0&pf=and_6.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d4d36fd0-e5e2-4b28-a225-ee0dca05d724&cp.optout=false&cp.deviceid=aa5e1b6c96988d68&cp.osversion=6.0";
-                //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=vmap&t=Content+Type=Full+Episode,Series+Title=MTV+Unplugged+S06,Gender=U,Media+ID=476975,Genre=Music,SBU=MTV,Content+Name=The+fusion+of+stars,OEM=LGE,Language=Hindi,WiFi=Y,appversion=0.1.102,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false,&tid=43cdeafd-77f5-11e6-bff1-02a55d5f3a8d&tt=p%2Cm%2Cpo%2Co&bp=336.0,681.0,1128.0,1464.0,1655.4,2052.0&rnd=8170019078998&cd=2485&rt=vmap_1.0&pf=and_6.0.1&rt=vmap_1.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d928acbe-4276-422e-b97a-9d9b681f94c3&cp.optout=false";
-                //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/youth/MTV&t=Content+Type=Highlights,Series+Title=MTV+Roadies+Rising,Gender=,GeoCity=,Age=,Carrier=,Media+ID=491591,Genre=Reality,SBU=MTV,Content+Name=Highlights%3A+Rannvijay+makes+his+choice,OEM=LGE,Language=Hindi,WiFi=Y,appversion=1.6.119,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=365.40002&rnd=8170019078998&cd=489&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=73274a17-920a-4666-b844-540ab8dd29f9&rt=vmap_1.0&pf=and_6.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d4d36fd0-e5e2-4b28-a225-ee0dca05d724&cp.optout=false&cp.deviceid=aa5e1b6c96988d68&cp.osversion=6.0";
-                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
-                //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostoptimizedpodbumper&cmsid=496&vid=short_onecue&correlator=";
-                //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+        imaAdsConfig = getIMAConfig();
+        config.setPluginConfig(IMAPlugin.factory.getName(), imaAdsConfig.toJSONObject());
+    }
+
+    private IMAConfig getIMAConfig() {
+        String adTagUrl = PRE_ROLL_AD + System.currentTimeMillis();
+        //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/youth/MTV&t=Content+Type=Highlights,Series+Title=MTV+Roadies+Rising,Gender=,GeoCity=,Age=,Carrier=,Media+ID=491591,Genre=Reality,SBU=MTV,Content+Name=Highlights%3A+Rannvijay+makes+his+choice,OEM=LGE,Language=Hindi,WiFi=Y,appversion=1.6.119,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=365.40002&rnd=8170019078998&cd=489&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=73274a17-920a-4666-b844-540ab8dd29f9&rt=vmap_1.0&pf=and_6.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d4d36fd0-e5e2-4b28-a225-ee0dca05d724&cp.optout=false&cp.deviceid=aa5e1b6c96988d68&cp.osversion=6.0";
+        //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=vmap&t=Content+Type=Full+Episode,Series+Title=MTV+Unplugged+S06,Gender=U,Media+ID=476975,Genre=Music,SBU=MTV,Content+Name=The+fusion+of+stars,OEM=LGE,Language=Hindi,WiFi=Y,appversion=0.1.102,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false,&tid=43cdeafd-77f5-11e6-bff1-02a55d5f3a8d&tt=p%2Cm%2Cpo%2Co&bp=336.0,681.0,1128.0,1464.0,1655.4,2052.0&rnd=8170019078998&cd=2485&rt=vmap_1.0&pf=and_6.0.1&rt=vmap_1.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d928acbe-4276-422e-b97a-9d9b681f94c3&cp.optout=false";
+        //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/youth/MTV&t=Content+Type=Highlights,Series+Title=MTV+Roadies+Rising,Gender=,GeoCity=,Age=,Carrier=,Media+ID=491591,Genre=Reality,SBU=MTV,Content+Name=Highlights%3A+Rannvijay+makes+his+choice,OEM=LGE,Language=Hindi,WiFi=Y,appversion=1.6.119,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=365.40002&rnd=8170019078998&cd=489&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=73274a17-920a-4666-b844-540ab8dd29f9&rt=vmap_1.0&pf=and_6.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d4d36fd0-e5e2-4b28-a225-ee0dca05d724&cp.optout=false&cp.deviceid=aa5e1b6c96988d68&cp.osversion=6.0";
+        // "https://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
+        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostoptimizedpodbumper&cmsid=496&vid=short_onecue&correlator=";
+        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
         List<String> videoMimeTypes = new ArrayList<>();
@@ -362,9 +418,30 @@ public class PlaybackOverlayActivity extends Activity implements
         //Map<Double, String> tagTimesMap = new HashMap<>();
         //tagTimesMap.put(2.0,"ADTAG");
 
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl);//.enableDebugMode(true);
-        config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
+        return new IMAConfig().setAdTagURL(adTagUrl);
     }
+
+//    private void addAdPluginConfig(PKPluginConfigs config, FrameLayout layout, RelativeLayout adSkin) {
+//        adsConfig = getAdsConfig(layout, adSkin, PRE_ROLL_AD  + System.currentTimeMillis());
+//        config.setPluginConfig(AdsPlugin.factory.getName(), adsConfig);
+//    }
+//
+//    private AdsConfig getAdsConfig(FrameLayout layout, RelativeLayout adSkin, String adTag) {
+//        //String AD_HOND = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
+//        String AD_GOOGLE_SEARCH = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
+//        //"http://externaltests.dev.kaltura.com/player/Vast_xml/alexs.qacore-vast3-rol_02.xml";
+//        //"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
+//        return new AdsConfig().
+//                setAdTagURL(adTag).
+//                setPlayerViewContainer(layout).
+//                setAdSkinContainer(adSkin).
+//                setAdLoadTimeOut(15000).
+//                setVideoMimeTypes(PKMediaFormat.valueOf("mp4")).
+//                setVideoBitrate(600).
+//                setMinAdDurationForSkipButton(8).
+//                setCompanionAdWidth(728).
+//                setCompanionAdHeight(90);
+//    }
 
     private void setupCallbacks() {
         player.addEventListener(new PKEvent.Listener() {
@@ -408,19 +485,22 @@ public class PlaybackOverlayActivity extends Activity implements
                                             }
                                         } else if (event instanceof AdEvent) {
                                             switch (((AdEvent) event).type) {
-                                                case LOADED:
 
+                                                case LOADED:
                                                     break;
                                                 case CUEPOINTS_CHANGED:
-
                                                     break;
                                                 case ALL_ADS_COMPLETED:
-
+                                                    Log.d(TAG, "XXX ALL_ADS_COMPLETED");
+                                                    adsPlaying = false;
                                                     break;
                                                 case AD_BREAK_IGNORED:
 
                                                     break;
                                                 case CONTENT_PAUSE_REQUESTED:
+
+                                                    Log.d(TAG, "XXX CONTENT_PAUSE_REQUESTED");
+                                                    adsPlaying = true;
                                                     //isAdStarted = true;
                                                     //showOrHideContentLoaderProgress(false);
                                                     //hideSbuLogo();
@@ -429,8 +509,11 @@ public class PlaybackOverlayActivity extends Activity implements
                                                 //    VideoPlaybackTimer.getInstance().stopTimer();
                                                 //    showOrHideContentLoaderProgress(false);
                                                 //    break;
+
                                                 case CONTENT_RESUME_REQUESTED:
 
+                                                    Log.d(TAG, "XXX CONTENT_RESUME_REQUESTED");
+                                                    adsPlaying = false;
                                                     break;
                                                 case STARTED:
 

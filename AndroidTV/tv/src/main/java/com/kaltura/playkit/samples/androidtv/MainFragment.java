@@ -17,8 +17,11 @@ package com.kaltura.playkit.samples.androidtv;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v17.leanback.app.BackgroundManager;
 import android.support.v17.leanback.app.BrowseFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
@@ -57,11 +60,13 @@ import static com.kaltura.playkit.samples.androidtv.MainActivity.movieIdex;
 public class MainFragment extends BrowseFragment {
     private static final String TAG = "MainFragment";
 
+    private static final String GRID_STRING_SPINNER = "Spinner";
+
     private static final int BACKGROUND_UPDATE_DELAY = 300;
     private static final int GRID_ITEM_WIDTH = 200;
     private static final int GRID_ITEM_HEIGHT = 200;
-    private static final int NUM_ROWS = 3;
-    private static final int NUM_COLS = 15;
+    public static final int NUM_ROWS = 4;
+    public static final int NUM_COLS = 20;
     private java.util.Timer timer = new java.util.Timer();
     private final Handler mHandler = new Handler();
     private ArrayObjectAdapter mRowsAdapter;
@@ -70,6 +75,7 @@ public class MainFragment extends BrowseFragment {
     private Timer mBackgroundTimer;
     private URI mBackgroundURI;
     private BackgroundManager mBackgroundManager;
+    private SpinnerFragment mSpinnerFragment;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -79,6 +85,8 @@ public class MainFragment extends BrowseFragment {
         prepareBackgroundManager();
 
         setupUIElements();
+        mSpinnerFragment = new SpinnerFragment();
+        getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, mSpinnerFragment).commit();
         mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         setAdapter(mRowsAdapter);
         setupEventListeners();
@@ -87,11 +95,12 @@ public class MainFragment extends BrowseFragment {
             @Override
             public void run() {
                 Log.d(TAG,"onActivityCreated movieIdex = " + movieIdex);
-                if (movieIdex == 5) {
+                if (movieIdex == NUM_COLS) {
                     loadRows();
 
                     timer.cancel();
                     timer = null;
+                    getFragmentManager().beginTransaction().remove(mSpinnerFragment).commit();
                 }
             }
         }, 0, 1500);
@@ -108,32 +117,61 @@ public class MainFragment extends BrowseFragment {
     }
 
     private void loadRows() {
-        List<Movie> list = MainActivity.list;
+        final List<Movie> list = MainActivity.list;
+        Collections.sort(list);
+        Handler handler = new Handler(Looper.getMainLooper());
 
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                CardPresenter cardPresenter = new CardPresenter();
 
-        CardPresenter cardPresenter = new CardPresenter();
+                int i;
+                for (i = 0; i < MOVIE_CATEGORY.length; i++) {
+//            if (i != 0) {
+//                Collections.shuffle(list);
+//            }
+                    ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
+                    if (i == 0) {
+                        for (int j = 0; j <= 4; j++) {
+                            list.get(j).getPkMediaEntry().getMetadata().put("pref", "hls");
+                            listRowAdapter.add(list.get(j));
+                        }
+                    } else if (i == 1) {
+                        for (int j = 5; j <= 9; j++) {
+                            list.get(j).getPkMediaEntry().getMetadata().put("pref", "dash");
+                            listRowAdapter.add(list.get(j));
+                        }
+                    } else if (i == 2) {
+                        for (int j = 10; j <= 14; j++) {
+                            list.get(j).getPkMediaEntry().getMetadata().put("pref", "mp4");
+                            listRowAdapter.add(list.get(j));
+                        }
+                    }
 
-        int i;
-        for (i = 0; i < MOVIE_CATEGORY.length; i++) {
-            if (i != 0) {
-                Collections.shuffle(list);
+                    if (i == 3) {
+                        for (int j = 15; j <= 19; j++) {
+                            list.get(j).getPkMediaEntry().getMetadata().put("pref", "dash");
+                            listRowAdapter.add(list.get(j));
+                        }
+                    }
+                    HeaderItem header = new HeaderItem(i, MOVIE_CATEGORY[i]);
+                    mRowsAdapter.add(new ListRow(header, listRowAdapter));
+                }
+
+                HeaderItem gridHeader = new HeaderItem(i, "PREFERENCES");
+
+                GridItemPresenter mGridPresenter = new GridItemPresenter();
+                ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
+                gridRowAdapter.add(getResources().getString(R.string.grid_view));
+                gridRowAdapter.add(getString(R.string.error_fragment));
+                gridRowAdapter.add(getResources().getString(R.string.personal_settings));
+
+                mRowsAdapter.add(new ListRow(gridHeader, gridRowAdapter));
+
             }
-            ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-            for (int j = 0; j < list.size(); j++) {
-                listRowAdapter.add(list.get(j % (list.size())));
-            }
-            HeaderItem header = new HeaderItem(i, MOVIE_CATEGORY[i]);
-            mRowsAdapter.add(new ListRow(header, listRowAdapter));
-        }
+        }, 2500);
 
-        HeaderItem gridHeader = new HeaderItem(i, "PREFERENCES");
-
-        GridItemPresenter mGridPresenter = new GridItemPresenter();
-        ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
-        gridRowAdapter.add(getResources().getString(R.string.grid_view));
-        gridRowAdapter.add(getString(R.string.error_fragment));
-        gridRowAdapter.add(getResources().getString(R.string.personal_settings));
-        mRowsAdapter.add(new ListRow(gridHeader, gridRowAdapter));
     }
 
     private void prepareBackgroundManager() {
@@ -251,7 +289,6 @@ public class MainFragment extends BrowseFragment {
                     }
                 }
             });
-
         }
     }
 
@@ -275,6 +312,27 @@ public class MainFragment extends BrowseFragment {
 
         @Override
         public void onUnbindViewHolder(ViewHolder viewHolder) {
+        }
+    }
+
+    private class ShowSpinnerTask extends AsyncTask<Void, Void, Void> {
+        SpinnerFragment mSpinnerFragment;
+
+        @Override
+        protected void onPreExecute() {
+            mSpinnerFragment = new SpinnerFragment();
+            getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, mSpinnerFragment).commit();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            getFragmentManager().beginTransaction().remove(mSpinnerFragment).commit();
         }
     }
 }

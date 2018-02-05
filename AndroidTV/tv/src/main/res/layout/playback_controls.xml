@@ -26,6 +26,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"/>
 
+    <include
+        android:id="@+id/ad_skin"
+        layout="@layout/ad_skin_layout"
+        android:visibility="invisible" />
+
     <fragment
         android:id="@+id/playback_controls_fragment"
         android:name="com.kaltura.playkit.samples.androidtv.PlaybackOverlayFragment"

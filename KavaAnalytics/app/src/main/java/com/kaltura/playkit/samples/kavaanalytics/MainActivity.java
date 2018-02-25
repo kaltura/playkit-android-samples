@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, "Kava Analytics report sent. Reported event name: " + reportedEventName);
             }
             //Event subscription.
-        }, KalturaStatsEvent.Type.REPORT_SENT);
+        }, KavaAnalyticsEvent.Type.REPORT_SENT);
     }
 
     /**

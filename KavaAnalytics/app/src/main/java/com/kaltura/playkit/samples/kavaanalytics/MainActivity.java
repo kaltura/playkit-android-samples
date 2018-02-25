@@ -16,6 +16,7 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsEvent;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsEvent;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
@@ -117,11 +118,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onEvent(PKEvent event) {
                 //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                KalturaStatsEvent.KalturaStatsReport reportEvent = (KalturaStatsEvent.KalturaStatsReport) event;
+                KavaAnalyticsEvent.KavaAnalyticsReport reportEvent= (KavaAnalyticsEvent.KavaAnalyticsReport) event;
 
                 //Get the event name from the report.
                 String reportedEventName = reportEvent.reportedEventName;
-                Log.i(TAG, "Kaltura stats report sent. Reported event name: " + reportedEventName);
+                Log.i(TAG, "Kava Analytics report sent. Reported event name: " + reportedEventName);
             }
             //Event subscription.
         }, KalturaStatsEvent.Type.REPORT_SENT);

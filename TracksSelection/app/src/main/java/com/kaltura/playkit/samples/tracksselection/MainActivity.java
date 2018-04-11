@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     //The url of the source to play
-    private static final String SOURCE_URL = "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
+    private static final String SOURCE_URL = "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
 
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";

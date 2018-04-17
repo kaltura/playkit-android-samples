@@ -42,6 +42,11 @@ public class SamplePlugin extends PKPlugin {
         }
 
         @Override
+        public String getVersion() {
+            return null;
+        }
+
+        @Override
         public PKPlugin newInstance() {
             return new SamplePlugin();
         }

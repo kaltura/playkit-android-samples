@@ -13,6 +13,7 @@ import android.widget.Button;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.TextTrackStyle;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
@@ -22,11 +23,12 @@ import com.google.android.gms.cast.framework.IntroductoryOverlay;
 import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
+import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.plugins.googlecast.BasicCastBuilder;
-import com.kaltura.playkit.plugins.googlecast.OVPCastBuilder;
-import com.kaltura.playkit.plugins.googlecast.TVPAPICastBuilder;
+import com.kaltura.playkit.addon.cast.BasicCastBuilder;
+import com.kaltura.playkit.addon.cast.OVPCastBuilder;
+import com.kaltura.playkit.addon.cast.TVPAPICastBuilder;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -294,7 +296,8 @@ public class MainActivity extends AppCompatActivity {
             public void onAdBreakStatusUpdated() {
             }
         });
-        remoteMediaClient.load(getOttCastMediaInfo(getConverterCastForOtt(), false), autoPlay, position);
+        //remoteMediaClient.load(getOttCastMediaInfo(getConverterCastForOtt(), false), autoPlay, position);
+        remoteMediaClient.load(getOttInfo(), false);
     }
 
     private void updatePlaybackLocation(PlaybackLocation location) {
@@ -338,6 +341,7 @@ public class MainActivity extends AppCompatActivity {
                 .setUiConfId(converterGoogleCast.getUiconfId())
                 .setMediaEntryId(converterGoogleCast.getEntryId())
                 .setStreamType(BasicCastBuilder.StreamType.VOD)
+                //.setTextTrackStyle(new TextTrackStyle().)
                 .build();
         return mediaInfo;
     }
@@ -440,6 +444,39 @@ public class MainActivity extends AppCompatActivity {
         return converterOttCast;
     }
 
+    private MediaInfo getOttInfo() {
+        TVPAPICastBuilder castBuilder = new TVPAPICastBuilder()
+                .setFormat("Chromecast_DASH_Web")
+                .setInitObject(getInitObject())
+                .setMetadata(getMediaMetadata())
+                .setUiConfId("8413355")
+                .setMediaEntryId("882120")
+                .setDefaultTextLanguageLabel("en")
+                .setStreamType(BasicCastBuilder.StreamType.VOD);
+
+        return castBuilder.build();
+    }
+
+    private String getInitObject() {
+        JsonObject initObj = new JsonObject();
+        initObj.addProperty("ApiPass", "11111");
+        initObj.addProperty("ApiUser", "tvpapi_463");
+        initObj.addProperty("UDID", "0a748bae-21de-38d1-a092-d2adf1f87bde");
+        initObj.addProperty("DomainID", "1410790");
+        initObj.addProperty("SiteGuid", "");
+        initObj.addProperty("Platform", "Cellular");
+        JsonObject localeObj = new JsonObject(); localeObj.addProperty("LocaleCountry", "");
+        localeObj.addProperty("LocaleDevice", "");
+        localeObj.addProperty("LocaleLanguage", "en");
+        localeObj.addProperty("LocaleUserState", "Unknown");
+        initObj.add("Locale", localeObj);
+        return initObj.toString();
+    }
+
+    private MediaMetadata getMediaMetadata() {
+         MediaMetadata metadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
+         metadata.putString(MediaMetadata.KEY_TITLE, "Title");
+         metadata.putString(MediaMetadata.KEY_SUBTITLE, "SubTitle");  return metadata; }
     @Override
     protected void onResume() {
         mCastContext.addCastStateListener(mCastStateListener);

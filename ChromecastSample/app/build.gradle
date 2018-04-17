@@ -22,16 +22,16 @@ android {
 }
 
 dependencies {
-    implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
+    //implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
     implementation ('com.kaltura:playkit-android-ima:master-SNAPSHOT')
     implementation ('com.kaltura:playkit-android-youbora:master-SNAPSHOT')
-    implementation 'com.kaltura:playkit-android-googlecast:master-SNAPSHOT'
+    //implementation 'com.kaltura:playkit-android-googlecast:master-SNAPSHOT'
 
 
-    //compile project(':playkit')
+    implementation project(':playkit')
     //compile project(':ima')
     //compile project(':youbora')
-    //compile project(':googlecast')
+    //implementation project(':googlecast')
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

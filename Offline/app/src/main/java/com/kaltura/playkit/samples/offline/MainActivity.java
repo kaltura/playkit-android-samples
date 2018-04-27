@@ -2,6 +2,8 @@ package com.kaltura.playkit.samples.offline;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v("main activity", "on create");
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -86,6 +89,13 @@ public class MainActivity extends AppCompatActivity {
         startLocalAssetsManager();
         
         loadPlayer();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.v("main activity", "orientation changed = "+newConfig.toString());
+
     }
 
     private void loadPlayer() {
@@ -361,4 +371,5 @@ public class MainActivity extends AppCompatActivity {
             item.startDownload();
         }
     }
+    
 }

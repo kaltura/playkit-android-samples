@@ -92,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
         IMAConfig imaConfigs = new IMAConfig();
 
         //Configure ima.
-        imaConfigs.setAdTagURL(AD_TAG_URL);
+        //imaConfigs.setAdTagURL(AD_TAG_URL);
+        imaConfigs.setAdTagURL("http://externaltests.dev.kaltura.com/playKitApp/adManager/customAdTags/vmap/inline/ima_pre_mid_post_bumber2.xml");
         imaConfigs.setVideoBitrate(PREFERRED_AD_BITRATE);
         imaConfigs.enableDebugMode(true);
 

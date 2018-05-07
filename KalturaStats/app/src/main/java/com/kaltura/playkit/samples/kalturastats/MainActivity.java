@@ -16,6 +16,10 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsEvent;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
+import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsEvent;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 
@@ -36,11 +40,13 @@ public class MainActivity extends AppCompatActivity {
     //The entry id of the media.
     private static final String ANALYTICS_MEDIA_ENTRY_ID = "entryId"; // the meida's entryId both for OVP and OTT
 
-
     //The id of the source.
     private static final String MEDIA_SOURCE_ID = "source_id";
 
-    //Analytics constants
+    //Kava Analytics constants
+    private static final String KAVA_BASE_URL = "https://analytics.kaltura.com/api_v3/index.php";
+
+    //KalturaStats Analytics constants
     private static final String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";//Server url
 
     private static final int UI_CONF_ID = 12345; //your ui conf id here.
@@ -60,14 +66,23 @@ public class MainActivity extends AppCompatActivity {
         //Initialize media config object.
         createMediaConfig();
 
+        //Initialize PKPluginConfigs object.
+        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+
         //Initialize PKPluginConfigs object with KalturaStatsPlugin.
-        PKPluginConfigs pluginConfigs = createKalturaStatsPlugin();
+        createKalturaStatsPlugin(pluginConfigs);
+
+        //Initialize PKPluginConfigs object with KavaAnalyticsPlugin.
+        createKavaAnalyticsPlugin(pluginConfigs);
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
 
-        //Subscribe to analytics report event.
+        //Subscribe to kalturastats analytics report event.
         subscribeToKalturaStatsReportEvent();
+
+        //Subscribe to kava analytics report event.
+        subscribeToKavaReportEvent();
 
         //Add player to the view hierarchy.
         addPlayerToView();
@@ -83,36 +98,47 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Will create {@link PKPluginConfigs} object with {@link KalturaStatsPlugin}.
      *
-     * @return - the pluginConfig object that should be passed as parameter when loading the player.
      */
-    private PKPluginConfigs createKalturaStatsPlugin() {
+    private void createKalturaStatsPlugin(PKPluginConfigs pluginConfigs) {
 
         //First register your plugin.
         PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
 
-        //Initialize PKPluginConfigs object.
-        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
-        //Initialize Json object that will hold all the configurations for the plugin.
-        JsonObject pluginEntry = new JsonObject();
+        KalturaStatsConfig kalturaStatsPluginConfig = new KalturaStatsConfig(true)
+                .setBaseUrl(KALTURA_STATS_URL)
+                .setUiconfId(UI_CONF_ID)
+                .setPartnerId(PARTNER_ID)
+                .setEntryId(ANALYTICS_MEDIA_ENTRY_ID)
+                .setTimerInterval(ANALYTICS_TRIGGER_INTERVAL)
+                .setUserId("TestUser");
 
-        //Put url to the kaltura stats server.
-        pluginEntry.addProperty("baseUrl", KALTURA_STATS_URL);
-
-        //Put the partner id.
-        pluginEntry.addProperty("partnerId", PARTNER_ID);
-
-        //Put ui conf id.
-        pluginEntry.addProperty("uiconfId", UI_CONF_ID);
-
-        //Put entry id.
-        //pluginEntry.addProperty("entryId", ANALYTICS_MEDIA_ENTRY_ID);
-
-        //Put interval with which analitcs reports would be triggered.
-        pluginEntry.addProperty("timerInterval", ANALYTICS_TRIGGER_INTERVAL);
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(KalturaStatsPlugin.factory.getName(), pluginEntry);
+        pluginConfigs.setPluginConfig(KalturaStatsPlugin.factory.getName(), kalturaStatsPluginConfig);
 
-        return pluginConfigs;
+    }
+
+    /**
+     * Will create {@link PKPluginConfigs} object with {@link KavaAnalyticsPlugin}.
+     *
+     */
+    private void createKavaAnalyticsPlugin(PKPluginConfigs pluginConfigs) {
+
+        //First register your plugin.
+        PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
+
+        //Initialize Json object that will hold all the configurations for the plugin.
+        int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
+        String referrer = "app://NonDefaultReferrer1/"  + this.getPackageName();
+        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
+                .setBaseUrl(KAVA_BASE_URL)
+                .setPartnerId(PARTNER_ID)
+                .setUiConfId(UI_CONF_ID)
+                .setReferrer(referrer)
+                .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
+
+        //Set plugin entry to the plugin configs.
+        pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
+
     }
 
     /**
@@ -135,6 +161,28 @@ public class MainActivity extends AppCompatActivity {
             //Event subscription.
         }, KalturaStatsEvent.Type.REPORT_SENT);
     }
+
+    /**
+     * Subscribe to kava analytics report event.
+     * This event will be received each and every time
+     * the analytics report is sent.
+     */
+    private void subscribeToKavaReportEvent() {
+        //Subscribe to the event.
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
+                KavaAnalyticsEvent.KavaAnalyticsReport reportEvent = (KavaAnalyticsEvent.KavaAnalyticsReport) event;
+
+                //Get the event name from the report.
+                String reportedEventName = reportEvent.reportedEventName;
+                Log.i(TAG, "Kava Analytics report sent. Reported event name: " + reportedEventName);
+            }
+            //Event subscription.
+        }, KavaAnalyticsEvent.Type.REPORT_SENT);
+    }
+
 
     /**
      * Will create {@link PKMediaConfig} object.

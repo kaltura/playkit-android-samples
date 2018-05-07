@@ -26,7 +26,8 @@ repositories {
 }
 
 dependencies {
-    compile project(":playkit");
+    implementation 'com.kaltura.playkit:playkit:3.4.5'
+    implementation 'com.kaltura.playkit:kavaplugin:1.0.6'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

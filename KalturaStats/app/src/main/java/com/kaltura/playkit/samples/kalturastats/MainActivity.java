@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -22,6 +21,7 @@ import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsEvent;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
+import com.kaltura.playkit.utils.Consts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -127,14 +127,14 @@ public class MainActivity extends AppCompatActivity {
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
 
         //Initialize Json object that will hold all the configurations for the plugin.
-        int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
         String referrer = "app://NonDefaultReferrer1/"  + this.getPackageName();
         KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
                 .setBaseUrl(KAVA_BASE_URL)
                 .setPartnerId(PARTNER_ID)
                 .setUiConfId(UI_CONF_ID)
+                .setEntryId(ANALYTICS_MEDIA_ENTRY_ID)
                 .setReferrer(referrer)
-                .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
+                .setDvrThreshold(Consts.DISTANCE_FROM_LIVE_THRESHOLD);
 
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);

@@ -31,7 +31,7 @@ configurations.all {
 }
 
 dependencies {
-    implementation ('com.kaltura:playkit-android:develop-SNAPSHOT')
+    implementation ('com.kaltura:playkit-android:dev-SNAPSHOT')
     //compile project(":playkit")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

@@ -23,7 +23,7 @@ android {
 
 dependencies {
 
-    implementation 'com.kaltura:playkit-android:develop-SNAPSHOT'
+    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
     implementation 'com.kaltura:playkit-android-youbora:master-SNAPSHOT'
 
     //implementation project(":playkit")

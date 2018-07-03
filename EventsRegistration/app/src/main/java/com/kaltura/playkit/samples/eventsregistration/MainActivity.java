@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
                                             switch (((PlayerEvent) event).type) {
                                                 case PLAYBACK_RATE_CHANGED:
                                                     PlayerEvent.PlaybackRateChanged playbackRateChanged = (PlayerEvent.PlaybackRateChanged) event;
-                                                    Log.d(TAG, "event received: " + event.eventType().name() + "Rate = " + playbackRateChanged.rate);
+                                                    Log.d(TAG, "event received: " + event.eventType().name() + " Rate = " + playbackRateChanged.rate);
                                                     break;
                                                 //Player play triggered.
                                                 case PLAY:

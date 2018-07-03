@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     //The url of the source to play
     private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
 
-    private static final String ENTRY_ID = "entry_id";
+    private static final String ENTRY_ID = "1_w9zx2eti";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     private Player player;
@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
 
         //Initialize jsonObject which will hold custom parameters for plugin.
+        //for Real world plugins you can create config object using the plugin's Config class i.e IMAConfig/YouboraConfig etc.  or build the config json your self
+
         JsonObject jsonObject = new JsonObject();
         //Add custom values.
         jsonObject.addProperty("value1", 1200);
@@ -104,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
         mediaEntry.setId(ENTRY_ID);
 
         //Set media entry type. It could be Live,Vod or Unknown.
-        //For now we will use Unknown.
-        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Unknown);
+        //In this sample we use Vod.
+        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
 
         //Create list that contains at least 1 media source.
         //Each media entry can contain a couple of different media sources.
@@ -179,5 +181,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (player != null) {
+            player.onApplicationResumed();
+            player.play();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (player != null) {
+            player.onApplicationPaused();
+        }
     }
 }

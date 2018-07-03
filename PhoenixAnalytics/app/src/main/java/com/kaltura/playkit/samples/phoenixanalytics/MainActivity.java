@@ -30,16 +30,16 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //Phoenix analytics constants
-    private static final String PHOENIX_ANALYTICS_BASE_URL = "analytics_base_url";
-    private static final String PHOENIX_ANALYTICS_PARTNER_ID = "partner_id";
-    private static final String PHOENIX_ANALYTICS_KS = "ks";
+    private static final String PHOENIX_ANALYTICS_BASE_URL = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/"; // analytics base url
+    private static final String PHOENIX_ANALYTICS_PARTNER_ID = "198"; // your OTT partner id
+    private static final String PHOENIX_ANALYTICS_KS = "";
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
     //Phoenix provider constans.
-    private static final String PHOENIX_PROVIDER_BASE_URL = "provider_base_url";
-    private static final String PHOENIX_PROVIDER_KS = "ks";
-    private static final int PHOENIX_PROVIDER_PARTNER_ID = 0;
-    private static final String ASSET_ID = "asset_id";
+    private static final String PHOENIX_PROVIDER_BASE_URL = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/"; //your provider base url
+    private static final String PHOENIX_PROVIDER_KS = ""; // your user ks if required
+    private static final int PHOENIX_PROVIDER_PARTNER_ID = 198; // your OTT partner id
+    private static final String ASSET_ID = "259153";//"258459"; // asset id to request
 
 
     private Player player;

@@ -29,19 +29,20 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //The url of the source to play
-    private static final String SOURCE_URL = "http://nasatv-lh.akamaihd.net/i/NASA_101@319270/master.m3u8";
+    private static final String SOURCE_URL = "http://qa-apache-php7.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_f8re4ujs/format/applehttp/protocol/http/uiConfId/15068781/a.m3u8";
+    //"http://nasatv-lh.akamaihd.net/i/NASA_101@319270/master.m3u8";
 
     //The id of the entry.
-    private static final String ENTRY_ID = "id";
+    private static final String ENTRY_ID = "0_f8re4ujs";
 
     //The entry id of the media.
-    private static final String ANALYTICS_MEDIA_ENTRY_ID = "entryId"; // the meida's entryId both for OVP and OTT
+    private static final String ANALYTICS_MEDIA_ENTRY_ID = "0_f8re4ujs"; // the meida's entryId both for OVP and OTT
 
     //The id of the source.
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     //Analytics constants
-    private static final int PARTNER_ID = 12345; // your partner id here.
+    private static final int PARTNER_ID = 1091; // your partner id here.
     private static final String KALTURA_LIVE_STATS_URL = "https://livestats.kaltura.com/api_v3/index.php"; //Server url
     private static final int ANALYTICS_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 

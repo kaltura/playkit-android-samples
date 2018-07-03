@@ -19,12 +19,12 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int START_POSITION = 60; // one minute.
+    private static final int START_POSITION = 60; // position tp start playback in seconds.
 
     //The url of the source to play
     private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
 
-    private static final String ENTRY_ID = "entry_id";
+    private static final String ENTRY_ID = "1_w9zx2eti";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     private Player player;
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         //Initialize media config object.
         createMediaConfig();
 
-        //Create instance of the player.
+        //Create instance of the player without plugins.
         player = PlayKitManager.loadPlayer(this, null);
 
         //Add player to the view hierarchy.
@@ -87,8 +87,8 @@ public class MainActivity extends AppCompatActivity {
         mediaEntry.setId(ENTRY_ID);
 
         //Set media entry type. It could be Live,Vod or Unknown.
-        //For now we will use Unknown.
-        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Unknown);
+        //In this sample we use Vod.
+        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
 
         //Create list that contains at least 1 media source.
         //Each media entry can contain a couple of different media sources.
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         //Set the content url. In our case it will be link to hls source(.m3u8).
         mediaSource.setUrl(SOURCE_URL);
 
-        //Set the format of the source. In our case it will be hls.
+        //Set the format of the source. In our case it will be hls in case of mpd/wvm formats you have to to call mediaSource.setDrmData method as well
         mediaSource.setMediaFormat(PKMediaFormat.hls);
 
         //Add media source to the list.
@@ -162,5 +162,22 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (player != null) {
+            player.onApplicationResumed();
+            player.play();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (player != null) {
+            player.onApplicationPaused();
+        }
     }
 }

@@ -158,11 +158,6 @@ public class SamplePlugin extends PKPlugin {
             }
 
             @Override
-            public AdController getAdController() {
-                return super.getAdController();
-            }
-
-            @Override
             public void play() {
                 super.play();
             }

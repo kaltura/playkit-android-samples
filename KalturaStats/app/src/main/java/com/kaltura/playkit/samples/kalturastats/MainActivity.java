@@ -35,10 +35,10 @@ public class MainActivity extends AppCompatActivity {
     //The url of the source to play
     private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/playManifest/entryId/1_w9zx2eti/format/mpegdash/protocol/https/a.mpd";
 
-    private static final String ENTRY_ID = "id";
+    private static final String ENTRY_ID = "1_w9zx2eti";
 
     //The entry id of the media.
-    private static final String ANALYTICS_MEDIA_ENTRY_ID = "entryId"; // the meida's entryId both for OVP and OTT
+    private static final String ANALYTICS_MEDIA_ENTRY_ID = "1_w9zx2eti"; // the meida's entryId both for OVP and OTT
 
     //The id of the source.
     private static final String MEDIA_SOURCE_ID = "source_id";
@@ -49,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
     //KalturaStats Analytics constants
     private static final String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";//Server url
 
-    private static final int UI_CONF_ID = 12345; //your ui conf id here.
-    private static final int PARTNER_ID = 12345; // your partner id here.
+    private static final int UI_CONF_ID = 42869951; //your ui conf id here.
+    private static final int PARTNER_ID = 2215841; // your partner id here.
     private static final int ANALYTICS_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
     private Player player;

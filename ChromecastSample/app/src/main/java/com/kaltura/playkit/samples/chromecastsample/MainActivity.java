@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //NOTE - FOR OTT CASTING YOU HAVE TO CHANGE THE REVIVER ID TO E4D66C10 in strings.xml
         mCastStateListener = new CastStateListener() {
             @Override
             public void onCastStateChanged(int newState) {
@@ -76,9 +77,7 @@ public class MainActivity extends AppCompatActivity {
         mCastContext = CastContext.getSharedInstance(this);
         mCastContext.getSessionManager().addSessionManagerListener(
                 mSessionManagerListener, CastSession.class);
-        //mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
-
-
+        // mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
         // mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
 
 
@@ -429,10 +428,10 @@ public class MainActivity extends AppCompatActivity {
         ConverterOttCast converterOttCast = new ConverterOttCast(
                 ConverterGoogleCast.ReceiverEnvironmentType.RECEIVER_TVPAPI_ENVIRONMENT,
                 initObj.toJson(),
-                "Web_HD_Dash",
-                "480097",
-                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
-                "https://player-preprod.ott.kaltura.com/v2.58/mwEmbed/",
+                "Mobile_Devices_Main_SD",
+                "259153",
+                "https://pubsssads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
+                "http://player-preprod.ott.kaltura.com/v2.61/mwEmbed/",
                 "198",
                 "8413355",
                 converterMediaMetadata);

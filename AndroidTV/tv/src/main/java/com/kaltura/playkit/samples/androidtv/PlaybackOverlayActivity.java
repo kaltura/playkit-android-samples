@@ -42,9 +42,9 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.ads.AdEvent;
 import com.kaltura.playkit.ads.PKAdErrorType;
 import com.kaltura.playkit.player.PKTracks;
+import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
@@ -66,6 +66,8 @@ import static com.kaltura.playkit.ads.PKAdErrorType.VAST_LINEAR_ASSET_MISMATCH;
 import static com.kaltura.playkit.ads.PKAdErrorType.VAST_LOAD_TIMEOUT;
 import static com.kaltura.playkit.ads.PKAdErrorType.VAST_MALFORMED_RESPONSE;
 import static com.kaltura.playkit.ads.PKAdErrorType.VAST_TOO_MANY_REDIRECTS;
+import static com.kaltura.playkit.plugins.ads.AdEvent.Type.CUEPOINTS_CHANGED;
+import static com.kaltura.playkit.plugins.ads.AdEvent.Type.LOADED;
 
 
 /**

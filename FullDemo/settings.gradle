@@ -1,0 +1,15 @@
+include ':app'
+include ':playkit'
+project(':playkit').projectDir = new File(settingsDir, '../../playkit-android/playkit')
+//include ':admanager'
+//project(':admanager').projectDir = new File(settingsDir, '../../playkit-admanager-android/admanager')
+//include ':adsplugin'
+//project(':adsplugin').projectDir = new File(settingsDir, '../../playkit-android-ads-plugin/adsplugin')
+include ':youbora'
+project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
+include ':ima'
+project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
+include ':kava'
+project(':kava').projectDir = new File('../../playkit-android-kava/kavaplugin')
+include ':googlecast'
+project(':googlecast').projectDir = new File('../../playkit-android-googlecast/googlecast')

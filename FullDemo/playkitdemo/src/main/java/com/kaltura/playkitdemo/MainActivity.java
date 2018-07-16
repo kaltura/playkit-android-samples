@@ -5,6 +5,8 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.SensorManager;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -32,6 +34,7 @@ import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
+import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
@@ -39,6 +42,7 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.api.ovp.SimpleOvpSessionProvider;
+
 import com.kaltura.playkit.api.phoenix.APIDefines;
 import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
 import com.kaltura.playkit.mediaproviders.mock.MockMediaProvider;
@@ -100,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Spinner videoSpinner, audioSpinner, textSpinner;
 
     private OrientationManager mOrientationManager;
+    private boolean userIsInteracting;
 
     private void registerPlugins() {
 
@@ -110,13 +115,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
         //PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
         //PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
-
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         initDrm();
 
         mOrientationManager = new OrientationManager(this, SensorManager.SENSOR_DELAY_NORMAL, this);
@@ -213,10 +216,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setId(id);
     }
 
+//    private void startSimpleOvpMediaLoading(OnMediaLoadCompletion completion) {
+//        new KalturaOvpMediaProvider()
+//                .setSessionProvider(new SimpleOvpSessionProvider("https://cdnapisec.kaltura.com", 1740481, null))
+//                .setEntryId("1_1tvsf9ru")//("1_f93tepsn") //("1_uzea2uje")
+//
+//                .load(completion);
+//    }
+
     private void startSimpleOvpMediaLoading(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
                 .setSessionProvider(new SimpleOvpSessionProvider("https://cdnapisec.kaltura.com", 2222401, null))
-                .setEntryId("1_f93tepsn")
+                .setEntryId("1_f93tepsn")//("1_f93tepsn") //("1_uzea2uje") 1_asoyc5ef
+
                 .load(completion);
     }
 
@@ -291,7 +303,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player = PlayKitManager.loadPlayer(this, pluginConfig);
             KalturaPlaybackRequestAdapter.install(player, "myApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
             player.getSettings().setSecureSurface(true);
+           // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
 
+            //player.setPlaybackRate(1.5f);
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
 
@@ -481,6 +495,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         }, AdEvent.Type.CUEPOINTS_CHANGED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                AdEvent.AdBufferStart adBufferStartEvent = (AdEvent.AdBufferStart) event;
+                log.d("AD_BUFFER_START pos = " + adBufferStartEvent.adPosition);
+                appProgressBar.setVisibility(View.VISIBLE);
+            }
+        }, AdEvent.Type.AD_BUFFER_START);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                AdEvent.AdBufferEnd adBufferEnd = (AdEvent.AdBufferEnd) event;
+                log.d("AD_BUFFER_END pos = " + adBufferEnd.adPosition);
+                appProgressBar.setVisibility(View.INVISIBLE);
+            }
+        }, AdEvent.Type.AD_BUFFER_END);
+
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
@@ -727,8 +760,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        userIsInteracting = true;
+    }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        if (!userIsInteracting) {
+            return;
+        }
         TrackItem trackItem = (TrackItem) parent.getItemAtPosition(position);
         //tell to the player, to switch track based on the user selection.
         player.changeTrack(trackItem.getUniqueId());

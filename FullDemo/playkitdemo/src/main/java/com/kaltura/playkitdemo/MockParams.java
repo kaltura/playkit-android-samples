@@ -10,11 +10,11 @@ import java.util.List;
 public class MockParams {
 
 /*Ott Mock params: */
-    public static final String PhoenixBaseUrl = "https://api-preprod.ott.kaltura.com/v4_2/api_v3/";
-    public static final int OttPartnerId = 198;
+    public static String PhoenixBaseUrl = "https://api-preprod.ott.kaltura.com/v4_2/api_v3/";
+    public static int OttPartnerId = 198;
 
     //result of login with : [username: albert@gmail.com, pass: 123456]
-    public static final String PnxKS = "djJ8MTk4fH6bz_2197wFUNBqv2zRZ3h5YlTwiAEJZvVhJJut1pq13CMVSpgmD-NLVco4pJuthWU9b8Z_XEV7h6uvg5tpJbCj4ODWAzWhslokulcfUrgG0WISPD3wq1YWwD1lzuJ109OFrezv9Ih5Wa8qrUIsaz8=";
+    public static String PnxKS = "djJ8MTk4fH6bz_2197wFUNBqv2zRZ3h5YlTwiAEJZvVhJJut1pq13CMVSpgmD-NLVco4pJuthWU9b8Z_XEV7h6uvg5tpJbCj4ODWAzWhslokulcfUrgG0WISPD3wq1YWwD1lzuJ109OFrezv9Ih5Wa8qrUIsaz8=";
 
     public static final String SingMediaId = "480989";
     public static final String MediaId = "258656";//frozen

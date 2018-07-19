@@ -19,7 +19,7 @@ import android.view.View;
 
 import static com.kaltura.playkit.samples.fulldemo.Consts.*;
 
-public class MainActivity extends AppCompatActivity  implements VideoListFragment.OnVideoSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener,
+public class MainActivity extends AppCompatActivity implements VideoListFragment.OnVideoSelectedListener, SharedPreferences.OnSharedPreferenceChangeListener,
         VideoListFragment.OnVideoListFragmentResumedListener,
         VideoFragment.OnVideoFragmentViewCreatedListener ,OrientationManager.OrientationListener {
 
@@ -105,8 +105,7 @@ public class MainActivity extends AppCompatActivity  implements VideoListFragmen
         boolean isLandscape = (orientation == Configuration.ORIENTATION_LANDSCAPE);
         // Hide the non-video content when in landscape so the video is as large as possible.
         FragmentManager fragmentManager = getSupportFragmentManager();
-        VideoFragment videoFragment = (VideoFragment) fragmentManager
-                .findFragmentByTag(VIDEO_EXAMPLE_FRAGMENT_TAG);
+        VideoFragment videoFragment = (VideoFragment) fragmentManager.findFragmentByTag(VIDEO_EXAMPLE_FRAGMENT_TAG);
 
         Fragment videoListFragment = fragmentManager.findFragmentByTag(
                 VIDEO_PLAYLIST_FRAGMENT_TAG);

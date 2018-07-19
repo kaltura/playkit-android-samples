@@ -5,8 +5,6 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.SensorManager;
-import android.media.MediaCodecInfo;
-import android.media.MediaCodecList;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -28,7 +26,6 @@ import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.connect.response.ResultElement;
 import com.kaltura.netkit.utils.OnCompletion;
 import com.kaltura.netkit.utils.SessionProvider;
-import com.kaltura.playkit.MediaEntryProvider;
 import com.kaltura.playkit.PKDrmParams;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
@@ -41,13 +38,6 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
-import com.kaltura.playkit.api.ovp.SimpleOvpSessionProvider;
-
-import com.kaltura.playkit.api.phoenix.APIDefines;
-import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
-import com.kaltura.playkit.mediaproviders.mock.MockMediaProvider;
-import com.kaltura.playkit.mediaproviders.ott.PhoenixMediaProvider;
-import com.kaltura.playkit.mediaproviders.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
 import com.kaltura.playkit.player.MediaSupport;
@@ -57,7 +47,6 @@ import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.plugins.SamplePlugin;
 import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
-
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
@@ -66,6 +55,13 @@ import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.playback.KalturaPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
+import com.kaltura.playkit.providers.MediaEntryProvider;
+import com.kaltura.playkit.providers.api.ovp.SimpleOvpSessionProvider;
+import com.kaltura.playkit.providers.api.phoenix.APIDefines;
+import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
+import com.kaltura.playkit.providers.mock.MockMediaProvider;
+import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
+import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.utils.Consts;
 
 import java.util.ArrayList;
@@ -156,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         };
 
-//        startMockMediaLoading(playLoadedEntry);
+//      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
         startSimpleOvpMediaLoading(playLoadedEntry);
@@ -216,25 +212,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setId(id);
     }
 
-//    private void startSimpleOvpMediaLoading(OnMediaLoadCompletion completion) {
-//        new KalturaOvpMediaProvider()
-//                .setSessionProvider(new SimpleOvpSessionProvider("https://cdnapisec.kaltura.com", 1740481, null))
-//                .setEntryId("1_1tvsf9ru")//("1_f93tepsn") //("1_uzea2uje")
-//
-//                .load(completion);
-//    }
-
     private void startSimpleOvpMediaLoading(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleOvpSessionProvider("https://cdnapisec.kaltura.com", 243342, null))
+                .setEntryId("0_uka1msg4")
+                .load(completion);
+    }
+
+    private void startSimpleOvpMediaLoadingOld(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider()
                 .setSessionProvider(new SimpleOvpSessionProvider("https://cdnapisec.kaltura.com", 2222401, null))
-                .setEntryId("1_f93tepsn")//("1_f93tepsn") //("1_uzea2uje") 1_asoyc5ef
+                .setEntryId("1_f93tepsn")//("1_asoyc5ef") //("1_uzea2uje")
 
                 .load(completion);
     }
 
     private void startMockMediaLoading(OnMediaLoadCompletion completion) {
 
-        mediaProvider = new MockMediaProvider("mock/entries.playkit.json", getApplicationContext(), "hls");
+        mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "mp4");
 
         mediaProvider.load(completion);
     }

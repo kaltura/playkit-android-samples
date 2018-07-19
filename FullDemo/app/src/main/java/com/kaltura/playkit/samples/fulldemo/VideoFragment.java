@@ -1,9 +1,10 @@
 package com.kaltura.playkit.samples.fulldemo;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.text.TextUtils;
@@ -35,7 +36,9 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.ads.AdEnabledPlayerController;
+import com.kaltura.playkit.player.PlayerSettings;
 import com.kaltura.playkit.plugins.ads.AdEvent;
+
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
@@ -43,6 +46,7 @@ import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
+
 //import com.kaltura.plugins.adsmanager.AdsConfig;
 //import com.kaltura.plugins.adsmanager.AdsPlugin;
 
@@ -51,7 +55,7 @@ import java.util.List;
 
 import static com.kaltura.playkit.samples.fulldemo.Consts.*;
 
-public class VideoFragment extends Fragment {
+public class VideoFragment extends android.support.v4.app.Fragment {
     private static final String TAG = VideoFragment.class.getSimpleName();
 
 
@@ -168,6 +172,8 @@ public class VideoFragment extends Fragment {
 
         //Before changing media we must call stop on the player.
         player.stop();
+        player.getSettings().setPreferredMediaFormat(PKMediaFormat.mp3);
+        ((PlayerSettings)player.getSettings()).getPreferredMediaFormat();
         clearLog();
 
         //Check if id of the media entry that is set in mediaConfig.
@@ -188,7 +194,7 @@ public class VideoFragment extends Fragment {
 //                    setCompanionAdWidth(companionAdWidth).
 //                    setCompanionAdHeight(companionAdHeight);
 
-            String referrer = "app://NonDefaultReferrer1/"  + getContext().getPackageName();
+            String referrer = "app://NonDefaultReferrer1/"  + getActivity().getPackageCodePath();
             KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(39487581, referrer, DISTANCE_FROM_LIVE_THRESHOLD + 30000);
 
 
@@ -211,7 +217,7 @@ public class VideoFragment extends Fragment {
 //                    setCompanionAdWidth(companionAdWidth).
 //                    setCompanionAdHeight(companionAdHeight);
 
-            String referrer = "app://NonDefaultReferrer2/"  + getContext().getPackageName();
+            String referrer = "app://NonDefaultReferrer2/"  + getActivity().getPackageName();
             KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(40125321, referrer, DISTANCE_FROM_LIVE_THRESHOLD + 60000);
 
 
@@ -224,8 +230,6 @@ public class VideoFragment extends Fragment {
             prepareFirstEntry();
         }
     }
-
-
 
     /**
      * Prepare the first entry.
@@ -387,6 +391,8 @@ public class VideoFragment extends Fragment {
         //Create instance of the player.
         player = PlayKitManager.loadPlayer(this.getActivity(), pluginConfig);
         player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.SELECTION).setTrackLanguage("zho"));
+        //player.getSettings().setPreferredMediaFormat(PKMediaFormat.mp4);
+
         //player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.SELECTION).setTrackLanguage("eng"));
 
         addPlayerListeners(progressBar);
@@ -458,7 +464,7 @@ public class VideoFragment extends Fragment {
     }
 
     private void addKavaPlugin(PKPluginConfigs config) {
-        String referrer = "app://NonDefaultReferrer/"  + getContext().getPackageName();
+        String referrer = "app://NonDefaultReferrer/"  + getActivity().getPackageName();
         KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(38713161, referrer, DISTANCE_FROM_LIVE_THRESHOLD);
         config.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
     }

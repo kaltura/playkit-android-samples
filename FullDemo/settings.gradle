@@ -2,6 +2,8 @@ include ':app'
 include ':playkitdemo'
 include ':playkit'
 project(':playkit').projectDir = new File(settingsDir, '../../playkit-android/playkit')
+include ':providers'
+project(':providers').projectDir = new File('../../playkit-android-providers/mediaproviders')
 //include ':admanager'
 //project(':admanager').projectDir = new File(settingsDir, '../../playkit-admanager-android/admanager')
 //include ':adsplugin'
@@ -12,5 +14,6 @@ include ':ima'
 project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
 include ':kava'
 project(':kava').projectDir = new File('../../playkit-android-kava/kavaplugin')
+
 include ':googlecast'
 project(':googlecast').projectDir = new File('../../playkit-android-googlecast/googlecast')

@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.androidtv"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
 
@@ -19,8 +19,9 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.6.1'
     implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+
     implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
     implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
     //compile project(':playkit')
@@ -28,8 +29,8 @@ dependencies {
     //compile project(':youbora')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:leanback-v17:26.1.0'
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:leanback-v17:27.0.0'
+    implementation 'com.android.support:appcompat-v7:27.0.0'
     implementation 'com.github.bumptech.glide:glide:3.7.0'
 }
 
@@ -38,6 +39,6 @@ configurations.all {
 }
 
 repositories {
-    maven { url 'https://jitpack.io' }
     google()
+    maven { url 'https://jitpack.io' }
 }

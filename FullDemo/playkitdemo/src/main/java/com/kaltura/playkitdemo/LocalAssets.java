@@ -17,7 +17,7 @@ import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
-import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
+import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
 
 import java.io.File;
 import java.util.Collections;

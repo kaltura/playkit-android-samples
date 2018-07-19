@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.eventsregistration"
         minSdkVersion 17
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -24,14 +24,20 @@ android {
 dependencies {
 
     implementation ('com.kaltura:playkit-android:dev-SNAPSHOT')
+    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+
     //compile project(":playkit")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:appcompat-v7:27.0.0', {
+        exclude group: 'com.android.support', module: 'support-v4'
+    }
+    implementation 'com.android.support:design:27.0.0', {
+        exclude group: 'com.android.support', module: 'support-v4'
+    }
     testImplementation 'junit:junit:4.12'
 }
 
@@ -40,6 +46,6 @@ configurations.all {
 }
 
 repositories {
-    maven { url 'https://jitpack.io' }
     google()
+    maven { url 'https://jitpack.io' }
 }

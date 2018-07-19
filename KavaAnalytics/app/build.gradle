@@ -24,6 +24,7 @@ android {
 dependencies {
 
     implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
     implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
     implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
 
@@ -36,8 +37,12 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.android.support:appcompat-v7:27.0.0', {
+        exclude group: 'com.android.support', module: 'support-v4'
+    }
+    implementation 'com.android.support:design:27.0.0', {
+        exclude group: 'com.android.support', module: 'support-v4'
+    }
     testImplementation 'junit:junit:4.12'
 }
 
@@ -46,6 +51,6 @@ configurations.all {
 }
 
 repositories {
-    maven { url 'https://jitpack.io' }
     google()
+    maven { url 'https://jitpack.io' }
 }

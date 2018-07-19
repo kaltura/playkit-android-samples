@@ -47,6 +47,11 @@ public class SamplePlugin extends PKPlugin {
         }
 
         @Override
+        public String getVersion() {
+            return "1.1";
+        }
+
+        @Override
         public void warmUp(Context context) {
             
         }

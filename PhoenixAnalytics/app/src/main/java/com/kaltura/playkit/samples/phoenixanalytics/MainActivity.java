@@ -15,6 +15,7 @@ import com.kaltura.netkit.utils.SessionProvider;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
+import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
@@ -37,9 +38,12 @@ public class MainActivity extends AppCompatActivity {
 
     //Phoenix provider constans.
     private static final String PHOENIX_PROVIDER_BASE_URL = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/"; //your provider base url
+    //"https://rest-sgs1.ott.kaltura.com/api_v3/";
     private static final String PHOENIX_PROVIDER_KS = ""; // your user ks if required
     private static final int PHOENIX_PROVIDER_PARTNER_ID = 198; // your OTT partner id
-    private static final String ASSET_ID = "259153";//"258459"; // asset id to request
+    //487;
+    private static final String ASSET_ID = "259153"; // asset id to request  VR Meida "258459"
+    //"315298";
 
 
     private Player player;
@@ -57,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
-
+        //player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
+        
         //Subscribe to analytics report event.
         subscribePhoenixAnalyticsReportEvent();
 

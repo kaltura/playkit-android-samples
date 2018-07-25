@@ -37,10 +37,9 @@ dependencies {
     implementation project(path: ':kava')
     implementation project(path: ':googlecast')
 
+    implementation 'com.kaltura.netkit:netkit-core:1.0.9'
     //implementation project(":kava")
     implementation 'com.android.support:appcompat-v7:27.0.0'
     implementation 'com.android.support:design:27.0.0'
     //implementation 'com.github.kaltura:playkit-dtg-android:v2.3.0'
-
-
 }

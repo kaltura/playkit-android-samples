@@ -21,6 +21,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.connect.response.ResultElement;
@@ -49,6 +50,8 @@ import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
+import com.kaltura.playkit.plugins.imadai.IMADAIPlugin;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
@@ -105,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void registerPlugins() {
 
         PlayKitManager.registerPlugins(this, SamplePlugin.factory);
-        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+        PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
         PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
         PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
@@ -152,10 +155,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         };
 
-//      startMockMediaLoading(playLoadedEntry);
+      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
-        startSimpleOvpMediaLoading(playLoadedEntry);
+//        startSimpleOvpMediaLoading(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
@@ -331,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("delay", 1200);
         pluginConfigs.setPluginConfig("Sample", jsonObject);
-        addIMAPluginConfig(pluginConfigs);
+        addIMADAIPluginConfig(pluginConfigs);
         addKaluraStatsPluginConfig(pluginConfigs);
 
         addYouboraPluginConfig(pluginConfigs);
@@ -449,8 +452,57 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAdLoadTimeOut(8);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
+    }
+
+    private void addIMADAIPluginConfig(PKPluginConfigs config) {
+        String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
+        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
+        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
+        List<String> videoMimeTypes = new ArrayList<>();
+        videoMimeTypes.add("video/mp4");
+        videoMimeTypes.add("application/x-mpegURL");
+        // videoMimeTypes.add("application/dash+xml");
+        //Map<Double, String> tagTimesMap = new HashMap<>();
+        //tagTimesMap.put(2.0,"ADTAG");
+
+
+        String assetTitle = "VOD - Tears of Steel";
+        String assetKey = null;
+        String apiKey = null;
+        String contentSourceId = "19463";
+        String videoId = "tears-of-steel";
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+
+        IMADAIConfig adsConfig = new IMADAIConfig(assetTitle,
+                assetKey, // null for VOD
+                contentSourceId, // null for Live
+                apiKey, // seems to be always null in demos
+                videoId, // null for Live
+                streamFormat,
+                licenseUrl);
+
+
+        String assetTitle1 = "Live Video - Big Buck Bunny";
+        String assetKey1 = "sN_IYUG8STe1ZzhIIE_ksA";
+        String apiKey1 = null;
+        String contentSourceId1 = null;
+        String videoId1 = null;
+        StreamRequest.StreamFormat streamFormat1 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl1 = null;
+        IMADAIConfig adsConfigLive = new IMADAIConfig(assetTitle,
+                assetKey1, // null for VOD
+                contentSourceId1, // null for Live
+                apiKey1, // seems to be always null in demos
+                videoId1, // null for Live
+                streamFormat1,
+                licenseUrl1);
+
+        config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig);
 
     }
+
     @Override
     protected void onPause() {
         super.onPause();

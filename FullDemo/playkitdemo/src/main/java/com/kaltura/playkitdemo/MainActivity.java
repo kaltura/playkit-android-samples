@@ -54,6 +54,8 @@ import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
 import com.kaltura.playkit.plugins.imadai.IMADAIPlugin;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
+import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
+import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.playback.KalturaPlaybackRequestAdapter;
@@ -176,6 +178,77 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 setRequestedOrientation(orient);
             }
         });
+    }
+
+    private void startVootOttMediaLoading(final OnMediaLoadCompletion completion) {
+        SessionProvider ksSessionProvider = new SessionProvider() {
+            @Override
+            public String baseUrl() {
+                String PhoenixBaseUrl = "https://rest-as.ott.kaltura.com/v4_4/api_v3/";//"https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
+                return PhoenixBaseUrl;
+            }
+
+            @Override
+            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                String ks1 = "djJ8MjI1fI9tjvRYGjEgsFMKzLjP6DfsVRp3lLk7HOuwIx9FjvigREzqdh1wTjdRKj0h7JdRSuAKT1TprH_FJnehrk50OMp3t7efc70L8pTYz0miqor_2ilWbBYjXCCpMHUd7stKCRdZVg1YM72av7PJnCoBjQUVlgCvwSZr7pLKzciYacwGF2Fw7JRhSgypqsDY2hs9WQ==";
+                String PnxKS = "";
+                if (completion != null) {
+                    completion.onComplete(new PrimitiveResult(PnxKS));
+                }
+            }
+
+            @Override
+            public int partnerId() {
+                int OttPartnerId = 225;
+                return OttPartnerId;
+            }
+        };
+
+        String mediaId = "603038";//"311078";//"561107";
+        String format  = "dash Main";//"Tablet Main";//
+
+//                "Format": "dash Mobile",
+//                "Format": "ism Main",
+//                "Format": "Tablet Main",
+//                "Format": "dash Main",
+//                "Format": "widevine_sbr Download High",
+//                "Format": "widevine_mbr Main",
+//                "Format": "TV Main",
+//                "Format": "Web New",
+//                "Format": "360_Main",
+//                "Format": "HLS_Mobile_SD",
+//                "Format": "HLS_Mobile_HD",
+//                "Format": "HLSFPS_Mobile_SD",
+//                "Format": "HLSFPS_Mobile_HD",
+//                "Format": "HLS_Web_SD",
+//                "Format": "HLS_Web_HD",
+//                "Format": "HLS_360_SD",
+//                "Format": "HLS_360_HD",
+//                "Format": "HLS_TV_SD",
+//                "Format": "HLS_TV_HD",
+//                "Format": "HLSFPS_Main",
+//                "Format": "WVC_Low",
+//                "Format": "WVC_Auto",
+//                "Format": "DASH_Mobile_SD",
+//                "Format": "DASH_Mobile_HD",
+//                "Format": "WVC_High",
+//                "Format": "JIO_MAIN",
+//                "Format": "SBR256",
+//                "Format": "HLS_Linear_P",
+//                "Format": "HLS_Linear_B",
+
+
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaId)
+                //.setReferrer()
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                .setFormats(format);
+
+        mediaProvider.load(completion);
     }
 
     private void initDrm() {
@@ -438,6 +511,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //        config.setPluginConfig(TVPAPIAnalyticsPlugin.factory.getName(),tvpapiAnalyticsConfig);
 //    }
 
+
+    private void addPhoenixAnalyticsPlugin(PKPluginConfigs config) {
+
+        //Important!!! First you need to register your plugin.
+        PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
+
+        //Phoenix analytics constants
+        String PHOENIX_ANALYTICS_BASE_URL = "https://rest-as.ott.kaltura.com/v4_4/api_v3/";
+        int PHOENIX_ANALYTICS_PARTNER_ID = 225;
+        String PHOENIX_ANALYTICS_KS = "ks";
+        int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
+
+
+
+        //Set plugin entry to the plugin configs.
+        PhoenixAnalyticsConfig phoenixAnalyticsConfig = new PhoenixAnalyticsConfig(PHOENIX_ANALYTICS_PARTNER_ID, PHOENIX_ANALYTICS_BASE_URL, PHOENIX_ANALYTICS_KS, ANALYTIC_TRIGGER_INTERVAL);
+        config.setPluginConfig(PhoenixAnalyticsPlugin.factory.getName(), phoenixAnalyticsConfig);
+    }
+
     private void addIMAPluginConfig(PKPluginConfigs config) {
         String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
@@ -523,6 +615,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
         }, AdEvent.Type.CONTENT_RESUME_REQUESTED);
+
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                log.d("DAI_SOURCE_SELECTED");
+                AdEvent.AdDAISourceSelected adDAISourceSelected = (AdEvent.AdDAISourceSelected) event;
+                player.prepare(adDAISourceSelected.mediaConfig);
+                player.play();
+            }
+        }, AdEvent.Type.DAI_SOURCE_SELECTED);
+
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {

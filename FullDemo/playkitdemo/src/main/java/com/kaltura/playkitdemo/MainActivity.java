@@ -583,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String videoId1 = null;
         StreamRequest.StreamFormat streamFormat1 = StreamRequest.StreamFormat.HLS;
         String licenseUrl1 = null;
-        IMADAIConfig adsConfigLive = new IMADAIConfig(assetTitle,
+        IMADAIConfig adsConfigLive = new IMADAIConfig(assetTitle1,
                 assetKey1, // null for VOD
                 contentSourceId1, // null for Live
                 apiKey1, // seems to be always null in demos
@@ -591,7 +591,23 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 streamFormat1,
                 licenseUrl1);
 
-        config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig);
+
+        String assetTitle2 = "BBB-widevine";
+        String assetKey2 = null;
+        String apiKey2 = null;
+        String contentSourceId2 = "2474148";
+        String videoId2 = "bbb-widevine";
+        StreamRequest.StreamFormat streamFormat2 = StreamRequest.StreamFormat.DASH;
+        String licenseUrl2 = "https://proxy.uat.widevine.com/proxy";
+        IMADAIConfig adsConfigDash = new IMADAIConfig(assetTitle2,
+                assetKey2, // null for VOD
+                contentSourceId2, // null for Live
+                apiKey2, // seems to be always null in demos
+                videoId2, // null for Live
+                streamFormat2,
+                licenseUrl2);
+
+        config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigDash);
 
     }
 

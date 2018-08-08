@@ -607,7 +607,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 streamFormat2,
                 licenseUrl2);
 
-        config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigDash);
+        String assetTitle3 = "JW1";
+        String assetKey3 = null;
+        String apiKey3 = null;
+        String contentSourceId3 = "2472176";
+        String videoId3 = "2504847";
+        StreamRequest.StreamFormat streamFormat3 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl3 = null;
+        IMADAIConfig adsConfigVod2 = new IMADAIConfig(assetTitle3,
+                assetKey3, // null for VOD
+                contentSourceId3, // null for Live
+                apiKey3, // seems to be always null in demos
+                videoId3, // null for Live
+                streamFormat3,
+                licenseUrl3);
+
+
+        String assetTitle4 = "JW4";
+        String assetKey4 = null;
+        String apiKey4 = null;
+        String contentSourceId4 = "19823";
+        String videoId4 = "ima-test";
+        StreamRequest.StreamFormat streamFormat4 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl4 = null;
+        IMADAIConfig adsConfigVod4 = new IMADAIConfig(assetTitle3,
+                assetKey3, // null for VOD
+                contentSourceId3, // null for Live
+                apiKey3, // seems to be always null in demos
+                videoId3, // null for Live
+                streamFormat3,
+                licenseUrl3);
+
+        config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig);
 
     }
 
@@ -788,7 +819,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onEvent(PKEvent event) {
                 //When the track data available, this event occurs. It brings the info object with it.
                 PlayerEvent.PlayheadUpdated playheadUpdated = (PlayerEvent.PlayheadUpdated) event;
-                log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
+                //log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
             }
         }, PlayerEvent.Type.PLAYHEAD_UPDATED);
     }
@@ -844,14 +875,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Retrieve info that describes available tracks.(video/audio/subtitle).
         TrackItem[] videoTrackItems = obtainRelevantTrackInfo(Consts.TRACK_TYPE_VIDEO, tracksInfo.getVideoTracks());
         //populate spinner with this info.
-        applyAdapterOnSpinner(videoSpinner, videoTrackItems);
+        applyAdapterOnSpinner(videoSpinner, videoTrackItems, tracksInfo.getDefaultVideoTrackIndex());
 
         TrackItem[] audioTrackItems = obtainRelevantTrackInfo(Consts.TRACK_TYPE_AUDIO, tracksInfo.getAudioTracks());
-        applyAdapterOnSpinner(audioSpinner, audioTrackItems);
+        applyAdapterOnSpinner(audioSpinner, audioTrackItems, tracksInfo.getDefaultAudioTrackIndex());
 
         TrackItem[] subtitlesTrackItems = obtainRelevantTrackInfo(Consts.TRACK_TYPE_TEXT, tracksInfo.getTextTracks());
-        applyAdapterOnSpinner(textSpinner, subtitlesTrackItems);
-    }
+        applyAdapterOnSpinner(textSpinner, subtitlesTrackItems, tracksInfo.getDefaultTextTrackIndex());    }
 
 
     /**
@@ -921,9 +951,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    private void applyAdapterOnSpinner(Spinner spinner, TrackItem[] trackInfo) {
+    private void applyAdapterOnSpinner(Spinner spinner, TrackItem[] trackInfo, int defaultSelectedIndex) {
         TrackItemAdapter trackItemAdapter = new TrackItemAdapter(this, R.layout.track_items_list_row, trackInfo);
         spinner.setAdapter(trackItemAdapter);
+        if (defaultSelectedIndex > 0) {
+            spinner.setSelection(defaultSelectedIndex);
+        }
+
     }
 
     @Override

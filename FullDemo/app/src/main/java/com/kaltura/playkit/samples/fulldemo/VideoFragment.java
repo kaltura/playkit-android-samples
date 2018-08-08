@@ -376,7 +376,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         //Initialize media config object.
         createMediaConfig();
         PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
-        //PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
+        //PlayKitManager.registerPlugins(this.getActivity(), IMADAIPlugin.factory);
         PlayKitManager.registerPlugins(this.getActivity(), KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(getActivity(), YouboraPlugin.factory);
         PlayKitManager.registerPlugins(getActivity(), KavaAnalyticsPlugin.factory);

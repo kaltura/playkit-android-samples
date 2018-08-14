@@ -59,6 +59,7 @@ import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.playback.KalturaPlaybackRequestAdapter;
+import com.kaltura.playkit.plugins.playback.KalturaUDRMLicenseRequestAdapter;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 import com.kaltura.playkit.providers.MediaEntryProvider;
 import com.kaltura.playkit.providers.api.ovp.SimpleOvpSessionProvider;
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final boolean AUTO_PLAY_ON_RESUME = true;
 
     private static final PKLog log = PKLog.get("MainActivity");
+    public static final int START_POSITION = 0;
 
     private Player player;
     private MediaEntryProvider mediaProvider;
@@ -157,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         };
 
-      startMockMediaLoading(playLoadedEntry);
+        startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
 //        startSimpleOvpMediaLoading(playLoadedEntry);
@@ -364,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
 
-        PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(0);
+        PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(START_POSITION);
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         if (player == null) {
 
@@ -372,6 +374,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             player = PlayKitManager.loadPlayer(this, pluginConfig);
             KalturaPlaybackRequestAdapter.install(player, "myApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
+            KalturaUDRMLicenseRequestAdapter.install(player, "myApp");
+
             player.getSettings().setSecureSurface(true);
             player.getSettings().setAdAutoPlayOnResume(true);
            // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
@@ -546,6 +550,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
     }
 
+    //IMA CONFIG
     private void addIMADAIPluginConfig(PKPluginConfigs config) {
         String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
@@ -573,7 +578,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 apiKey, // seems to be always null in demos
                 videoId, // null for Live
                 streamFormat,
-                licenseUrl);
+                licenseUrl).enableDebugMode(true);
 
 
         String assetTitle1 = "Live Video - Big Buck Bunny";
@@ -589,7 +594,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 apiKey1, // seems to be always null in demos
                 videoId1, // null for Live
                 streamFormat1,
-                licenseUrl1);
+                licenseUrl1).enableDebugMode(true);
 
 
         String assetTitle2 = "BBB-widevine";
@@ -605,7 +610,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 apiKey2, // seems to be always null in demos
                 videoId2, // null for Live
                 streamFormat2,
-                licenseUrl2);
+                licenseUrl2).enableDebugMode(true);
 
         String assetTitle3 = "JW1";
         String assetKey3 = null;
@@ -630,13 +635,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String videoId4 = "ima-test";
         StreamRequest.StreamFormat streamFormat4 = StreamRequest.StreamFormat.HLS;
         String licenseUrl4 = null;
-        IMADAIConfig adsConfigVod4 = new IMADAIConfig(assetTitle3,
-                assetKey3, // null for VOD
-                contentSourceId3, // null for Live
-                apiKey3, // seems to be always null in demos
-                videoId3, // null for Live
-                streamFormat3,
-                licenseUrl3);
+        IMADAIConfig adsConfigVod4 = new IMADAIConfig(assetTitle4,
+                assetKey4, // null for VOD
+                contentSourceId4, // null for Live
+                apiKey4, // seems to be always null in demos
+                videoId4, // null for Live
+                streamFormat4,
+                licenseUrl4).enableDebugMode(true);
+
 
         config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig);
     }
@@ -644,6 +650,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onPause() {
         super.onPause();
+
         if (controlsView != null) {
             controlsView.release();
         }

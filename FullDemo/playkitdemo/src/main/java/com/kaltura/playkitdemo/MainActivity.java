@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 });
             }
         };
-
+        
         startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
-    private void startVootOttMediaLoading(final OnMediaLoadCompletion completion) {
+    private void startVootOttMediaLoadingProd(final OnMediaLoadCompletion completion) {
         SessionProvider ksSessionProvider = new SessionProvider() {
             @Override
             public String baseUrl() {
@@ -252,6 +252,78 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         mediaProvider.load(completion);
     }
+
+    private void startVootOttMediaLoadingStg(final OnMediaLoadCompletion completion) {
+        SessionProvider ksSessionProvider = new SessionProvider() {
+            @Override
+            public String baseUrl() {
+                String PhoenixBaseUrl = "https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";
+                return PhoenixBaseUrl;
+            }
+
+            @Override
+            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                String ks1 = "djJ8MjI1fI9tjvRYGjEgsFMKzLjP6DfsVRp3lLk7HOuwIx9FjvigREzqdh1wTjdRKj0h7JdRSuAKT1TprH_FJnehrk50OMp3t7efc70L8pTYz0miqor_2ilWbBYjXCCpMHUd7stKCRdZVg1YM72av7PJnCoBjQUVlgCvwSZr7pLKzciYacwGF2Fw7JRhSgypqsDY2hs9WQ==";
+                String PnxKS = "";
+                if (completion != null) {
+                    completion.onComplete(new PrimitiveResult(PnxKS));
+                }
+            }
+
+            @Override
+            public int partnerId() {
+                int OttPartnerId = 225;
+                return OttPartnerId;
+            }
+        };
+
+        String mediaId = "315369";//"311078";//"561107";
+        String format  = "HLS_Linear_P";//"Tablet Main";//
+
+//                "Format": "dash Mobile",
+//                "Format": "ism Main",
+//                "Format": "Tablet Main",
+//                "Format": "dash Main",
+//                "Format": "widevine_sbr Download High",
+//                "Format": "widevine_mbr Main",
+//                "Format": "TV Main",
+//                "Format": "Web New",
+//                "Format": "360_Main",
+//                "Format": "HLS_Mobile_SD",
+//                "Format": "HLS_Mobile_HD",
+//                "Format": "HLSFPS_Mobile_SD",
+//                "Format": "HLSFPS_Mobile_HD",
+//                "Format": "HLS_Web_SD",
+//                "Format": "HLS_Web_HD",
+//                "Format": "HLS_360_SD",
+//                "Format": "HLS_360_HD",
+//                "Format": "HLS_TV_SD",
+//                "Format": "HLS_TV_HD",
+//                "Format": "HLSFPS_Main",
+//                "Format": "WVC_Low",
+//                "Format": "WVC_Auto",
+//                "Format": "DASH_Mobile_SD",
+//                "Format": "DASH_Mobile_HD",
+//                "Format": "WVC_High",
+//                "Format": "JIO_MAIN",
+//                "Format": "SBR256",
+//                "Format": "HLS_Linear_P",
+//                "Format": "HLS_Linear_B",
+
+
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaId)
+                //.setReferrer()
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                .setFormats(format);
+
+        mediaProvider.load(completion);
+    }
+
 
     private void initDrm() {
         MediaSupport.initializeDrm(this, new MediaSupport.DrmInitCallback() {
@@ -644,6 +716,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 licenseUrl4).enableDebugMode(true);
 
 
+        IMADAIConfig adsConfigError = new IMADAIConfig(assetTitle4,
+                assetKey4, // null for VOD
+                contentSourceId4 + "AAAA", // null for Live
+                apiKey4, // seems to be always null in demos
+                videoId4, // null for Live
+                streamFormat4,
+                licenseUrl4).enableDebugMode(true);
+
         config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig);
     }
 
@@ -725,13 +805,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
         }, AdEvent.Type.AD_FIRST_PLAY);
+
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
                 log.d("AD_STARTED");
+                AdEvent.AdStartedEvent adStartedEvent = (AdEvent.AdStartedEvent) event;
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
         }, AdEvent.Type.STARTED);
+
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {

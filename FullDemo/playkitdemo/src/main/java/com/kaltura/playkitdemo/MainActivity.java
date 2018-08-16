@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             KalturaPlaybackRequestAdapter.install(player, "myApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
             KalturaUDRMLicenseRequestAdapter.install(player, "myApp");
 
-            player.getSettings().setSecureSurface(true);
+            player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
            // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
 
@@ -466,7 +466,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         player.prepare(mediaConfig);
-        //player.play();
+        player.play();
     }
 
     private void initSpinners() {
@@ -753,16 +753,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         }, AdEvent.Type.CONTENT_RESUME_REQUESTED);
 
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("DAI_SOURCE_SELECTED");
-                AdEvent.AdDAISourceSelected adDAISourceSelected = (AdEvent.AdDAISourceSelected) event;
-                player.prepare(adDAISourceSelected.mediaConfig);
-                player.play();
-            }
-        }, AdEvent.Type.DAI_SOURCE_SELECTED);
+//
+//        player.addEventListener(new PKEvent.Listener() {
+//            @Override
+//            public void onEvent(PKEvent event) {
+//                log.d("DAI_SOURCE_SELECTED");
+//                AdEvent.AdDAISourceSelected adDAISourceSelected = (AdEvent.AdDAISourceSelected) event;
+//                player.prepare(adDAISourceSelected.mediaConfig);
+//                player.play();
+//            }
+//        }, AdEvent.Type.DAI_SOURCE_SELECTED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override

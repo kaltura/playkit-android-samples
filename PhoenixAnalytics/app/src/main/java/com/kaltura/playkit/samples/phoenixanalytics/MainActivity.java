@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
 
     //Phoenix analytics constants
     private static final String PHOENIX_ANALYTICS_BASE_URL = "analytics_base_url";
-    private static final String PHOENIX_ANALYTICS_FILE_ID = "file_id";
     private static final String PHOENIX_ANALYTICS_PARTNER_ID = "partner_id";
     private static final String PHOENIX_ANALYTICS_KS = "ks";
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
@@ -92,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         JsonObject phoenixPluginConfigJson = new JsonObject();
 
         //Set plugin properties.
-        phoenixPluginConfigJson.addProperty("fileId", PHOENIX_ANALYTICS_FILE_ID);
         phoenixPluginConfigJson.addProperty("baseUrl", PHOENIX_ANALYTICS_BASE_URL);
         phoenixPluginConfigJson.addProperty("timerInterval", ANALYTIC_TRIGGER_INTERVAL);
         phoenixPluginConfigJson.addProperty("ks", PHOENIX_ANALYTICS_KS);

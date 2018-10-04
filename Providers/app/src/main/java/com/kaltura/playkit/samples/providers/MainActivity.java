@@ -12,7 +12,7 @@ import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.providers.api.ovp.SimpleOvpSessionProvider;
+import com.kaltura.playkit.providers.api.SimpleSessionProvider;
 import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
 import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         KalturaOvpMediaProvider mediaProvider = new KalturaOvpMediaProvider();
 
         //Initialize ovp session provider.
-        SimpleOvpSessionProvider sessionProvider = new SimpleOvpSessionProvider(PROVIDER_BASE_URL, PARTNER_ID, KS);
+        SimpleSessionProvider sessionProvider = new SimpleSessionProvider(PROVIDER_BASE_URL, PARTNER_ID, KS);
 
         //Set entry id for the session provider.
         mediaProvider.setEntryId(ENTRY_ID);

@@ -36,13 +36,30 @@ public class PlayerActivity extends AppCompatActivity {
 
     private static final String TAG = "PlayerActivity";
     private static final String BASE_URL = "https://cdnapisec.kaltura.com";
-    private static final String ENTRY_ID = "1_bc69i9jw";
+    public static final String ENTRY_ID = "1_bc69i9jw";
     private static final int PARTNER_ID = 2344301;
 
     private static final String KAVA_BASE_URL = "https://analytics.kaltura.com/api_v3/index.php";
 
     // UIConf id -- optional for KAVA
     private static final int UI_CONF_ID = 0;
+
+
+    public static final int MSEC_IN_SEC = 1000;
+    public static final int SEEKBAR_MSEC_FACTOR = 200;
+
+
+    private ImageButton playPauseButton;
+    private LinearLayout playerContainer;
+    private View controlsView;
+
+    private Player player;
+    private String ks;
+    private String entryId = ENTRY_ID;
+
+    private boolean ended;
+
+
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -61,12 +78,8 @@ public class PlayerActivity extends AppCompatActivity {
      * and a change of the status and navigation bar.
      */
     private static final int UI_ANIMATION_DELAY = 300;
-    public static final int MSEC_IN_SEC = 1000;
-    public static final int SEEKBAR_MSEC_FACTOR = 200;
-    private final Handler mHideHandler = new Handler();
-    private ImageButton playPauseButton;
-    private LinearLayout playerContainer;
-    private final Runnable mHidePart2Runnable = new Runnable() {
+    private final Handler hideHandler = new Handler();
+    private final Runnable hidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
         public void run() {
@@ -83,15 +96,14 @@ public class PlayerActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
     };
-    private View controlsView;
-    private final Runnable mShowPart2Runnable = new Runnable() {
+    private final Runnable showPart2Runnable = new Runnable() {
         @Override
         public void run() {
             controlsView.setVisibility(View.VISIBLE);
         }
     };
-    private boolean mVisible;
-    private final Runnable mHideRunnable = new Runnable() {
+    private boolean controlsVisible;
+    private final Runnable hideRunnable = new Runnable() {
         @Override
         public void run() {
             hide();
@@ -102,7 +114,7 @@ public class PlayerActivity extends AppCompatActivity {
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
-    private final View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
+    private final View.OnTouchListener delayHideTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (AUTO_HIDE) {
@@ -111,25 +123,20 @@ public class PlayerActivity extends AppCompatActivity {
             return false;
         }
     };
-    private Player player;
-    private String currentKS;
-
-    public PlayerActivity() {
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_player);
-        registerPlugins();
 
-        mVisible = true;
+        controlsVisible = true;
         controlsView = findViewById(R.id.fullscreen_content_controls);
 
+
+        registerPlugins();
+
         playPauseButton = findViewById(R.id.play_pause_button);
-
-
         playerContainer = findViewById(R.id.player_container);
 
 
@@ -141,16 +148,25 @@ public class PlayerActivity extends AppCompatActivity {
             }
         });
 
-        player = PlayKitManager.loadPlayer(this, createPluginConfigs());
-        addPlayerToView();
+        setupPlayer();
+
         playerContainer.setKeepScreenOn(true);
 
-        controlsView.setOnTouchListener(mDelayHideTouchListener);
+        controlsView.setOnTouchListener(delayHideTouchListener);
 
-        loadMedia(ENTRY_ID, currentKS);
+        loadMedia();
     }
 
-    private void addPlayerToView() {
+    public void setKs(String ks) {
+        this.ks = ks;
+    }
+
+    public void setEntryId(String entryId) {
+        this.entryId = entryId;
+    }
+
+    private void setupPlayer() {
+        player = PlayKitManager.loadPlayer(this, createPluginConfigs());
         playerContainer.addView(player.getView());
 
         final SeekBar seekBar = findViewById(R.id.mediacontroller_progress);
@@ -180,16 +196,26 @@ public class PlayerActivity extends AppCompatActivity {
 
                     // Change play/pause button to PAUSE
                     case PLAYING:
+                        playerContainer.setKeepScreenOn(true);
                         playPauseButton.setImageResource(R.drawable.ic_pause_black_24dp);
                         break;
 
                     // Change play/pause button to PLAY
                     case PAUSE:
+                        playerContainer.setKeepScreenOn(false);
                         playPauseButton.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                        break;
+
+                    case ENDED:
+                        playerContainer.setKeepScreenOn(false);
+                        playPauseButton.setImageResource(R.drawable.ic_replay_black_24dp);
+                        ended = true;
+                        player.pause();
                         break;
                 }
             }
-        }, PlayerEvent.Type.DURATION_CHANGE, PlayerEvent.Type.PLAYHEAD_UPDATED, PlayerEvent.Type.PLAYING, PlayerEvent.Type.PAUSE);
+        }, PlayerEvent.Type.DURATION_CHANGE, PlayerEvent.Type.PLAYHEAD_UPDATED,
+                PlayerEvent.Type.PLAYING, PlayerEvent.Type.PAUSE, PlayerEvent.Type.ENDED);
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -215,6 +241,8 @@ public class PlayerActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (player.isPlaying()) {
                     player.pause();
+                } else if (ended) {
+                    player.replay();
                 } else {
                     player.play();
                 }
@@ -243,9 +271,9 @@ public class PlayerActivity extends AppCompatActivity {
         return HH + ":" + MM + ":" + SS;
     }
 
-    private void loadMedia(String entryId, String ks) {
+    private void loadMedia() {
 
-        new KalturaOvpMediaProvider(BASE_URL, PARTNER_ID, ks)
+        new KalturaOvpMediaProvider(BASE_URL, PARTNER_ID, this.ks)
                 .setEntryId(entryId)
                 .load(new OnMediaLoadCompletion() {
                     @Override
@@ -254,6 +282,8 @@ public class PlayerActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 if (response.isSuccess()) {
+
+                                    player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), getKavaConfig());
 
                                     player.prepare(new PKMediaConfig().setMediaEntry(response.getResponse()));
                                     player.play();  // Will play when ready
@@ -271,16 +301,21 @@ public class PlayerActivity extends AppCompatActivity {
 
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
 
-        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
-                .setBaseUrl(KAVA_BASE_URL)
-                .setPartnerId(PARTNER_ID)
-                .setUiConfId(UI_CONF_ID); // optional
+        KavaAnalyticsConfig kavaAnalyticsConfig = getKavaConfig();
 
 
         // Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
 
         return pluginConfigs;
+    }
+
+    private KavaAnalyticsConfig getKavaConfig() {
+        return new KavaAnalyticsConfig()
+                    .setBaseUrl(KAVA_BASE_URL)
+                    .setPartnerId(PARTNER_ID)
+                    .setKs(ks)
+                    .setUiConfId(UI_CONF_ID);
     }
 
     private void registerPlugins() {
@@ -322,7 +357,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private void toggle() {
-        if (mVisible) {
+        if (controlsVisible) {
             hide();
         } else {
             show();
@@ -332,11 +367,11 @@ public class PlayerActivity extends AppCompatActivity {
     private void hide() {
         // Hide UI first
         controlsView.setVisibility(View.GONE);
-        mVisible = false;
+        controlsVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar after a delay
-        mHideHandler.removeCallbacks(mShowPart2Runnable);
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
+        hideHandler.removeCallbacks(showPart2Runnable);
+        hideHandler.postDelayed(hidePart2Runnable, UI_ANIMATION_DELAY);
     }
 
     @SuppressLint("InlinedApi")
@@ -344,11 +379,11 @@ public class PlayerActivity extends AppCompatActivity {
         // Show the system bar
         playerContainer.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mVisible = true;
+        controlsVisible = true;
 
         // Schedule a runnable to display UI elements after a delay
-        mHideHandler.removeCallbacks(mHidePart2Runnable);
-        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
+        hideHandler.removeCallbacks(hidePart2Runnable);
+        hideHandler.postDelayed(showPart2Runnable, UI_ANIMATION_DELAY);
     }
 
     /**
@@ -356,7 +391,7 @@ public class PlayerActivity extends AppCompatActivity {
      * previously scheduled calls.
      */
     private void delayedHide(int delayMillis) {
-        mHideHandler.removeCallbacks(mHideRunnable);
-        mHideHandler.postDelayed(mHideRunnable, delayMillis);
+        hideHandler.removeCallbacks(hideRunnable);
+        hideHandler.postDelayed(hideRunnable, delayMillis);
     }
 }

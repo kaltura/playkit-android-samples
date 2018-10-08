@@ -30,7 +30,7 @@
 
             <ImageButton
                 android:id="@+id/play_pause_button"
-                android:background="@null"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:tint="#ffffff"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

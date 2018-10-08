@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements VideoListFragment
     private OrientationManager mOrientationManager;
     private int minAdDurationForSkipButton;
     private boolean isAutoPlay;
-    private int startPosition;
+    private Long startPosition = new Long(0);
     private int adLoadTimeOut;
     private String videoMimeType;
     private int videoBitrate;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements VideoListFragment
             VideoListFragment videoListFragment = new VideoListFragment();
             Bundle bundle = new Bundle();
             bundle.putBoolean(AUTO_PLAY, isAutoPlay);
-            bundle.putInt(START_FROM, startPosition);
+            bundle.putLong(START_FROM, startPosition);
             bundle.putInt(MIN_AD_DURATION_FOR_SKIP_BUTTON, minAdDurationForSkipButton);
             bundle.putInt(AD_LOAD_TIMEOUT, adLoadTimeOut);
             bundle.putString(MIME_TYPE, videoMimeType);
@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements VideoListFragment
         if ("".equals(currentStartPosition)) {
             currentStartPosition = "0";
         }
-        startPosition = Integer.valueOf(currentStartPosition);
+        startPosition = Long.valueOf(currentStartPosition);
 
         isAutoPlay = sharedPreferences.getBoolean(getString(R.string.pref_auto_play_key),
                 getResources().getBoolean(R.bool.pref_auto_play_default));
@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements VideoListFragment
             videoFragment = new VideoFragment();
             Bundle bundle = new Bundle();
             bundle.putBoolean(AUTO_PLAY, isAutoPlay);
-            bundle.putInt(START_FROM, startPosition);
+            bundle.putLong(START_FROM, startPosition);
             bundle.putInt(MIN_AD_DURATION_FOR_SKIP_BUTTON, minAdDurationForSkipButton);
             bundle.putInt(AD_LOAD_TIMEOUT, adLoadTimeOut);
             bundle.putString(MIME_TYPE, videoMimeType);
@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements VideoListFragment
             if (!"".equals(sharedPreferences.getString(getString(R.string.pref_start_from_key), getString(R.string.pref_start_from_default)))) {
                 startFrom = sharedPreferences.getString(getString(R.string.pref_start_from_key), getString(R.string.pref_start_from_default));
             }
-            startPosition = Integer.valueOf(startFrom);
+            startPosition = Long.valueOf(startFrom);
         } else if (key.equals(getString(R.string.pref_bitrate_key))) {
             videoBitrate = Integer.valueOf(sharedPreferences.getString(getString(R.string.pref_bitrate_key), getString(R.string.pref_bitrate_value)));
         } else if (key.equals(getString(R.string.pref_companion_key))) {

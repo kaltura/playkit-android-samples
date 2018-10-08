@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    tools:context=".PlayerActivity" tools:ignore="HardcodedText">
+
+    <LinearLayout
+        android:id="@+id/player_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout
+            android:id="@+id/fullscreen_content_controls"
+            style="?metaButtonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@color/black_overlay"
+            android:orientation="horizontal"
+            tools:ignore="UselessParent">
+
+            <ImageButton
+                android:id="@+id/play_pause_button"
+                android:background="@null"
+                android:tint="#ffffff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_play_arrow_black_24dp"
+                android:contentDescription="Play/Pause"
+                />
+
+            <TextView android:id="@+id/time_current"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:paddingTop="4dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:textColor="#FFBEBEBE"/>
+
+            <SeekBar android:id="@+id/mediacontroller_progress"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="32dp"
+                style="?android:attr/progressBarStyleHorizontal"/>
+
+            <TextView android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:paddingTop="4dp"
+                android:paddingEnd="4dp"
+                android:paddingStart="4dp"
+                android:textColor="#FFBEBEBE"/>
+
+        </LinearLayout>
+    </FrameLayout>
+
+</FrameLayout>

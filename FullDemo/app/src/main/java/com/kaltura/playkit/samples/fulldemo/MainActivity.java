@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements VideoListFragment
     private OrientationManager mOrientationManager;
     private int minAdDurationForSkipButton;
     private boolean isAutoPlay;
-    private Long startPosition = new Long(0);
+    private Long startPosition = 0L;
     private int adLoadTimeOut;
     private String videoMimeType;
     private int videoBitrate;

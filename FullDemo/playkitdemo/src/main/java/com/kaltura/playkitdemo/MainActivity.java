@@ -62,7 +62,7 @@ import com.kaltura.playkit.plugins.playback.KalturaPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.playback.KalturaUDRMLicenseRequestAdapter;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 import com.kaltura.playkit.providers.MediaEntryProvider;
-import com.kaltura.playkit.providers.api.ovp.SimpleOvpSessionProvider;
+import com.kaltura.playkit.providers.api.SimpleSessionProvider;
 import com.kaltura.playkit.providers.api.phoenix.APIDefines;
 import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
 import com.kaltura.playkit.providers.mock.MockMediaProvider;
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final boolean AUTO_PLAY_ON_RESUME = true;
 
     private static final PKLog log = PKLog.get("MainActivity");
-    public static final int START_POSITION = 0;
+    public static final Long START_POSITION = 0L;
 
     private Player player;
     private MediaEntryProvider mediaProvider;
@@ -365,14 +365,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void startSimpleOvpMediaLoadingHls(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleOvpSessionProvider("https://cdnapisec.kaltura.com", 243342, null))
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 243342, null))
                 .setEntryId("0_uka1msg4")
                 .load(completion);
     }
 
     private void startSimpleOvpMediaLoading(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleOvpSessionProvider("https://cdnapisec.kaltura.com", 2222401, null))
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2222401, null))
                 .setEntryId("1_f93tepsn")//("1_asoyc5ef") //("1_uzea2uje")
                 .load(completion);
     }

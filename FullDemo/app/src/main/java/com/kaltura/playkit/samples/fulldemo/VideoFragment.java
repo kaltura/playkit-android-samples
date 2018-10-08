@@ -112,7 +112,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
     private OnVideoFragmentViewCreatedListener mViewCreatedCallback;
 
     private boolean isAutoPlay;
-    private int startPosition;
+    private Long startPosition;
     private int adLoadTimeOut;
     private String videoMimeType;
     private int videoBitrate;
@@ -151,7 +151,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         isAutoPlay    = getArguments().getBoolean(AUTO_PLAY);
-        startPosition = getArguments().getInt(START_FROM);
+        startPosition = getArguments().getLong(START_FROM);
         adLoadTimeOut = getArguments().getInt(AD_LOAD_TIMEOUT);
         videoMimeType = getArguments().getString(MIME_TYPE);
         videoBitrate  = getArguments().getInt(PREFERRED_BITRATE);

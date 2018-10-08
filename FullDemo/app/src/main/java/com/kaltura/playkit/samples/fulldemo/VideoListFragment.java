@@ -45,7 +45,7 @@ public class VideoListFragment extends Fragment implements LoaderManager.LoaderC
 
     private int minAdDurationForSkipButton;
     private boolean isAutoPlay;
-    private int startPosition;
+    private Long startPosition;
     private int adLoadTimeOut;
     private String videoMimeType;
     private int videoBitrate;
@@ -96,7 +96,7 @@ public class VideoListFragment extends Fragment implements LoaderManager.LoaderC
         mContainer = container;
 
         isAutoPlay    = getArguments().getBoolean(AUTO_PLAY);
-        startPosition = getArguments().getInt(START_FROM);
+        startPosition = getArguments().getLong(START_FROM);
         minAdDurationForSkipButton = getArguments().getInt(MIN_AD_DURATION_FOR_SKIP_BUTTON);
         adLoadTimeOut = getArguments().getInt(AD_LOAD_TIMEOUT);
         videoMimeType = getArguments().getString(MIME_TYPE);

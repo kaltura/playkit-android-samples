@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
-    tools:context=".PlayerActivity" tools:ignore="HardcodedText">
+    tools:context=".FullscreenActivity" tools:ignore="HardcodedText">
 
     <LinearLayout
         android:id="@+id/player_container"

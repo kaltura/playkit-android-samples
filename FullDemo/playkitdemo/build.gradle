@@ -37,7 +37,14 @@ dependencies {
     implementation project(path: ':kava')
     implementation project(path: ':googlecast')
 
-    //implementation project(":kava")
+//    implementation 'com.kaltura.playkit:playkit:3.6.0'
+//    implementation 'com.kaltura.playkit:playkitproviders:1.0.0'
+//    implementation 'com.kaltura.playkit:youboraplugin:1.0.0'
+//    implementation 'com.kaltura.playkit:imaplugin:1.0.0'
+//    implementation 'com.kaltura.playkit:kavaplugin:1.1.0'
+//    implementation 'com.kaltura.playkit:googlecast:1.0.0'
+//    implementation 'com.kaltura.playkit:vrplugin:1.0.2'
+
     implementation 'com.android.support:appcompat-v7:27.0.0'
     implementation 'com.android.support:design:27.0.0'
     //implementation 'com.github.kaltura:playkit-dtg-android:v2.3.0'

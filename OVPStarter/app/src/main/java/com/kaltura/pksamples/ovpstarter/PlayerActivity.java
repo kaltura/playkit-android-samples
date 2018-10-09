@@ -24,11 +24,11 @@ import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 
 public class PlayerActivity extends PlayerActivityBase {
     private static final String TAG = "PlayerActivity";
-    public static final String ENTRY_ID = "1_bc69i9jw";
+    public static final String ENTRY_ID = "1_djnefl4e";
     public static final int MSEC_IN_SEC = 1000;
     public static final int SEEKBAR_MSEC_FACTOR = 200;
     private static final String BASE_URL = "https://cdnapisec.kaltura.com";
-    private static final int PARTNER_ID = 2344301;
+    private static final int PARTNER_ID = 1424501;
     private static final String KAVA_BASE_URL = "https://analytics.kaltura.com/api_v3/index.php";
     // UIConf id -- optional for KAVA
     private static final int UI_CONF_ID = 0;

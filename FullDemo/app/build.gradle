@@ -22,22 +22,22 @@ android {
 dependencies {
     implementation 'com.android.support:support-v4:27.0.0'
     implementation 'com.android.support:support-vector-drawable:27.0.0'
-    compile project(":playkit")
-    implementation project(path: ':providers')
-    //compile project(":admanager")
-    //compile project(":adsplugin")
-    compile project(":youbora")
-    compile project(":ima")
-    compile project(":kava")
-    compile project(":googlecast")
+//    compile project(":playkit")
+//    implementation project(path: ':providers')
+//    //compile project(":admanager")
+//    //compile project(":adsplugin")
+//    compile project(":youbora")
+//    compile project(":ima")
+//    compile project(":kava")
+//    compile project(":googlecast")
 
-//    implementation 'com.kaltura.playkit:playkit:3.6.0'
-//    implementation 'com.kaltura.playkit:playkitproviders:1.0.0'
-//    implementation 'com.kaltura.playkit:youboraplugin:1.0.0'
-//    implementation 'com.kaltura.playkit:imaplugin:1.0.0'
-//    implementation 'com.kaltura.playkit:kavaplugin:1.1.0'
-//    implementation 'com.kaltura.playkit:googlecast:1.0.0'
-//    implementation 'com.kaltura.playkit:vrplugin:1.0.2'
+    implementation 'com.kaltura.playkit:playkit:3.6.+'
+    implementation 'com.kaltura.playkit:playkitproviders:1.0.0'
+    implementation 'com.kaltura.playkit:youboraplugin:1.0.0'
+    implementation 'com.kaltura.playkit:imaplugin:1.0.0'
+    implementation 'com.kaltura.playkit:kavaplugin:1.1.0'
+    implementation 'com.kaltura.playkit:googlecast:1.0.0'
+    implementation 'com.kaltura.playkit:vrplugin:1.0.2'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 

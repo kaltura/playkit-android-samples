@@ -19,11 +19,17 @@ android {
 }
 
 dependencies {
-    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
-    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+    implementation 'com.kaltura.playkit:playkit:3.6.+'
+    implementation 'com.kaltura.playkit:playkitproviders:1.0.0'
+    implementation 'com.kaltura.playkit:youboraplugin:1.0.0'
+    implementation 'com.kaltura.playkit:imaplugin:1.0.0'
 
-    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
-    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+//    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+//
+//    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+
     //compile project(':playkit')
     //compile project(':ima')
     //compile project(':youbora')

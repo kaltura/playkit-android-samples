@@ -324,6 +324,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void applyAdapterOnSpinner(Spinner spinner, TrackItem[] trackItems, int defaultSelectedIndex) {
         //Initialize custom adapter.
         TrackItemAdapter trackItemAdapter = new TrackItemAdapter(this, R.layout.track_items_list_row, trackItems);
+
         //Apply adapter on spinner.
         spinner.setAdapter(trackItemAdapter);
 

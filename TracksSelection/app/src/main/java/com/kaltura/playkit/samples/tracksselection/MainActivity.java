@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     //Cast event to the TracksAvailable object that is actually holding the necessary data.
                     PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
 
-                    //Obtain the actual tracks info from it.
+                    //Obtain the actual tracks info from it. Default track index values are coming from manifest
                     PKTracks tracks = tracksAvailable.tracksInfo;
                     int defaultAudioTrackIndex = tracks.getDefaultAudioTrackIndex();
                     int defaultTextTrackIndex = tracks.getDefaultTextTrackIndex();
@@ -199,17 +199,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Build track items that are based on videoTrack data.
         TrackItem[] videoTrackItems = buildVideoTrackItems(tracks.getVideoTracks());
         //populate spinner with this info.
-        applyAdapterOnSpinner(videoSpinner, videoTrackItems);
+        applyAdapterOnSpinner(videoSpinner, videoTrackItems, tracks.getDefaultVideoTrackIndex());
 
         //Build track items that are based on audioTrack data.
         TrackItem[] audioTrackItems = buildAudioTrackItems(tracks.getAudioTracks());
         //populate spinner with this info.
-        applyAdapterOnSpinner(audioSpinner, audioTrackItems);
+        applyAdapterOnSpinner(audioSpinner, audioTrackItems, tracks.getDefaultAudioTrackIndex());
 
         //Build track items that are based on textTrack data.
         TrackItem[] textTrackItems = buildTextTrackItems(tracks.getTextTracks());
         //populate spinner with this info.
-        applyAdapterOnSpinner(textSpinner, textTrackItems);
+        applyAdapterOnSpinner(textSpinner, textTrackItems, tracks.getDefaultTextTrackIndex());
     }
 
     /**
@@ -321,12 +321,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * @param spinner - spinner to which adapter should be applied.
      * @param trackItems - custom track items array.
      */
-    private void applyAdapterOnSpinner(Spinner spinner, TrackItem[] trackItems) {
+    private void applyAdapterOnSpinner(Spinner spinner, TrackItem[] trackItems, int defaultSelectedIndex) {
         //Initialize custom adapter.
         TrackItemAdapter trackItemAdapter = new TrackItemAdapter(this, R.layout.track_items_list_row, trackItems);
-
         //Apply adapter on spinner.
         spinner.setAdapter(trackItemAdapter);
+
+        if (defaultSelectedIndex > 0) {
+            spinner.setSelection(defaultSelectedIndex);
+        }
     }
 
     /**
@@ -388,13 +391,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        //Get the selected TrackItem from adapter.
-        if (userIsInteracting) {
-            TrackItem trackItem = (TrackItem) parent.getItemAtPosition(position);
-
-            //Important! This will actually do the switch between tracks.
-            player.changeTrack(trackItem.getUniqueId());
+        if (!userIsInteracting) {
+            return;
         }
+        //Get the selected TrackItem from adapter.
+        TrackItem trackItem = (TrackItem) parent.getItemAtPosition(position);
+
+        //Important! This will actually do the switch between tracks.
+        player.changeTrack(trackItem.getUniqueId());
     }
 
     @Override

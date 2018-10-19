@@ -1,12 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.fulldemo"
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 1
+        multiDexEnabled  true
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
@@ -20,8 +21,8 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:support-v4:27.0.0'
-    implementation 'com.android.support:support-vector-drawable:27.0.0'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:support-vector-drawable:28.0.0'
     compile project(":playkit")
     implementation project(path: ':providers')
     //compile project(":admanager")
@@ -41,9 +42,9 @@ dependencies {
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:27.0.0'
-    compile 'com.android.support:preference-v7:27.0.0'
-    compile 'com.android.support:design:27.0.0'
+    compile 'com.android.support:appcompat-v7:28.0.0'
+    compile 'com.android.support:preference-v7:28.0.0'
+    compile 'com.android.support:design:28.0.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 }

@@ -446,8 +446,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             configurePlugins(pluginConfig);
 
             player = PlayKitManager.loadPlayer(this, pluginConfig);
-            KalturaPlaybackRequestAdapter.install(player, "myApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
-            KalturaUDRMLicenseRequestAdapter.install(player, "myApp");
+            KalturaPlaybackRequestAdapter.install(player, "PlaykitTestApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
+            KalturaUDRMLicenseRequestAdapter.install(player, "PlaykitTestApp");
 
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);

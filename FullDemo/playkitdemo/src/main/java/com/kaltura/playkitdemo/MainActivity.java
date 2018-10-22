@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +22,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.connect.response.ResultElement;
@@ -32,7 +32,6 @@ import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
-import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
@@ -72,6 +71,7 @@ import com.kaltura.playkit.utils.Consts;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
+    private PKTracks tracksInfo;
 
     private void registerPlugins() {
 
@@ -182,149 +183,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
     }
-
-    private void startVootOttMediaLoadingProd(final OnMediaLoadCompletion completion) {
-        SessionProvider ksSessionProvider = new SessionProvider() {
-            @Override
-            public String baseUrl() {
-                String PhoenixBaseUrl = "https://rest-as.ott.kaltura.com/v4_4/api_v3/";//"https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
-                return PhoenixBaseUrl;
-            }
-
-            @Override
-            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
-                String ks1 = "djJ8MjI1fI9tjvRYGjEgsFMKzLjP6DfsVRp3lLk7HOuwIx9FjvigREzqdh1wTjdRKj0h7JdRSuAKT1TprH_FJnehrk50OMp3t7efc70L8pTYz0miqor_2ilWbBYjXCCpMHUd7stKCRdZVg1YM72av7PJnCoBjQUVlgCvwSZr7pLKzciYacwGF2Fw7JRhSgypqsDY2hs9WQ==";
-                String PnxKS = "";
-                if (completion != null) {
-                    completion.onComplete(new PrimitiveResult(PnxKS));
-                }
-            }
-
-            @Override
-            public int partnerId() {
-                int OttPartnerId = 225;
-                return OttPartnerId;
-            }
-        };
-
-        String mediaId = "603038";//"311078";//"561107";
-        String format  = "dash Main";//"Tablet Main";//
-
-//                "Format": "dash Mobile",
-//                "Format": "ism Main",
-//                "Format": "Tablet Main",
-//                "Format": "dash Main",
-//                "Format": "widevine_sbr Download High",
-//                "Format": "widevine_mbr Main",
-//                "Format": "TV Main",
-//                "Format": "Web New",
-//                "Format": "360_Main",
-//                "Format": "HLS_Mobile_SD",
-//                "Format": "HLS_Mobile_HD",
-//                "Format": "HLSFPS_Mobile_SD",
-//                "Format": "HLSFPS_Mobile_HD",
-//                "Format": "HLS_Web_SD",
-//                "Format": "HLS_Web_HD",
-//                "Format": "HLS_360_SD",
-//                "Format": "HLS_360_HD",
-//                "Format": "HLS_TV_SD",
-//                "Format": "HLS_TV_HD",
-//                "Format": "HLSFPS_Main",
-//                "Format": "WVC_Low",
-//                "Format": "WVC_Auto",
-//                "Format": "DASH_Mobile_SD",
-//                "Format": "DASH_Mobile_HD",
-//                "Format": "WVC_High",
-//                "Format": "JIO_MAIN",
-//                "Format": "SBR256",
-//                "Format": "HLS_Linear_P",
-//                "Format": "HLS_Linear_B",
-
-
-
-        mediaProvider = new PhoenixMediaProvider()
-                .setSessionProvider(ksSessionProvider)
-                .setAssetId(mediaId)
-                //.setReferrer()
-                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
-                .setContextType(APIDefines.PlaybackContextType.Playback)
-                .setAssetType(APIDefines.KalturaAssetType.Media)
-                .setFormats(format);
-
-        mediaProvider.load(completion);
-    }
-
-    private void startVootOttMediaLoadingStg(final OnMediaLoadCompletion completion) {
-        SessionProvider ksSessionProvider = new SessionProvider() {
-            @Override
-            public String baseUrl() {
-                String PhoenixBaseUrl = "https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";
-                return PhoenixBaseUrl;
-            }
-
-            @Override
-            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
-                String ks1 = "djJ8MjI1fI9tjvRYGjEgsFMKzLjP6DfsVRp3lLk7HOuwIx9FjvigREzqdh1wTjdRKj0h7JdRSuAKT1TprH_FJnehrk50OMp3t7efc70L8pTYz0miqor_2ilWbBYjXCCpMHUd7stKCRdZVg1YM72av7PJnCoBjQUVlgCvwSZr7pLKzciYacwGF2Fw7JRhSgypqsDY2hs9WQ==";
-                String PnxKS = "";
-                if (completion != null) {
-                    completion.onComplete(new PrimitiveResult(PnxKS));
-                }
-            }
-
-            @Override
-            public int partnerId() {
-                int OttPartnerId = 225;
-                return OttPartnerId;
-            }
-        };
-
-        String mediaId = "315369";//"311078";//"561107";
-        String format  = "HLS_Linear_P";//"Tablet Main";//
-
-//                "Format": "dash Mobile",
-//                "Format": "ism Main",
-//                "Format": "Tablet Main",
-//                "Format": "dash Main",
-//                "Format": "widevine_sbr Download High",
-//                "Format": "widevine_mbr Main",
-//                "Format": "TV Main",
-//                "Format": "Web New",
-//                "Format": "360_Main",
-//                "Format": "HLS_Mobile_SD",
-//                "Format": "HLS_Mobile_HD",
-//                "Format": "HLSFPS_Mobile_SD",
-//                "Format": "HLSFPS_Mobile_HD",
-//                "Format": "HLS_Web_SD",
-//                "Format": "HLS_Web_HD",
-//                "Format": "HLS_360_SD",
-//                "Format": "HLS_360_HD",
-//                "Format": "HLS_TV_SD",
-//                "Format": "HLS_TV_HD",
-//                "Format": "HLSFPS_Main",
-//                "Format": "WVC_Low",
-//                "Format": "WVC_Auto",
-//                "Format": "DASH_Mobile_SD",
-//                "Format": "DASH_Mobile_HD",
-//                "Format": "WVC_High",
-//                "Format": "JIO_MAIN",
-//                "Format": "SBR256",
-//                "Format": "HLS_Linear_P",
-//                "Format": "HLS_Linear_B",
-
-
-
-        mediaProvider = new PhoenixMediaProvider()
-                .setSessionProvider(ksSessionProvider)
-                .setAssetId(mediaId)
-                //.setReferrer()
-                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
-                .setContextType(APIDefines.PlaybackContextType.Playback)
-                .setAssetType(APIDefines.KalturaAssetType.Media)
-                .setFormats(format);
-
-        mediaProvider.load(completion);
-    }
-
 
     private void initDrm() {
         MediaSupport.initializeDrm(this, new MediaSupport.DrmInitCallback() {
@@ -902,6 +760,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onEvent(PKEvent event) {
                 //When the track data available, this event occurs. It brings the info object with it.
                 PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
+                tracksInfo = tracksAvailable.tracksInfo;
                 populateSpinnersWithTrackInfo(tracksAvailable.tracksInfo);
 
             }
@@ -1066,7 +925,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         TrackItem trackItem = (TrackItem) parent.getItemAtPosition(position);
         //tell to the player, to switch track based on the user selection.
+
         player.changeTrack(trackItem.getUniqueId());
+
+        //String selectedIndex = getQualityIndex(BitRateRange.QualityType.Auto, currentTracks.getVideoTracks());
     }
 
     @Override
@@ -1094,4 +956,92 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 break;
         }
     }
+
+    protected String getQualityIndex(BitRateRange.QualityType videoQuality, List<VideoTrack> videoTrackInfo) {
+        String uniqueTrackId = null;
+        long bitRateValue = 0;
+        BitRateRange bitRateRange = null;
+
+        switch (videoQuality) {
+            case Low:
+                bitRateRange = BitRateRange.getLowQuality();
+                List<VideoTrack> lowBitrateMatchedTracks = getVideoTracksInRange(videoTrackInfo, bitRateRange);
+                Collections.sort(lowBitrateMatchedTracks, bitratesComperator());
+
+                for (VideoTrack track : lowBitrateMatchedTracks) {
+                    bitRateValue = track.getBitrate();
+                    if (isBitrateInRange(bitRateValue, bitRateRange.getLow(), bitRateRange.getHigh())) {
+                        uniqueTrackId = track.getUniqueId();
+                        break;
+                    }
+                }
+                break;
+            case Mediun:
+                bitRateRange = BitRateRange.getMedQuality();
+                List<VideoTrack> medBitratesMatchedTracks = getVideoTracksInRange(videoTrackInfo, bitRateRange);
+                Collections.sort(medBitratesMatchedTracks, bitratesComperator());
+
+                for (VideoTrack track : medBitratesMatchedTracks) {
+                    bitRateValue = track.getBitrate();
+                    if (isBitrateInRange(bitRateValue, bitRateRange.getLow(), bitRateRange.getHigh())) {
+                        uniqueTrackId = track.getUniqueId();
+                        break;
+                    }
+                }
+                break;
+            case High:
+                bitRateRange = BitRateRange.getHighQuality();
+                Collections.sort(videoTrackInfo, bitratesComperator());
+                for (BaseTrack entry : videoTrackInfo) {
+                    bitRateValue = ((VideoTrack) entry).getBitrate();
+                    if (bitRateValue >= bitRateRange.getLow()) {
+                        uniqueTrackId = entry.getUniqueId();
+                        break;
+                    }
+                }
+                break;
+            case Auto:
+            default:
+                for (VideoTrack track : videoTrackInfo) {
+                    if (track.isAdaptive()) {
+                        uniqueTrackId = track.getUniqueId();
+                        break;
+                    }
+                }
+                break;
+        }
+
+        //null protection
+        if (uniqueTrackId == null && tracksInfo != null) {
+            tracksInfo.getDefaultVideoTrackIndex();
+        }
+        return uniqueTrackId;
+    }
+
+    private static List<VideoTrack> getVideoTracksInRange(List<VideoTrack> videoTracks, BitRateRange bitRateRange) {
+        List<VideoTrack> videoTrackInfo = new ArrayList<>() ;
+        long bitRate;
+        for (VideoTrack track : videoTracks) {
+            bitRate = track.getBitrate();
+            if (bitRate >= bitRateRange.getLow() && bitRate <= bitRateRange.getHigh()) {
+                videoTrackInfo.add(track);
+            }
+        }
+        return videoTrackInfo;
+    }
+
+    private boolean isBitrateInRange(long bitRate, long low, long high) {
+        return low <= bitRate && bitRate <= high;
+    }
+
+    @NonNull
+    private Comparator<VideoTrack> bitratesComperator() {
+        return new Comparator<VideoTrack>() {
+            @Override
+            public int compare(VideoTrack track1, VideoTrack track2) {
+                return Long.valueOf(track1.getBitrate()).compareTo(track2.getBitrate());
+            }
+        };
+    }
+
 }

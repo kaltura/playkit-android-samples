@@ -20,16 +20,15 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:support-v4:27.0.0'
-    implementation 'com.android.support:support-vector-drawable:27.0.0'
-//    compile project(":playkit")
+
+//    implementation project(":playkit")
 //    implementation project(path: ':providers')
-//    //compile project(":admanager")
-//    //compile project(":adsplugin")
-//    compile project(":youbora")
-//    compile project(":ima")
-//    compile project(":kava")
-//    compile project(":googlecast")
+//    //implementation project(":admanager")
+//    //implementation project(":adsplugin")
+//    implementation project(":youbora")
+//    implementation project(":ima")
+//    implementation project(":kava")
+//    implementation project(":googlecast")
 
     implementation 'com.kaltura.playkit:playkit:3.6.+'
     implementation 'com.kaltura.playkit:playkitproviders:1.0.0'
@@ -39,11 +38,12 @@ dependencies {
     implementation 'com.kaltura.playkit:googlecast:1.0.0'
     implementation 'com.kaltura.playkit:vrplugin:1.0.2'
 
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
-    compile 'com.android.support:appcompat-v7:27.0.0'
-    compile 'com.android.support:preference-v7:27.0.0'
-    compile 'com.android.support:design:27.0.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    testCompile 'junit:junit:4.12'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:support-v4:27.0.0'
+    implementation 'com.android.support:support-vector-drawable:27.0.0'
+    implementation 'com.android.support:appcompat-v7:27.0.0'
+    implementation 'com.android.support:preference-v7:27.0.0'
+    implementation 'com.android.support:design:27.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
 }

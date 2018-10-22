@@ -20,7 +20,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:weightSum="3">
+                android:weightSum="4">
+
+                <Button
+                    android:id="@+id/btn_refresh"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Refresh Ad" />
 
                 <TextView
                     android:id="@+id/tvVideo"
@@ -122,6 +129,12 @@
 
     </RelativeLayout>
 
+    <FrameLayout
+        android:id="@+id/fl_adplaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_below="@id/player_container"/>
 
 
 </RelativeLayout>

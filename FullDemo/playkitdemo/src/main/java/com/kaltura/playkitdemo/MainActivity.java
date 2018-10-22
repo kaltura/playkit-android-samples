@@ -14,7 +14,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -22,6 +24,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.VideoController;
+import com.google.android.gms.ads.VideoOptions;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.formats.NativeAdOptions;
+import com.google.android.gms.ads.formats.NativeCustomTemplateAd;
+import com.google.android.gms.ads.formats.UnifiedNativeAd;
+import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 import com.google.gson.JsonObject;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.connect.response.ResultElement;
@@ -73,6 +84,7 @@ import com.kaltura.playkit.utils.Consts;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
@@ -88,6 +100,8 @@ import static com.kaltura.playkitdemo.MockParams.SingMediaId;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
         OrientationManager.OrientationListener {
 
+    private static final String DFP_AD_UNIT_ID = "/6499/example/native";
+    private static final String SIMPLE_TEMPLATE_ID = "10104090";
 
     public static final boolean AUTO_PLAY_ON_RESUME = true;
 
@@ -179,6 +193,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     orient = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
                 }
                 setRequestedOrientation(orient);
+            }
+        });
+
+        Button refresh = findViewById(R.id.btn_refresh);
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                refreshAd(true,
+                        true);
             }
         });
     }
@@ -1093,5 +1116,116 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 break;
         }
+    }
+
+
+
+    /**
+     * Populates a {@link View} object with data from a {@link NativeCustomTemplateAd}. This method
+     * handles a particular "simple" custom native ad format.
+     *
+     * @param nativeCustomTemplateAd the object containing the ad's assets
+     * @param adView                 the view to be populated
+     */
+    private void populateSimpleTemplateAdView(final NativeCustomTemplateAd nativeCustomTemplateAd,
+                                              View adView) {
+
+        FrameLayout mediaPlaceholder = adView.findViewById(R.id.simplecustom_media_placeholder);
+
+        // Get the video controller for the ad. One will always be provided, even if the ad doesn't
+        // have a video asset.
+        VideoController vc = nativeCustomTemplateAd.getVideoController();
+
+        // Apps can check the VideoController's hasVideoContent property to determine if the
+        // NativeCustomTemplateAd has a video asset.
+        if (vc.hasVideoContent()) {
+            mediaPlaceholder.addView(nativeCustomTemplateAd.getVideoMediaView());
+
+            // Create a new VideoLifecycleCallbacks object and pass it to the VideoController. The
+            // VideoController will call methods on this object when events occur in the video
+            // lifecycle.
+            vc.setVideoLifecycleCallbacks(new VideoController.VideoLifecycleCallbacks() {
+                public void onVideoEnd() {
+                    // Publishers should allow native ads to complete video playback before
+                    // refreshing or replacing them with another ad in the same UI location.
+                    super.onVideoEnd();
+                }
+            });
+        } else {
+            ImageView mainImage = new ImageView(this);
+            mainImage.setAdjustViewBounds(true);
+            mainImage.setImageDrawable(nativeCustomTemplateAd.getImage("MainImage").getDrawable());
+
+            mainImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    nativeCustomTemplateAd.performClick("MainImage");
+                }
+            });
+            mediaPlaceholder.addView(mainImage);
+        }
+    }
+
+    /**
+     * Creates a request for a new native ad based on the boolean parameters and calls the
+     * corresponding "populate" method when one is successfully returned.
+     *
+     * @param requestUnifiedNativeAds  indicates whether unified native ads should be requested
+     * @param requestCustomTemplateAds indicates whether custom template ads should be requested
+     */
+    private void refreshAd(boolean requestUnifiedNativeAds,
+                           boolean requestCustomTemplateAds) {
+        if (!requestUnifiedNativeAds && !requestCustomTemplateAds) {
+            Toast.makeText(this, "At least one ad format must be checked to request an ad.",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        AdLoader.Builder builder = new AdLoader.Builder(this, DFP_AD_UNIT_ID);
+
+        if (requestCustomTemplateAds) {
+            builder.forCustomTemplateAd(SIMPLE_TEMPLATE_ID,
+                    new NativeCustomTemplateAd.OnCustomTemplateAdLoadedListener() {
+                        @Override
+                        public void onCustomTemplateAdLoaded(NativeCustomTemplateAd ad) {
+                            FrameLayout frameLayout = findViewById(R.id.fl_adplaceholder);
+                            View adView = getLayoutInflater()
+                                    .inflate(R.layout.ad_simple_custom_template, null);
+                            populateSimpleTemplateAdView(ad, adView);
+                            frameLayout.removeAllViews();
+                            frameLayout.addView(adView);
+                        }
+                    },
+                    new NativeCustomTemplateAd.OnCustomClickListener() {
+                        @Override
+                        public void onCustomClick(NativeCustomTemplateAd ad, String s) {
+                            Toast.makeText(MainActivity.this,
+                                    "A custom click has occurred in the simple template",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+
+        VideoOptions videoOptions = new VideoOptions.Builder()
+                .setStartMuted(false)
+                .build();
+
+        NativeAdOptions adOptions = new NativeAdOptions.Builder()
+                .setVideoOptions(videoOptions)
+                .build();
+
+        builder.withNativeAdOptions(adOptions);
+
+        AdLoader adLoader = builder.withAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                Toast.makeText(MainActivity.this, "Failed to load native ad: "
+                        + errorCode, Toast.LENGTH_SHORT).show();
+            }
+        }).build();
+
+        adLoader.loadAd(new PublisherAdRequest.Builder().build());
+
     }
 }

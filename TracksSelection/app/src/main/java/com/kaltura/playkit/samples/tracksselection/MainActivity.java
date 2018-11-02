@@ -215,9 +215,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                if(llCcSpinner != null) {
-                    llCcSpinner.setVisibility(View.INVISIBLE);
-                }
                 if (event instanceof PlayerEvent.VideoTrackChanged) {
                     Log.d(TAG, "Event VideoTrackChanged");
                 } else if (event instanceof PlayerEvent.AudioTrackChanged) {

@@ -1,10 +1,12 @@
 package com.kaltura.playkit.samples.tracksselection;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -20,6 +22,7 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.PKTracks;
+import com.kaltura.playkit.player.SubtitleStyleSettings;
 import com.kaltura.playkit.player.TextTrack;
 import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.samples.tracksselection.tracks.TrackItem;
@@ -44,9 +47,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Button playPauseButton;
 
     //Android Spinner view, that will actually hold and manipulate tracks selection.
-    private Spinner videoSpinner, audioSpinner, textSpinner;
+    private Spinner videoSpinner, audioSpinner, textSpinner, ccStyleSpinner;
+    private LinearLayout llCcSpinner;
     private boolean userIsInteracting;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ////player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO)); // select the track by locale if does not exist manifest default
         //player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.EXPLICIT).setTrackLanguage("rus")); // select specific track lang if not exist select manifest default
         ////player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO));
+
+        player.getSettings().setSubtitleStyle(getDefaultPositionDefault());
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
@@ -138,10 +143,67 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         videoSpinner = (Spinner) this.findViewById(R.id.videoSpinner);
         audioSpinner = (Spinner) this.findViewById(R.id.audioSpinner);
         textSpinner = (Spinner) this.findViewById(R.id.textSpinner);
+        ccStyleSpinner = (Spinner) this.findViewById(R.id.ccStyleSpinner);
+        llCcSpinner = (LinearLayout) this.findViewById(R.id.llCcSpinner);
+        llCcSpinner.setVisibility(View.INVISIBLE);
 
         textSpinner.setOnItemSelectedListener(this);
         audioSpinner.setOnItemSelectedListener(this);
         videoSpinner.setOnItemSelectedListener(this);
+
+        ArrayList<String> stylesStrings = new ArrayList<>();
+        stylesStrings.add("Default");
+        stylesStrings.add("Style 1");
+        stylesStrings.add("Style 2");
+        ArrayAdapter<String> ccStyleAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, stylesStrings);
+        ccStyleSpinner.setAdapter(ccStyleAdapter);
+        ccStyleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!userIsInteracting) {
+                    return;
+                }
+
+                if (position == 0) {
+                    player.updateSubtitleStyle(getDefaultPositionDefault());
+                } else if(position == 1) {
+                    player.updateSubtitleStyle(getStyleForPositionOne());
+                } else {
+                    player.updateSubtitleStyle(getStyleForPositionTwo());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private SubtitleStyleSettings getDefaultPositionDefault() {
+        return new SubtitleStyleSettings();
+    }
+
+    private SubtitleStyleSettings getStyleForPositionOne() {
+        return new SubtitleStyleSettings()
+                .setSubtitleBackgroundColor(Color.BLUE)
+                .setSubtitleTextColor(Color.WHITE)
+                .setSubtitleTextSizeFraction(SubtitleStyleSettings.SubtitleTextSizeFraction.SUBTITLE_FRACTION_50)
+                .setSubtitleWindowColor(Color.YELLOW)
+                .setSubtitleEdgeColor(Color.BLUE)
+                .setSubtitleTypeface(SubtitleStyleSettings.SubtitleStyleTypeface.MONOSPACE)
+                .setSubtitleEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW);
+    }
+
+    private SubtitleStyleSettings getStyleForPositionTwo() {
+        return new SubtitleStyleSettings()
+                .setSubtitleBackgroundColor(Color.WHITE)
+                .setSubtitleTextColor(Color.BLUE)
+                .setSubtitleTextSizeFraction(SubtitleStyleSettings.SubtitleTextSizeFraction.SUBTITLE_FRACTION_100)
+                .setSubtitleWindowColor(Color.BLUE)
+                .setSubtitleEdgeColor(Color.BLUE)
+                .setSubtitleTypeface(SubtitleStyleSettings.SubtitleStyleTypeface.SANS_SERIF)
+                .setSubtitleEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW);
     }
 
     /**
@@ -153,6 +215,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
+                if(llCcSpinner != null) {
+                    llCcSpinner.setVisibility(View.INVISIBLE);
+                }
                 if (event instanceof PlayerEvent.VideoTrackChanged) {
                     Log.d(TAG, "Event VideoTrackChanged");
                 } else if (event instanceof PlayerEvent.AudioTrackChanged) {
@@ -174,6 +239,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     if (tracks.getTextTracks().size() > 0) {
                         Log.d(TAG, "Default Text langae = " + tracks.getTextTracks().get(defaultTextTrackIndex).getLabel());
+                        if(llCcSpinner != null) {
+                            llCcSpinner.setVisibility(View.VISIBLE);
+                        }
                     }
                     if (tracks.getVideoTracks().size() > 0) {
                         Log.d(TAG, "Default video isAdaptive = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).isAdaptive() + " bitrate = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).getBitrate());

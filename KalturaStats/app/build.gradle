@@ -21,19 +21,18 @@ android {
     }
 }
 
-repositories {
-    google()
-    maven { url 'https://jitpack.io' }
-}
-
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 dependencies {
-    implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
-    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
-    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+    implementation 'com.kaltura.playkit:playkit:3.6.2'
+    implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
+    implementation 'com.kaltura.playkit:kavaplugin:1.1.2'
+
+    //implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
+    //implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+    //implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -46,4 +45,10 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-v4'
     }
     testImplementation 'junit:junit:4.12'
+}
+
+repositories {
+    google()
+    jcenter()
+    maven { url 'https://jitpack.io' }
 }

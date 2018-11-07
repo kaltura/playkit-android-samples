@@ -689,6 +689,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
+                appProgressBar.setVisibility(View.INVISIBLE);
+                AdEvent.AdPlayHeadEvent adEventProress = (AdEvent.AdPlayHeadEvent) event;
+                //log.d("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
+            }
+        }, AdEvent.Type.PLAY_HEAD_CHANGED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
                 log.d("Ad Event AD_ALL_ADS_COMPLETED");
                 appProgressBar.setVisibility(View.INVISIBLE);
                 if (adCuePoints != null && adCuePoints.hasPostRoll()) {
@@ -696,6 +705,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         }, AdEvent.Type.ALL_ADS_COMPLETED);
+
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {

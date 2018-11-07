@@ -751,7 +751,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             public void onEvent(PKEvent event) {
                 appProgressBar.setVisibility(View.INVISIBLE);
                 AdEvent.AdPlayHeadEvent adEventProress = (AdEvent.AdPlayHeadEvent) event;
-                //log.d("received NEW AD_PROGRESS_UPDATE " + adEventProress.currentPosition + "/" +  adEventProress.duration);
+                //log("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
             }
         }, AdEvent.Type.PLAY_HEAD_CHANGED);
 

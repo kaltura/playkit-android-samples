@@ -838,6 +838,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
         }, AdEvent.Type.ALL_ADS_COMPLETED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                appProgressBar.setVisibility(View.INVISIBLE);
+                AdEvent.AdPlayHeadEvent adEventProress = (AdEvent.AdPlayHeadEvent) event;
+                //log.d("received NEW AD_PROGRESS_UPDATE " + adEventProress.currentPosition + "/" +  adEventProress.duration);
+            }
+        }, AdEvent.Type.PLAY_HEAD_CHANGED);
+
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {

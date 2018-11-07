@@ -152,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         videoSpinner.setOnItemSelectedListener(this);
 
         ArrayList<String> stylesStrings = new ArrayList<>();
-        stylesStrings.add("Default");
-        stylesStrings.add("Style 1");
-        stylesStrings.add("Style 2");
+        stylesStrings.add(getDefaultPositionDefault().getSubtitleStyleName());
+        stylesStrings.add(getStyleForPositionOne().getSubtitleStyleName());
+        stylesStrings.add(getStyleForPositionTwo().getSubtitleStyleName());
         ArrayAdapter<String> ccStyleAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, stylesStrings);
         ccStyleSpinner.setAdapter(ccStyleAdapter);
         ccStyleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -181,11 +181,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private SubtitleStyleSettings getDefaultPositionDefault() {
-        return new SubtitleStyleSettings();
+        return new SubtitleStyleSettings("DefaultStyle");
     }
 
     private SubtitleStyleSettings getStyleForPositionOne() {
-        return new SubtitleStyleSettings()
+        return new SubtitleStyleSettings("KidsStyle")
                 .setSubtitleBackgroundColor(Color.BLUE)
                 .setSubtitleTextColor(Color.WHITE)
                 .setSubtitleTextSizeFraction(SubtitleStyleSettings.SubtitleTextSizeFraction.SUBTITLE_FRACTION_50)
@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private SubtitleStyleSettings getStyleForPositionTwo() {
-        return new SubtitleStyleSettings()
+        return new SubtitleStyleSettings("AdultsStyle")
                 .setSubtitleBackgroundColor(Color.WHITE)
                 .setSubtitleTextColor(Color.BLUE)
                 .setSubtitleTextSizeFraction(SubtitleStyleSettings.SubtitleTextSizeFraction.SUBTITLE_FRACTION_100)

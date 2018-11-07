@@ -31,13 +31,13 @@ dependencies {
 //    implementation project(":kava")
 //    implementation project(":googlecast")
 
-    implementation 'com.kaltura.playkit:playkit:3.6.+'
-    implementation 'com.kaltura.playkit:playkitproviders:1.0.0'
-    implementation 'com.kaltura.playkit:youboraplugin:1.0.0'
-    implementation 'com.kaltura.playkit:imaplugin:1.0.0'
-    implementation 'com.kaltura.playkit:kavaplugin:1.1.0'
-    implementation 'com.kaltura.playkit:googlecast:1.0.0'
-    implementation 'com.kaltura.playkit:vrplugin:1.0.2'
+    implementation 'com.kaltura.playkit:playkit:3.6.2'
+    implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
+    implementation 'com.kaltura.playkit:youboraplugin:1.0.2'
+    implementation 'com.kaltura.playkit:imaplugin:1.0.2'
+    implementation 'com.kaltura.playkit:kavaplugin:1.1.2'
+    implementation 'com.kaltura.playkit:googlecast:1.0.1'
+    implementation 'com.kaltura.playkit:vrplugin:1.0.4'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:support-v4:27.0.0'

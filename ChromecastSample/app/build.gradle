@@ -36,10 +36,11 @@ dependencies {
     //implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
 
 
-    //compile project(':playkit')
-    //compile project(':ima')
-    //compile project(':youbora')
-    //compile project(':googlecast')
+    //implementation project(':playkit')
+    //implementation project(':providers')
+    //implementation project(':ima')
+    //implementation project(':youbora')
+    //implementation project(':googlecast')
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

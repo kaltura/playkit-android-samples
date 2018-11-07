@@ -94,9 +94,7 @@ public class MainActivity extends AppCompatActivity {
         int DISTANCE_FROM_LIVE_THRESHOLD = 120000; // 2 min
         String referrer = "app://NonDefaultReferrer1/"  + this.getPackageName();
         KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
-                .setBaseUrl(KAVA_BASE_URL)
                 .setPartnerId(PARTNER_ID)
-                .setUiConfId(UI_CONF_ID)
                 .setReferrer(referrer)
                 .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
 

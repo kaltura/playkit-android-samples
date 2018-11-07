@@ -216,11 +216,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onEvent(PKEvent event) {
                 if (event instanceof PlayerEvent.VideoTrackChanged) {
-                    Log.d(TAG, "Event VideoTrackChanged");
+                    Log.d(TAG, "Event VideoTrackChanged " + ((PlayerEvent.VideoTrackChanged) event).newTrack.getBitrate());
                 } else if (event instanceof PlayerEvent.AudioTrackChanged) {
-                    Log.d(TAG, "Event AudioTrackChanged");
+                    Log.d(TAG, "Event AudioTrackChanged " + ((PlayerEvent.AudioTrackChanged) event).newTrack.getLanguage());
                 } else if (event instanceof PlayerEvent.TextTrackChanged) {
-                    Log.d(TAG, "Event TextTrackChanged");
+                    Log.d(TAG, "Event TextTrackChanged " + ((PlayerEvent.TextTrackChanged) event).newTrack.getLanguage());
+                } else if (event instanceof PlayerEvent.SubtitlesStyleChanged) {
+                    Log.d(TAG, "Event SubtitlesStyleChanged " + ((PlayerEvent.SubtitlesStyleChanged) event).styleName);
                 } else if (event instanceof PlayerEvent.TracksAvailable) {
                     Log.d(TAG, "Event TRACKS_AVAILABLE");
 
@@ -250,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
             //Event that will be sent when tracks data is available.
-        }, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.AUDIO_TRACK_CHANGED, PlayerEvent.Type.TEXT_TRACK_CHANGED, PlayerEvent.Type.VIDEO_TRACK_CHANGED);
+        }, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.AUDIO_TRACK_CHANGED, PlayerEvent.Type.TEXT_TRACK_CHANGED, PlayerEvent.Type.VIDEO_TRACK_CHANGED, PlayerEvent.Type.SUBTITLE_STYLE_CHANGED);
     }
 
     /**

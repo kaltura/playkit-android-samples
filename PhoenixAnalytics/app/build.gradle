@@ -34,8 +34,14 @@ dependencies {
 
     //implementation ('com.kaltura:playkit-android:dev-SNAPSHOT')
     //implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+    //implementation 'com.kaltura:playkit-android-vr:develop-SNAPSHOT'
+    //implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
 
-    //compile project(':playkit')
+    //implementation project(':playkit')
+    //implementation project(':providers')
+    //implementation project(':playkitvr')
+    //implementation project(':kava')
+
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {

@@ -31,6 +31,7 @@ dependencies {
     //implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
 
     //implementation project(":playkit")
+    //implementation project(':providers')
     //implementation project(":youbora")
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

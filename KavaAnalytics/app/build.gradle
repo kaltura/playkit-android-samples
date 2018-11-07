@@ -29,13 +29,14 @@ dependencies {
 
 
     //implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
-    //implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+    //implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
     //implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
     //implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
 
-    //compile project(':playkit')
-    //compile project(':kava')
-    //compile project(':ima')
+    //implementation project(':playkit')
+    //implementation project(':providers')
+    //implementation project(':kava')
+    //implementation project(':ima')
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

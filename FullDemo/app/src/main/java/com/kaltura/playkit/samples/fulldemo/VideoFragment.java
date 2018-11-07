@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.text.TextUtils;
@@ -43,6 +44,8 @@ import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
+import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
+import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
@@ -196,11 +199,11 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
             String referrer = "app://NonDefaultReferrer1/"  + getActivity().getPackageCodePath();
             KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(39487581, referrer, DISTANCE_FROM_LIVE_THRESHOLD + 30000);
-
+            player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
 
             //player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
+            player.updatePluginConfig(PhoenixAnalyticsPlugin.factory.getName(), getPhoenixAnalyticsConfig());
             player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
-            player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
             player.updatePluginConfig(YouboraPlugin.factory.getName(), getConverterYoubora(MEDIA_TITLE + "_changeMedia1", false).toJson());
             //If first one is active, prepare second one.
             prepareSecondEntry();
@@ -219,11 +222,10 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
             String referrer = "app://NonDefaultReferrer2/"  + getActivity().getPackageName();
             KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(40125321, referrer, DISTANCE_FROM_LIVE_THRESHOLD + 60000);
-
-
+            player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
+            player.updatePluginConfig(PhoenixAnalyticsPlugin.factory.getName(), getPhoenixAnalyticsConfig());
             //player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
-            player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
             player.updatePluginConfig(YouboraPlugin.factory.getName(), getConverterYoubora(MEDIA_TITLE + "_changeMedia2", false).toJson());
 
             //If the second one is active, prepare the first one.
@@ -376,6 +378,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         //Initialize media config object.
         createMediaConfig();
         PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
+        PlayKitManager.registerPlugins(this.getActivity(), PhoenixAnalyticsPlugin.factory);
         //PlayKitManager.registerPlugins(this.getActivity(), IMADAIPlugin.factory);
         PlayKitManager.registerPlugins(this.getActivity(), KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(getActivity(), YouboraPlugin.factory);
@@ -383,6 +386,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         //addAdPluginConfig(pluginConfig, playerLayout, adSkin);
+        addPhoenixAnalyticsPluginConfig(pluginConfig);
         addIMAPluginConfig(pluginConfig, mVideoItem.getAdTagUrl());
         addKalturaStatsPlugin(pluginConfig);
         addKavaPlugin(pluginConfig);
@@ -439,6 +443,17 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 //        }
 //        config.setPluginConfig(AdsPlugin.factory.getName(), adsConfig);
 //    }
+
+    private void addPhoenixAnalyticsPluginConfig(PKPluginConfigs config) {
+        PhoenixAnalyticsConfig phoenixAnalyticsConfig = getPhoenixAnalyticsConfig();
+        config.setPluginConfig(PhoenixAnalyticsPlugin.factory.getName(),phoenixAnalyticsConfig);
+    }
+
+    @NonNull
+    private PhoenixAnalyticsConfig getPhoenixAnalyticsConfig() {
+        String ks = "djJ8MTk4fHFftqeAPxdlLVzZBk0Et03Vb8on1wLsKp7cbOwzNwfOvpgmOGnEI_KZDhRWTS-76jEY7pDONjKTvbWyIJb5RsP4NL4Ng5xuw6L__BeMfLGAktkVliaGNZq9SXF5n2cMYX-sqsXLSmWXF9XN89io7-k=";
+        return new PhoenixAnalyticsConfig(198, "https://rest-as.ott.kaltura.com/v4_4/api_v3/", ks, 30);
+    }
 
     private void addIMAPluginConfig(PKPluginConfigs config, String adTagUrl) {
 
@@ -736,7 +751,6 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             }
         }, AdEvent.Type.CONTENT_RESUME_REQUESTED);
 
-
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
@@ -744,7 +758,6 @@ public class VideoFragment extends android.support.v4.app.Fragment {
                 log("AD_REQUESTED");// adtag = " + adRequestEvent.adTagUrl);
             }
         }, AdEvent.Type.AD_REQUESTED);
-
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -755,7 +768,6 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             }
         }, AdEvent.Type.PLAY_HEAD_CHANGED);
 
-
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
@@ -765,7 +777,6 @@ public class VideoFragment extends android.support.v4.app.Fragment {
                 log("AD_ERROR");
             }
         }, AdEvent.Type.ERROR);
-
 
         player.addEventListener(new PKEvent.Listener() {
             @Override

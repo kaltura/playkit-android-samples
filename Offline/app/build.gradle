@@ -23,9 +23,11 @@ android {
 }
 
 dependencies {
+    implementation 'com.kaltura.playkit:playkit:3.6.2'
+    implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
 
-    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
-    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+    //implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+    //implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
 
     //compile project(':playkit')
 
@@ -51,5 +53,6 @@ configurations.all {
 
 repositories {
     google()
+    jcenter()
     maven { url 'https://jitpack.io' }
 }

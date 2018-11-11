@@ -1,7 +1,6 @@
 package com.kaltura.playkit.samples.fulldemo;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 

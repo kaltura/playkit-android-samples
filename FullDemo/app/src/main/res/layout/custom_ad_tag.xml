@@ -10,7 +10,8 @@
         android:id="@+id/mediaUrl"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:inputType="text"
+        android:inputType="textUri"
+        android:hint="mediaUrl"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp" />
 
@@ -19,6 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:inputType="text"
+        android:hint="mediaLic"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp" />
 
@@ -27,6 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:inputType="text"
+        android:hint="customTag"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp" />
 

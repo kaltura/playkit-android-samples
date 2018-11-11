@@ -2,6 +2,7 @@ package com.kaltura.playkit.samples.fulldemo;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -72,12 +73,21 @@ public class VideoListFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Activity activity = null;
         try {
-            mSelectedCallback = (OnVideoSelectedListener) activity;
+
+            if (context instanceof Activity){
+                activity = (Activity) context;
+                mSelectedCallback = (OnVideoSelectedListener) activity;
+            }
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            String activityName = "Unknown";
+            if (activity != null) {
+                activityName = activity.toString();
+            }
+            throw new ClassCastException(activityName
                     + " must implement " + OnVideoSelectedListener.class.getName());
         }
 

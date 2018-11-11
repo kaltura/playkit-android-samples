@@ -60,7 +60,7 @@ public class VideoListFragment extends Fragment implements LoaderManager.LoaderC
      * Container activity must implement this interface.
      */
     public interface OnVideoSelectedListener {
-        public void onVideoSelected(VideoItem videoItem);
+        void onVideoSelected(VideoItem videoItem);
     }
 
     private OnVideoListFragmentResumedListener mResumeCallback;
@@ -69,7 +69,7 @@ public class VideoListFragment extends Fragment implements LoaderManager.LoaderC
      * Listener called when the video list fragment resumes.
      */
     public interface OnVideoListFragmentResumedListener {
-        public void onVideoListFragmentResumed();
+        void onVideoListFragmentResumed();
     }
 
     @Override

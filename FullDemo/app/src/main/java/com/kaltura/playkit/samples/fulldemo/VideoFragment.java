@@ -127,7 +127,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
      * Listener called when the fragment's onCreateView is fired.
      */
     public interface OnVideoFragmentViewCreatedListener {
-        public void onVideoFragmentViewCreated();
+        void onVideoFragmentViewCreated();
     }
 
     @Override
@@ -184,7 +184,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         if (mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)) {
             String AD_HOND = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";//"http://externaltests.dev.kaltura.com/player/Vast_xml/alexs.qacore-vast3-rol_02.xml";
             IMAConfig adsConfig = new IMAConfig().setAdTagURL(AD_HOND).enableDebugMode(true);
-                    //"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
+            //"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
 //            AdsConfig adsConfig = new AdsConfig().
 //                    setAdTagURL(AD_HOND).
 //                    setPlayerViewContainer(playerLayout).
@@ -468,12 +468,12 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
     private void addKalturaStatsPlugin(PKPluginConfigs config) {
         KalturaStatsConfig kalturaStatsPluginConfig = new KalturaStatsConfig(true)
-        .setBaseUrl(STATS_KALTURA_URL)
-        .setUiconfId(38713161)
-        .setPartnerId(2222401)
-        .setEntryId("1_f93tepsn")
-        .setTimerInterval(150000)
-        .setUserId("TestUser");
+                .setBaseUrl(STATS_KALTURA_URL)
+                .setUiconfId(38713161)
+                .setPartnerId(2222401)
+                .setEntryId("1_f93tepsn")
+                .setTimerInterval(150000)
+                .setUserId("TestUser");
         config.setPluginConfig(KalturaStatsPlugin.factory.getName(), kalturaStatsPluginConfig);
     }
 
@@ -495,7 +495,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
 
     private void addYouboraPlugin(PKPluginConfigs pluginConfigs) {
-       ConverterYoubora converterYoubora = getConverterYoubora(MEDIA_TITLE, false);
+        ConverterYoubora converterYoubora = getConverterYoubora(MEDIA_TITLE, false);
 
         pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), converterYoubora.toJson());
     }
@@ -1001,9 +1001,10 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         (adSkin).findViewById(R.id.skip_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (player != null && player.getController(AdEnabledPlayerController.class) != null)
+                if (player != null && player.getController(AdEnabledPlayerController.class) != null) {
                     log("Controller skipAd");
                     player.getController(AdEnabledPlayerController.class).skipAd();
+                }
             }
         });
 

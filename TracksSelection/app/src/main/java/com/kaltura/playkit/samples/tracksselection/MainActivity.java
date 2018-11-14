@@ -152,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         videoSpinner.setOnItemSelectedListener(this);
 
         ArrayList<String> stylesStrings = new ArrayList<>();
-        stylesStrings.add(getDefaultPositionDefault().getSubtitleStyleName());
-        stylesStrings.add(getStyleForPositionOne().getSubtitleStyleName());
-        stylesStrings.add(getStyleForPositionTwo().getSubtitleStyleName());
+        stylesStrings.add(getDefaultPositionDefault().getStyleName());
+        stylesStrings.add(getStyleForPositionOne().getStyleName());
+        stylesStrings.add(getStyleForPositionTwo().getStyleName());
         ArrayAdapter<String> ccStyleAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, stylesStrings);
         ccStyleSpinner.setAdapter(ccStyleAdapter);
         ccStyleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -186,24 +186,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private SubtitleStyleSettings getStyleForPositionOne() {
         return new SubtitleStyleSettings("KidsStyle")
-                .setSubtitleBackgroundColor(Color.BLUE)
-                .setSubtitleTextColor(Color.WHITE)
-                .setSubtitleTextSizeFraction(SubtitleStyleSettings.SubtitleTextSizeFraction.SUBTITLE_FRACTION_50)
-                .setSubtitleWindowColor(Color.YELLOW)
-                .setSubtitleEdgeColor(Color.BLUE)
-                .setSubtitleTypeface(SubtitleStyleSettings.SubtitleStyleTypeface.MONOSPACE)
-                .setSubtitleEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW);
+                .setBackgroundColor(Color.BLUE)
+                .setTextColor(Color.WHITE)
+                .setTextSizeFraction(SubtitleStyleSettings.SubtitleTextSizeFraction.SUBTITLE_FRACTION_50)
+                .setWindowColor(Color.YELLOW)
+                .setEdgeColor(Color.BLUE)
+                .setTypeface(SubtitleStyleSettings.SubtitleStyleTypeface.MONOSPACE)
+                .setEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW);
     }
 
     private SubtitleStyleSettings getStyleForPositionTwo() {
         return new SubtitleStyleSettings("AdultsStyle")
-                .setSubtitleBackgroundColor(Color.WHITE)
-                .setSubtitleTextColor(Color.BLUE)
-                .setSubtitleTextSizeFraction(SubtitleStyleSettings.SubtitleTextSizeFraction.SUBTITLE_FRACTION_100)
-                .setSubtitleWindowColor(Color.BLUE)
-                .setSubtitleEdgeColor(Color.BLUE)
-                .setSubtitleTypeface(SubtitleStyleSettings.SubtitleStyleTypeface.SANS_SERIF)
-                .setSubtitleEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW);
+                .setBackgroundColor(Color.WHITE)
+                .setTextColor(Color.BLUE)
+                .setTextSizeFraction(SubtitleStyleSettings.SubtitleTextSizeFraction.SUBTITLE_FRACTION_100)
+                .setWindowColor(Color.BLUE)
+                .setEdgeColor(Color.BLUE)
+                .setTypeface(SubtitleStyleSettings.SubtitleStyleTypeface.SANS_SERIF)
+                .setEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW);
     }
 
     /**

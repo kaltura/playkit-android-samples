@@ -904,16 +904,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
                 for (int i = 0; i < trackInfos.size(); i++) {
                     AudioTrack audioTrackInfo = (AudioTrack) trackInfos.get(i);
-                    if(audioTrackInfo.isAdaptive()){
-                        trackItems[i] = new TrackItem("Auto", audioTrackInfo.getUniqueId());
-                    }else{
                         String label = audioTrackInfo.getLabel() != null ? audioTrackInfo.getLabel() : audioTrackInfo.getLanguage();
                         String bitrate = (audioTrackInfo.getBitrate() >  0) ? "" + audioTrackInfo.getBitrate() : "";
                         if (TextUtils.isEmpty(bitrate) && addChannel) {
-                            bitrate = buildAudioChannelString(audioTrackInfo.getChannelCount());
+                           bitrate = buildAudioChannelString(audioTrackInfo.getChannelCount());
+                        }
+                        if (audioTrackInfo.isAdaptive()) {
+                            bitrate += " Adaptive";
                         }
                         trackItems[i] = new TrackItem(label + " " + bitrate, audioTrackInfo.getUniqueId());
-                    }
                 }
                 break;
             case Consts.TRACK_TYPE_TEXT:

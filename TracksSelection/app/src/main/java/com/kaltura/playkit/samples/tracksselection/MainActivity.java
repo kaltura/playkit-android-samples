@@ -3,6 +3,7 @@ package com.kaltura.playkit.samples.tracksselection;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,7 +30,10 @@ import com.kaltura.playkit.samples.tracksselection.tracks.TrackItem;
 import com.kaltura.playkit.samples.tracksselection.tracks.TrackItemAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -73,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Subscribe to the event which will notify us when track data is available.
         subscribeToTracksAvailableEvent();
-        
+
         // --->  SELECTING preferred AUDIO/TEXT TRACKS
         //player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.OFF)); // no text tracks
         ////player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO)); // select the track by locale if does not exist manifest default
@@ -333,28 +337,54 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Initialize TrackItem array with size of audioTracks list.
         TrackItem[] trackItems = new TrackItem[audioTracks.size()];
 
-        //Iterate through all available audio tracks.
+        Map<Integer, AtomicInteger> channelMap = new HashMap<>();
         for (int i = 0; i < audioTracks.size(); i++) {
-
-            //Get audio track from index i.
-            AudioTrack audioTrackInfo = audioTracks.get(i);
-
-            //Check if audio track is adaptive. If so, give it "Auto" name.
-            if (audioTrackInfo.isAdaptive()) {
-                //In this case, if this track is selected, the player will
-                //adapt the playback bitrate automatically, based on user bandwidth and device capabilities.
-                //Initialize TrackItem.
-                trackItems[i] = new TrackItem("Auto", audioTrackInfo.getUniqueId());
+            if (channelMap.containsKey(audioTracks.get(i).getChannelCount())) {
+                channelMap.get(audioTracks.get(i).getChannelCount()).incrementAndGet();
             } else {
-                //If it is not adaptive track, name it based on the audio track label.
-                String name = audioTrackInfo.getLabel();
-
-                //Initialize TrackItem.
-                trackItems[i] = new TrackItem(name, audioTrackInfo.getUniqueId());
+                channelMap.put(audioTracks.get(i).getChannelCount(), new AtomicInteger(1));
             }
         }
+        boolean addChannel = false;
+
+        if (channelMap.keySet().size() > 0 && !(new AtomicInteger(audioTracks.size()).toString().equals(channelMap.get(audioTracks.get(0).getChannelCount()).toString()))) {
+            addChannel = true;
+        }
+
+
+        //Iterate through all available audio tracks.
+        for (int i = 0; i < audioTracks.size(); i++) {
+            AudioTrack audioTrackInfo = audioTracks.get(i);
+            String label = audioTrackInfo.getLabel() != null ? audioTrackInfo.getLabel() : audioTrackInfo.getLanguage();
+            String bitrate = (audioTrackInfo.getBitrate() > 0) ? "" + audioTrackInfo.getBitrate() : "";
+            if (TextUtils.isEmpty(bitrate) && addChannel) {
+                bitrate = buildAudioChannelString(audioTrackInfo.getChannelCount());
+            }
+            if (audioTrackInfo.isAdaptive()) {
+                bitrate += " Adaptive";
+            }
+            trackItems[i] = new TrackItem(audioTrackInfo.getLabel() + " " + bitrate, audioTrackInfo.getUniqueId());
+        }
         return trackItems;
+
     }
+
+    private String buildAudioChannelString(int channelCount) {
+        switch (channelCount) {
+            case 1:
+                return "Mono";
+            case 2:
+                return "Stereo";
+            case 6:
+            case 7:
+                return "Surround_5.1";
+            case 8:
+                return "Surround_7.1";
+            default:
+                return "Surround";
+        }
+    }
+
 
     /**
      * Will build array of {@link TrackItem} objects.
@@ -413,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Set media entry type. It could be Live,Vod or Unknown.
         //For now we will use Unknown.
-        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Unknown);
+        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
 
         //Create list that contains at least 1 media source.
         //Each media entry can contain a couple of different media sources.

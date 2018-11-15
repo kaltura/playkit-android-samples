@@ -19,6 +19,10 @@ android {
     lintOptions {
         warning 'InvalidPackage'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -27,8 +31,6 @@ dependencies {
     implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
     implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
     implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
-
-
     //compile project(':playkit')
     //compile project(':ima')
     //compile project(':youbora')
@@ -45,7 +47,6 @@ dependencies {
     implementation 'com.android.support:design:28.0.0', {
         exclude group: 'com.android.support', module: 'support-v4'
     }
-
     testImplementation 'junit:junit:4.12'
 }
 

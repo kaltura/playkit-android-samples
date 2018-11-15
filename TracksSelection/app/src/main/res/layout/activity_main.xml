@@ -33,7 +33,7 @@
             android:text="@string/play_text" />
 
         <LinearLayout
-            android:id="@+id/llCcSpinner"
+            android:id="@+id/ccStyleLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"

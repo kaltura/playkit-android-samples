@@ -751,7 +751,6 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             }
         }, AdEvent.Type.CONTENT_RESUME_REQUESTED);
 
-
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
@@ -760,15 +759,14 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             }
         }, AdEvent.Type.AD_REQUESTED);
 
-
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
+                appProgressBar.setVisibility(View.INVISIBLE);
                 AdEvent.AdPlayHeadEvent adEventProress = (AdEvent.AdPlayHeadEvent) event;
-                //log.d("received NEW AD_PROGRESS_UPDATE " + adEventProress.currentPosition + "/" +  adEventProress.duration);
+                //log.d("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
             }
         }, AdEvent.Type.PLAY_HEAD_CHANGED);
-
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -779,7 +777,6 @@ public class VideoFragment extends android.support.v4.app.Fragment {
                 log("AD_ERROR");
             }
         }, AdEvent.Type.ERROR);
-
 
         player.addEventListener(new PKEvent.Listener() {
             @Override

@@ -18,10 +18,17 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.player.vr.VRInteractionMode;
+import com.kaltura.playkit.player.vr.VRPKMediaEntry;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
+import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
+import com.kaltura.playkit.providers.api.phoenix.APIDefines;
 import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
+import com.kaltura.playkitvr.VRUtil;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -31,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Phoenix analytics constants
     private static final String PHOENIX_ANALYTICS_BASE_URL = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/"; // analytics base url
-    private static final String PHOENIX_ANALYTICS_PARTNER_ID = "198"; // your OTT partner id
+    private static final int PHOENIX_ANALYTICS_PARTNER_ID = 198; // your OTT partner id
     private static final String PHOENIX_ANALYTICS_KS = "";
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
@@ -39,7 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String PHOENIX_PROVIDER_BASE_URL = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/"; //your provider base url
     private static final String PHOENIX_PROVIDER_KS = ""; // your user ks if required
     private static final int PHOENIX_PROVIDER_PARTNER_ID = 198; // your OTT partner id
-    private static final String ASSET_ID = "259153";//"258459"; // asset id to request
+    private static final String FORMAT = "Mobile_Devices_Main_SD";
+    private static final String MEDIA_ID = "259153";//"258459"; // asset id to request
+    public static final String VR_MEDIA_ID = "258459";
 
 
     private Player player;
@@ -53,7 +62,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Initialize PKPluginConfigs object with PhoenixAnalyticsPlugin.
-        pluginConfigs = createPhoenixAnalyticsPlugin();
+        pluginConfigs = new PKPluginConfigs();
+        createPhoenixAnalyticsPlugin(pluginConfigs);
+        createKavaAnalyticsPlugin(pluginConfigs);
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
@@ -69,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize phoenix media provider.
         createPhoenixMediaProvider();
-
     }
 
     /**
@@ -77,30 +87,35 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return - the pluginConfig object that should be passed as parameter when loading the player.
      */
-    private PKPluginConfigs createPhoenixAnalyticsPlugin() {
+    private void createPhoenixAnalyticsPlugin(PKPluginConfigs pluginConfigs) {
 
         //Important!!! First you need to register your plugin.
         PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
-
-        //Initialize PKPluginConfigs object.
-        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
         //Initialize Json object that will hold all the configurations for the plugin.
         JsonObject pluginEntry = new JsonObject();
 
         //PhoenixAnalyticsPlugin config json. Main config goes here.
-        JsonObject phoenixPluginConfigJson = new JsonObject();
-
-        //Set plugin properties.
-        phoenixPluginConfigJson.addProperty("baseUrl", PHOENIX_ANALYTICS_BASE_URL);
-        phoenixPluginConfigJson.addProperty("timerInterval", ANALYTIC_TRIGGER_INTERVAL);
-        phoenixPluginConfigJson.addProperty("ks", PHOENIX_ANALYTICS_KS);
-        phoenixPluginConfigJson.addProperty("partnerId", PHOENIX_ANALYTICS_PARTNER_ID);
-
-
+        PhoenixAnalyticsConfig phoenixAnalyticsConfig = new PhoenixAnalyticsConfig(PHOENIX_ANALYTICS_PARTNER_ID, PHOENIX_ANALYTICS_BASE_URL, PHOENIX_ANALYTICS_KS, ANALYTIC_TRIGGER_INTERVAL);
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(PhoenixAnalyticsPlugin.factory.getName(), phoenixPluginConfigJson);
+        pluginConfigs.setPluginConfig(PhoenixAnalyticsPlugin.factory.getName(), phoenixAnalyticsConfig);
 
-        return pluginConfigs;
+    }
+
+
+    private void createKavaAnalyticsPlugin(PKPluginConfigs pluginConfigs) {
+
+        //Important!!! First you need to register your plugin.
+        PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
+
+        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig();
+
+        // Each OTT media with mediaPrep has OVP partnerId and OVP entryId (asset list will contain the entryId for here, partner you should ask..
+        int MEDIA_PREP_PARTNER_ID = 1774581;
+        String MEDIA_ENTRY_ID = "1_mphei4ku";
+        kavaAnalyticsConfig.setPartnerId(MEDIA_PREP_PARTNER_ID);
+        kavaAnalyticsConfig.setEntryId(MEDIA_ENTRY_ID);
+        //Set plugin entry to the plugin configs.
+        pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
     }
 
     /**
@@ -164,12 +179,15 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize provider.
         PhoenixMediaProvider mediaProvider = new PhoenixMediaProvider();
-
         //Initialize session provider.
         SessionProvider sessionProvider = createSessionProvider();
 
         //Set entry id for the session provider.
-        mediaProvider.setAssetId(ASSET_ID);
+        mediaProvider.setAssetId(VR_MEDIA_ID);
+        mediaProvider.setAssetType(APIDefines.KalturaAssetType.Media);
+        mediaProvider.setAssetReferenceType(APIDefines.AssetReferenceType.Media);
+        mediaProvider.setContextType(APIDefines.PlaybackContextType.Playback);
+        mediaProvider.setFormats(FORMAT);
 
         //Set session provider to media provider.
         mediaProvider.setSessionProvider(sessionProvider);
@@ -227,8 +245,13 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 //Initialize media config object.
+                if (mediaEntry instanceof VRPKMediaEntry) {
+                    boolean modeSupported = VRUtil.isModeSupported(getApplicationContext(), VRInteractionMode.Motion);
+                    if (modeSupported) {
+                        ((VRPKMediaEntry) mediaEntry).getVrSettings().setInteractionMode(VRInteractionMode.MotionWithTouch);
+                    }
+                }
                 createMediaConfig(mediaEntry);
             }
         });

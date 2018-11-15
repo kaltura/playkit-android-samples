@@ -19,19 +19,23 @@ android {
     lintOptions {
         warning 'InvalidPackage'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    implementation 'com.kaltura.playkit:playkit:3.6.2'
-    implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
-    implementation 'com.kaltura.playkit:imaplugin:1.0.2'
-    implementation 'com.kaltura.playkit:kavaplugin:1.1.2'
+    //implementation 'com.kaltura.playkit:playkit:3.6.2'
+    //implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
+    //implementation 'com.kaltura.playkit:imaplugin:1.0.2'
+    //implementation 'com.kaltura.playkit:kavaplugin:1.1.2'
 
 
-    //implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
-    //implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
-    //implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
-    //implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
+    implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
+    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
 
     //implementation project(':playkit')
     //implementation project(':providers')

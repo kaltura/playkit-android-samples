@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -72,8 +73,11 @@ import com.kaltura.playkit.utils.Consts;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
 import static com.kaltura.playkitdemo.MockParams.Format;
@@ -606,6 +610,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
+                PlayerEvent.Error playerErrorEvent = (PlayerEvent.Error) event;
+                if (playerErrorEvent != null && playerErrorEvent.error != null) {
+                    log.e("ERROR: " + playerErrorEvent.error.errorType + ", " + playerErrorEvent.error.message);
+                }
+            }
+        }, PlayerEvent.Type.ERROR);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
                 log.d("AD_CONTENT_PAUSE_REQUESTED");
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
@@ -876,16 +890,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             case Consts.TRACK_TYPE_AUDIO:
                 TextView tvAudio = (TextView) this.findViewById(R.id.tvAudio);
                 changeSpinnerVisibility(audioSpinner, tvAudio, trackInfos);
-
+                Map<Integer, AtomicInteger> channelMap = new HashMap<>();
+                for (int i = 0; i < trackInfos.size(); i++) {
+                    if (channelMap.containsKey(((AudioTrack) trackInfos.get(i)).getChannelCount())) {
+                        channelMap.get(((AudioTrack) trackInfos.get(i)).getChannelCount()).incrementAndGet();
+                    } else {
+                        channelMap.put(((AudioTrack) trackInfos.get(i)).getChannelCount(), new AtomicInteger(1));
+                    }
+                }
+                boolean addChannel = false;
+                if (channelMap.keySet().size() > 0 && !(new AtomicInteger(trackInfos.size()).toString().equals(channelMap.get(((AudioTrack) trackInfos.get(0)).getChannelCount()).toString()))) {
+                    addChannel = true;
+                }
                 for (int i = 0; i < trackInfos.size(); i++) {
                     AudioTrack audioTrackInfo = (AudioTrack) trackInfos.get(i);
-                    if(audioTrackInfo.isAdaptive()){
-                        trackItems[i] = new TrackItem("Auto", audioTrackInfo.getUniqueId());
-                    }else{
-                        String label = audioTrackInfo.getLanguage() != null ? audioTrackInfo.getLanguage() : audioTrackInfo.getLabel();
-                        String bitrate = (audioTrackInfo.getBitrate() >  0)? "" + audioTrackInfo.getBitrate() : "";
+                        String label = audioTrackInfo.getLabel() != null ? audioTrackInfo.getLabel() : audioTrackInfo.getLanguage();
+                        String bitrate = (audioTrackInfo.getBitrate() >  0) ? "" + audioTrackInfo.getBitrate() : "";
+                        if (TextUtils.isEmpty(bitrate) && addChannel) {
+                           bitrate = buildAudioChannelString(audioTrackInfo.getChannelCount());
+                        }
+                        if (audioTrackInfo.isAdaptive()) {
+                            bitrate += " Adaptive";
+                        }
                         trackItems[i] = new TrackItem(label + " " + bitrate, audioTrackInfo.getUniqueId());
-                    }
                 }
                 break;
             case Consts.TRACK_TYPE_TEXT:
@@ -895,7 +922,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 for (int i = 0; i < trackInfos.size(); i++) {
 
                     TextTrack textTrackInfo = (TextTrack) trackInfos.get(i);
-                    String lang = (textTrackInfo.getLanguage() != null) ? textTrackInfo.getLanguage() : "unknown";
+                    String lang = (textTrackInfo.getLabel() != null) ? textTrackInfo.getLabel() : "unknown";
                     trackItems[i] = new TrackItem(lang, textTrackInfo.getUniqueId());
                 }
                 break;
@@ -1052,6 +1079,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 return Long.valueOf(track1.getBitrate()).compareTo(track2.getBitrate());
             }
         };
+    }
+
+    private String buildAudioChannelString(int channelCount) {
+        switch (channelCount) {
+            case 1:
+                return "Mono";
+            case 2:
+                return "Stereo";
+            case 6:
+            case 7:
+                return "Surround_5.1";
+            case 8:
+                return "Surround_7.1";
+            default:
+                return "Surround";
+        }
     }
 
 }

@@ -1,7 +1,6 @@
 package com.kaltura.playkit.samples.fulldemo;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
@@ -22,6 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.kaltura.playkit.PKDrmParams;
@@ -42,6 +42,8 @@ import com.kaltura.playkit.plugins.ads.AdEvent;
 
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
+import com.kaltura.playkit.plugins.imadai.IMADAIPlugin;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
@@ -204,6 +206,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             //player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             player.updatePluginConfig(PhoenixAnalyticsPlugin.factory.getName(), getPhoenixAnalyticsConfig());
             player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
+            player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigVodHLSTearOfSteel());
             player.updatePluginConfig(YouboraPlugin.factory.getName(), getConverterYoubora(MEDIA_TITLE + "_changeMedia1", false).toJson());
             //If first one is active, prepare second one.
             prepareSecondEntry();
@@ -225,7 +228,8 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
             player.updatePluginConfig(PhoenixAnalyticsPlugin.factory.getName(), getPhoenixAnalyticsConfig());
             //player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
-            player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
+            //player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
+            player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigVodHLSJW1Sample());
             player.updatePluginConfig(YouboraPlugin.factory.getName(), getConverterYoubora(MEDIA_TITLE + "_changeMedia2", false).toJson());
 
             //If the second one is active, prepare the first one.
@@ -377,9 +381,9 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         clearLog();
         //Initialize media config object.
         createMediaConfig();
-        PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
+        //PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
         PlayKitManager.registerPlugins(this.getActivity(), PhoenixAnalyticsPlugin.factory);
-        //PlayKitManager.registerPlugins(this.getActivity(), IMADAIPlugin.factory);
+        PlayKitManager.registerPlugins(this.getActivity(), IMADAIPlugin.factory);
         PlayKitManager.registerPlugins(this.getActivity(), KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(getActivity(), YouboraPlugin.factory);
         PlayKitManager.registerPlugins(getActivity(), KavaAnalyticsPlugin.factory);
@@ -387,7 +391,8 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         //addAdPluginConfig(pluginConfig, playerLayout, adSkin);
         addPhoenixAnalyticsPluginConfig(pluginConfig);
-        addIMAPluginConfig(pluginConfig, mVideoItem.getAdTagUrl());
+        //addIMAPluginConfig(pluginConfig, mVideoItem.getAdTagUrl());
+        addIMADAIPluginConfig(pluginConfig);
         addKalturaStatsPlugin(pluginConfig);
         addKavaPlugin(pluginConfig);
         addYouboraPlugin(pluginConfig);
@@ -466,6 +471,12 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl).enableDebugMode(true);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
+
+    private void addIMADAIPluginConfig(PKPluginConfigs config) {
+        //config.setPluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigVodDASHBBB());getDAIConfigVodHLSTearOfSteel()
+        config.setPluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigVodHLSLive());
+    }
+
 
     private void addKalturaStatsPlugin(PKPluginConfigs config) {
         KalturaStatsConfig kalturaStatsPluginConfig = new KalturaStatsConfig(true)
@@ -949,11 +960,15 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log("AD_PLAYBACK_READY");
-                appProgressBar.setVisibility(View.INVISIBLE);
-
+                log("DAI_SOURCE_SELECTED");
+                AdEvent.AdDAISourceSelected adDAISourceSelected = (AdEvent.AdDAISourceSelected) event;
+                player.prepare(adDAISourceSelected.mediaConfig);
+                if (isAutoPlay) {
+                    player.play();
+                }
             }
-        }, AdEvent.Type.AD_BREAK_ENDED);
+        }, AdEvent.Type.DAI_SOURCE_SELECTED);
+
 
         player.addStateChangeListener(new PKEvent.Listener() {
             @Override
@@ -1060,6 +1075,115 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         }
         playerLayout.requestLayout();
     }
+
+    private IMADAIConfig getDAIConfigVodHLSTearOfSteel() {
+        String assetTitle = "VOD - Tears of Steel";
+        String assetKey = null;
+        String apiKey = null;
+        String contentSourceId = "19463";
+        String videoId = "tears-of-steel";
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+
+        return new IMADAIConfig(assetTitle,
+                assetKey, // null for VOD
+                contentSourceId, // null for Live
+                apiKey, // seems to be always null in demos
+                videoId, // null for Live
+                streamFormat,
+                licenseUrl).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfigVodHLSJW4Sample() {
+        String assetTitle4 = "JW4";
+        String assetKey4 = null;
+        String apiKey4 = null;
+        String contentSourceId4 = "19823";
+        String videoId4 = "ima-test";
+        StreamRequest.StreamFormat streamFormat4 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl4 = null;
+        return new IMADAIConfig(assetTitle4,
+                assetKey4, // null for VOD
+                contentSourceId4, // null for Live
+                apiKey4, // seems to be always null in demos
+                videoId4, // null for Live
+                streamFormat4,
+                licenseUrl4).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfigVodDASHBBB() {
+        String assetTitle2 = "BBB-widevine";
+        String assetKey2 = null;
+        String apiKey2 = null;
+        String contentSourceId2 = "2474148";
+        String videoId2 = "bbb-widevine";
+        StreamRequest.StreamFormat streamFormat2 = StreamRequest.StreamFormat.DASH;
+        String licenseUrl2 = "https://proxy.uat.widevine.com/proxy";
+        return new IMADAIConfig(assetTitle2,
+                assetKey2, // null for VOD
+                contentSourceId2, // null for Live
+                apiKey2, // seems to be always null in demos
+                videoId2, // null for Live
+                streamFormat2,
+                licenseUrl2).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfigVodHLSJW1Sample() {
+        String assetTitle3 = "JW1";
+        String assetKey3 = null;
+        String apiKey3 = null;
+        String contentSourceId3 = "2472176";
+        String videoId3 = "2504847";
+        StreamRequest.StreamFormat streamFormat3 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl3 = null;
+        return new IMADAIConfig(assetTitle3,
+                assetKey3, // null for VOD
+                contentSourceId3, // null for Live
+                apiKey3, // seems to be always null in demos
+                videoId3, // null for Live
+                streamFormat3,
+                licenseUrl3);
+    }
+
+    private IMADAIConfig getDAIConfigVodHLSErrorSample() {
+        String assetTitle4 = "JW1";
+        String assetKey4 = null;
+        String apiKey4 = null;
+        String contentSourceId4 = "2472176";
+        String videoId4 = "2504847";
+        StreamRequest.StreamFormat streamFormat4 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl4 = null;
+
+        return new IMADAIConfig(assetTitle4,
+                assetKey4, // null for VOD
+                contentSourceId4 + "AAAA", // null for Live
+                apiKey4, // seems to be always null in demos
+                videoId4, // null for Live
+                streamFormat4,
+                licenseUrl4).enableDebugMode(true);
+    }
+
+
+    private IMADAIConfig getDAIConfigVodHLSLive() {
+        String assetTitle4 = "Live Video - Big Buck Bunny";
+        String assetKey4 = "sN_IYUG8STe1ZzhIIE_ksA";
+        String apiKey4 = null;
+        String contentSourceId4 = null;
+        String videoId4 = null;
+        StreamRequest.StreamFormat streamFormat4 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl4 = null;
+
+        return new IMADAIConfig(assetTitle4,
+                assetKey4, // null for VOD
+                contentSourceId4, // null for Live
+                apiKey4, // seems to be always null in demos
+                videoId4, // null for Live
+                streamFormat4,
+                licenseUrl4).enableDebugMode(true);
+    }
+
+//"Live Video - Big Buck Bunny", "", null, null,
+//                    null, StreamFormat.HLS, null
 
     public interface Logger {
         void log(String logMessage);

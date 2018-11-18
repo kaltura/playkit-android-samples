@@ -2,13 +2,17 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.fulldemo"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
-        multiDexEnabled  true
         versionName "1.0"
+        multiDexEnabled  true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -21,30 +25,38 @@ android {
 }
 
 dependencies {
+
+    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
+    implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
+    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
+    implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
+
+
+//    implementation project(":playkit")
+//    implementation project(path: ':providers')
+//    //implementation project(":admanager")
+//    //implementation project(":adsplugin")
+//    implementation project(":youbora")
+//    implementation project(":ima")
+//    implementation project(":kava")
+//    implementation project(":googlecast")
+
+//    implementation 'com.kaltura.playkit:playkit:3.6.2'
+//    implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
+//    implementation 'com.kaltura.playkit:youboraplugin:1.0.2'
+//    implementation 'com.kaltura.playkit:imaplugin:1.0.2'
+//    implementation 'com.kaltura.playkit:kavaplugin:1.1.2'
+//    implementation 'com.kaltura.playkit:googlecast:1.0.1'
+//    implementation 'com.kaltura.playkit:vrplugin:1.0.4'
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.android.support:support-vector-drawable:28.0.0'
-    compile project(":playkit")
-    implementation project(path: ':providers')
-    //compile project(":admanager")
-    //compile project(":adsplugin")
-    compile project(":youbora")
-    compile project(":ima")
-    compile project(":kava")
-    compile project(":googlecast")
-
-//    implementation 'com.kaltura.playkit:playkit:3.6.0'
-//    implementation 'com.kaltura.playkit:playkitproviders:1.0.0'
-//    implementation 'com.kaltura.playkit:youboraplugin:1.0.0'
-//    implementation 'com.kaltura.playkit:imaplugin:1.0.0'
-//    implementation 'com.kaltura.playkit:kavaplugin:1.1.0'
-//    implementation 'com.kaltura.playkit:googlecast:1.0.0'
-//    implementation 'com.kaltura.playkit:vrplugin:1.0.2'
-
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
-    compile 'com.android.support:appcompat-v7:28.0.0'
-    compile 'com.android.support:preference-v7:28.0.0'
-    compile 'com.android.support:design:28.0.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:preference-v7:28.0.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
 }

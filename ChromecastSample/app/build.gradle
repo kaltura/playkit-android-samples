@@ -2,6 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.chromecastsample"
         minSdkVersion 17
@@ -22,6 +26,13 @@ android {
 }
 
 dependencies {
+    //implementation 'com.kaltura.playkit:playkit:3.6.2'
+    //implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
+    //implementation 'com.kaltura.playkit:youboraplugin:1.0.2'
+    //implementation 'com.kaltura.playkit:imaplugin:1.0.2'
+    //implementation 'com.kaltura.playkit:googlecast:1.0.1'
+
+
     implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
     implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
     implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
@@ -29,10 +40,11 @@ dependencies {
     implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
 
 
-    //compile project(':playkit')
-    //compile project(':ima')
-    //compile project(':youbora')
-    //compile project(':googlecast')
+    //implementation project(':playkit')
+    //implementation project(':providers')
+    //implementation project(':ima')
+    //implementation project(':youbora')
+    //implementation project(':googlecast')
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -45,7 +57,6 @@ dependencies {
     implementation 'com.android.support:design:28.0.0', {
         exclude group: 'com.android.support', module: 'support-v4'
     }
-
     testImplementation 'junit:junit:4.12'
 }
 
@@ -55,5 +66,6 @@ configurations.all {
 
 repositories {
     google()
+    jcenter()
     maven { url 'https://jitpack.io' }
 }

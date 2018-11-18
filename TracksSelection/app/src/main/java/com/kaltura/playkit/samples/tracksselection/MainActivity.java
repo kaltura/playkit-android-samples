@@ -1,10 +1,13 @@
 package com.kaltura.playkit.samples.tracksselection;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -20,13 +23,17 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.PKTracks;
+import com.kaltura.playkit.player.SubtitleStyleSettings;
 import com.kaltura.playkit.player.TextTrack;
 import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.samples.tracksselection.tracks.TrackItem;
 import com.kaltura.playkit.samples.tracksselection.tracks.TrackItemAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
@@ -44,9 +51,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Button playPauseButton;
 
     //Android Spinner view, that will actually hold and manipulate tracks selection.
-    private Spinner videoSpinner, audioSpinner, textSpinner;
+    private Spinner videoSpinner, audioSpinner, textSpinner, ccStyleSpinner;
+    private LinearLayout ccStyleLayout;
     private boolean userIsInteracting;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +77,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Subscribe to the event which will notify us when track data is available.
         subscribeToTracksAvailableEvent();
-        
+
         // --->  SELECTING preferred AUDIO/TEXT TRACKS
         //player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.OFF)); // no text tracks
         ////player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO)); // select the track by locale if does not exist manifest default
         //player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.EXPLICIT).setTrackLanguage("rus")); // select specific track lang if not exist select manifest default
         ////player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO));
+
+        player.getSettings().setSubtitleStyle(getDefaultPositionDefault());
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
@@ -138,10 +147,67 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         videoSpinner = (Spinner) this.findViewById(R.id.videoSpinner);
         audioSpinner = (Spinner) this.findViewById(R.id.audioSpinner);
         textSpinner = (Spinner) this.findViewById(R.id.textSpinner);
+        ccStyleSpinner = (Spinner) this.findViewById(R.id.ccStyleSpinner);
+        ccStyleLayout = (LinearLayout) this.findViewById(R.id.ccStyleLayout);
+        ccStyleLayout.setVisibility(View.INVISIBLE);
 
         textSpinner.setOnItemSelectedListener(this);
         audioSpinner.setOnItemSelectedListener(this);
         videoSpinner.setOnItemSelectedListener(this);
+
+        ArrayList<String> stylesStrings = new ArrayList<>();
+        stylesStrings.add(getDefaultPositionDefault().getStyleName());
+        stylesStrings.add(getStyleForPositionOne().getStyleName());
+        stylesStrings.add(getStyleForPositionTwo().getStyleName());
+        ArrayAdapter<String> ccStyleAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, stylesStrings);
+        ccStyleSpinner.setAdapter(ccStyleAdapter);
+        ccStyleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!userIsInteracting) {
+                    return;
+                }
+
+                if (position == 0) {
+                    player.updateSubtitleStyle(getDefaultPositionDefault());
+                } else if(position == 1) {
+                    player.updateSubtitleStyle(getStyleForPositionOne());
+                } else {
+                    player.updateSubtitleStyle(getStyleForPositionTwo());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private SubtitleStyleSettings getDefaultPositionDefault() {
+        return new SubtitleStyleSettings("DefaultStyle");
+    }
+
+    private SubtitleStyleSettings getStyleForPositionOne() {
+        return new SubtitleStyleSettings("KidsStyle")
+                .setBackgroundColor(Color.BLUE)
+                .setTextColor(Color.WHITE)
+                .setTextSizeFraction(SubtitleStyleSettings.SubtitleTextSizeFraction.SUBTITLE_FRACTION_50)
+                .setWindowColor(Color.YELLOW)
+                .setEdgeColor(Color.BLUE)
+                .setTypeface(SubtitleStyleSettings.SubtitleStyleTypeface.MONOSPACE)
+                .setEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW);
+    }
+
+    private SubtitleStyleSettings getStyleForPositionTwo() {
+        return new SubtitleStyleSettings("AdultsStyle")
+                .setBackgroundColor(Color.WHITE)
+                .setTextColor(Color.BLUE)
+                .setTextSizeFraction(SubtitleStyleSettings.SubtitleTextSizeFraction.SUBTITLE_FRACTION_100)
+                .setWindowColor(Color.BLUE)
+                .setEdgeColor(Color.BLUE)
+                .setTypeface(SubtitleStyleSettings.SubtitleStyleTypeface.SANS_SERIF)
+                .setEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW);
     }
 
     /**
@@ -154,11 +220,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onEvent(PKEvent event) {
                 if (event instanceof PlayerEvent.VideoTrackChanged) {
-                    Log.d(TAG, "Event VideoTrackChanged");
+                    Log.d(TAG, "Event VideoTrackChanged " + ((PlayerEvent.VideoTrackChanged) event).newTrack.getBitrate());
                 } else if (event instanceof PlayerEvent.AudioTrackChanged) {
-                    Log.d(TAG, "Event AudioTrackChanged");
+                    Log.d(TAG, "Event AudioTrackChanged " + ((PlayerEvent.AudioTrackChanged) event).newTrack.getLanguage());
                 } else if (event instanceof PlayerEvent.TextTrackChanged) {
-                    Log.d(TAG, "Event TextTrackChanged");
+                    Log.d(TAG, "Event TextTrackChanged " + ((PlayerEvent.TextTrackChanged) event).newTrack.getLanguage());
+                } else if (event instanceof PlayerEvent.SubtitlesStyleChanged) {
+                    Log.d(TAG, "Event SubtitlesStyleChanged " + ((PlayerEvent.SubtitlesStyleChanged) event).styleName);
                 } else if (event instanceof PlayerEvent.TracksAvailable) {
                     Log.d(TAG, "Event TRACKS_AVAILABLE");
 
@@ -174,6 +242,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     if (tracks.getTextTracks().size() > 0) {
                         Log.d(TAG, "Default Text langae = " + tracks.getTextTracks().get(defaultTextTrackIndex).getLabel());
+                        if(ccStyleLayout != null) {
+                            ccStyleLayout.setVisibility(View.VISIBLE);
+                        }
                     }
                     if (tracks.getVideoTracks().size() > 0) {
                         Log.d(TAG, "Default video isAdaptive = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).isAdaptive() + " bitrate = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).getBitrate());
@@ -185,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
             }
             //Event that will be sent when tracks data is available.
-        }, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.AUDIO_TRACK_CHANGED, PlayerEvent.Type.TEXT_TRACK_CHANGED, PlayerEvent.Type.VIDEO_TRACK_CHANGED);
+        }, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.AUDIO_TRACK_CHANGED, PlayerEvent.Type.TEXT_TRACK_CHANGED, PlayerEvent.Type.VIDEO_TRACK_CHANGED, PlayerEvent.Type.SUBTITLE_STYLE_CHANGED);
     }
 
     /**
@@ -266,28 +337,54 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Initialize TrackItem array with size of audioTracks list.
         TrackItem[] trackItems = new TrackItem[audioTracks.size()];
 
-        //Iterate through all available audio tracks.
+        Map<Integer, AtomicInteger> channelMap = new HashMap<>();
         for (int i = 0; i < audioTracks.size(); i++) {
-
-            //Get audio track from index i.
-            AudioTrack audioTrackInfo = audioTracks.get(i);
-
-            //Check if audio track is adaptive. If so, give it "Auto" name.
-            if (audioTrackInfo.isAdaptive()) {
-                //In this case, if this track is selected, the player will
-                //adapt the playback bitrate automatically, based on user bandwidth and device capabilities.
-                //Initialize TrackItem.
-                trackItems[i] = new TrackItem("Auto", audioTrackInfo.getUniqueId());
+            if (channelMap.containsKey(audioTracks.get(i).getChannelCount())) {
+                channelMap.get(audioTracks.get(i).getChannelCount()).incrementAndGet();
             } else {
-                //If it is not adaptive track, name it based on the audio track label.
-                String name = audioTrackInfo.getLabel();
-
-                //Initialize TrackItem.
-                trackItems[i] = new TrackItem(name, audioTrackInfo.getUniqueId());
+                channelMap.put(audioTracks.get(i).getChannelCount(), new AtomicInteger(1));
             }
         }
+        boolean addChannel = false;
+
+        if (channelMap.keySet().size() > 0 && !(new AtomicInteger(audioTracks.size()).toString().equals(channelMap.get(audioTracks.get(0).getChannelCount()).toString()))) {
+            addChannel = true;
+        }
+
+
+        //Iterate through all available audio tracks.
+        for (int i = 0; i < audioTracks.size(); i++) {
+            AudioTrack audioTrackInfo = audioTracks.get(i);
+            String label = audioTrackInfo.getLabel() != null ? audioTrackInfo.getLabel() : audioTrackInfo.getLanguage();
+            String bitrate = (audioTrackInfo.getBitrate() > 0) ? "" + audioTrackInfo.getBitrate() : "";
+            if (TextUtils.isEmpty(bitrate) && addChannel) {
+                bitrate = buildAudioChannelString(audioTrackInfo.getChannelCount());
+            }
+            if (audioTrackInfo.isAdaptive()) {
+                bitrate += " Adaptive";
+            }
+            trackItems[i] = new TrackItem(audioTrackInfo.getLabel() + " " + bitrate, audioTrackInfo.getUniqueId());
+        }
         return trackItems;
+
     }
+
+    private String buildAudioChannelString(int channelCount) {
+        switch (channelCount) {
+            case 1:
+                return "Mono";
+            case 2:
+                return "Stereo";
+            case 6:
+            case 7:
+                return "Surround_5.1";
+            case 8:
+                return "Surround_7.1";
+            default:
+                return "Surround";
+        }
+    }
+
 
     /**
      * Will build array of {@link TrackItem} objects.
@@ -346,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Set media entry type. It could be Live,Vod or Unknown.
         //For now we will use Unknown.
-        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Unknown);
+        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
 
         //Create list that contains at least 1 media source.
         //Each media entry can contain a couple of different media sources.

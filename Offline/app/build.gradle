@@ -2,6 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.offline"
         minSdkVersion 16
@@ -23,11 +27,14 @@ android {
 }
 
 dependencies {
+    //implementation 'com.kaltura.playkit:playkit:3.6.2'
+    //implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
 
     implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
     implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
 
-    //compile project(':playkit')
+    //implementation project(':playkit')
+    //implementation project(':providers')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -51,5 +58,6 @@ configurations.all {
 
 repositories {
     google()
+    jcenter()
     maven { url 'https://jitpack.io' }
 }

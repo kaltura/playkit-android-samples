@@ -1,10 +1,8 @@
 package com.kaltura.playkit.samples.fulldemo;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
@@ -39,7 +37,6 @@ import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.ads.AdEnabledPlayerController;
 import com.kaltura.playkit.player.PlayerSettings;
 import com.kaltura.playkit.plugins.ads.AdEvent;
-
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
@@ -50,13 +47,25 @@ import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 
-//import com.kaltura.plugins.adsmanager.AdsConfig;
-//import com.kaltura.plugins.adsmanager.AdsPlugin;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kaltura.playkit.samples.fulldemo.Consts.*;
+import static com.kaltura.playkit.samples.fulldemo.Consts.AD_LOAD_TIMEOUT;
+import static com.kaltura.playkit.samples.fulldemo.Consts.AUTO_PLAY;
+import static com.kaltura.playkit.samples.fulldemo.Consts.COMPANION_AD_HEIGHT;
+import static com.kaltura.playkit.samples.fulldemo.Consts.COMPANION_AD_WIDTH;
+import static com.kaltura.playkit.samples.fulldemo.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
+import static com.kaltura.playkit.samples.fulldemo.Consts.HLS_URL;
+import static com.kaltura.playkit.samples.fulldemo.Consts.HLS_URL2;
+import static com.kaltura.playkit.samples.fulldemo.Consts.KAVA_BASE_URL;
+import static com.kaltura.playkit.samples.fulldemo.Consts.MIME_TYPE;
+import static com.kaltura.playkit.samples.fulldemo.Consts.MIN_AD_DURATION_FOR_SKIP_BUTTON;
+import static com.kaltura.playkit.samples.fulldemo.Consts.PREFERRED_BITRATE;
+import static com.kaltura.playkit.samples.fulldemo.Consts.START_FROM;
+import static com.kaltura.playkit.samples.fulldemo.Consts.STATS_KALTURA_URL;
+
+//import com.kaltura.plugins.adsmanager.AdsConfig;
+//import com.kaltura.plugins.adsmanager.AdsPlugin;
 
 public class VideoFragment extends android.support.v4.app.Fragment {
     private static final String TAG = VideoFragment.class.getSimpleName();
@@ -729,6 +738,16 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         super.onPause();
     }
 
+    @Override
+    public void onStop() {
+
+        if (player != null) {
+            player.destroy();
+            player = null;
+        }
+        super.onStop();
+    }
+    
     @Override
     public void onResume() {
         super.onResume();

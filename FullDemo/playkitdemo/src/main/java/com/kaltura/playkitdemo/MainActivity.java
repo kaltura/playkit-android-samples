@@ -54,7 +54,9 @@ import com.kaltura.playkit.plugins.ima.IMAPlugin;
 //import com.kaltura.playkit.plugins.imadai.IMADAIPlugin;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
+import com.kaltura.playkit.plugins.ott.OttEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
+import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
@@ -164,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 });
             }
         };
-        
+
         startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
@@ -313,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
-           // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
+            // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
 
             //player.setPlaybackRate(1.5f);
             log.d("Player: " + player.getClass());
@@ -353,12 +355,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         addKavaPluginConfig(pluginConfigs);
         //addPhoenixAnalyticsPluginConfig(pluginConfigs);
         //addTVPAPIAnalyticsPluginConfig(pluginConfigs);
-
-        //pluginConfigs.setPluginConfig("IMASimplePlugin", jsonObject);
-        //pluginConfigs.setPluginConfig("KalturaStatistics", jsonObject);
-        //pluginConfigs.setPluginConfig("PhoenixAnalytics", jsonObject);
-        //pluginConfigs.setPluginConfig("Youbora", jsonObject);
-
     }
 
     private void addKaluraStatsPluginConfig(PKPluginConfigs pluginConfigs) {
@@ -437,35 +433,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
     }
 
-//    private void addPhoenixAnalyticsPluginConfig(PKPluginConfigs config) {
-//        String ks = "djJ8MTk4fHFftqeAPxdlLVzZBk0Et03Vb8on1wLsKp7cbOwzNwfOvpgmOGnEI_KZDhRWTS-76jEY7pDONjKTvbWyIJb5RsP4NL4Ng5xuw6L__BeMfLGAktkVliaGNZq9SXF5n2cMYX-sqsXLSmWXF9XN89io7-k=";
-//        PhoenixAnalyticsConfig phoenixAnalyticsConfig = new PhoenixAnalyticsConfig(198, "http://api-preprod.ott.kaltura.com/v4_2/api_v3/", ks, 30);
-//        config.setPluginConfig(PhoenixAnalyticsPlugin.factory.getName(),phoenixAnalyticsConfig);
-//    }
-//
-//    private void addTVPAPIAnalyticsPluginConfig(PKPluginConfigs config) {
-//        TVPAPILocale locale = new TVPAPILocale("","","", "");
-//        TVPAPIInitObject tvpapiInitObject = new TVPAPIInitObject(716158, "tvpapi_198", 354531, "e8aa934c-eae4-314f-b6a0-f55e96498786", "11111", "Cellular", locale);
-//        TVPAPIAnalyticsConfig tvpapiAnalyticsConfig = new TVPAPIAnalyticsConfig("http://tvpapi-preprod.ott.kaltura.com/v4_2/gateways/jsonpostgw.aspx?", 30, tvpapiInitObject);
-//        config.setPluginConfig(TVPAPIAnalyticsPlugin.factory.getName(),tvpapiAnalyticsConfig);
-//    }
-
-
-    private void addPhoenixAnalyticsPlugin(PKPluginConfigs config) {
-
-        //Important!!! First you need to register your plugin.
-        PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
-
-        //Phoenix analytics constants
-        String PHOENIX_ANALYTICS_BASE_URL = "https://rest-as.ott.kaltura.com/v4_4/api_v3/";
-        int PHOENIX_ANALYTICS_PARTNER_ID = 225;
-        String PHOENIX_ANALYTICS_KS = "ks";
-        int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
-
-
-
-        //Set plugin entry to the plugin configs.
-        PhoenixAnalyticsConfig phoenixAnalyticsConfig = new PhoenixAnalyticsConfig(PHOENIX_ANALYTICS_PARTNER_ID, PHOENIX_ANALYTICS_BASE_URL, PHOENIX_ANALYTICS_KS, ANALYTIC_TRIGGER_INTERVAL);
+    private void addPhoenixAnalyticsPluginConfig(PKPluginConfigs config) {
+        String ks = "djJ8MTk4fHFftqeAPxdlLVzZBk0Et03Vb8on1wLsKp7cbOwzNwfOvpgmOGnEI_KZDhRWTS-76jEY7pDONjKTvbWyIJb5RsP4NL4Ng5xuw6L__BeMfLGAktkVliaGNZq9SXF5n2cMYX-sqsXLSmWXF9XN89io7-k=";
+        PhoenixAnalyticsConfig phoenixAnalyticsConfig = new PhoenixAnalyticsConfig(198, "http://api-preprod.ott.kaltura.com/v4_2/api_v3/", ks, 30);
         config.setPluginConfig(PhoenixAnalyticsPlugin.factory.getName(), phoenixAnalyticsConfig);
     }
 
@@ -606,16 +576,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void addPlayerListeners(final ProgressBar appProgressBar) {
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PlayerEvent.Error playerErrorEvent = (PlayerEvent.Error) event;
-                if (playerErrorEvent != null && playerErrorEvent.error != null) {
-                    log.e("ERROR: " + playerErrorEvent.error.errorType + ", " + playerErrorEvent.error.message);
-                }
-            }
-        }, PlayerEvent.Type.ERROR);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override
@@ -794,10 +754,53 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onEvent(PKEvent event) {
                 //When the track data available, this event occurs. It brings the info object with it.
+                PlayerEvent.Error playerError = (PlayerEvent.Error) event;
+                if (playerError != null && playerError.error != null) {
+                    log.d("PlayerEvent.Error event  position = " + playerError.error.errorType + " errorMessage = " + playerError.error.message);
+                }
+            }
+        }, PlayerEvent.Type.ERROR);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                //When the track data available, this event occurs. It brings the info object with it.
                 PlayerEvent.PlayheadUpdated playheadUpdated = (PlayerEvent.PlayheadUpdated) event;
                 //log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
             }
         }, PlayerEvent.Type.PLAYHEAD_UPDATED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                PhoenixAnalyticsEvent.BookmarkErrorEvent bookmarkErrorEvent = (PhoenixAnalyticsEvent.BookmarkErrorEvent) event;
+                log.d("bookmarkErrorEvent errorCode = " + bookmarkErrorEvent.errorCode + " message = " + bookmarkErrorEvent.errorMessage);
+            }
+        }, PhoenixAnalyticsEvent.Type.BOOKMARK_ERROR);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                PhoenixAnalyticsEvent.ConcurrencyErrorEvent concurrencyErrorEvent = (PhoenixAnalyticsEvent.ConcurrencyErrorEvent) event;
+                log.d("ConcurrencyErrorEvent errorCode = " + concurrencyErrorEvent.errorCode + " message = " + concurrencyErrorEvent.errorMessage);
+            }
+        }, PhoenixAnalyticsEvent.Type.CONCURRENCY_ERROR);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                PhoenixAnalyticsEvent.ErrorEvent errorEvent = (PhoenixAnalyticsEvent.ErrorEvent) event;
+                log.d("Phoenox Analytics errorEvent errorCode = " + errorEvent.errorCode + " message = " + errorEvent.errorMessage);
+            }
+        }, PhoenixAnalyticsEvent.Type.ERROR);
+
+        //OLD WAY FOR GETTING THE CONCURRENCY
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                log.d("Concurrency event");
+            }
+        }, OttEvent.OttEventType.Concurrency);
     }
 
     @Override

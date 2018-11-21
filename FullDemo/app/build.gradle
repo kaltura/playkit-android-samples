@@ -32,7 +32,7 @@ dependencies {
 //    implementation project(":googlecast")
 
     implementation 'com.kaltura.playkit:playkit:3.6.2'
-    implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
+    implementation 'com.kaltura.playkit:playkitproviders:1.0.4'
     implementation 'com.kaltura.playkit:youboraplugin:1.0.2'
     implementation 'com.kaltura.playkit:imaplugin:1.0.2'
     implementation 'com.kaltura.playkit:kavaplugin:1.1.2'

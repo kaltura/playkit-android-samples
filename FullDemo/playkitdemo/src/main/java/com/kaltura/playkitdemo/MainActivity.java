@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
         PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
         //PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
-        //PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
+        PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
     }
 
     @Override
@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         addYouboraPluginConfig(pluginConfigs);
         addKavaPluginConfig(pluginConfigs);
-        //addPhoenixAnalyticsPluginConfig(pluginConfigs);
+        addPhoenixAnalyticsPluginConfig(pluginConfigs);
         //addTVPAPIAnalyticsPluginConfig(pluginConfigs);
     }
 

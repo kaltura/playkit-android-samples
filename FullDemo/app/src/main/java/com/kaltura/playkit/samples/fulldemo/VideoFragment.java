@@ -205,7 +205,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
             //player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             player.updatePluginConfig(PhoenixAnalyticsPlugin.factory.getName(), getPhoenixAnalyticsConfig());
-            player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
+            //player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
             player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigVodHLSTearOfSteel());
             player.updatePluginConfig(YouboraPlugin.factory.getName(), getConverterYoubora(MEDIA_TITLE + "_changeMedia1", false).toJson());
             //If first one is active, prepare second one.

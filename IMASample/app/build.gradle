@@ -33,18 +33,23 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
+def excludePlaykit = {
+    exclude group: 'com.kaltura', module: 'playkit-android'
+    exclude group: 'com.kaltura.playkit', module: 'playkit'
+}
+
 dependencies {
-    implementation 'com.kaltura.playkit:playkit:3.6.2'
-    implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
-    implementation 'com.kaltura.playkit:imaplugin:1.0.2'
+    implementation 'com.kaltura.playkit:playkit:3.7.0'
+    implementation 'com.kaltura.playkit:playkitproviders:3.7.0', excludePlaykit
+    implementation 'com.kaltura.playkit:imaplugin:1.0.2', excludePlaykit
 
 //    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
 //    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
 //    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
 
-    //implementation project(':playkit')
-    //implementation project(':providers')
-    //implementation project(':ima')
+//    implementation project(':playkit')
+//    implementation project(':providers')
+//    implementation project(':ima')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {

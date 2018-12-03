@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -145,27 +146,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         log.i("PlayKitManager: " + PlayKitManager.CLIENT_TAG);
 
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        Button button = findViewById(R.id.changeMedia);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (player != null) {
+                    OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
+                    startSimpleOvpMediaLoading(playLoadedEntry);
+                }
+            }
+        });
+
+
+        progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
         registerPlugins();
 
-        OnMediaLoadCompletion playLoadedEntry = new OnMediaLoadCompletion() {
-            @Override
-            public void onComplete(final ResultElement<PKMediaEntry> response) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (response.isSuccess()) {
-                            onMediaLoaded(response.getResponse());
-                        } else {
-
-                            Toast.makeText(MainActivity.this, "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""), Toast.LENGTH_LONG).show();
-                            log.e("failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""));
-                        }
-                    }
-                });
-            }
-        };
+        OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
         startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
@@ -188,6 +184,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 setRequestedOrientation(orient);
             }
         });
+    }
+
+    @NonNull
+    private OnMediaLoadCompletion registerToLoadedMediaCallback() {
+        return new OnMediaLoadCompletion() {
+                            @Override
+                            public void onComplete(final ResultElement<PKMediaEntry> response) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        if (response.isSuccess()) {
+                                            onMediaLoaded(response.getResponse());
+                                        } else {
+
+                                            Toast.makeText(MainActivity.this, "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""), Toast.LENGTH_LONG).show();
+                                            log.e("failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""));
+                                        }
+                                    }
+                                });
+                            }
+                        };
     }
 
     private void initDrm() {

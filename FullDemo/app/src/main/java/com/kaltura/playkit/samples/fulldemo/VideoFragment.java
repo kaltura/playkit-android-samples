@@ -181,7 +181,9 @@ public class VideoFragment extends android.support.v4.app.Fragment {
     }
 
     private void changeMedia() {
-
+        if (player == null) {
+            return;
+        }
         //Before changing media we must call stop on the player.
         player.stop();
         player.getSettings().setPreferredMediaFormat(PKMediaFormat.mp3);
@@ -739,15 +741,14 @@ public class VideoFragment extends android.support.v4.app.Fragment {
     }
 
     @Override
-    public void onStop() {
-
+    public void onDestroy() {
         if (player != null) {
             player.destroy();
             player = null;
         }
-        super.onStop();
+        super.onDestroy();
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();

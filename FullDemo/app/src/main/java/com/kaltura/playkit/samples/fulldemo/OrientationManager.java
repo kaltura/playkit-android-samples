@@ -58,6 +58,6 @@ public class OrientationManager extends OrientationEventListener {
 
     public interface OrientationListener {
 
-        public void onOrientationChange(ScreenOrientation screenOrientation);
+        void onOrientationChange(ScreenOrientation screenOrientation);
     }
 }

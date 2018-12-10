@@ -276,7 +276,8 @@ public class MainActivity extends AppCompatActivity {
 
         PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = null;
         MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(position).build();
-        pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_b7s02kjl", "", null), loadOptions);
+        String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+        pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_b7s02kjl", vastAdTag, CAFCastBuilder.AdTagType.VAST), loadOptions);
         pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
             @Override
@@ -409,103 +410,43 @@ public class MainActivity extends AppCompatActivity {
         return cafCastBuilder.build();
     }
 
-    private void setMediaMetadata(BasicCastBuilder basicCastBuilder, ConverterGoogleCast converterGoogleCast) {
-
-        MediaMetadata mediaMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
-        ConverterMediaMetadata converterMediaMetadata = converterGoogleCast.getMediaMetadata();
-
-        if (converterMediaMetadata != null) { // MediaMetadata isn't mandatory
-
-            String title = converterMediaMetadata.getTitle();
-            String subTitle = converterMediaMetadata.getSubtitle();
-            ConverterImageUrl image = converterMediaMetadata.getImageUrl();
-
-            if (!TextUtils.isEmpty(title)) {
-                mediaMetadata.putString(MediaMetadata.KEY_TITLE, title);
-            }
-
-            if (!TextUtils.isEmpty(subTitle)) {
-                mediaMetadata.putString(MediaMetadata.KEY_SUBTITLE, subTitle);
-            }
-
-            if (image != null) {
-                Uri uri = null;
-                String url = image.getURL();
-                int width = image.getWidth();
-                int height = image.getHeight();
-
-                if (!TextUtils.isEmpty(url)) {
-                    uri = Uri.parse(url);
-                }
-
-                if (uri != null && width != 0 && height != 0) {
-                    mediaMetadata.addImage(new WebImage(uri, width, height));
-                }
-
-            }
-            basicCastBuilder.setMetadata(mediaMetadata);
-        }
-    }
-
-    private void setAdTagUrl(BasicCastBuilder basicCastBuilder, ConverterGoogleCast converterGoogleCast,
-                             boolean setAdTagUrl) {
-
-        String adTagUrl = converterGoogleCast.getAdTagURL();
-
-        if (!TextUtils.isEmpty(adTagUrl) && setAdTagUrl) { // adTagUrl isn't mandatory
-            basicCastBuilder.setAdTagUrl(adTagUrl);
-        }
-    }
-
-
-    private ConverterOvpCast getConverterCastForOvp() {
-        ConverterMediaMetadata converterMediaMetadata = new ConverterMediaMetadata("Cofee", "Folgers",
-                new ConverterImageUrl("https://cfvod.kaltura.com/p/243342/sp/24334200/thumbnail/entry_id/0_uka1msg4/version/100007/width/1200/hight/780",1200, 780));
-
-        ConverterOvpCast converterOvpCast = new ConverterOvpCast(
-                ConverterGoogleCast.ReceiverEnvironmentType.RECEIVER_OVP_ENVIRONMENT,
-                "", //ks
-                "0_uka1msg4",
-                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
-                "", //mwEmbed
-                "243342",
-                "21099702",
-                converterMediaMetadata);
-
-        return converterOvpCast;
-    }
-
-    private ConverterOttCast getConverterCastForOtt() {
-        ConverterMediaMetadata converterMediaMetadata = new ConverterMediaMetadata("Sintel", "Blender foundation",
-                new ConverterImageUrl("https://commondatastorage.googleapis.com/gtv-videos-bucket/CastVideos/images/780x1200/BigBuckBunny-780x1200.jpg",1200, 780));
-
-
-        KInitObjModel initObj = new KInitObjModel();
-        initObj.setApiUser("tvpapi_198");
-        initObj.setApiPass("11111");
-        initObj.setDomainID(362595);
-        initObj.setSiteGuid("739182");
-        initObj.setUDID("fd6c5420-8647-3dad-91d8-815309f8e319");
-        initObj.setPlatform("Cellular");
-        KLocaleModel kLocaleModel = new KLocaleModel();
-        kLocaleModel.setLocaleCountry("");
-        kLocaleModel.setLocaleDevice("");
-        kLocaleModel.setLocaleLanguage("en");
-        kLocaleModel.setLocaleUserState("Unknown");
-        initObj.setLocale(kLocaleModel);
-        ConverterOttCast converterOttCast = new ConverterOttCast(
-                ConverterGoogleCast.ReceiverEnvironmentType.RECEIVER_TVPAPI_ENVIRONMENT,
-                initObj.toJson(),
-                "Mobile_Devices_Main_SD",
-                "259153",
-                "https://pubsssads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
-                "http://player-preprod.ott.kaltura.com/v2.61/mwEmbed/",
-                "198",
-                "8413355",
-                converterMediaMetadata);
-
-        return converterOttCast;
-    }
+//    private void setMediaMetadata(BasicCastBuilder basicCastBuilder, ConverterGoogleCast converterGoogleCast) {
+//
+//        MediaMetadata mediaMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
+//        ConverterMediaMetadata converterMediaMetadata = converterGoogleCast.getMediaMetadata();
+//
+//        if (converterMediaMetadata != null) { // MediaMetadata isn't mandatory
+//
+//            String title = converterMediaMetadata.getTitle();
+//            String subTitle = converterMediaMetadata.getSubtitle();
+//            ConverterImageUrl image = converterMediaMetadata.getImageUrl();
+//
+//            if (!TextUtils.isEmpty(title)) {
+//                mediaMetadata.putString(MediaMetadata.KEY_TITLE, title);
+//            }
+//
+//            if (!TextUtils.isEmpty(subTitle)) {
+//                mediaMetadata.putString(MediaMetadata.KEY_SUBTITLE, subTitle);
+//            }
+//
+//            if (image != null) {
+//                Uri uri = null;
+//                String url = image.getURL();
+//                int width = image.getWidth();
+//                int height = image.getHeight();
+//
+//                if (!TextUtils.isEmpty(url)) {
+//                    uri = Uri.parse(url);
+//                }
+//
+//                if (uri != null && width != 0 && height != 0) {
+//                    mediaMetadata.addImage(new WebImage(uri, width, height));
+//                }
+//
+//            }
+//            basicCastBuilder.setMetadata(mediaMetadata);
+//        }
+//    }
 
     @Override
     protected void onResume() {

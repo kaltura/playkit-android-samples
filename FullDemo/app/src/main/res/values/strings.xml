@@ -60,7 +60,7 @@
 
     <string name="pref_companion_value" translatable="false">728x90</string>
     <string name="pref_companion_key" translatable="false">companion</string>
-    <string name="pref_companion_label">Companion Ad Dimentions</string>
+    <string name="pref_companion_label">Companion Ad Dimensions</string>
     <string name="pref_companion_off_label">OFF</string>
     <string name="pref_companion_320_50_label">320x50</string>
     <string name="pref_companion_320_100_label">320x100</string>

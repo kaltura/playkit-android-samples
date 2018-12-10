@@ -163,10 +163,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
-        startMockMediaLoading(playLoadedEntry);
+//        startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
-//        startSimpleOvpMediaLoading(playLoadedEntry);
+        startSimpleOvpMediaLoading(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
@@ -389,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void addKavaPluginConfig(PKPluginConfigs pluginConfigs) {
         KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
                 .setApplicationVersion(BuildConfig.VERSION_NAME)
-                .setPartnerId(Integer.valueOf(2222401))
+                .setPartnerId(2222401)
                 .setEntryId("1_f93tepsn")
                 .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
         //Set plugin entry to the plugin configs.
@@ -469,7 +469,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Map<Double, String> tagTimesMap = new HashMap<>();
         //tagTimesMap.put(2.0,"ADTAG");
 
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(preSKipAdTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAdLoadTimeOut(8);
+        String vooturl = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOH&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DU%26Age%3DNULL%26KidsPinEnabled%3DN%26AppVersion%3D0.1.58%26DeviceModel%3DAndroid%20SDK%20built%20for%20x86%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26description_url%3Dhttps%253A%252F%252Fwww.voot.com%26first_time%3DFalse&cmsid=2467608&ppid=2fbdf28d-5bf9-4f43-b49e-19c4ca1f10f8&vid=0_o71549bv&ad_rule=1&correlator=246819";//builder.build().toString();
+
+        IMAConfig adsConfig = new IMAConfig().setAdTagURL(vooturl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAdLoadTimeOut(8);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
@@ -622,6 +624,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
 
         }, AdEvent.Type.CONTENT_PAUSE_REQUESTED);
+
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                log.d("AD_PLAYBACK_INFO_UPDATED");
+                AdEvent.AdPlaybackInfoUpdated playbackInfoUpdated = (AdEvent.AdPlaybackInfoUpdated) event;
+                log.d("XXX playbackInfoUpdated  = " + playbackInfoUpdated.width + "/" + playbackInfoUpdated.height + "/" + playbackInfoUpdated.bitrate);
+            }
+
+        }, AdEvent.Type.AD_PLAYBACK_INFO_UPDATED);
+
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {

@@ -29,17 +29,18 @@ public class VideoItemAdapter extends ArrayAdapter<VideoItem> {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             row = inflater.inflate(mLayoutResourceId, parent, false);
             videoItemHolder = new VideoItemHolder();
-            videoItemHolder.title = (TextView) row.findViewById(R.id.videoItemText);
-            videoItemHolder.image = (ImageView) row.findViewById(R.id.videoItemImage);
+            videoItemHolder.title = row.findViewById(R.id.videoItemText);
+            videoItemHolder.image = row.findViewById(R.id.videoItemImage);
             row.setTag(videoItemHolder);
         } else {
             videoItemHolder = (VideoItemHolder) row.getTag();
         }
 
         VideoItem item = getItem(position);
-
-        videoItemHolder.title.setText(item.getTitle());
-        videoItemHolder.image.setImageResource(item.getImageResource());
+        if (item != null) {
+            videoItemHolder.title.setText(item.getTitle());
+            videoItemHolder.image.setImageResource(item.getImageResource());
+        }
 
         return row;
     }

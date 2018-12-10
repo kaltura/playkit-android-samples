@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.kaltura.playkit.PKDrmParams;
@@ -137,7 +138,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
      * Listener called when the fragment's onCreateView is fired.
      */
     public interface OnVideoFragmentViewCreatedListener {
-        public void onVideoFragmentViewCreated();
+        void onVideoFragmentViewCreated();
     }
 
     @Override
@@ -192,10 +193,13 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
         //Check if id of the media entry that is set in mediaConfig.
         String AD_HONDA2 = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=" + System.currentTimeMillis();//"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
-
+        List<String> videoMimeTypes = new ArrayList<>();
+        videoMimeTypes.add("video/mp4");
+        videoMimeTypes.add("application/x-mpegURL");
         if (mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)) {
             String AD_HOND = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";//"http://externaltests.dev.kaltura.com/player/Vast_xml/alexs.qacore-vast3-rol_02.xml";
-            IMAConfig adsConfig = new IMAConfig().setAdTagURL(AD_HOND).enableDebugMode(true);
+
+            IMAConfig adsConfig = new IMAConfig().setAdTagURL(AD_HOND).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes);
                     //"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
 //            AdsConfig adsConfig = new AdsConfig().
 //                    setAdTagURL(AD_HOND).
@@ -219,7 +223,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             //If first one is active, prepare second one.
             prepareSecondEntry();
         } else {
-            IMAConfig adsConfig = new IMAConfig().setAdTagURL(AD_HONDA2).enableDebugMode(true);
+            IMAConfig adsConfig = new IMAConfig().setAdTagURL(AD_HONDA2).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes);
 
 //            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_HONDA2).
 //                    setPlayerViewContainer(playerLayout).
@@ -468,13 +472,15 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
     private void addIMAPluginConfig(PKPluginConfigs config, String adTagUrl) {
 
-        List<String> videoMimeTypes = new ArrayList<>();
+        //List<String> videoMimeTypes = new ArrayList<>();
         //videoMimeTypes.add(MimeTypes.APPLICATION_MP4);
         //videoMimeTypes.add(MimeTypes.APPLICATION_M3U8);
         //Map<Double, String> tagTimesMap = new HashMap<>();
         //tagTimesMap.put(2.0,"ADTAG");
-
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl).enableDebugMode(true);
+        List<String> videoMimeTypes = new ArrayList<>();
+        videoMimeTypes.add("video/mp4");
+        videoMimeTypes.add(MimeTypes.APPLICATION_M3U8);
+        IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
@@ -659,7 +665,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
     private void initUi(View rootView) {
 
-        Button changeMediaButton = (Button)rootView.findViewById(R.id.changeMedia);
+        Button changeMediaButton = rootView.findViewById(R.id.changeMedia);
         //Set click listener.
         changeMediaButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -668,13 +674,13 @@ public class VideoFragment extends android.support.v4.app.Fragment {
                 changeMedia();
             }
         });
-        mVideoTitle = (TextView) rootView.findViewById(R.id.video_title);
-        playerLayout = (FrameLayout) rootView.findViewById(R.id.player_root);
-        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBarSpinner);
-        controlsView = (PlaybackControlsView) rootView.findViewById(R.id.playerControls);
+        mVideoTitle = rootView.findViewById(R.id.video_title);
+        playerLayout = rootView.findViewById(R.id.player_root);
+        progressBar = rootView.findViewById(R.id.progressBarSpinner);
+        controlsView = rootView.findViewById(R.id.playerControls);
         progressBar.setVisibility(View.INVISIBLE);
-        adSkin = (RelativeLayout) rootView.findViewById(R.id.ad_skin);
-        fullScreenBtn = (AppCompatImageView)rootView.findViewById(R.id.full_screen_switcher);
+        adSkin = rootView.findViewById(R.id.ad_skin);
+        fullScreenBtn = rootView.findViewById(R.id.full_screen_switcher);
         fullScreenBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -691,8 +697,8 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             }
         });
 
-        final TextView logText = (TextView) rootView.findViewById(R.id.logText);
-        final ScrollView logScroll = (ScrollView) rootView.findViewById(R.id.logScroll);
+        final TextView logText = rootView.findViewById(R.id.logText);
+        final ScrollView logScroll = rootView.findViewById(R.id.logScroll);
 
         Logger logger = new Logger() {
             @Override
@@ -770,6 +776,25 @@ public class VideoFragment extends android.support.v4.app.Fragment {
                 log("ADS_PLAYBACK_ENDED");
             }
         }, AdEvent.Type.CONTENT_RESUME_REQUESTED);
+
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                log("AD_PLAYBACK_INFO_UPDATED");
+                AdEvent.AdPlaybackInfoUpdated playbackInfoUpdated = (AdEvent.AdPlaybackInfoUpdated) event;
+                //log.d("XXX playbackInfoUpdated  = " + playbackInfoUpdated.width + "/" + playbackInfoUpdated.height + "/" + playbackInfoUpdated.bitrate);
+                log("AD_PLAYBACK_INFO_UPDATED bitrate = " + playbackInfoUpdated.bitrate);
+            }
+
+        }, AdEvent.Type.AD_PLAYBACK_INFO_UPDATED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                log("SKIPPABLE_STATE_CHANGED");
+            }
+        }, AdEvent.Type.SKIPPABLE_STATE_CHANGED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override

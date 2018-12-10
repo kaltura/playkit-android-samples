@@ -1,7 +1,5 @@
 package com.kaltura.playkit.samples.fulldemo;
 
-import android.app.Application;
-
 
 //public class LeakTest extends Application {
 //

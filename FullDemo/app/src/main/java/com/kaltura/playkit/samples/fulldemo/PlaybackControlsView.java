@@ -60,12 +60,12 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
 
     private void initPlaybackControls() {
 
-        btnPlay = (ImageButton) this.findViewById(R.id.play);
-        btnPause = (ImageButton) this.findViewById(R.id.pause);
-        btnFastForward = (ImageButton) this.findViewById(R.id.ffwd);
-        btnRewind = (ImageButton) this.findViewById(R.id.rew);
-        btnNext = (ImageButton) this.findViewById(R.id.next);
-        btnPrevious = (ImageButton) this.findViewById(R.id.prev);
+        btnPlay = this.findViewById(R.id.play);
+        btnPause = this.findViewById(R.id.pause);
+        btnFastForward = this.findViewById(R.id.ffwd);
+        btnRewind = this.findViewById(R.id.rew);
+        btnNext = this.findViewById(R.id.next);
+        btnPrevious = this.findViewById(R.id.prev);
 
         btnPlay.setOnClickListener(this);
         btnPause.setOnClickListener(this);
@@ -74,11 +74,11 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         btnNext.setOnClickListener(this);
         btnPrevious.setOnClickListener(this);
 
-        seekBar = (SeekBar) this.findViewById(R.id.mediacontroller_progress);
+        seekBar = this.findViewById(R.id.mediacontroller_progress);
         seekBar.setOnSeekBarChangeListener(this);
 
-        tvCurTime = (TextView) this.findViewById(R.id.time_current);
-        tvTime = (TextView) this.findViewById(R.id.time);
+        tvCurTime = this.findViewById(R.id.time_current);
+        tvTime = this.findViewById(R.id.time);
     }
 
     private void updateProgress() {

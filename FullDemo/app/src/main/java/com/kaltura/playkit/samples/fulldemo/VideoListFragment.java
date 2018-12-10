@@ -105,8 +105,8 @@ public class VideoListFragment extends Fragment implements LoaderManager.LoaderC
         companionAdHeight = getArguments().getInt(COMPANION_AD_HEIGHT);
 
         rootView = inflater.inflate(R.layout.fragment_video_list, container, false);
-        listView = (ListView) rootView.findViewById(R.id.videoListView);
-        loadingIndicator = (ProgressBar) rootView.findViewById(R.id.pb_loading_indicator);
+        listView = rootView.findViewById(R.id.videoListView);
+        loadingIndicator = rootView.findViewById(R.id.pb_loading_indicator);
 
         getActivity().getSupportLoaderManager().initLoader(ADS_LOADER, null, this);
 
@@ -123,21 +123,21 @@ public class VideoListFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     private void getCustomAdTag(VideoItem originalVideoItem) {
-        View dialogueView = mInflater.inflate(R.layout.custom_ad_tag, mContainer, false);
+        View dialogView = mInflater.inflate(R.layout.custom_ad_tag, mContainer, false);
 
-        final EditText videoUrl = (EditText) dialogueView.findViewById(mediaUrl);
+        final EditText videoUrl = dialogView.findViewById(mediaUrl);
         videoUrl.setHint("Media URL");
 
-        final EditText licUrl = (EditText) dialogueView.findViewById(mediaLic);
+        final EditText licUrl = dialogView.findViewById(mediaLic);
         licUrl.setHint("Media Lic URL");
 
-        final EditText adUrl = (EditText) dialogueView.findViewById(customTag);
+        final EditText adUrl = dialogView.findViewById(customTag);
         adUrl.setHint("Ad Tag URL/XML");
         final VideoItem videoItem = originalVideoItem;
 
         new AlertDialog.Builder(this.getActivity())
                 .setTitle("Custom Ad Tag URL/XML(plaint text)")
-                .setView(dialogueView)
+                .setView(dialogView)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         String customMediaUrl = (!TextUtils.isEmpty(videoUrl.getText().toString())) ? videoUrl.getText().toString() : SOURCE_URL1;

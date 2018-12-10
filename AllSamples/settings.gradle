@@ -34,6 +34,7 @@ def samples = [
         'Providers',
         'TVPapiStats',
         'ChromecastSample',
+        'ChromecastCAFSample',
         'MediaSession'
 ]
 

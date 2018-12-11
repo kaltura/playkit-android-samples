@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //NOTE - FOR OTT CASTING YOU HAVE TO CHANGE THE REVIVER ID TO E4D66C10 in strings.xml
+        //NOTE - FOR OTT CASTING YOU HAVE TO CHANGE THE PRODUCT FLAVOUR TO OTT
         mCastStateListener = new CastStateListener() {
             @Override
             public void onCastStateChanged(int newState) {

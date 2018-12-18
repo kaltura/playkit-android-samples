@@ -398,14 +398,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void addYouboraPluginConfig(PKPluginConfigs pluginConfigs) {
         JsonObject pluginEntry = new JsonObject();
-
-        //Youbora config json. Main config goes here.
-        JsonObject youboraConfigJson = new JsonObject();
-        youboraConfigJson.addProperty("accountCode", "KALTURA_TEST");
-        youboraConfigJson.addProperty("username", "a@a.com");
-        youboraConfigJson.addProperty("haltOnError", true);
-        youboraConfigJson.addProperty("enableAnalytics", true);
-        youboraConfigJson.addProperty("enableSmartAds", true);
+        
+        pluginEntry.addProperty("accountCode", "kalturatest");
+        pluginEntry.addProperty("username", "a@a.com");
+        pluginEntry.addProperty("haltOnError", true);
+        pluginEntry.addProperty("enableAnalytics", true);
+        pluginEntry.addProperty("enableSmartAds", true);
 
 
         //Media entry json.

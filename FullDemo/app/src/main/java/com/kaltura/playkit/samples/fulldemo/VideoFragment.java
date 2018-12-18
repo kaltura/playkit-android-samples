@@ -84,8 +84,8 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
 
     //Youbora analytics Constants
-    public static final String ACCOUNT_CODE = "your_account_code";
-    public static final String USER_NAME = "your_user_name";
+    public static final String ACCOUNT_CODE = "kalturatest";
+    public static final String USER_NAME = "a@a.com";
     public static final String MEDIA_TITLE = "your_media_title";
     public static final boolean IS_LIVE = false;
     public static final boolean ENABLE_SMART_ADS = true;

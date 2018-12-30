@@ -35,7 +35,7 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
-import com.kaltura.playkit.ads.AdEnabledPlayerController;
+import com.kaltura.playkit.ads.AdController;
 import com.kaltura.playkit.player.PlayerSettings;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
@@ -200,7 +200,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             String AD_HOND = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";//"http://externaltests.dev.kaltura.com/player/Vast_xml/alexs.qacore-vast3-rol_02.xml";
 
             IMAConfig adsConfig = new IMAConfig().setAdTagURL(AD_HOND).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes);
-                    //"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
+            //"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
 //            AdsConfig adsConfig = new AdsConfig().
 //                    setAdTagURL(AD_HOND).
 //                    setPlayerViewContainer(playerLayout).
@@ -486,12 +486,12 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
     private void addKalturaStatsPlugin(PKPluginConfigs config) {
         KalturaStatsConfig kalturaStatsPluginConfig = new KalturaStatsConfig(true)
-        .setBaseUrl(STATS_KALTURA_URL)
-        .setUiconfId(38713161)
-        .setPartnerId(2222401)
-        .setEntryId("1_f93tepsn")
-        .setTimerInterval(150000)
-        .setUserId("TestUser");
+                .setBaseUrl(STATS_KALTURA_URL)
+                .setUiconfId(38713161)
+                .setPartnerId(2222401)
+                .setEntryId("1_f93tepsn")
+                .setTimerInterval(150000)
+                .setUserId("TestUser");
         config.setPluginConfig(KalturaStatsPlugin.factory.getName(), kalturaStatsPluginConfig);
     }
 
@@ -513,7 +513,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
 
     private void addYouboraPlugin(PKPluginConfigs pluginConfigs) {
-       ConverterYoubora converterYoubora = getConverterYoubora(MEDIA_TITLE, false);
+        ConverterYoubora converterYoubora = getConverterYoubora(MEDIA_TITLE, false);
 
         pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), converterYoubora.toJson());
     }
@@ -754,7 +754,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         }
         super.onDestroy();
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
@@ -861,6 +861,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
+                log("AD_COMPLETED");
 //                AdEvent.AdEndedEvent adEndedEvent = (AdEvent.AdEndedEvent) event;
 //                if (adEndedEvent.adEndedReason == PKAdEndedReason.COMPLETED) {
 //                    log("AD_ENDED-" + adEndedEvent.adEndedReason);
@@ -887,6 +888,14 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             public void onEvent(PKEvent event) {
                 log("AD_PAUSED");
                 nowPlaying = true;
+                if (player != null) {
+                    AdController adController = player.getController(AdController.class);
+                    if (adController != null && adController.isAdDisplayed()) {
+                        log("Ad " + adController.getCurrentPosition() + "/" + adController.getDuration());
+                    } else {
+                        log("Player " + player.getCurrentPosition() + "/" + player.getDuration());
+                    }
+                }
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
         }, AdEvent.Type.PAUSED);
@@ -912,6 +921,14 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             public void onEvent(PKEvent event) {
                 //log("PLAYER PAUSE");
                 nowPlaying = false;
+                if (player != null) {
+                    AdController adController = player.getController(AdController.class);
+                    if (adController != null && adController.isAdDisplayed()) {
+                        log("Ad " + adController.getCurrentPosition() + "/" + adController.getDuration());
+                    } else {
+                        log("Player " + player.getCurrentPosition() + "/" + player.getDuration());
+                    }
+                }
             }
         }, PlayerEvent.Type.PAUSE);
 
@@ -937,6 +954,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             @Override
             public void onEvent(PKEvent event) {
                 log("FIRST_QUARTILE");
+
             }
         }, AdEvent.Type.FIRST_QUARTILE);
 
@@ -944,6 +962,17 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             @Override
             public void onEvent(PKEvent event) {
                 log("MIDPOINT");
+                if (player != null) {
+                    AdController adController = player.getController(AdController.class);
+                    if (adController != null) {
+                        if (adController.isAdDisplayed()) {
+                            log(adController.getCurrentPosition() + "/" + adController.getDuration());
+                        }
+                        //log("" + adController.getCuePoints().getAdCuePoints().size());
+                        //log(adController.getAdInfo().toString());
+                        //adController.skip();
+                    }
+                }
             }
         }, AdEvent.Type.MIDPOINT);
 
@@ -1022,11 +1051,20 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
+                log("TRACKS_AVAILABLE");
                 //When the track data available, this event occurs. It brings the info object with it.
                 //PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
                 //populateSpinnersWithTrackInfo(tracksAvailable.tracksInfo);
                 //log("PLAYER TRACKS_AVAILABLE");
 
+                if (player != null) {
+                    AdController adController = player.getController(AdController.class);
+                    if (adController != null) {
+                        if (adController.isAdDisplayed()) {
+                            //log(adController.getCurrentPosition() + "/" + adController.getDuration());
+                        }
+                    }
+                }
             }
         }, PlayerEvent.Type.TRACKS_AVAILABLE);
 
@@ -1047,16 +1085,17 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         (adSkin).findViewById(R.id.skip_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (player != null && player.getController(AdEnabledPlayerController.class) != null)
-                    log("Controller skipAd");
-                    player.getController(AdEnabledPlayerController.class).skipAd();
+                if (player != null && player.getController(AdController.class) != null) {
+                    log("Controller skip");
+                    player.getController(AdController.class).skip();
+                }
             }
         });
 
         (adSkin).findViewById(R.id.learn_more_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (player != null && player.getController(AdEnabledPlayerController.class) != null) {
+                if (player != null && player.getController(AdController.class) != null) {
                     log("Controller openLearnMore");
                     //player.getController(AdEnabledPlayerController.class).openLearnMore();
                 }
@@ -1067,7 +1106,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         (companionAdPlaceHolder).findViewById(R.id.imageViewCompanion).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (player != null && player.getController(AdEnabledPlayerController.class) != null) {
+                if (player != null && player.getController(AdController.class) != null) {
                     log("Controller openCompanionAdLearnMore");
                     //player.getController(AdEnabledPlayerController.class).openCompanionAdLearnMore();
                 }
@@ -1080,8 +1119,8 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             return;
         }
 
-        if (player != null && player.getController(AdEnabledPlayerController.class) != null) {
-            log("Controller screenOrientationChanged");
+        if (player != null && player.getController(AdController.class) != null) {
+            //log("Controller screenOrientationChanged");
             //player.getController(AdEnabledPlayerController.class).screenOrientationChanged(isFullScreen);
         }
 

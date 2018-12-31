@@ -853,10 +853,29 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         player.addEventListener(new PKEvent.Listener() {
             @Override
             public void onEvent(PKEvent event) {
-                log("AD_STARTED ");
+                AdEvent.AdStartedEvent adStartedEvent = (AdEvent.AdStartedEvent) event;
+                log("AD_STARTED w/h - " + adStartedEvent.adInfo.getAdWidth() + "/" + adStartedEvent.adInfo.getAdHeight());
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
         }, AdEvent.Type.STARTED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+
+                PlayerEvent.VideoFramesDropped videoFramesDropped = (PlayerEvent.VideoFramesDropped) event;
+                log("VIDEO_FRAMES_DROPPED " + videoFramesDropped.droppedVideoFrames);
+            }
+        }, PlayerEvent.Type.VIDEO_FRAMES_DROPPED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+
+                PlayerEvent.BytesLoaded bytesLoaded = (PlayerEvent.BytesLoaded) event;
+                log("BYTES_LOADED " + bytesLoaded.bytesLoaded);
+            }
+        }, PlayerEvent.Type.BYTES_LOADED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override

@@ -467,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Map<Double, String> tagTimesMap = new HashMap<>();
         //tagTimesMap.put(2.0,"ADTAG");
 
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(preSKipAdTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAdLoadTimeOut(8);
+        IMAConfig adsConfig = new IMAConfig().setAdTagURL(preSKipAdTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
@@ -674,6 +674,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onEvent(PKEvent event) {
                 log.d("AD_STARTED");
                 AdEvent.AdStartedEvent adStartedEvent = (AdEvent.AdStartedEvent) event;
+                log.d("AD_STARTED w/h - " + adStartedEvent.adInfo.getAdWidth() + "/" + adStartedEvent.adInfo.getAdHeight());
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
         }, AdEvent.Type.STARTED);
@@ -796,6 +797,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
             }
         }, PlayerEvent.Type.PLAYHEAD_UPDATED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+
+                PlayerEvent.VideoFramesDropped videoFramesDropped = (PlayerEvent.VideoFramesDropped) event;
+                log.d("VIDEO_FRAMES_DROPPED " + videoFramesDropped.droppedVideoFrames);
+            }
+        }, PlayerEvent.Type.VIDEO_FRAMES_DROPPED);
+
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+
+                PlayerEvent.BytesLoaded bytesLoaded = (PlayerEvent.BytesLoaded) event;
+                log.d("BYTES_LOADED " + bytesLoaded.bytesLoaded);
+            }
+        }, PlayerEvent.Type.BYTES_LOADED);
 
         player.addEventListener(new PKEvent.Listener() {
             @Override

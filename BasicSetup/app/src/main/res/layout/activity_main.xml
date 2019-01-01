@@ -4,7 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.kaltura.playkit.samples.basicsample.MainActivity">
+    tools:context="com.kaltura.playkit.samples.basicsample.PlayerActivity">
 
     <LinearLayout
         android:id="@+id/player_root"
@@ -21,5 +21,21 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"/>
+
+    <Button
+        android:id="@+id/download_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:text="Download" />
+
+    <Button
+        android:id="@+id/seek_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="seekTO" />
 
 </RelativeLayout>

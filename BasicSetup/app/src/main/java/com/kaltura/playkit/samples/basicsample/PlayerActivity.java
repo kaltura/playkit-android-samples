@@ -1,11 +1,18 @@
 package com.kaltura.playkit.samples.basicsample;
 
+import android.app.Activity;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+
+import com.google.android.exoplayer2.offline.StreamKey;
+import com.google.android.exoplayer2.upstream.DataSource;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -17,25 +24,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class PlayerActivity extends AppCompatActivity implements DownloadTracker.Listener {
+    private static final String TAG = PlayerActivity.class.getSimpleName();
 
     private static final Long START_POSITION = 0L; // position tp start playback in seconds.
 
     //The url of the source to play
-    private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
-
+    //private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
+    private static final String SOURCE_URL = "http://cdnapi.kaltura.com/p/1774581/sp/177458100/playManifest/entryId/1_mphei4ku/format/applehttp/tags/mbr/protocol/http/f/a.m3u8";
     private static final String ENTRY_ID = "1_w9zx2eti";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     private Player player;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
+    private Button downloadButton;
+
+    private DownloadTracker downloadTracker;
+    private DataSource.Factory dataSourceFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        dataSourceFactory = buildDataSourceFactory();
+        addSeekToButton();
+        addDownloadButton();
         //Initialize media config object.
         createMediaConfig();
 
@@ -49,11 +63,22 @@ public class MainActivity extends AppCompatActivity {
         addPlayPauseButton();
 
         //Prepare player with media configuration.
+        player.getSettings().setOfflineDataSourceFactory(dataSourceFactory);
+        player.getSettings().setOfflineStreamKeys(getOfflineStreamKeys(Uri.parse(SOURCE_URL)));
         player.prepare(mediaConfig);
 
         //Start playback.
         player.play();
 
+    }
+
+    /** Returns a new DataSource factory. */
+    private DataSource.Factory buildDataSourceFactory() {
+        return ((PrimeTimeRescueApplication) getApplication()).buildDataSourceFactory();
+    }
+
+    private List<StreamKey> getOfflineStreamKeys(Uri uri) {
+        return ((PrimeTimeRescueApplication) getApplication()).getDownloadTracker().getOfflineStreamKeys(uri);
     }
 
     /**
@@ -149,6 +174,7 @@ public class MainActivity extends AppCompatActivity {
         playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
         //Add clickListener.
         playPauseButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 if (player.isPlaying()) {
@@ -164,6 +190,42 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void addSeekToButton() {
+        //Get reference to the play/pause button.
+        playPauseButton = (Button) this.findViewById(R.id.seek_button);
+        //Add clickListener.
+        playPauseButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if (player.isPlaying()) {
+                    Log.d(TAG, "XXX DURATION = " + player.getDuration());
+                    player.seekTo(1000 * 60 * 10);
+                }
+            }
+        });
+    }
+
+    private void addDownloadButton() {
+        //Get reference to the play/pause button.
+        downloadButton = (Button) this.findViewById(R.id.download_button);
+        //Add clickListener.
+        downloadButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                onDownloadButtonClicked();
+            }
+        });
+    }
+
+    private void onDownloadButtonClicked() {
+        ///////////////////////////////////
+        PrimeTimeRescueApplication application = (PrimeTimeRescueApplication) getApplication();
+        downloadTracker = application.getDownloadTracker();
+        downloadTracker.toggleDownload(this, "Test", Uri.parse(SOURCE_URL), "m3u8");
+        //////////////////////////////////
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -179,5 +241,10 @@ public class MainActivity extends AppCompatActivity {
         if (player != null) {
             player.onApplicationPaused();
         }
+    }
+
+    @Override
+    public void onDownloadsChanged() {
+        Log.d(TAG, "XXX onDownloadsChanged");
     }
 }

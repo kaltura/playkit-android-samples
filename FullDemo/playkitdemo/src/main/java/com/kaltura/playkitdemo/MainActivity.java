@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final boolean AUTO_PLAY_ON_RESUME = true;
 
     private static final PKLog log = PKLog.get("MainActivity");
-    public static final Long START_POSITION = 0L;
+    public static final Long START_POSITION = 30L;
 
     private Player player;
     private MediaEntryProvider mediaProvider;
@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
-//        startMockMediaLoading(playLoadedEntry);
+        startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
         startSimpleOvpMediaLoading(playLoadedEntry);
@@ -467,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Map<Double, String> tagTimesMap = new HashMap<>();
         //tagTimesMap.put(2.0,"ADTAG");
 
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(preSKipAdTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
+        IMAConfig adsConfig = new IMAConfig().setAdTagURL(preMidPostAdTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 

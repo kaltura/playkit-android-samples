@@ -31,7 +31,9 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
 
     //The url of the source to play
     //private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
-    private static final String SOURCE_URL = "http://cdnapi.kaltura.com/p/1774581/sp/177458100/playManifest/entryId/1_mphei4ku/format/applehttp/tags/mbr/protocol/http/f/a.m3u8";
+    //private static final String SOURCE_URL = "http://cdnapi.kaltura.com/p/1774581/sp/177458100/playManifest/entryId/1_mphei4ku/format/applehttp/tags/mbr/protocol/http/f/a.m3u8";
+    private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/1982551/sp/198255100/playManifest/entryId/1_aworxd15/format/applehttp/protocol/https/a.m3u8";
+
     private static final String ENTRY_ID = "1_w9zx2eti";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
@@ -69,7 +71,6 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
 
         //Start playback.
         player.play();
-
     }
 
     /** Returns a new DataSource factory. */

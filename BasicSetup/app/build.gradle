@@ -38,6 +38,7 @@ dependencies {
 
     implementation project(":playkit")
     implementation project(':providers')
+    implementation project(':ptrescue')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {

@@ -16,11 +16,14 @@
         android:id="@+id/play_pause_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/pause_text"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="94dp"
+        android:layout_marginLeft="94dp"
+        android:layout_marginBottom="0dp"
+        android:gravity="center"
+        android:text="@string/pause_text" />
 
     <Button
         android:id="@+id/download_button"
@@ -34,8 +37,20 @@
         android:id="@+id/seek_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_marginEnd="107dp"
+        android:layout_marginBottom="0dp"
         android:text="seekTO" />
+
+    <Button
+        android:id="@+id/prepare_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginBottom="0dp"
+        android:text="Prepare" />
 
 </RelativeLayout>

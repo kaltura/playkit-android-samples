@@ -2,6 +2,7 @@
     <string name="app_name">BasicSetup</string>
     <string name="play_text">Play</string>
     <string name="pause_text">Pause</string>
+    <string name="prepare_text">Prepare</string>
 
 
     <string name="download_start_error">Failed to start download</string>

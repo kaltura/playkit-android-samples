@@ -3,39 +3,41 @@ include ':playkit'
 project(':playkit').projectDir = new File('../../playkit-android/playkit')
 include ':providers'
 project(':providers').projectDir = new File('../../playkit-android-providers/mediaproviders')
-include ':ima'
-project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
-include ':youbora'
-project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
-include ':kava'
-project(':kava').projectDir = new File('../../playkit-android-kava/kavaplugin')
-include ':googlecast'
-project(':googlecast').projectDir = new File(settingsDir,'../../playkit-android-googlecast/googlecast')
-include ':MD360'
-project(':MD360').projectDir = new File('../../MD360Player4Android/vrlib')
-include ':playkitvr'
-project(':playkitvr').projectDir = new File('../../playkit-android-vr/playkitvr')
+//include ':ima'
+//project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
+//include ':youbora'
+//project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
+//include ':kava'
+//project(':kava').projectDir = new File('../../playkit-android-kava/kavaplugin')
+//include ':googlecast'
+//project(':googlecast').projectDir = new File(settingsDir,'../../playkit-android-googlecast/googlecast')
+//include ':MD360'
+//project(':MD360').projectDir = new File('../../MD360Player4Android/vrlib')
+//include ':playkitvr'
+//project(':playkitvr').projectDir = new File('../../playkit-android-vr/playkitvr')
+include ':ptrescue'
+project(':ptrescue').projectDir = new File('../../kaltura-player-android/android/ptrescue')
 
 // Sample apps
 def samples = [
         'BasicSetup',
-        'EventsRegistration',
-        'ErHandling',
-        'BasicPluginsSetup',
-        'TracksSelection',
-        'ChangeMedia',
-        'IMASample',
-        'Offline',
-        'Youbora',
-        'PhoenixAnalytics',
-        'KalturaLiveStats',
-        'KalturaStats',
-        'KavaAnalytics',
-        'Providers',
-        'TVPapiStats',
-        'ChromecastSample',
-        'ChromecastCAFSample',
-        'MediaSession'
+//        'EventsRegistration',
+//        'ErHandling',
+//        'BasicPluginsSetup',
+//        'TracksSelection',
+//        'ChangeMedia',
+//        'IMASample',
+//        'Offline',
+//        'Youbora',
+//        'PhoenixAnalytics',
+//        'KalturaLiveStats',
+//        'KalturaStats',
+//        'KavaAnalytics',
+//        'Providers',
+//        'TVPapiStats',
+//        'ChromecastSample',
+//        'ChromecastCAFSample',
+//        'MediaSession'
 ]
 
 samples.each {
@@ -44,5 +46,5 @@ samples.each {
     project(entry).projectDir = new File ('../' + it + '/app')
 }
 
-include ":AndroidTV"
-project(":AndroidTV").projectDir = new File ('../AndroidTV/tv')
+//include ":AndroidTV"
+//project(":AndroidTV").projectDir = new File ('../AndroidTV/tv')

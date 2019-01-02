@@ -1,7 +1,5 @@
 package com.kaltura.playkit.samples.basicsample;
 
-import android.app.Activity;
-import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +17,8 @@ import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.ptrescue.DownloadTracker;
+import com.kaltura.ptrescue.PrefetchSdk;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,15 +41,17 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
     private Button downloadButton;
+    private Button prepareButton;
 
-    private DownloadTracker downloadTracker;
-    private DataSource.Factory dataSourceFactory;
+//    private DownloadTracker downloadTracker;
+//    private DataSource.Factory dataSourceFactory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        dataSourceFactory = buildDataSourceFactory();
+//        dataSourceFactory = buildDataSourceFactory();
+        addPrepareButton();
         addSeekToButton();
         addDownloadButton();
         //Initialize media config object.
@@ -65,23 +67,24 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
         addPlayPauseButton();
 
         //Prepare player with media configuration.
-        player.getSettings().setOfflineDataSourceFactory(dataSourceFactory);
-        player.getSettings().setOfflineStreamKeys(getOfflineStreamKeys(Uri.parse(SOURCE_URL)));
-        player.prepare(mediaConfig);
+//        player.getSettings().setOfflineDataSourceFactory(dataSourceFactory);
+//        player.getSettings().setOfflineStreamKeys(getOfflineStreamKeys(Uri.parse(SOURCE_URL)));
+        PrefetchSdk.shared(this).install(player);
+//        player.prepare(mediaConfig);
 
         //Start playback.
-        player.play();
+//        player.play();
     }
 
-    /** Returns a new DataSource factory. */
-    private DataSource.Factory buildDataSourceFactory() {
-        return ((PrimeTimeRescueApplication) getApplication()).buildDataSourceFactory();
-    }
-
-    private List<StreamKey> getOfflineStreamKeys(Uri uri) {
-        return ((PrimeTimeRescueApplication) getApplication()).getDownloadTracker().getOfflineStreamKeys(uri);
-    }
-
+//    /** Returns a new DataSource factory. */
+//    private DataSource.Factory buildDataSourceFactory() {
+//        return ((PrimeTimeRescueApplication) getApplication()).buildDataSourceFactory();
+//    }
+//
+//    private List<StreamKey> getOfflineStreamKeys(Uri uri) {
+//        return ((PrimeTimeRescueApplication) getApplication()).getDownloadTracker().getOfflineStreamKeys(uri);
+//    }
+//
     /**
      * Will create {@link } object.
      */
@@ -191,6 +194,20 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
         });
     }
 
+    private void addPrepareButton() {
+        //Get reference to the play/pause button.
+        prepareButton = (Button) this.findViewById(R.id.prepare_button);
+        //Add clickListener.
+        prepareButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                player.prepare(mediaConfig);
+                player.play();
+            }
+        });
+    }
+
     private void addSeekToButton() {
         //Get reference to the play/pause button.
         playPauseButton = (Button) this.findViewById(R.id.seek_button);
@@ -223,8 +240,11 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
     private void onDownloadButtonClicked() {
         ///////////////////////////////////
         PrimeTimeRescueApplication application = (PrimeTimeRescueApplication) getApplication();
-        downloadTracker = application.getDownloadTracker();
-        downloadTracker.toggleDownload(this, "Test", Uri.parse(SOURCE_URL), "m3u8");
+        PrefetchSdk.shared(this).prefetchNow((strings, e) -> {
+            Log.d(TAG, "onDownloadButtonClicked: prefetched entries");
+        });
+//        downloadTracker = application.getDownloadTracker();
+//        downloadTracker.toggleDownload(this, "Test", Uri.parse(SOURCE_URL), "m3u8");
         //////////////////////////////////
     }
     @Override

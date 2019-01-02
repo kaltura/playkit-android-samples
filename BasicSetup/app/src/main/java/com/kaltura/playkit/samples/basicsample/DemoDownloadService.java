@@ -33,7 +33,7 @@ public class DemoDownloadService extends DownloadService {
   private static final String CHANNEL_ID = "download_channel";
   private static final int JOB_ID = 1;
   private static final int FOREGROUND_NOTIFICATION_ID = 1;
-  public static final int DATA_TO_SAVA_BYTES = 1024 * 100;
+  public static final int DATA_TO_SAVA_BYTES = 1024 * 1024;
 
   public DemoDownloadService() {
     super(
@@ -55,7 +55,7 @@ public class DemoDownloadService extends DownloadService {
     Log.d(TAG, "XXX downloadedBytes = " + taskStates[0].downloadedBytes);
     Log.d(TAG, "XXX downloadPercentage = " + taskStates[0].downloadPercentage);
     if (taskStates[0].downloadedBytes > DATA_TO_SAVA_BYTES) {
-        stopSelf();
+      getDownloadManager().stopDownloads();
     }
     return DownloadNotificationUtil.buildProgressNotification(
         /* context= */ this,

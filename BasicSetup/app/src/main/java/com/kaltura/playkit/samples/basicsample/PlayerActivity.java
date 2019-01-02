@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,6 +24,7 @@ import com.kaltura.ptrescue.PrefetchSdk;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class PlayerActivity extends AppCompatActivity implements DownloadTracker.Listener {
@@ -44,6 +46,9 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
     private Button downloadButton;
     private Button prepareButton;
 
+    private String entryId;
+    private String entryUrl;
+
 //    private DownloadTracker downloadTracker;
 //    private DataSource.Factory dataSourceFactory;
 
@@ -56,6 +61,10 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
         addPrepareButton();
         addSeekToButton();
         addDownloadButton();
+        final SharedPreferences prefs = prefs();
+        entryId = prefs.getString("id", null);
+        entryUrl = prefs.getString("url", null);
+
         //Initialize media config object.
         createMediaConfig();
 
@@ -115,7 +124,7 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
         PKMediaEntry mediaEntry = new PKMediaEntry();
 
         //Set id for the entry.
-        mediaEntry.setId(ENTRY_ID);
+        mediaEntry.setId(entryId);
 
         //Set media entry type. It could be Live,Vod or Unknown.
         //In this sample we use Vod.
@@ -151,7 +160,7 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
         mediaSource.setId(MEDIA_SOURCE_ID);
 
         //Set the content url. In our case it will be link to hls source(.m3u8).
-        mediaSource.setUrl(SOURCE_URL);
+        mediaSource.setUrl(entryUrl);
 
         //Set the format of the source. In our case it will be hls in case of mpd/wvm formats you have to to call mediaSource.setDrmData method as well
         mediaSource.setMediaFormat(PKMediaFormat.hls);
@@ -204,6 +213,7 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
 
             @Override
             public void onClick(View v) {
+                createMediaConfig();
                 player.prepare(mediaConfig);
                 player.play();
             }
@@ -241,10 +251,15 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
 
     private void onDownloadButtonClicked() {
         ///////////////////////////////////
-        PrimeTimeRescueApplication application = (PrimeTimeRescueApplication) getApplication();
         PrefetchSdk.shared(this).prefetchNow((strings, e) -> {
+            final Map.Entry<String, String> first = strings.entrySet().iterator().next();
+            entryId = first.getKey();
+            entryUrl = first.getValue();
+            prefs().edit().clear().
+                    putString("id", entryId).putString("url", entryUrl).apply();
             Log.d(TAG, "onDownloadButtonClicked: prefetched entries");
         });
+
 //        downloadTracker = application.getDownloadTracker();
 //        downloadTracker.toggleDownload(this, "Test", Uri.parse(SOURCE_URL), "m3u8");
         //////////////////////////////////
@@ -264,6 +279,10 @@ public class PlayerActivity extends AppCompatActivity implements DownloadTracker
         if (player != null) {
             player.onApplicationPaused();
         }
+    }
+
+    private SharedPreferences prefs() {
+        return getSharedPreferences("ptr", MODE_PRIVATE);
     }
 
     @Override

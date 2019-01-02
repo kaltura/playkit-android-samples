@@ -1,6 +1,7 @@
 package com.kaltura.playkitdemo;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -34,6 +35,7 @@ import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
+import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
@@ -72,6 +74,7 @@ import com.kaltura.playkit.providers.mock.MockMediaProvider;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
 import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.utils.Consts;
+import com.kaltura.ptrescue.PrefetchSdk;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -97,9 +100,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     public static final boolean AUTO_PLAY_ON_RESUME = true;
-
+    private static final String TAG = "MainActivity";
     private static final PKLog log = PKLog.get("MainActivity");
-    public static final Long START_POSITION = 30L;
+    public static final Long START_POSITION = 0L;
 
     private Player player;
     private MediaEntryProvider mediaProvider;
@@ -116,6 +119,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
+    private String entryId;
+    private String entryUrl;
 
     private void registerPlugins() {
 
@@ -133,41 +138,56 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initDrm();
+        final SharedPreferences prefs = prefs();
+        entryId = prefs.getString("id", null);
+        entryUrl = prefs.getString("url", null);
+        //createMediaConfig();
+
+        PrefetchSdk.shared(this).prefetchNow((strings, e) -> {
+            final Map.Entry<String, String> first = strings.entrySet().iterator().next();
+            entryId = first.getKey();
+            entryUrl = first.getValue();
+            prefs().edit().clear().
+                    putString("id", entryId).putString("url", entryUrl).apply();
+            if (!player.isPlaying()) {
+                runOnUiThread(() -> {
+                    onMediaLoaded(createMediaEntry());
+                });
+            }
+            Log.d(TAG, "onDownloadButtonClicked: prefetched entries");
+        });
+
+
 
         mOrientationManager = new OrientationManager(this, SensorManager.SENSOR_DELAY_NORMAL, this);
         mOrientationManager.enable();
         setContentView(R.layout.activity_main);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-            Toast.makeText(this, "Please tap ALLOW", Toast.LENGTH_LONG).show();
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    1);
-        }
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+//            Toast.makeText(this, "Please tap ALLOW", Toast.LENGTH_LONG).show();
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+//                    1);
+//        }
 
         log.i("PlayKitManager: " + PlayKitManager.CLIENT_TAG);
 
-        Button button = findViewById(R.id.changeMedia);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (player != null) {
-                    OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
-                    startSimpleOvpMediaLoading(playLoadedEntry);
-                }
-            }
-        });
+//        Button button = findViewById(R.id.changeMedia);
+//        button.setVisibility(View.GONE);
+//        button.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                if (player != null) {
+//                    OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
+//                    startSimpleOvpMediaLoading(playLoadedEntry);
+//                }
+//            }
+//        });
 
 
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
         registerPlugins();
 
-        OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
-        startMockMediaLoading(playLoadedEntry);
-//      startOvpMediaLoading(playLoadedEntry);
-//      startOttMediaLoading(playLoadedEntry);
-        startSimpleOvpMediaLoading(playLoadedEntry);
-//      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
         fullScreenBtn = (AppCompatImageView)findViewById(R.id.full_screen_switcher);
@@ -184,6 +204,84 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 setRequestedOrientation(orient);
             }
         });
+
+        onMediaLoaded(createMediaEntry());
+
+    }
+
+    private PKMediaEntry createMediaEntry() {
+        return new PKMediaEntry().setId(entryId).setSources(Collections.singletonList(new PKMediaSource().setUrl(entryUrl)));
+    }
+
+    /**
+     * Create list of {@link PKMediaSource}.
+     *
+     * @return - the list of sources.
+     */
+    private List<PKMediaSource> createMediaSources(String mediaEntryId, String url) {
+        //Init list which will hold the PKMediaSources.
+        List<PKMediaSource> mediaSources = new ArrayList<>();
+
+        //Create new PKMediaSource instance.
+        PKMediaSource mediaSource = new PKMediaSource();
+
+        //Set the id.
+        mediaSource.setId("ID_" + mediaEntryId);
+
+        //Set the content url. In our case it will be link to hls source(.m3u8).
+        mediaSource.setUrl(url);
+
+        //Set the format of the source. In our case it will be hls in case of mpd/wvm formats you have to to call mediaSource.setDrmData method as well
+        mediaSource.setMediaFormat(PKMediaFormat.hls);
+
+        //Add media source to the list.
+        mediaSources.add(mediaSource);
+
+        return mediaSources;
+    }
+
+
+    private SharedPreferences prefs() {
+        return getSharedPreferences("ptr", MODE_PRIVATE);
+    }
+
+
+    private void startVootOttMediaLoadingProd1(final OnMediaLoadCompletion completion) {
+        SessionProvider ksSessionProvider = new SessionProvider() {
+            @Override
+            public String baseUrl() {
+                String PhoenixBaseUrl = "https://rest-as.ott.kaltura.com/v5_0_3/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";// 4_4 "https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
+                return PhoenixBaseUrl;
+            }
+
+            @Override
+            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                String PnxKS = "djJ8MjI1fOp535earB1FrLYRkal8KB7Y9j19Hr0bhrnO-OyOgyfBJNg4EhwdIpDfHb8gosKb385gA76QmGTaNAVzgCvsfTkAMIwCVTEAOfR8h70aCWxAQHfIQa8UJzFkLq9iXjTGzetw-DDadMXbhWdNqIRvtDc_CRNxMTDHzx_8kZBUyP1e";
+                if (completion != null) {
+                    completion.onComplete(new PrimitiveResult(""));
+                }
+            }
+
+            @Override
+            public int partnerId() {
+                int OttPartnerId = 225;
+                return OttPartnerId;
+            }
+        };
+
+        String mediaId ="610715";// "626769";//"610715";
+        String formatHls  = "Tablet Main";
+        String formatDash  = "dash Main";
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaId)
+                //.setReferrer()
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                .setFormats(formatDash);//, "Dash_TV");
+        mediaProvider.load(completion);
     }
 
     @NonNull
@@ -195,7 +293,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                     @Override
                                     public void run() {
                                         if (response.isSuccess()) {
-                                            onMediaLoaded(response.getResponse());
                                         } else {
 
                                             Toast.makeText(MainActivity.this, "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""), Toast.LENGTH_LONG).show();
@@ -329,6 +426,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player = PlayKitManager.loadPlayer(this, pluginConfig);
             KalturaPlaybackRequestAdapter.install(player, "PlaykitTestApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
             KalturaUDRMLicenseRequestAdapter.install(player, "PlaykitTestApp");
+            PrefetchSdk.shared(this).install(player);
+
 
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
@@ -361,15 +460,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("delay", 1200);
-        pluginConfigs.setPluginConfig("Sample", jsonObject);
-        addIMAPluginConfig(pluginConfigs);
-        //addIMADAIPluginConfig(pluginConfigs);
-        addKaluraStatsPluginConfig(pluginConfigs);
 
-        addYouboraPluginConfig(pluginConfigs);
-        addKavaPluginConfig(pluginConfigs);
+       // addIMAPluginConfig(pluginConfigs);
+        //addIMADAIPluginConfig(pluginConfigs);
+       // addKaluraStatsPluginConfig(pluginConfigs);
+
+       // addYouboraPluginConfig(pluginConfigs);
+       // addKavaPluginConfig(pluginConfigs);
         //addPhoenixAnalyticsPluginConfig(pluginConfigs);
         //addTVPAPIAnalyticsPluginConfig(pluginConfigs);
     }
@@ -468,7 +565,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //tagTimesMap.put(2.0,"ADTAG");
 
         IMAConfig adsConfig = new IMAConfig().setAdTagURL(preMidPostAdTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
-        config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
+        //config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
 

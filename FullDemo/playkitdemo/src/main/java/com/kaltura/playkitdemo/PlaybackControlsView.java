@@ -13,6 +13,7 @@ import com.google.android.exoplayer2.C;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerState;
+import com.kaltura.playkit.ads.AdController;
 
 import java.util.Formatter;
 import java.util.Locale;
@@ -89,10 +90,20 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         long duration = C.TIME_UNSET;
         long position = C.POSITION_UNSET;
         long bufferedPosition = 0;
-        if(player != null){
-            duration = player.getDuration();
-            position = player.getCurrentPosition();
-            bufferedPosition = player.getBufferedPosition();
+        if(player != null) {
+            AdController adController = player.getController(AdController.class);
+            if (adController != null && adController.isAdDisplayed()) {
+                duration = adController.getDuration();
+                position = adController.getCurrentPosition();
+                log.d("XXX Duration:" + duration);
+                log.d("XXX Position:" + position);
+            } else {
+                duration = player.getDuration();
+                position = player.getCurrentPosition();
+                log.d("XXX Duration:" + duration);
+                log.d("XXX Position:" + position);
+                bufferedPosition = player.getBufferedPosition();
+            }
         }
 
         if(duration != C.TIME_UNSET){
@@ -120,6 +131,10 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         int progressValue = 0;
         if(player != null){
             long duration = player.getDuration();
+            AdController adController = player.getController(AdController.class);
+            if (adController != null && adController.isAdDisplayed()) {
+                duration = adController.getDuration();
+            }
             if (duration > 0) {
                 progressValue = (int) ((position * PROGRESS_BAR_MAX) / duration);
             }
@@ -132,6 +147,10 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         long positionValue = 0;
         if(player != null){
             long duration = player.getDuration();
+            AdController adController = player.getController(AdController.class);
+            if (adController != null && adController.isAdDisplayed()) {
+                duration = adController.getDuration();
+            }
             positionValue = (duration * progress) / PROGRESS_BAR_MAX;
         }
 
@@ -199,7 +218,9 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         dragging = false;
-        player.seekTo(positionValue(seekBar.getProgress()));
+        if (player != null) {
+            player.seekTo(positionValue(seekBar.getProgress()));
+        }
     }
 
     public void release() {

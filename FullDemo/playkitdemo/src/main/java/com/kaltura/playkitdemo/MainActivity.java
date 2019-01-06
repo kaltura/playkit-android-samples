@@ -49,6 +49,11 @@ import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.plugins.SamplePlugin;
 import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
+import com.kaltura.playkit.plugins.ads.AdPositionType;
+import com.kaltura.playkit.plugins.fbinstream.FBInStreamAd;
+import com.kaltura.playkit.plugins.fbinstream.FBInStreamAdBreak;
+import com.kaltura.playkit.plugins.fbinstream.FBInstreamConfig;
+import com.kaltura.playkit.plugins.fbinstream.FBInstreamPlugin;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
 //import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
@@ -71,6 +76,7 @@ import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
 import com.kaltura.playkit.providers.mock.MockMediaProvider;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
 import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
+import com.facebook.ads.internal.protocol.AdPlacementType;
 import com.kaltura.playkit.utils.Consts;
 
 import java.util.ArrayList;
@@ -120,13 +126,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void registerPlugins() {
 
         PlayKitManager.registerPlugins(this, SamplePlugin.factory);
-        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+        PlayKitManager.registerPlugins(this, FBInstreamPlugin.factory);
+
+        //PlayKitManager.registerPlugins(this, IMAPlugin.factory);
         //PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
         PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
         PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
         //PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
-        //PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
+        PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
     }
 
     @Override
@@ -162,7 +170,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         registerPlugins();
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
-
+//        startVootOttMediaLoadingKids(playLoadedEntry);
+//        startVootKids(playLoadedEntry);
+//       startVootOttMediaLoadingProd1(playLoadedEntry);
 //        startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
@@ -197,7 +207,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                         if (response.isSuccess()) {
                                             onMediaLoaded(response.getResponse());
                                         } else {
-
                                             Toast.makeText(MainActivity.this, "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""), Toast.LENGTH_LONG).show();
                                             log.e("failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""));
                                         }
@@ -294,6 +303,82 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mediaProvider.load(completion);
     }
 
+    private void startVootOttMediaLoadingProd1(final OnMediaLoadCompletion completion) {
+        SessionProvider ksSessionProvider = new SessionProvider() {
+            @Override
+            public String baseUrl() {
+                String PhoenixBaseUrl = "https://rest-as.ott.kaltura.com/v5_0_3/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";// 4_4 "https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
+                return PhoenixBaseUrl;
+            }
+
+            @Override
+            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                String PnxKS = "djJ8MjI1fOp535earB1FrLYRkal8KB7Y9j19Hr0bhrnO-OyOgyfBJNg4EhwdIpDfHb8gosKb385gA76QmGTaNAVzgCvsfTkAMIwCVTEAOfR8h70aCWxAQHfIQa8UJzFkLq9iXjTGzetw-DDadMXbhWdNqIRvtDc_CRNxMTDHzx_8kZBUyP1e";
+                if (completion != null) {
+                    completion.onComplete(new PrimitiveResult(""));
+                }
+            }
+
+            @Override
+            public int partnerId() {
+                int OttPartnerId = 225;
+                return OttPartnerId;
+            }
+        };
+
+        String mediaId ="610715";// "626769";//"610715";
+        String formatHls  = "Tablet Main";
+        String formatDash  = "dash Main";
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaId)
+                //.setReferrer()
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                .setFormats(formatHls, formatDash);//, "Dash_TV");
+        mediaProvider.load(completion);
+    }
+
+    private void startVootOttMediaLoadingKids(final OnMediaLoadCompletion completion) {
+        SessionProvider ksSessionProvider = new SessionProvider() {
+            @Override
+            public String baseUrl() {
+                String PhoenixBaseUrl = "https://rest-as.ott.kaltura.com/v4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";// 4_4 "https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
+                return PhoenixBaseUrl;
+            }
+
+            @Override
+            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                String PnxKS = "djJ8MjI1fEy4ulFNzowTx4dlIE9jd3DMVX20THtiIHFuRkAVGtzLrZ08kzeSlCcv02Tp1rdqu-UzjESox6mXuRfNHJyymxeAuxh3c8GH9_ut-cXO0Gy1UXU4VmFhMRKoN3Gor47AQsdkMwdQtl-LS6mB2reHWNc=";
+                if (completion != null) {
+                    completion.onComplete(new PrimitiveResult(PnxKS));
+                }
+            }
+
+            @Override
+            public int partnerId() {
+                int OttPartnerId = 225;
+                return OttPartnerId;
+            }
+        };
+
+        String mediaId ="629951";// "626769";//"610715";
+        String formatHls  = "Tablet Main";
+        String formatDash  = "dash Main";
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaId)
+                //.setReferrer()
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+               .setFormats(formatHls);//, formatDash);//, "Dash_TV");
+        mediaProvider.load(completion);
+    }
+
     private void startOvpMediaLoading(final OnMediaLoadCompletion completion) {
         SessionProvider ksSessionProvider = new SessionProvider() {
             @Override
@@ -331,9 +416,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             KalturaUDRMLicenseRequestAdapter.install(player, "PlaykitTestApp");
 
             player.getSettings().setSecureSurface(false);
-            player.getSettings().setAdAutoPlayOnResume(true);
+            //player.getSettings().setAdAutoPlayOnResume(true);
             // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
-
+            //player.getSettings().setAdAutoPlayOnResume(false);
             //player.setPlaybackRate(1.5f);
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
@@ -364,13 +449,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("delay", 1200);
         pluginConfigs.setPluginConfig("Sample", jsonObject);
-        addIMAPluginConfig(pluginConfigs);
+        addFBInStreamPluginConfig(pluginConfigs);
+        //addIMAPluginConfig(pluginConfigs);
         //addIMADAIPluginConfig(pluginConfigs);
         addKaluraStatsPluginConfig(pluginConfigs);
 
         addYouboraPluginConfig(pluginConfigs);
         addKavaPluginConfig(pluginConfigs);
-        //addPhoenixAnalyticsPluginConfig(pluginConfigs);
+        addPhoenixAnalyticsPluginConfig(pluginConfigs);
         //addTVPAPIAnalyticsPluginConfig(pluginConfigs);
     }
 
@@ -395,6 +481,85 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
     }
+
+    private void startVootOttMediaLoadingProd(final OnMediaLoadCompletion completion) {
+        SessionProvider ksSessionProvider = new SessionProvider() {
+            @Override
+            public String baseUrl() {
+                String PhoenixBaseUrl = "https://rest-as.ott.kaltura.com/v4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";// 4_4 "https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
+                return PhoenixBaseUrl;
+            }
+
+            @Override
+            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                String PnxKS = "djJ8MjI1fOp535earB1FrLYRkal8KB7Y9j19Hr0bhrnO-OyOgyfBJNg4EhwdIpDfHb8gosKb385gA76QmGTaNAVzgCvsfTkAMIwCVTEAOfR8h70aCWxAQHfIQa8UJzFkLq9iXjTGzetw-DDadMXbhWdNqIRvtDc_CRNxMTDHzx_8kZBUyP1e";
+                if (completion != null) {
+                    completion.onComplete(new PrimitiveResult(""));
+                }
+            }
+
+            @Override
+            public int partnerId() {
+                int OttPartnerId = 225;
+                return OttPartnerId;
+            }
+        };
+
+        String mediaId ="629951";// "626769";//"610715";
+        String formatHls  = "Tablet Main";
+        String formatDash  = "dash Main";
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaId)
+                //.setReferrer()
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                .setFormats(formatHls);//, "Dash_TV");
+        mediaProvider.load(completion);
+    }
+
+
+    private void startVootKids(final OnMediaLoadCompletion completion) {
+        SessionProvider ksSessionProvider = new SessionProvider() {
+            @Override
+            public String baseUrl() {
+                String PhoenixBaseUrl = "https://rest-as.ott.kaltura.com/v4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";// 4_4 "https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
+                return PhoenixBaseUrl;
+            }
+
+            @Override
+            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                String PnxKS = "djJ8MjI1fO0gckBdNG1zISEedp17h9Vrk1fus32Ry9lzL-swPAdb2PxzcaeosgiFrFC1RDL-nHPPLPL9xCQY5T73V9SVc-oDqc8eHl_SEjdKRfsTBgruCzcs0kzolgFtvQ4qEqcMydLZoy97EzGAvg9CIH5SaCiFhgvsChN1ZQnyX4KFNaln";
+                PnxKS = "djJ8MjI1fL5b7qOzjkaGS7IzhAinbG4yo722HY-ZwKQEoWzyrTmDWp4H8daOlRUjaw9vrsw_Q-7AGluNDuHoVK44JKQGN5UKa62-Lfuld7RHpTVE9HpEtHHpzPppK4BP7Xxpnb7x8V5837lQYf53JbVMl3SA9QhttmnC-O19DwieMfIYlD0a";
+                if (completion != null) {
+                    completion.onComplete(new PrimitiveResult(""));
+                }
+            }
+
+            @Override
+            public int partnerId() {
+                int OttPartnerId = 225;
+                return OttPartnerId;
+            }
+        };
+
+        String mediaId = "621996";//"651492";// "626769";//"610715";
+        //String formatHls  = "Tablet Main";
+        String formatDash  = "dash Main";//"dash Main";
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaId)
+                //.setReferrer()
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                .setFormats(formatDash);//, "Dash_TV");
+        mediaProvider.load(completion);
+    }
+
 
     private void addYouboraPluginConfig(PKPluginConfigs pluginConfigs) {
         JsonObject pluginEntry = new JsonObject();
@@ -454,6 +619,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         config.setPluginConfig(PhoenixAnalyticsPlugin.factory.getName(), phoenixAnalyticsConfig);
     }
 
+
+    private void addFBInStreamPluginConfig(PKPluginConfigs config) {
+        List<FBInStreamAd> preRollFBInStreamAdList = new ArrayList<>();
+        FBInStreamAd preRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 0, 0);
+        FBInStreamAd preRoll2 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 0, 1);
+        preRollFBInStreamAdList.add(preRoll1);
+        preRollFBInStreamAdList.add(preRoll2);
+        FBInStreamAdBreak preRollAdBreak = new FBInStreamAdBreak(AdPositionType.PRE_ROLL, 0L, preRollFBInStreamAdList);
+
+
+        List<FBInStreamAd> midRoll1FBInStreamAdList = new ArrayList<>();
+        FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 40000, 0);
+        midRoll1FBInStreamAdList.add(midRoll1);
+        FBInStreamAdBreak midRoll1AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 40000, midRoll1FBInStreamAdList);
+
+
+        List<FBInStreamAd> midRoll2FBInStreamAdList = new ArrayList<>();
+        FBInStreamAd midRoll2 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 80000, 0);
+        midRoll2FBInStreamAdList.add(midRoll2);
+        FBInStreamAdBreak midRoll2AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 80000, midRoll2FBInStreamAdList);
+
+
+        List<FBInStreamAd> postRollFBInStreamAdList = new ArrayList<>();
+        FBInStreamAd postRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, -1, 0);
+        postRollFBInStreamAdList.add(postRoll1);
+        FBInStreamAdBreak postRollAdBreak = new FBInStreamAdBreak(AdPositionType.POST_ROLL, -1, postRollFBInStreamAdList);
+
+        List<FBInStreamAdBreak> fbInStreamAdBreakList = new ArrayList<>();
+        fbInStreamAdBreakList.add(preRollAdBreak);
+        fbInStreamAdBreakList.add(midRoll1AdBreak);
+        fbInStreamAdBreakList.add(midRoll2AdBreak);
+        fbInStreamAdBreakList.add(postRollAdBreak);
+
+
+        FBInstreamConfig fbInstreamConfig = new FBInstreamConfig(fbInStreamAdBreakList);
+        config.setPluginConfig(FBInstreamPlugin.factory.getName(), fbInstreamConfig);
+    }
+
     private void addIMAPluginConfig(PKPluginConfigs config) {
         String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
         String preSKipAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
@@ -468,12 +671,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //tagTimesMap.put(2.0,"ADTAG");
 
         String vooturl = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOH&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DU%26Age%3DNULL%26KidsPinEnabled%3DN%26AppVersion%3D0.1.58%26DeviceModel%3DAndroid%20SDK%20built%20for%20x86%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26description_url%3Dhttps%253A%252F%252Fwww.voot.com%26first_time%3DFalse&cmsid=2467608&ppid=2fbdf28d-5bf9-4f43-b49e-19c4ca1f10f8&vid=0_o71549bv&ad_rule=1&correlator=246819";//builder.build().toString();
+String xxx_voot = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOH&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D18%26KidsPinEnabled%3DN%26AppVersion%3D0.1.58%26DeviceModel%3Dmoto%20g(6)%26OptOut%3DFalse%26OSVersion%3D8.0.0%26PackageName%3Dcom.tv.v18.viola%26description_url%3Dhttps%253A%252F%252Fwww.voot.com%26first_time%3DFalse&cmsid=2467608&ppid=64221667c02a4cb79d07cbe726102a78&vid=0_bi9an7c4&ad_rule=1&correlator=3408515883056375&ms=361-jmSV4XIpRPhGG5kmTOnbXX1yws54j_zEgXJterZ4s3lt2xzU4Bo-sGumomNlLmhT_TKmunL_auVZxO_Xo7Ay9KcZZyU1H0hC1gsMMv5Nb9rlU7l1N6DIlcn1m38l2EG74xvGptMBCtxBLPYPdjW74RIy3gbyBJW-QJN5e1x-xhbIh1Na8cu7bZNvrITL-U-PsCH_1XZcjmbTaI0WmkzNgFcul29CWJcd-04rMubbprZs1Z0Pq1jZv4GXyErsIzFUPR-OxOMmxjo7jx0wZOmnUCFvRfChooTxQYN89pV8nCP0VG481WiO_Ivo9rIx7uojYLvYA4YXm_slBnIP_g&sdkv=h.3.96.0%2Fn.android.3.10.2%2Fcom.tv.v18.viola&sdki=445&scor=3514680655962820&js=ima-android.3.10.2&msid=com.tv.v18.viola&an=com.tv.v18.viola&mv=81272300.com.android.vending&u_so=l&osd=2&sdr=1&is_amp=0&hl=en&idtype=adid&is_lat=0&rdid=b1222a78-2d26-4b8d-9769-61d96006a9c4&mpt=kaltura-vp-android&mpv=3.7.1&sdk_apis=7&omid_p=Google1%2Fandroid.3.10.2&omid_v=a.1.2.4-google_20180831&url=com.tv.v18.viola";
 
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(vooturl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAdLoadTimeOut(8);
+       String singlepremidpost = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
+
+        IMAConfig adsConfig = new IMAConfig().setAdTagURL(xxx_voot).enableDebugMode(false).setAdLoadTimeOut(8);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
-
-
 
     //IMA CONFIG
 //    private void addIMADAIPluginConfig(PKPluginConfigs config) {

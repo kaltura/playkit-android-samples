@@ -1,17 +1,14 @@
 package com.kaltura.playkitdemo;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.kaltura.netkit.connect.executor.RequestQueue;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.player.LoadControlBuffers;
 
-import org.json.JSONObject;
 
 import java.io.IOException;
 

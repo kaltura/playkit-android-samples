@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LoadControlSetup.load(43568241);//(43565151);
+        LoadControlSetup.load(this, 43568241);//(43565151);
         initDrm();
 
         mOrientationManager = new OrientationManager(this, SensorManager.SENSOR_DELAY_NORMAL, this);

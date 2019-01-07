@@ -1,5 +1,6 @@
 package com.kaltura.playkitdemo;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -9,7 +10,9 @@ import com.google.gson.JsonPrimitive;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.player.LoadControlBuffers;
 
-
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -17,109 +20,121 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
-class LoadControlSetup {
-    public static final String TAG = "LoadControlSetup";
+public class LoadControlSetup {
+    private static final String TAG = "LoadControlSetup";
 
-    public static final String GET_UICONF_DATA = "https://cdnapisec.kaltura.com/api_v3/?format=1&partnerId=1982551&service=uiconf&action=get&id=";
-
-    private static Integer configurationId;
-
-    private static Integer initialBuffer;
-    private static Integer afterRebuffer;
-    private static Integer bufferLength;
-    //private static int startBitrate;
+    private static final String GET_UICONF_URL = "https://cdnapisec.kaltura.com/api_v3/?format=1&partnerId=1982551&service=uiconf&action=get&id=";
+    private static final String JSON_FILE_NAME = "LoadControlSetup.json";
 
     private static boolean loaded = false;
+    private static File configFile;
+    private static Config config;
+
+    // Gson and JsonParser are reusable
+    private static final JsonParser parser = new JsonParser();
+    private static final Gson gson = new Gson();
 
     // Call once as soon as the app loads, in Application.onCreate()
-    public static void load(int uiconfId) {
+    @SuppressWarnings("WeakerAccess")
+    public static void load(Context context, int uiConfId) {
         if (loaded) {
             return;
         }
+
+        configFile = new File(context.getFilesDir(), JSON_FILE_NAME);
+
+        // Read from file for immediate use. Later update the file.
+        readFromFile();
+
         OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(GET_UICONF_DATA + uiconfId).build();
+        Request request = new Request.Builder().url(GET_UICONF_URL + uiConfId).build();
+
         client.newCall(request).enqueue(new Callback() {
+
             @Override
             public void onFailure(Call call, IOException e) {
-                String mMessage = e.getMessage().toString();
-                Log.e(TAG, "failure Response: " + mMessage);
+                Log.e(TAG, "failure Response: " + e.getMessage());
                 call.cancel();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()){
-                    populateLoadControlsMembers(response);
+                if (loaded) {
+                    return;
+                }
+
+                if (response.isSuccessful()) {
+                    final ResponseBody body = response.body();
+                    if (body != null) {
+                        extractConfigFromUIConf(body.string());
+                        loaded = true;
+                    }
                 }
             }
         });
     }
 
-    public static Integer getConfigurationId() {
-        return configurationId;
+    @SuppressWarnings("unused")
+    public static String getConfigurationId() {
+        return config == null ? null : config.configurationId;
     }
 
-    private static void populateLoadControlsMembers(Response response) throws IOException {
-        if (response != null && response.body() != null) {
-            String uiconfFile = response.body().string();
-            JsonParser parser = new JsonParser();
-            JsonObject uiconf = parser.parse(uiconfFile).getAsJsonObject();
-            if (uiconf != null) {
-                JsonPrimitive config = uiconf.getAsJsonPrimitive("config");
-                if (config != null) {
-                    JsonObject configJsonObj = parser.parse(config.getAsString()).getAsJsonObject();
-                    if (configJsonObj != null) {
-                        Gson gson = new Gson();
-                        LoadControlModel loadControlModel = gson.fromJson(configJsonObj, LoadControlModel.class);
-                        if (loadControlModel != null) {
-                            initialBuffer = loadControlModel.getInitialBuffer();
-                            afterRebuffer = loadControlModel.getAfterRebuffer();
-                            bufferLength = loadControlModel.getBufferLength();
-                            configurationId = loadControlModel.getConfigurationId();
-                        }
-                    }
+    private static void extractConfigFromUIConf(String string) {
+        JsonObject uiconf = parser.parse(string).getAsJsonObject();
+        if (uiconf != null) {
+            JsonPrimitive jsonPrimitive = uiconf.getAsJsonPrimitive("config");
+            if (jsonPrimitive != null) {
+                final String configJson = jsonPrimitive.getAsString();
+                config = gson.fromJson(configJson, Config.class);
+                if (config == null) {
+                    return;
                 }
+
+                // Write to file as a clean json
+                saveToFile(gson.toJson(config));
             }
         }
     }
 
-    // Call after creating a player with loadPlayer()
-    public static void apply(Player player) {
-        player.getSettings().setPlayerBuffers(
-                new LoadControlBuffers().setMinPlayerBufferMs(LoadControlSetup.initialBuffer).
-                        setMaxPlayerBufferMs(LoadControlSetup.bufferLength).
-                        setMinBufferAfterReBufferMs(LoadControlSetup.afterRebuffer));
+    private static void saveToFile(String json) {
+        try (FileWriter writer = new FileWriter(configFile)) {
+            writer.append(json);
+        } catch (IOException e) {
+            Log.e(TAG, "saveToFile: failed", e);
+        }
     }
 
-    class LoadControlModel {
+    private static void readFromFile() {
 
-        private Integer configurationId;
+        try (FileReader reader = new FileReader(configFile)) {
+            config = gson.fromJson(reader, Config.class);
+
+        } catch (IOException e) {
+            Log.e(TAG, "readFromFile: failed", e);
+        }
+    }
+
+    // Call after creating a player with loadPlayer()
+    @SuppressWarnings("WeakerAccess")
+    public static void apply(Player player) {
+        if (config == null) {
+            return;
+        }
+
+        player.getSettings().setPlayerBuffers(
+                new LoadControlBuffers()
+                        .setMinPlayerBufferMs(config.initialBuffer)
+                        .setMaxPlayerBufferMs(config.bufferLength)
+                        .setMinBufferAfterReBufferMs(config.afterRebuffer));
+    }
+
+    @SuppressWarnings("unused") // assigned by Gson
+    private class Config {
+        private String configurationId;
         private Integer initialBuffer;
         private Integer afterRebuffer;
         private Integer bufferLength;
-        private Integer startBitrate;
-
-        public LoadControlModel() {}
-
-        public Integer getConfigurationId() {
-            return configurationId;
-        }
-
-        public Integer getInitialBuffer() {
-            return initialBuffer;
-        }
-
-        public Integer getAfterRebuffer() {
-            return afterRebuffer;
-        }
-
-        public Integer getBufferLength() {
-            return bufferLength;
-        }
-
-        public Integer getStartBitrate() {
-            return startBitrate;
-        }
     }
 }

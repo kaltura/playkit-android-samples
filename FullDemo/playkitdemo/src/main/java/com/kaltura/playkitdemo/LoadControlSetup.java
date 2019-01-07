@@ -21,9 +21,9 @@ import okhttp3.Response;
 class LoadControlSetup {
     public static final String TAG = "LoadControlSetup";
 
-    public static final String GET_UICONF_DATA = "https://cdnapisec.kaltura.com/api_v3/?format=1&partnerId=1982551&service=uiconf&action=get&id=43565151";
+    public static final String GET_UICONF_DATA = "https://cdnapisec.kaltura.com/api_v3/?format=1&partnerId=1982551&service=uiconf&action=get&id=";
 
-    private static Integer experimentId;
+    private static Integer configurationId;
 
     private static Integer initialBuffer;
     private static Integer afterRebuffer;
@@ -33,12 +33,12 @@ class LoadControlSetup {
     private static boolean loaded = false;
 
     // Call once as soon as the app loads, in Application.onCreate()
-    public static void load() {
+    public static void load(int uiconfId) {
         if (loaded) {
             return;
         }
         OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder().url(GET_UICONF_DATA).build();
+        Request request = new Request.Builder().url(GET_UICONF_DATA + uiconfId).build();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -56,8 +56,8 @@ class LoadControlSetup {
         });
     }
 
-    public static Integer getExperimentId() {
-        return experimentId;
+    public static Integer getConfigurationId() {
+        return configurationId;
     }
 
     private static void populateLoadControlsMembers(Response response) throws IOException {
@@ -76,7 +76,7 @@ class LoadControlSetup {
                             initialBuffer = loadControlModel.getInitialBuffer();
                             afterRebuffer = loadControlModel.getAfterRebuffer();
                             bufferLength = loadControlModel.getBufferLength();
-                            experimentId = loadControlModel.getExperimentId();
+                            configurationId = loadControlModel.getConfigurationId();
                         }
                     }
                 }
@@ -94,7 +94,7 @@ class LoadControlSetup {
 
     class LoadControlModel {
 
-        private Integer experimentId;
+        private Integer configurationId;
         private Integer initialBuffer;
         private Integer afterRebuffer;
         private Integer bufferLength;
@@ -102,8 +102,8 @@ class LoadControlSetup {
 
         public LoadControlModel() {}
 
-        public Integer getExperimentId() {
-            return experimentId;
+        public Integer getConfigurationId() {
+            return configurationId;
         }
 
         public Integer getInitialBuffer() {

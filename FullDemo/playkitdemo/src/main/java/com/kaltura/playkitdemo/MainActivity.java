@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LoadControlSetup.load();
+        LoadControlSetup.load(43568241);//(43565151);
         initDrm();
 
         mOrientationManager = new OrientationManager(this, SensorManager.SENSOR_DELAY_NORMAL, this);
@@ -333,8 +333,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player = PlayKitManager.loadPlayer(this, pluginConfig);
             KalturaPlaybackRequestAdapter.install(player, "PlaykitTestApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
             KalturaUDRMLicenseRequestAdapter.install(player, "PlaykitTestApp");
-            if (LoadControlSetup.getExperimentId() != null) {
-                player.updatePluginConfig(YouboraPlugin.factory.getName(), new Pair<String, Integer>("experimentId", LoadControlSetup.getExperimentId()));
+            if (LoadControlSetup.getConfigurationId() != null) {
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject());
                 LoadControlSetup.apply(player);
             }
             player.getSettings().setSecureSurface(false);
@@ -404,8 +404,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void addYouboraPluginConfig(PKPluginConfigs pluginConfigs) {
+        JsonObject pluginEntry = getYouboraJsonObject();
+
+        //Set plugin entry to the plugin configs.
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
+    }
+
+    @NonNull
+    private JsonObject getYouboraJsonObject() {
         JsonObject pluginEntry = new JsonObject();
-        
+
         pluginEntry.addProperty("accountCode", "kalturatest");
         pluginEntry.addProperty("username", "a@a.com");
         pluginEntry.addProperty("haltOnError", true);
@@ -444,15 +452,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         JsonObject extraParamJson = new JsonObject();
         extraParamJson.addProperty("param1", "param1");
         extraParamJson.addProperty("param2", "param2");
-
+        if (LoadControlSetup.getConfigurationId() != null) {
+            extraParamJson.addProperty("param6", LoadControlSetup.getConfigurationId());
+        }
         //Add all the json objects created before to the pluginEntry json.
         pluginEntry.add("media", mediaEntryJson);
         pluginEntry.add("ads", adsJson);
         pluginEntry.add("properties", propertiesJson);
         pluginEntry.add("extraParams", extraParamJson);
-
-        //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
+        return pluginEntry;
     }
 
     private void addPhoenixAnalyticsPluginConfig(PKPluginConfigs config) {

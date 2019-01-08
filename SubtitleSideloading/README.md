@@ -1,14 +1,14 @@
-# Tracks Selection Sample
+# Subtitle Sideloading Sample
 
 ## Purpose
 
-This PlayKit sample show how to use Tracks Selection with PlayKit SDK.
+This PlayKit sample show how to use Subtitle Sideloading with PlayKit SDK.
 
 For more info see [documentation](https://vpaas.kaltura.com/documentation/Mobile-Video-Player-SDKs/v3_Android_TracksSelection.html)
 
 ## How to use
 
-1. Open TracksSelection project in Android Studio.
+1. Open SubtitleSideloading project in Android Studio.
 2. Compile.
 3. You will have 3 dropdown menus:
  * Video tracks.

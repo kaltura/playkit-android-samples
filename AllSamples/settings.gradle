@@ -21,6 +21,7 @@ def samples = [
         'BasicSetup',
         'EventsRegistration',
         'ErHandling',
+        'SubtitleSideloading',
         'BasicPluginsSetup',
         'TracksSelection',
         'ChangeMedia',

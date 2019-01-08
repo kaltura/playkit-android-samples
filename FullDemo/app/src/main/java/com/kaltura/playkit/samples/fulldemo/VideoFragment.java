@@ -186,7 +186,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             return;
         }
         //Before changing media we must call stop on the player.
-        player.stop();
+        //player.stop();
         player.getSettings().setPreferredMediaFormat(PKMediaFormat.mp3);
         ((PlayerSettings)player.getSettings()).getPreferredMediaFormat();
         clearLog();
@@ -285,7 +285,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
         //Set id for the entry.
         mediaEntry.setId(FIRST_ENTRY_ID);
-
+        mediaEntry.setDuration(300 * 1000);
         //Set media entry type. It could be Live,Vod or Unknown.
         //For now we will use Unknown.
         mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
@@ -315,7 +315,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
         //Set id for the entry.
         mediaEntry.setId(SECOND_ENTRY_ID);
-
+        mediaEntry.setDuration(450 * 1000);
         //Set media entry type. It could be Live,Vod or Unknown.
         //For now we will use Unknown.
         mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);

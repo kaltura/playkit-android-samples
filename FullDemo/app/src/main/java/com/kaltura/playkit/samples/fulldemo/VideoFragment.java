@@ -36,6 +36,7 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.ads.AdController;
+import com.kaltura.playkit.ads.AdEnabledPlayerController;
 import com.kaltura.playkit.player.PlayerSettings;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
@@ -1104,9 +1105,12 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         (adSkin).findViewById(R.id.skip_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (player != null && player.getController(AdController.class) != null) {
-                    log("Controller skip");
-                    player.getController(AdController.class).skip();
+                if (player != null) {
+                    log("Controller skipAd");
+                    AdController adController = player.getController(AdEnabledPlayerController.class);
+                    if (adController != null) {
+                        adController.skip();
+                    }
                 }
             }
         });

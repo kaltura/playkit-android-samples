@@ -93,8 +93,8 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         if(player != null) {
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
-                duration = adController.getDuration();
-                position = adController.getCurrentPosition();
+                duration = adController.getAdDuration();
+                position = adController.getAdCurrentPosition();
                 //log.d("XXX adController Duration:" + duration);
                 //log.d("XXX adController Position:" + position);
             } else {
@@ -133,7 +133,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
             long duration = player.getDuration();
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
-                duration = adController.getDuration();
+                duration = adController.getAdDuration();
             }
             if (duration > 0) {
                 progressValue = (int) ((position * PROGRESS_BAR_MAX) / duration);
@@ -149,7 +149,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
             long duration = player.getDuration();
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
-                duration = adController.getDuration();
+                duration = adController.getAdDuration();
             }
             positionValue = (duration * progress) / PROGRESS_BAR_MAX;
         }

@@ -88,8 +88,8 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         if(player != null){
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
-                duration = adController.getDuration();
-                position = adController.getCurrentPosition();
+                duration = adController.getAdDuration();
+                position = adController.getAdCurrentPosition();
                 //log.d("XXX adController Duration:" + duration);
                 //log.d("XXX adController Position:" + position);
             } else {
@@ -116,7 +116,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         // Remove scheduled updates.
         removeCallbacks(updateProgressAction);
         // Schedule an update if necessary.
-        if (playerState != PlayerState.IDLE || (player.getController(AdController.class)  != null && player.getController(AdController.class).getCurrentPosition() >= 0)) {
+        if (playerState != PlayerState.IDLE || (player.getController(AdController.class)  != null && player.getController(AdController.class).getAdCurrentPosition() >= 0)) {
             long delayMs = 1000;
             postDelayed(updateProgressAction, delayMs);
         }

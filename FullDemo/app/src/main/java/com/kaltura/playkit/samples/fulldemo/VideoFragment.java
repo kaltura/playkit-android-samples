@@ -911,7 +911,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
                 if (player != null) {
                     AdController adController = player.getController(AdController.class);
                     if (adController != null && adController.isAdDisplayed()) {
-                        log("Ad " + adController.getCurrentPosition() + "/" + adController.getDuration());
+                        log("Ad " + adController.getAdCurrentPosition() + "/" + adController.getAdDuration());
                     } else {
                         log("Player " + player.getCurrentPosition() + "/" + player.getDuration());
                     }
@@ -944,7 +944,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
                 if (player != null) {
                     AdController adController = player.getController(AdController.class);
                     if (adController != null && adController.isAdDisplayed()) {
-                        log("Ad " + adController.getCurrentPosition() + "/" + adController.getDuration());
+                        log("Ad " + adController.getAdCurrentPosition() + "/" + adController.getAdDuration());
                     } else {
                         log("Player " + player.getCurrentPosition() + "/" + player.getDuration());
                     }
@@ -986,7 +986,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
                     AdController adController = player.getController(AdController.class);
                     if (adController != null) {
                         if (adController.isAdDisplayed()) {
-                            log(adController.getCurrentPosition() + "/" + adController.getDuration());
+                            log(adController.getAdCurrentPosition() + "/" + adController.getAdDuration());
                         }
                         //log("" + adController.getCuePoints().getAdCuePoints().size());
                         //log(adController.getAdInfo().toString());

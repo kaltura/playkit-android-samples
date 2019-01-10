@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private static final PKLog log = PKLog.get("MainActivity");
     public static int changeMediaIndex = -1;
-    public static final Long START_POSITION = 0L;
+    public static Long START_POSITION = 0L;
 
     String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
     String preSKipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
@@ -178,6 +178,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         registerPlugins();
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
+  //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
+  //      startVootOttMediaLoadingProd1(playLoadedEntry);
         startSimpleOvpMediaLoadingHls(playLoadedEntry);
 
 //      startMockMediaLoading(playLoadedEntry);
@@ -359,6 +361,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
 
+        if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
+            START_POSITION = null;
+        } else {
+            START_POSITION = 0L;
+        }
         PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(START_POSITION);
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         if (player == null) {
@@ -427,14 +434,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("delay", 1200);
-        pluginConfigs.setPluginConfig("Sample", jsonObject);
         addIMAPluginConfig(pluginConfigs);
         //addIMADAIPluginConfig(pluginConfigs);
         addKaluraStatsPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
 
-        addYouboraPluginConfig(pluginConfigs, false, "Title1");
+        addYouboraPluginConfig(pluginConfigs, false, "preMidPostSingleAdTagUrl Title1");
         addKavaPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
         //addPhoenixAnalyticsPluginConfig(pluginConfigs);
         //addTVPAPIAnalyticsPluginConfig(pluginConfigs);
@@ -527,7 +531,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         pluginEntry.add("extraParams", extraParamJson);
         return pluginEntry;
     }
-
+    
     private void addPhoenixAnalyticsPluginConfig(PKPluginConfigs config) {
         String ks = "djJ8MTk4fHFftqeAPxdlLVzZBk0Et03Vb8on1wLsKp7cbOwzNwfOvpgmOGnEI_KZDhRWTS-76jEY7pDONjKTvbWyIJb5RsP4NL4Ng5xuw6L__BeMfLGAktkVliaGNZq9SXF5n2cMYX-sqsXLSmWXF9XN89io7-k=";
         PhoenixAnalyticsConfig phoenixAnalyticsConfig = new PhoenixAnalyticsConfig(198, "http://api-preprod.ott.kaltura.com/v4_2/api_v3/", ks, 30);
@@ -540,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
 
         log.d("Play Ad preSKipAdTagUrl");
-        IMAConfig adsConfig = getAdsConfig(preSKipAdTagUrl);
+        IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 

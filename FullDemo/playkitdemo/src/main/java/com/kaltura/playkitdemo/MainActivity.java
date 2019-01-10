@@ -99,7 +99,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final boolean AUTO_PLAY_ON_RESUME = true;
 
     private static final PKLog log = PKLog.get("MainActivity");
+    public static int changeMediaIndex = -1;
     public static final Long START_POSITION = 0L;
+
+    String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
+    String preSKipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+    String inLinePreAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
+    String preMidPostSingleAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
+    String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
 
     private Player player;
     private MediaEntryProvider mediaProvider;
@@ -150,8 +157,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (player != null) {
+                    changeMediaIndex++;
                     OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
-                    startSimpleOvpMediaLoading(playLoadedEntry);
+                    if (changeMediaIndex % 4 == 0) {
+                        startSimpleOvpMediaLoadingDRM(playLoadedEntry);
+                    } else if (changeMediaIndex % 4 == 1) {
+                        startSimpleOvpMediaLoadingLive1(playLoadedEntry);
+                    } if (changeMediaIndex % 4 == 2) {
+                        startSimpleOvpMediaLoadingClear(playLoadedEntry);
+                    } if (changeMediaIndex % 4 == 3) {
+                        startSimpleOvpMediaLoadingHls(playLoadedEntry);
+                    }
                 }
             }
         });
@@ -162,11 +178,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         registerPlugins();
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
+        startSimpleOvpMediaLoadingHls(playLoadedEntry);
 
-//        startMockMediaLoading(playLoadedEntry);
+//      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
-        startSimpleOvpMediaLoading(playLoadedEntry);
+//      startSimpleOvpMediaLoading(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
@@ -246,15 +263,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void startSimpleOvpMediaLoadingHls(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 243342, null))
-                .setEntryId("0_uka1msg4")
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 1734751, null))
+                .setEntryId("1_3o1seqnv")
                 .load(completion);
     }
 
-    private void startSimpleOvpMediaLoading(OnMediaLoadCompletion completion) {
+    private void startSimpleOvpMediaLoadingDRM(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
                 .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2222401, null))
                 .setEntryId("1_f93tepsn")//("1_asoyc5ef") //("1_uzea2uje")
+                .load(completion);
+    }
+
+    private void startSimpleOvpMediaLoadingClear(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null))
+                .setEntryId("0_wu32qrt3")
+                .load(completion);
+    }
+
+    private void startSimpleOvpMediaLoadingLive(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null))
+                .setEntryId("0_nwkp7jtx")
+                .load(completion);
+    }
+
+    private void startSimpleOvpMediaLoadingLive1(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com/", 1740481, null))
+                .setEntryId("1_fdv46dba")
+
                 .load(completion);
     }
 
@@ -344,6 +383,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             controlsView = (PlaybackControlsView) this.findViewById(R.id.playerControls);
             controlsView.setPlayer(player);
             initSpinners();
+        } else {
+            if (changeMediaIndex % 4 == 0) {
+                log.d("Play Ad preMidPostAdTagUrl");
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostAdTagUrl));
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preMidPostAdTagUrl media2"));
+                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(2222401, "1_f93tepsn"));
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(2222401, "1_f93tepsn"));
+
+            } else if (changeMediaIndex % 4 == 1) {
+                log.d("Play Ad inLinePreAdTagUrl");
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(inLinePreAdTagUrl));
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(true, "inLinePreAdTagUrl media3"));
+                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1740481, "1_fdv46dba"));
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1740481, "1_fdv46dba"));
+            } if (changeMediaIndex % 4 == 2) {
+                log.d("Play NO Ad");
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(""));
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "NO AD media4"));
+                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1091, "0_wu32qrt3"));
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1091, "0_wu32qrt3"));
+            } if (changeMediaIndex % 4 == 3) {
+                log.d("Play Ad preSKipAdTagUrl");
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSKipAdTagUrl));
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preSKipAdTagUrl media1"));
+                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1734751, "1_3o1seqnv"));
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1734751, "1_3o1seqnv"));
+            }
         }
 
         player.prepare(mediaConfig);
@@ -366,39 +432,55 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         pluginConfigs.setPluginConfig("Sample", jsonObject);
         addIMAPluginConfig(pluginConfigs);
         //addIMADAIPluginConfig(pluginConfigs);
-        addKaluraStatsPluginConfig(pluginConfigs);
+        addKaluraStatsPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
 
-        addYouboraPluginConfig(pluginConfigs);
-        addKavaPluginConfig(pluginConfigs);
+        addYouboraPluginConfig(pluginConfigs, false, "Title1");
+        addKavaPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
         //addPhoenixAnalyticsPluginConfig(pluginConfigs);
         //addTVPAPIAnalyticsPluginConfig(pluginConfigs);
     }
 
-    private void addKaluraStatsPluginConfig(PKPluginConfigs pluginConfigs) {
-        String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
-        KalturaStatsConfig kalturaStatsConfig = new KalturaStatsConfig(true)
-                .setBaseUrl(KALTURA_STATS_URL)
-                .setPartnerId(2222401)
-                .setEntryId("1_f93tepsn")
-                .setTimerInterval(30);
+    private void addKaluraStatsPluginConfig(PKPluginConfigs pluginConfigs, int partnerId, String ovpEntryId) {
+
+        KalturaStatsConfig kalturaStatsConfig = getKalturaStatsConfig(partnerId, ovpEntryId);
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KalturaStatsPlugin.factory.getName(), kalturaStatsConfig);
     }
 
+    private KalturaStatsConfig getKalturaStatsConfig(int partnerId, String ovpEntryId) {
+        return new KalturaStatsConfig(true)
+                    .setBaseUrl(KALTURA_STATS_URL)
+                    .setPartnerId(partnerId)
+                    .setEntryId(ovpEntryId)
+                    .setTimerInterval(30);
+    }
 
-    private void addKavaPluginConfig(PKPluginConfigs pluginConfigs) {
-        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
-                .setApplicationVersion(BuildConfig.VERSION_NAME)
-                .setPartnerId(2222401)
-                .setEntryId("1_f93tepsn")
-                .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
+
+    private void addKavaPluginConfig(PKPluginConfigs pluginConfigs, int partnerId, String ovpEntryId) {
+        KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(partnerId, ovpEntryId);
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
     }
 
-    private void addYouboraPluginConfig(PKPluginConfigs pluginConfigs) {
+    private KavaAnalyticsConfig getKavaAnalyticsConfig(int partnerId, String ovpEntryId) {
+        return new KavaAnalyticsConfig()
+                    .setApplicationVersion(BuildConfig.VERSION_NAME)
+                    .setPartnerId(partnerId)
+                    .setEntryId("ovpEntryId")
+                    .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
+    }
+
+    private void addYouboraPluginConfig(PKPluginConfigs pluginConfigs, boolean isLive, String title) {
+        JsonObject pluginEntry = getYouboraJsonObject(isLive, title);
+
+        //Set plugin entry to the plugin configs.
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
+    }
+
+    @NonNull
+    private JsonObject getYouboraJsonObject(boolean isLive, String title) {
         JsonObject pluginEntry = new JsonObject();
-        
+
         pluginEntry.addProperty("accountCode", "kalturatest");
         pluginEntry.addProperty("username", "a@a.com");
         pluginEntry.addProperty("haltOnError", true);
@@ -408,8 +490,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Media entry json.
         JsonObject mediaEntryJson = new JsonObject();
-        mediaEntryJson.addProperty("isLive", false);
-        mediaEntryJson.addProperty("title", "the media title");
+        mediaEntryJson.addProperty("isLive", isLive);
+        mediaEntryJson.addProperty("title", title);
 
         //Youbora ads configuration json.
         JsonObject adsJson = new JsonObject();
@@ -443,9 +525,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         pluginEntry.add("ads", adsJson);
         pluginEntry.add("properties", propertiesJson);
         pluginEntry.add("extraParams", extraParamJson);
-
-        //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
+        return pluginEntry;
     }
 
     private void addPhoenixAnalyticsPluginConfig(PKPluginConfigs config) {
@@ -455,22 +535,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void addIMAPluginConfig(PKPluginConfigs config) {
-        String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
-        String preSKipAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
+
+        log.d("Play Ad preSKipAdTagUrl");
+        IMAConfig adsConfig = getAdsConfig(preSKipAdTagUrl);
+        config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
+    }
+
+    private IMAConfig getAdsConfig(String adTagUrl) {
         List<String> videoMimeTypes = new ArrayList<>();
         videoMimeTypes.add("video/mp4");
         videoMimeTypes.add("application/x-mpegURL");
         // videoMimeTypes.add("application/dash+xml");
         //Map<Double, String> tagTimesMap = new HashMap<>();
         //tagTimesMap.put(2.0,"ADTAG");
-
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(preSKipAdTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
-        config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
+        return new IMAConfig().setAdTagURL(adTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
     }
-
 
 
     //IMA CONFIG
@@ -959,7 +1041,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                            bitrate = buildAudioChannelString(audioTrackInfo.getChannelCount());
                         }
                         if (audioTrackInfo.isAdaptive()) {
-                            bitrate += " Adaptive";
+                            if (bitrate != null) {
+                                bitrate += " Adaptive";
+                            } else {
+                                bitrate = "Adaptive";
+                            }
+                            if (label == null) {
+                                label = "";
+                            }
                         }
                         trackItems[i] = new TrackItem(label + " " + bitrate, audioTrackInfo.getUniqueId());
                 }

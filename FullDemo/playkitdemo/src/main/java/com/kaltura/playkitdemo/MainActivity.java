@@ -676,15 +676,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+
     private void addPlayerListeners(final ProgressBar appProgressBar) {
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_CONTENT_PAUSE_REQUESTED");
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.CONTENT_RESUME_REQUESTED);
+
+        player.addListener(this, AdEvent.contentResumeRequested, event -> {
+            log.d("CONTENT_RESUME_REQUESTED");
+            appProgressBar.setVisibility(View.INVISIBLE);
+            controlsView.setPlayerState(PlayerState.READY);
+        });
+
 
 //
 //        player.addEventListener(new PKEvent.Listener() {
@@ -697,242 +698,179 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //            }
 //        }, AdEvent.Type.DAI_SOURCE_SELECTED);
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_CONTENT_PAUSE_REQUESTED");
-                appProgressBar.setVisibility(View.VISIBLE);
-                controlsView.setPlayerState(PlayerState.READY);
+
+        player.addListener(this, AdEvent.contentPauseRequested, event -> {
+            log.d("AD_CONTENT_PAUSE_REQUESTED");
+            appProgressBar.setVisibility(View.VISIBLE);
+            controlsView.setPlayerState(PlayerState.READY);
+        });
+
+        player.addListener(this, AdEvent.adPlaybackInfoUpdated, event -> {
+            log.d("AD_PLAYBACK_INFO_UPDATED");
+            AdEvent.AdPlaybackInfoUpdated playbackInfoUpdated = event;
+            log.d("XXX playbackInfoUpdated  = " + playbackInfoUpdated.width + "/" + playbackInfoUpdated.height + "/" + playbackInfoUpdated.bitrate);
+        });
+
+        player.addListener(this, AdEvent.cuepointsChanged, event -> {
+            AdEvent.AdCuePointsUpdateEvent cuePointsList = event;
+            adCuePoints = cuePointsList.cuePoints;
+            if (adCuePoints != null) {
+                log.d("Has Postroll = " + adCuePoints.hasPostRoll());
             }
+        });
 
-        }, AdEvent.Type.CONTENT_PAUSE_REQUESTED);
+        player.addListener(this, AdEvent.adBufferStart, event -> {
+            AdEvent.AdBufferStart adBufferStartEvent = event;
+            log.d("AD_BUFFER_START pos = " + adBufferStartEvent.adPosition);
+            appProgressBar.setVisibility(View.VISIBLE);
+        });
 
+        player.addListener(this, AdEvent.adBufferEnd, event -> {
+            AdEvent.AdBufferEnd adBufferEnd = event;
+            log.d("AD_BUFFER_END pos = " + adBufferEnd.adPosition);
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_PLAYBACK_INFO_UPDATED");
-                AdEvent.AdPlaybackInfoUpdated playbackInfoUpdated = (AdEvent.AdPlaybackInfoUpdated) event;
-                log.d("XXX playbackInfoUpdated  = " + playbackInfoUpdated.width + "/" + playbackInfoUpdated.height + "/" + playbackInfoUpdated.bitrate);
+        player.addListener(this, AdEvent.adFirstPlay, event -> {
+            log.d("AD_FIRST_PLAY");
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+        player.addListener(this, AdEvent.started, event -> {
+            log.d("AD_STARTED");
+            AdEvent.AdStartedEvent adStartedEvent = event;
+            log.d("AD_STARTED w/h - " + adStartedEvent.adInfo.getAdWidth() + "/" + adStartedEvent.adInfo.getAdHeight());
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+        player.addListener(this, AdEvent.resumed, event -> {
+            log.d("Ad Event AD_RESUMED");
+            nowPlaying = true;
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+        player.addListener(this, AdEvent.playHeadChanged, event -> {
+            appProgressBar.setVisibility(View.INVISIBLE);
+            AdEvent.AdPlayHeadEvent adEventProress = event;
+            //log.d("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
+        });
+
+        player.addListener(this, AdEvent.allAdsCompleted, event -> {
+            log.d("Ad Event AD_ALL_ADS_COMPLETED");
+            appProgressBar.setVisibility(View.INVISIBLE);
+            if (adCuePoints != null && adCuePoints.hasPostRoll()) {
+                controlsView.setPlayerState(PlayerState.IDLE);
             }
+        });
 
-        }, AdEvent.Type.AD_PLAYBACK_INFO_UPDATED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.AdCuePointsUpdateEvent cuePointsList = (AdEvent.AdCuePointsUpdateEvent) event;
-                adCuePoints = cuePointsList.cuePoints;
-                if (adCuePoints != null) {
-                    log.d("Has Postroll = " + adCuePoints.hasPostRoll());
-                }
+        player.addListener(this, AdEvent.error, event -> {
+            AdEvent.Error adErrorEvent = event;
+            if (adErrorEvent != null && adErrorEvent.error != null) {
+                log.e("ERROR: " + adErrorEvent.error.errorType + ", " + adErrorEvent.error.message);
             }
-        }, AdEvent.Type.CUEPOINTS_CHANGED);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.AdBufferStart adBufferStartEvent = (AdEvent.AdBufferStart) event;
-                log.d("AD_BUFFER_START pos = " + adBufferStartEvent.adPosition);
-                appProgressBar.setVisibility(View.VISIBLE);
+        player.addListener(this, AdEvent.skipped, event -> {
+            log.d("Ad Event SKIPPED");
+            nowPlaying = true;
+        });
+
+        /////// PLAYER EVENTS
+
+        player.addListener(this, PlayerEvent.play, event -> {
+            log.d("Player Event PLAY");
+            nowPlaying = true;
+        });
+
+        player.addListener(this, PlayerEvent.playing, event -> {
+            log.d("Player Event PLAYING");
+            nowPlaying = true;
+        });
+
+        player.addListener(this, PlayerEvent.pause, event -> {
+            log.d("Player Event PAUSE");
+            nowPlaying = false;
+        });
+
+        player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
+            PlayerEvent.PlaybackRateChanged playbackRateChanged = event;
+            log.d("playbackRateChanged event  rate = " + playbackRateChanged.rate);
+        });
+
+        player.addListener(this, PlayerEvent.tracksAvailable, event -> {
+            //When the track data available, this event occurs. It brings the info object with it.
+            PlayerEvent.TracksAvailable tracksAvailable = event;
+            tracksInfo = tracksAvailable.tracksInfo;
+            populateSpinnersWithTrackInfo(tracksAvailable.tracksInfo);
+        });
+
+        player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
+            PlayerEvent.PlaybackRateChanged playbackRateChanged = event;
+            log.d("playbackRateChanged event  rate = " + playbackRateChanged.rate);
+        });
+
+        player.addListener(this, PlayerEvent.error, event -> {
+            //When the track data available, this event occurs. It brings the info object with it.
+            PlayerEvent.Error playerError = event;
+            if (playerError != null && playerError.error != null) {
+                log.d("PlayerEvent.Error event  position = " + playerError.error.errorType + " errorMessage = " + playerError.error.message);
             }
-        }, AdEvent.Type.AD_BUFFER_START);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
+        player.addListener(this, PlayerEvent.playheadUpdated, event -> {
+            //When the track data available, this event occurs. It brings the info object with it.
+            PlayerEvent.PlayheadUpdated playheadUpdated = event;
+            //log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
+        });
+
+        player.addListener(this, PlayerEvent.videoFramesDropped, event -> {
+            PlayerEvent.VideoFramesDropped videoFramesDropped = event;
+            //log.d("VIDEO_FRAMES_DROPPED " + videoFramesDropped.droppedVideoFrames);
+        });
+
+        player.addListener(this, PlayerEvent.bytesLoaded, event -> {
+            PlayerEvent.BytesLoaded bytesLoaded = event;
+            //log.d("BYTES_LOADED " + bytesLoaded.bytesLoaded);
+        });
+
+        player.addListener(this, PlayerEvent.stateChanged, new PKEvent.Listener<PlayerEvent.StateChanged>() {
             @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.AdBufferEnd adBufferEnd = (AdEvent.AdBufferEnd) event;
-                log.d("AD_BUFFER_END pos = " + adBufferEnd.adPosition);
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.AD_BUFFER_END);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_FIRST_PLAY");
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.AD_FIRST_PLAY);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_STARTED");
-                AdEvent.AdStartedEvent adStartedEvent = (AdEvent.AdStartedEvent) event;
-                log.d("AD_STARTED w/h - " + adStartedEvent.adInfo.getAdWidth() + "/" + adStartedEvent.adInfo.getAdHeight());
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.STARTED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("Ad Event AD_RESUMED");
-                nowPlaying = true;
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.RESUMED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                appProgressBar.setVisibility(View.INVISIBLE);
-                AdEvent.AdPlayHeadEvent adEventProress = (AdEvent.AdPlayHeadEvent) event;
-                //log.d("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
-            }
-        }, AdEvent.Type.PLAY_HEAD_CHANGED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("Ad Event AD_ALL_ADS_COMPLETED");
-                appProgressBar.setVisibility(View.INVISIBLE);
-                if (adCuePoints != null && adCuePoints.hasPostRoll()) {
-                    controlsView.setPlayerState(PlayerState.IDLE);
-                }
-            }
-        }, AdEvent.Type.ALL_ADS_COMPLETED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = true;
-            }
-        }, PlayerEvent.Type.PLAY);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = true;
-            }
-        }, PlayerEvent.Type.PLAYING);
-
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.Error adErrorEvent = (AdEvent.Error) event;
-                if (adErrorEvent != null && adErrorEvent.error != null) {
-                    log.e("ERROR: " + adErrorEvent.error.errorType + ", " + adErrorEvent.error.message);
-                }
-            }
-        }, AdEvent.Type.ERROR);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = false;
-            }
-        }, PlayerEvent.Type.PAUSE);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = true;
-            }
-        }, AdEvent.Type.SKIPPED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PlayerEvent.PlaybackRateChanged playbackRateChanged = (PlayerEvent.PlaybackRateChanged) event;
-                log.d("playbackRateChanged event  rate = " + playbackRateChanged.rate);
-            }
-        }, PlayerEvent.Type.PLAYBACK_RATE_CHANGED);
-
-        player.addStateChangeListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                if (event instanceof PlayerEvent.StateChanged) {
-                    PlayerEvent.StateChanged stateChanged = (PlayerEvent.StateChanged) event;
-                    log.d("State changed from " + stateChanged.oldState + " to " + stateChanged.newState);
-                    if(controlsView != null){
-                        controlsView.setPlayerState(stateChanged.newState);
-                    }
+            public void onEvent(PlayerEvent.StateChanged event) {
+                PlayerEvent.StateChanged stateChanged = event;
+                log.d("State changed from " + stateChanged.oldState + " to " + stateChanged.newState);
+                if(controlsView != null){
+                    controlsView.setPlayerState(stateChanged.newState);
                 }
             }
         });
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //When the track data available, this event occurs. It brings the info object with it.
-                PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
-                tracksInfo = tracksAvailable.tracksInfo;
-                populateSpinnersWithTrackInfo(tracksAvailable.tracksInfo);
 
-            }
-        }, PlayerEvent.Type.TRACKS_AVAILABLE);
+        /////Phoenox events
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //When the track data available, this event occurs. It brings the info object with it.
-                PlayerEvent.Error playerError = (PlayerEvent.Error) event;
-                if (playerError != null && playerError.error != null) {
-                    log.d("PlayerEvent.Error event  position = " + playerError.error.errorType + " errorMessage = " + playerError.error.message);
-                }
-            }
-        }, PlayerEvent.Type.ERROR);
+        player.addListener(this, PhoenixAnalyticsEvent.bookmarkErrorEvent, event -> {
+            PhoenixAnalyticsEvent.BookmarkErrorEvent bookmarkErrorEvent = event;
+            log.d("bookmarkErrorEvent errorCode = " + bookmarkErrorEvent.errorCode + " message = " + bookmarkErrorEvent.errorMessage);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //When the track data available, this event occurs. It brings the info object with it.
-                PlayerEvent.PlayheadUpdated playheadUpdated = (PlayerEvent.PlayheadUpdated) event;
-                //log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
-            }
-        }, PlayerEvent.Type.PLAYHEAD_UPDATED);
+        player.addListener(this, PhoenixAnalyticsEvent.concurrencyErrorEvent, event -> {
+            PhoenixAnalyticsEvent.ConcurrencyErrorEvent concurrencyErrorEvent = event;
+            log.d("ConcurrencyErrorEvent errorCode = " + concurrencyErrorEvent.errorCode + " message = " + concurrencyErrorEvent.errorMessage);
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
+        });
 
-                PlayerEvent.VideoFramesDropped videoFramesDropped = (PlayerEvent.VideoFramesDropped) event;
-                log.d("VIDEO_FRAMES_DROPPED " + videoFramesDropped.droppedVideoFrames);
-            }
-        }, PlayerEvent.Type.VIDEO_FRAMES_DROPPED);
+        player.addListener(this, PhoenixAnalyticsEvent.error, event -> {
+            PhoenixAnalyticsEvent.ErrorEvent errorEvent = event;
+            log.d("Phoenox Analytics errorEvent errorCode = " + errorEvent.errorCode + " message = " + errorEvent.errorMessage);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
+        player.addListener(this, PhoenixAnalyticsEvent.error, event -> {
+            PhoenixAnalyticsEvent.ErrorEvent errorEvent = event;
+            log.d("Phoenox Analytics errorEvent errorCode = " + errorEvent.errorCode + " message = " + errorEvent.errorMessage);
+        });
 
-                PlayerEvent.BytesLoaded bytesLoaded = (PlayerEvent.BytesLoaded) event;
-                log.d("BYTES_LOADED " + bytesLoaded.bytesLoaded);
-            }
-        }, PlayerEvent.Type.BYTES_LOADED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PhoenixAnalyticsEvent.BookmarkErrorEvent bookmarkErrorEvent = (PhoenixAnalyticsEvent.BookmarkErrorEvent) event;
-                log.d("bookmarkErrorEvent errorCode = " + bookmarkErrorEvent.errorCode + " message = " + bookmarkErrorEvent.errorMessage);
-            }
-        }, PhoenixAnalyticsEvent.Type.BOOKMARK_ERROR);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PhoenixAnalyticsEvent.ConcurrencyErrorEvent concurrencyErrorEvent = (PhoenixAnalyticsEvent.ConcurrencyErrorEvent) event;
-                log.d("ConcurrencyErrorEvent errorCode = " + concurrencyErrorEvent.errorCode + " message = " + concurrencyErrorEvent.errorMessage);
-            }
-        }, PhoenixAnalyticsEvent.Type.CONCURRENCY_ERROR);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PhoenixAnalyticsEvent.ErrorEvent errorEvent = (PhoenixAnalyticsEvent.ErrorEvent) event;
-                log.d("Phoenox Analytics errorEvent errorCode = " + errorEvent.errorCode + " message = " + errorEvent.errorMessage);
-            }
-        }, PhoenixAnalyticsEvent.Type.ERROR);
-
-        //OLD WAY FOR GETTING THE CONCURRENCY
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("Concurrency event");
-            }
-        }, OttEvent.OttEventType.Concurrency);
+        player.addListener(this, OttEvent.ottEvent, event -> {
+            OttEvent concEvent = (OttEvent) event;
+            log.d("Concurrency event = " + concEvent.type);
+        });
     }
 
     @Override

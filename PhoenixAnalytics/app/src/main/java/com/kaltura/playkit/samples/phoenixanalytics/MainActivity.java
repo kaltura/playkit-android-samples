@@ -21,6 +21,7 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
 import com.kaltura.playkit.player.vr.VRPKMediaEntry;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
+import com.kaltura.playkit.plugins.kava.KavaAnalyticsEvent;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
@@ -125,18 +126,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribePhoenixAnalyticsReportEvent() {
         //Subscribe to the event.
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                PhoenixAnalyticsEvent.PhoenixAnalyticsReport reportEvent = (PhoenixAnalyticsEvent.PhoenixAnalyticsReport) event;
+        player.addListener(this, PhoenixAnalyticsEvent.phoenixAnalyticsReport, event -> {
+            PhoenixAnalyticsEvent.PhoenixAnalyticsReport reportEvent = event;
 
-                //Get the event name from the report.
-                String reportedEventName = reportEvent.reportedEventName;
-                Log.i(TAG, "PhoenixAnalytics report sent. Reported event name: " + reportedEventName);
-            }
-            //Event subscription.
-        }, PhoenixAnalyticsEvent.Type.REPORT_SENT);
+            //Get the event name from the report.
+            String reportedEventName = reportEvent.reportedEventName;
+            Log.i(TAG, "PhoenixAnalytics report sent. Reported event name: " + reportedEventName);
+        });
     }
 
     /**

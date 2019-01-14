@@ -109,32 +109,15 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToErrorEvents() {
 
-        //Add event listener. Note, that it have two parameters.
-        // 1. PKEvent.Listener itself.
-        // 2. Array of events you want to listen to.
-        player.addEventListener(new PKEvent.Listener() {
+        player.addListener(this, PlayerEvent.error, event -> {
+            PlayerEvent.Error playerErrorvEent = event;
+            Log.e(TAG, "PLAYER ERROR " +  playerErrorvEent.error.errorType.name() + " " + playerErrorvEent.error.message);
+        });
 
-                                    //Event received.
-                                    @Override
-                                    public void onEvent(PKEvent event) {
-                                        //Check type of the received event.
-                                        if (event.eventType() == PlayerEvent.Type.ERROR) {
-                                            //In case of PlayerEvent.Type.ERROR cast the event object to PlayerEvent.Error
-                                            PlayerEvent.Error errorEvent = (PlayerEvent.Error) event;
-                                            //Print the type of the received error.
-                                            Log.e(TAG, "Error: " + errorEvent.error.errorType.name());
-                                        } else if (event.eventType() == AdEvent.Type.ERROR) {
-                                            //In case of AdEvent.Type.ERROR cast the event object to AdEvent.Error
-                                            AdEvent.Error errorEvent = (AdEvent.Error) event;
-                                            //Print the type of the received error.
-                                            Log.e(TAG, "Ad Error: " + errorEvent.error.errorType.name());
-                                        }
-                                    }
-                                },
-                //Subscribe to the events you are interested in.
-                PlayerEvent.Type.ERROR,
-                AdEvent.Type.ERROR
-        );
+        player.addListener(this, AdEvent.error, event -> {
+            AdEvent.Error adError = event;
+            Log.e(TAG, "AD_ERROR : " +   adError.error.errorType.name() + " " + adError.error.errorType.name());
+        });
     }
 
     /**

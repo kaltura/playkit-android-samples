@@ -868,13 +868,9 @@ public class VideoFragment extends android.support.v4.app.Fragment {
             appProgressBar.setVisibility(View.INVISIBLE);
         });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("FIRST_QUARTILE");
-
-            }
-        }, AdEvent.Type.FIRST_QUARTILE);
+        player.addListener(this, AdEvent.firstQuartile, event -> {
+            log("FIRST_QUARTILE");
+        });
 
         player.addListener(this, AdEvent.midpoint, event -> {
             log("MIDPOINT");
@@ -964,6 +960,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         });
 
         player.addListener(this, PlayerEvent.error, event -> {
+            log("PLAYER ERROR " + event.error.message);
             appProgressBar.setVisibility(View.INVISIBLE);
             nowPlaying = false;
         });
@@ -975,7 +972,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         });
 
         player.addListener(this, PlayerEvent.stateChanged, event -> {
-            PlayerEvent.StateChanged stateChanged = (PlayerEvent.StateChanged) event;
+            PlayerEvent.StateChanged stateChanged = event;
             //log("State changed from " + stateChanged.oldState + " to " + stateChanged.newState);
             if (stateChanged.newState == PlayerState.BUFFERING) {
                 appProgressBar.setVisibility(View.VISIBLE);

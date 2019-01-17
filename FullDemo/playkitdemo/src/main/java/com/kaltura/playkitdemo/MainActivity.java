@@ -846,12 +846,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         /////Phoenox events
 
-        player.addListener(this, PhoenixAnalyticsEvent.bookmarkErrorEvent, event -> {
+        player.addListener(this, PhoenixAnalyticsEvent.bookmarkError, event -> {
             PhoenixAnalyticsEvent.BookmarkErrorEvent bookmarkErrorEvent = event;
             log.d("bookmarkErrorEvent errorCode = " + bookmarkErrorEvent.errorCode + " message = " + bookmarkErrorEvent.errorMessage);
         });
 
-        player.addListener(this, PhoenixAnalyticsEvent.concurrencyErrorEvent, event -> {
+        player.addListener(this, PhoenixAnalyticsEvent.concurrencyError, event -> {
             PhoenixAnalyticsEvent.ConcurrencyErrorEvent concurrencyErrorEvent = event;
             log.d("ConcurrencyErrorEvent errorCode = " + concurrencyErrorEvent.errorCode + " message = " + concurrencyErrorEvent.errorMessage);
 

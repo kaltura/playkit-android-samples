@@ -105,7 +105,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final boolean AUTO_PLAY_ON_RESUME = true;
 
     private static final PKLog log = PKLog.get("MainActivity");
-    public static final Long START_POSITION = 0L;
+    public static int changeMediaIndex = -1;
+    public static Long START_POSITION = 0L;
+
+    String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
+    String preSKipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+    String inLinePreAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
+    String preMidPostSingleAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
+    String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
 
     private Player player;
     private MediaEntryProvider mediaProvider;
@@ -158,8 +165,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (player != null) {
+                    changeMediaIndex++;
                     OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
-                    startSimpleOvpMediaLoading(playLoadedEntry);
+                    if (changeMediaIndex % 4 == 0) {
+                        startSimpleOvpMediaLoadingDRM(playLoadedEntry);
+                    } else if (changeMediaIndex % 4 == 1) {
+                        startSimpleOvpMediaLoadingLive1(playLoadedEntry);
+                    } if (changeMediaIndex % 4 == 2) {
+                        startSimpleOvpMediaLoadingClear(playLoadedEntry);
+                    } if (changeMediaIndex % 4 == 3) {
+                        startSimpleOvpMediaLoadingHls(playLoadedEntry);
+                    }
                 }
             }
         });
@@ -170,13 +186,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         registerPlugins();
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
+
 //        startVootOttMediaLoadingKids(playLoadedEntry);
 //        startVootKids(playLoadedEntry);
 //       startVootOttMediaLoadingProd1(playLoadedEntry);
-//        startMockMediaLoading(playLoadedEntry);
+        startMockMediaLoading(playLoadedEntry);
+//      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
+//      startVootOttMediaLoadingProd1(playLoadedEntry);
+//        startSimpleOvpMediaLoadingDRM(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
-        startSimpleOvpMediaLoading(playLoadedEntry);
+//      startSimpleOvpMediaLoading(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
@@ -255,15 +275,37 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void startSimpleOvpMediaLoadingHls(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 243342, null))
-                .setEntryId("0_uka1msg4")
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 1734751, null))
+                .setEntryId("1_3o1seqnv")
                 .load(completion);
     }
 
-    private void startSimpleOvpMediaLoading(OnMediaLoadCompletion completion) {
+    private void startSimpleOvpMediaLoadingDRM(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
                 .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2222401, null))
                 .setEntryId("1_f93tepsn")//("1_asoyc5ef") //("1_uzea2uje")
+                .load(completion);
+    }
+
+    private void startSimpleOvpMediaLoadingClear(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null))
+                .setEntryId("0_wu32qrt3")
+                .load(completion);
+    }
+
+    private void startSimpleOvpMediaLoadingLive(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null))
+                .setEntryId("0_nwkp7jtx")
+                .load(completion);
+    }
+
+    private void startSimpleOvpMediaLoadingLive1(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com/", 1740481, null))
+                .setEntryId("1_fdv46dba")
+
                 .load(completion);
     }
 
@@ -405,6 +447,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
 
+        if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
+            START_POSITION = null;
+        } else {
+            START_POSITION = 0L;
+        }
         PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(START_POSITION);
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         if (player == null) {
@@ -429,6 +476,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             controlsView = (PlaybackControlsView) this.findViewById(R.id.playerControls);
             controlsView.setPlayer(player);
             initSpinners();
+        } else {
+            if (changeMediaIndex % 4 == 0) {
+                log.d("Play Ad preMidPostAdTagUrl");
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostAdTagUrl));
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preMidPostAdTagUrl media2"));
+                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(2222401, "1_f93tepsn"));
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(2222401, "1_f93tepsn"));
+
+            } else if (changeMediaIndex % 4 == 1) {
+                log.d("Play Ad inLinePreAdTagUrl");
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(inLinePreAdTagUrl));
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(true, "inLinePreAdTagUrl media3"));
+                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1740481, "1_fdv46dba"));
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1740481, "1_fdv46dba"));
+            } if (changeMediaIndex % 4 == 2) {
+                log.d("Play NO Ad");
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(""));
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "NO AD media4"));
+                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1091, "0_wu32qrt3"));
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1091, "0_wu32qrt3"));
+            } if (changeMediaIndex % 4 == 3) {
+                log.d("Play Ad preSKipAdTagUrl");
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSKipAdTagUrl));
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preSKipAdTagUrl media1"));
+                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1734751, "1_3o1seqnv"));
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1734751, "1_3o1seqnv"));
+            }
         }
 
         player.prepare(mediaConfig);
@@ -452,118 +526,56 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         addFBInStreamPluginConfig(pluginConfigs);
         //addIMAPluginConfig(pluginConfigs);
         //addIMADAIPluginConfig(pluginConfigs);
-        addKaluraStatsPluginConfig(pluginConfigs);
+        addKaluraStatsPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
 
-        addYouboraPluginConfig(pluginConfigs);
-        addKavaPluginConfig(pluginConfigs);
-        addPhoenixAnalyticsPluginConfig(pluginConfigs);
+        addYouboraPluginConfig(pluginConfigs, false, "preMidPostSingleAdTagUrl Title1");
+        addKavaPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
+        //addPhoenixAnalyticsPluginConfig(pluginConfigs);
         //addTVPAPIAnalyticsPluginConfig(pluginConfigs);
     }
 
-    private void addKaluraStatsPluginConfig(PKPluginConfigs pluginConfigs) {
-        String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
-        KalturaStatsConfig kalturaStatsConfig = new KalturaStatsConfig(true)
-                .setBaseUrl(KALTURA_STATS_URL)
-                .setPartnerId(2222401)
-                .setEntryId("1_f93tepsn")
-                .setTimerInterval(30);
+    private void addKaluraStatsPluginConfig(PKPluginConfigs pluginConfigs, int partnerId, String ovpEntryId) {
+
+        KalturaStatsConfig kalturaStatsConfig = getKalturaStatsConfig(partnerId, ovpEntryId);
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KalturaStatsPlugin.factory.getName(), kalturaStatsConfig);
     }
 
+    private KalturaStatsConfig getKalturaStatsConfig(int partnerId, String ovpEntryId) {
+        return new KalturaStatsConfig(true)
+                    .setBaseUrl(KALTURA_STATS_URL)
+                    .setPartnerId(partnerId)
+                    .setEntryId(ovpEntryId)
+                    .setTimerInterval(30);
+    }
 
-    private void addKavaPluginConfig(PKPluginConfigs pluginConfigs) {
-        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
-                .setApplicationVersion(BuildConfig.VERSION_NAME)
-                .setPartnerId(2222401)
-                .setEntryId("1_f93tepsn")
-                .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
+
+    private void addKavaPluginConfig(PKPluginConfigs pluginConfigs, int partnerId, String ovpEntryId) {
+        KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(partnerId, ovpEntryId);
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
     }
 
-    private void startVootOttMediaLoadingProd(final OnMediaLoadCompletion completion) {
-        SessionProvider ksSessionProvider = new SessionProvider() {
-            @Override
-            public String baseUrl() {
-                String PhoenixBaseUrl = "https://rest-as.ott.kaltura.com/v4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";// 4_4 "https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
-                return PhoenixBaseUrl;
-            }
 
-            @Override
-            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
-                String PnxKS = "djJ8MjI1fOp535earB1FrLYRkal8KB7Y9j19Hr0bhrnO-OyOgyfBJNg4EhwdIpDfHb8gosKb385gA76QmGTaNAVzgCvsfTkAMIwCVTEAOfR8h70aCWxAQHfIQa8UJzFkLq9iXjTGzetw-DDadMXbhWdNqIRvtDc_CRNxMTDHzx_8kZBUyP1e";
-                if (completion != null) {
-                    completion.onComplete(new PrimitiveResult(""));
-                }
-            }
-
-            @Override
-            public int partnerId() {
-                int OttPartnerId = 225;
-                return OttPartnerId;
-            }
-        };
-
-        String mediaId ="629951";// "626769";//"610715";
-        String formatHls  = "Tablet Main";
-        String formatDash  = "dash Main";
-
-        mediaProvider = new PhoenixMediaProvider()
-                .setSessionProvider(ksSessionProvider)
-                .setAssetId(mediaId)
-                //.setReferrer()
-                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
-                .setContextType(APIDefines.PlaybackContextType.Playback)
-                .setAssetType(APIDefines.KalturaAssetType.Media)
-                .setFormats(formatHls);//, "Dash_TV");
-        mediaProvider.load(completion);
+    private KavaAnalyticsConfig getKavaAnalyticsConfig(int partnerId, String ovpEntryId) {
+        return new KavaAnalyticsConfig()
+                    .setApplicationVersion(BuildConfig.VERSION_NAME)
+                    .setPartnerId(partnerId)
+                    .setEntryId("ovpEntryId")
+                    .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
     }
 
+    private void addYouboraPluginConfig(PKPluginConfigs pluginConfigs, boolean isLive, String title) {
+        JsonObject pluginEntry = getYouboraJsonObject(isLive, title);
 
-    private void startVootKids(final OnMediaLoadCompletion completion) {
-        SessionProvider ksSessionProvider = new SessionProvider() {
-            @Override
-            public String baseUrl() {
-                String PhoenixBaseUrl = "https://rest-as.ott.kaltura.com/v4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";// 4_4 "https://rest-sgs1.ott.kaltura.com/restful_V4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
-                return PhoenixBaseUrl;
-            }
-
-            @Override
-            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
-                String PnxKS = "djJ8MjI1fO0gckBdNG1zISEedp17h9Vrk1fus32Ry9lzL-swPAdb2PxzcaeosgiFrFC1RDL-nHPPLPL9xCQY5T73V9SVc-oDqc8eHl_SEjdKRfsTBgruCzcs0kzolgFtvQ4qEqcMydLZoy97EzGAvg9CIH5SaCiFhgvsChN1ZQnyX4KFNaln";
-                PnxKS = "djJ8MjI1fL5b7qOzjkaGS7IzhAinbG4yo722HY-ZwKQEoWzyrTmDWp4H8daOlRUjaw9vrsw_Q-7AGluNDuHoVK44JKQGN5UKa62-Lfuld7RHpTVE9HpEtHHpzPppK4BP7Xxpnb7x8V5837lQYf53JbVMl3SA9QhttmnC-O19DwieMfIYlD0a";
-                if (completion != null) {
-                    completion.onComplete(new PrimitiveResult(""));
-                }
-            }
-
-            @Override
-            public int partnerId() {
-                int OttPartnerId = 225;
-                return OttPartnerId;
-            }
-        };
-
-        String mediaId = "621996";//"651492";// "626769";//"610715";
-        //String formatHls  = "Tablet Main";
-        String formatDash  = "dash Main";//"dash Main";
-
-        mediaProvider = new PhoenixMediaProvider()
-                .setSessionProvider(ksSessionProvider)
-                .setAssetId(mediaId)
-                //.setReferrer()
-                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
-                .setContextType(APIDefines.PlaybackContextType.Playback)
-                .setAssetType(APIDefines.KalturaAssetType.Media)
-                .setFormats(formatDash);//, "Dash_TV");
-        mediaProvider.load(completion);
+        //Set plugin entry to the plugin configs.
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
     }
 
-
-    private void addYouboraPluginConfig(PKPluginConfigs pluginConfigs) {
+    @NonNull
+    private JsonObject getYouboraJsonObject(boolean isLive, String title) {
         JsonObject pluginEntry = new JsonObject();
-        
+
         pluginEntry.addProperty("accountCode", "kalturatest");
         pluginEntry.addProperty("username", "a@a.com");
         pluginEntry.addProperty("haltOnError", true);
@@ -573,8 +585,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Media entry json.
         JsonObject mediaEntryJson = new JsonObject();
-        mediaEntryJson.addProperty("isLive", false);
-        mediaEntryJson.addProperty("title", "the media title");
+        mediaEntryJson.addProperty("isLive", isLive);
+        mediaEntryJson.addProperty("title", title);
 
         //Youbora ads configuration json.
         JsonObject adsJson = new JsonObject();
@@ -608,11 +620,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         pluginEntry.add("ads", adsJson);
         pluginEntry.add("properties", propertiesJson);
         pluginEntry.add("extraParams", extraParamJson);
-
-        //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
+        return pluginEntry;
     }
-
+    
     private void addPhoenixAnalyticsPluginConfig(PKPluginConfigs config) {
         String ks = "djJ8MTk4fHFftqeAPxdlLVzZBk0Et03Vb8on1wLsKp7cbOwzNwfOvpgmOGnEI_KZDhRWTS-76jEY7pDONjKTvbWyIJb5RsP4NL4Ng5xuw6L__BeMfLGAktkVliaGNZq9SXF5n2cMYX-sqsXLSmWXF9XN89io7-k=";
         PhoenixAnalyticsConfig phoenixAnalyticsConfig = new PhoenixAnalyticsConfig(198, "http://api-preprod.ott.kaltura.com/v4_2/api_v3/", ks, 30);
@@ -625,26 +635,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         FBInStreamAd preRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 0, 0);
         FBInStreamAd preRoll2 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 0, 1);
         preRollFBInStreamAdList.add(preRoll1);
-        preRollFBInStreamAdList.add(preRoll2);
+        //preRollFBInStreamAdList.add(preRoll2);
         FBInStreamAdBreak preRollAdBreak = new FBInStreamAdBreak(AdPositionType.PRE_ROLL, 0L, preRollFBInStreamAdList);
 
 
         List<FBInStreamAd> midRoll1FBInStreamAdList = new ArrayList<>();
-        FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 40000, 0);
+        FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 60000, 0);
         midRoll1FBInStreamAdList.add(midRoll1);
-        FBInStreamAdBreak midRoll1AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 40000, midRoll1FBInStreamAdList);
+        FBInStreamAdBreak midRoll1AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 60000, midRoll1FBInStreamAdList);
 
 
         List<FBInStreamAd> midRoll2FBInStreamAdList = new ArrayList<>();
-        FBInStreamAd midRoll2 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 80000, 0);
+        FBInStreamAd midRoll2 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 180000, 0);
         midRoll2FBInStreamAdList.add(midRoll2);
-        FBInStreamAdBreak midRoll2AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 80000, midRoll2FBInStreamAdList);
+        FBInStreamAdBreak midRoll2AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 180000, midRoll2FBInStreamAdList);
 
 
         List<FBInStreamAd> postRollFBInStreamAdList = new ArrayList<>();
-        FBInStreamAd postRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, -1, 0);
+        FBInStreamAd postRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, Long.MAX_VALUE, 0);
         postRollFBInStreamAdList.add(postRoll1);
-        FBInStreamAdBreak postRollAdBreak = new FBInStreamAdBreak(AdPositionType.POST_ROLL, -1, postRollFBInStreamAdList);
+        FBInStreamAdBreak postRollAdBreak = new FBInStreamAdBreak(AdPositionType.POST_ROLL, Long.MAX_VALUE, postRollFBInStreamAdList);
 
         List<FBInStreamAdBreak> fbInStreamAdBreakList = new ArrayList<>();
         fbInStreamAdBreakList.add(preRollAdBreak);
@@ -658,11 +668,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void addIMAPluginConfig(PKPluginConfigs config) {
-        String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
-        String preSKipAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
+
+        log.d("Play Ad preSKipAdTagUrl");
+        IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl);
+        config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
+    }
+
+    private IMAConfig getAdsConfig(String adTagUrl) {
         List<String> videoMimeTypes = new ArrayList<>();
         videoMimeTypes.add("video/mp4");
         videoMimeTypes.add("application/x-mpegURL");
@@ -671,12 +686,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //tagTimesMap.put(2.0,"ADTAG");
 
         String vooturl = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOH&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DU%26Age%3DNULL%26KidsPinEnabled%3DN%26AppVersion%3D0.1.58%26DeviceModel%3DAndroid%20SDK%20built%20for%20x86%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26description_url%3Dhttps%253A%252F%252Fwww.voot.com%26first_time%3DFalse&cmsid=2467608&ppid=2fbdf28d-5bf9-4f43-b49e-19c4ca1f10f8&vid=0_o71549bv&ad_rule=1&correlator=246819";//builder.build().toString();
-String xxx_voot = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOH&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D18%26KidsPinEnabled%3DN%26AppVersion%3D0.1.58%26DeviceModel%3Dmoto%20g(6)%26OptOut%3DFalse%26OSVersion%3D8.0.0%26PackageName%3Dcom.tv.v18.viola%26description_url%3Dhttps%253A%252F%252Fwww.voot.com%26first_time%3DFalse&cmsid=2467608&ppid=64221667c02a4cb79d07cbe726102a78&vid=0_bi9an7c4&ad_rule=1&correlator=3408515883056375&ms=361-jmSV4XIpRPhGG5kmTOnbXX1yws54j_zEgXJterZ4s3lt2xzU4Bo-sGumomNlLmhT_TKmunL_auVZxO_Xo7Ay9KcZZyU1H0hC1gsMMv5Nb9rlU7l1N6DIlcn1m38l2EG74xvGptMBCtxBLPYPdjW74RIy3gbyBJW-QJN5e1x-xhbIh1Na8cu7bZNvrITL-U-PsCH_1XZcjmbTaI0WmkzNgFcul29CWJcd-04rMubbprZs1Z0Pq1jZv4GXyErsIzFUPR-OxOMmxjo7jx0wZOmnUCFvRfChooTxQYN89pV8nCP0VG481WiO_Ivo9rIx7uojYLvYA4YXm_slBnIP_g&sdkv=h.3.96.0%2Fn.android.3.10.2%2Fcom.tv.v18.viola&sdki=445&scor=3514680655962820&js=ima-android.3.10.2&msid=com.tv.v18.viola&an=com.tv.v18.viola&mv=81272300.com.android.vending&u_so=l&osd=2&sdr=1&is_amp=0&hl=en&idtype=adid&is_lat=0&rdid=b1222a78-2d26-4b8d-9769-61d96006a9c4&mpt=kaltura-vp-android&mpv=3.7.1&sdk_apis=7&omid_p=Google1%2Fandroid.3.10.2&omid_v=a.1.2.4-google_20180831&url=com.tv.v18.viola";
+        String xxx_voot = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOH&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D18%26KidsPinEnabled%3DN%26AppVersion%3D0.1.58%26DeviceModel%3Dmoto%20g(6)%26OptOut%3DFalse%26OSVersion%3D8.0.0%26PackageName%3Dcom.tv.v18.viola%26description_url%3Dhttps%253A%252F%252Fwww.voot.com%26first_time%3DFalse&cmsid=2467608&ppid=64221667c02a4cb79d07cbe726102a78&vid=0_bi9an7c4&ad_rule=1&correlator=3408515883056375&ms=361-jmSV4XIpRPhGG5kmTOnbXX1yws54j_zEgXJterZ4s3lt2xzU4Bo-sGumomNlLmhT_TKmunL_auVZxO_Xo7Ay9KcZZyU1H0hC1gsMMv5Nb9rlU7l1N6DIlcn1m38l2EG74xvGptMBCtxBLPYPdjW74RIy3gbyBJW-QJN5e1x-xhbIh1Na8cu7bZNvrITL-U-PsCH_1XZcjmbTaI0WmkzNgFcul29CWJcd-04rMubbprZs1Z0Pq1jZv4GXyErsIzFUPR-OxOMmxjo7jx0wZOmnUCFvRfChooTxQYN89pV8nCP0VG481WiO_Ivo9rIx7uojYLvYA4YXm_slBnIP_g&sdkv=h.3.96.0%2Fn.android.3.10.2%2Fcom.tv.v18.viola&sdki=445&scor=3514680655962820&js=ima-android.3.10.2&msid=com.tv.v18.viola&an=com.tv.v18.viola&mv=81272300.com.android.vending&u_so=l&osd=2&sdr=1&is_amp=0&hl=en&idtype=adid&is_lat=0&rdid=b1222a78-2d26-4b8d-9769-61d96006a9c4&mpt=kaltura-vp-android&mpv=3.7.1&sdk_apis=7&omid_p=Google1%2Fandroid.3.10.2&omid_v=a.1.2.4-google_20180831&url=com.tv.v18.viola";
 
-       String singlepremidpost = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
-
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(xxx_voot).enableDebugMode(false).setAdLoadTimeOut(8);
-        config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
+        String singlepremidpost = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
+        return new IMAConfig().setAdTagURL(adTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
     }
 
     //IMA CONFIG
@@ -796,15 +809,16 @@ String xxx_voot = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&i
         }
     }
 
+
     private void addPlayerListeners(final ProgressBar appProgressBar) {
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_CONTENT_PAUSE_REQUESTED");
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.CONTENT_RESUME_REQUESTED);
+
+        player.addListener(this, AdEvent.contentResumeRequested, event -> {
+            log.d("CONTENT_RESUME_REQUESTED");
+            appProgressBar.setVisibility(View.INVISIBLE);
+            controlsView.setPlayerState(PlayerState.READY);
+        });
+
 
 //
 //        player.addEventListener(new PKEvent.Listener() {
@@ -817,223 +831,179 @@ String xxx_voot = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&i
 //            }
 //        }, AdEvent.Type.DAI_SOURCE_SELECTED);
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_CONTENT_PAUSE_REQUESTED");
-                appProgressBar.setVisibility(View.VISIBLE);
-                controlsView.setPlayerState(PlayerState.READY);
+
+        player.addListener(this, AdEvent.contentPauseRequested, event -> {
+            log.d("AD_CONTENT_PAUSE_REQUESTED");
+            appProgressBar.setVisibility(View.VISIBLE);
+            controlsView.setPlayerState(PlayerState.READY);
+        });
+
+        player.addListener(this, AdEvent.adPlaybackInfoUpdated, event -> {
+            log.d("AD_PLAYBACK_INFO_UPDATED");
+            AdEvent.AdPlaybackInfoUpdated playbackInfoUpdated = event;
+            log.d("XXX playbackInfoUpdated  = " + playbackInfoUpdated.width + "/" + playbackInfoUpdated.height + "/" + playbackInfoUpdated.bitrate);
+        });
+
+        player.addListener(this, AdEvent.cuepointsChanged, event -> {
+            AdEvent.AdCuePointsUpdateEvent cuePointsList = event;
+            adCuePoints = cuePointsList.cuePoints;
+            if (adCuePoints != null) {
+                log.d("Has Postroll = " + adCuePoints.hasPostRoll());
             }
+        });
 
-        }, AdEvent.Type.CONTENT_PAUSE_REQUESTED);
+        player.addListener(this, AdEvent.adBufferStart, event -> {
+            AdEvent.AdBufferStart adBufferStartEvent = event;
+            log.d("AD_BUFFER_START pos = " + adBufferStartEvent.adPosition);
+            appProgressBar.setVisibility(View.VISIBLE);
+        });
 
+        player.addListener(this, AdEvent.adBufferEnd, event -> {
+            AdEvent.AdBufferEnd adBufferEnd = event;
+            log.d("AD_BUFFER_END pos = " + adBufferEnd.adPosition);
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_PLAYBACK_INFO_UPDATED");
-                AdEvent.AdPlaybackInfoUpdated playbackInfoUpdated = (AdEvent.AdPlaybackInfoUpdated) event;
-                log.d("XXX playbackInfoUpdated  = " + playbackInfoUpdated.width + "/" + playbackInfoUpdated.height + "/" + playbackInfoUpdated.bitrate);
+        player.addListener(this, AdEvent.adFirstPlay, event -> {
+            log.d("AD_FIRST_PLAY");
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+        player.addListener(this, AdEvent.started, event -> {
+            log.d("AD_STARTED");
+            AdEvent.AdStartedEvent adStartedEvent = event;
+            log.d("AD_STARTED w/h - " + adStartedEvent.adInfo.getAdWidth() + "/" + adStartedEvent.adInfo.getAdHeight());
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+        player.addListener(this, AdEvent.resumed, event -> {
+            log.d("Ad Event AD_RESUMED");
+            nowPlaying = true;
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+        player.addListener(this, AdEvent.playHeadChanged, event -> {
+            appProgressBar.setVisibility(View.INVISIBLE);
+            AdEvent.AdPlayHeadEvent adEventProress = event;
+            //log.d("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
+        });
+
+        player.addListener(this, AdEvent.allAdsCompleted, event -> {
+            log.d("Ad Event AD_ALL_ADS_COMPLETED");
+            appProgressBar.setVisibility(View.INVISIBLE);
+            if (adCuePoints != null && adCuePoints.hasPostRoll()) {
+                controlsView.setPlayerState(PlayerState.IDLE);
             }
+        });
 
-        }, AdEvent.Type.AD_PLAYBACK_INFO_UPDATED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.AdCuePointsUpdateEvent cuePointsList = (AdEvent.AdCuePointsUpdateEvent) event;
-                adCuePoints = cuePointsList.cuePoints;
-                if (adCuePoints != null) {
-                    log.d("Has Postroll = " + adCuePoints.hasPostRoll());
-                }
+        player.addListener(this, AdEvent.error, event -> {
+            AdEvent.Error adErrorEvent = event;
+            if (adErrorEvent != null && adErrorEvent.error != null) {
+                log.e("ERROR: " + adErrorEvent.error.errorType + ", " + adErrorEvent.error.message);
             }
-        }, AdEvent.Type.CUEPOINTS_CHANGED);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.AdBufferStart adBufferStartEvent = (AdEvent.AdBufferStart) event;
-                log.d("AD_BUFFER_START pos = " + adBufferStartEvent.adPosition);
-                appProgressBar.setVisibility(View.VISIBLE);
+        player.addListener(this, AdEvent.skipped, event -> {
+            log.d("Ad Event SKIPPED");
+            nowPlaying = true;
+        });
+
+        /////// PLAYER EVENTS
+
+        player.addListener(this, PlayerEvent.play, event -> {
+            log.d("Player Event PLAY");
+            nowPlaying = true;
+        });
+
+        player.addListener(this, PlayerEvent.playing, event -> {
+            log.d("Player Event PLAYING");
+            nowPlaying = true;
+        });
+
+        player.addListener(this, PlayerEvent.pause, event -> {
+            log.d("Player Event PAUSE");
+            nowPlaying = false;
+        });
+
+        player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
+            PlayerEvent.PlaybackRateChanged playbackRateChanged = event;
+            log.d("playbackRateChanged event  rate = " + playbackRateChanged.rate);
+        });
+
+        player.addListener(this, PlayerEvent.tracksAvailable, event -> {
+            //When the track data available, this event occurs. It brings the info object with it.
+            PlayerEvent.TracksAvailable tracksAvailable = event;
+            tracksInfo = tracksAvailable.tracksInfo;
+            populateSpinnersWithTrackInfo(tracksAvailable.tracksInfo);
+        });
+
+        player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
+            PlayerEvent.PlaybackRateChanged playbackRateChanged = event;
+            log.d("playbackRateChanged event  rate = " + playbackRateChanged.rate);
+        });
+
+        player.addListener(this, PlayerEvent.error, event -> {
+            //When the track data available, this event occurs. It brings the info object with it.
+            PlayerEvent.Error playerError = event;
+            if (playerError != null && playerError.error != null) {
+                log.d("PlayerEvent.Error event  position = " + playerError.error.errorType + " errorMessage = " + playerError.error.message);
             }
-        }, AdEvent.Type.AD_BUFFER_START);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
+        player.addListener(this, PlayerEvent.playheadUpdated, event -> {
+            //When the track data available, this event occurs. It brings the info object with it.
+            PlayerEvent.PlayheadUpdated playheadUpdated = event;
+            //log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
+        });
+
+        player.addListener(this, PlayerEvent.videoFramesDropped, event -> {
+            PlayerEvent.VideoFramesDropped videoFramesDropped = event;
+            //log.d("VIDEO_FRAMES_DROPPED " + videoFramesDropped.droppedVideoFrames);
+        });
+
+        player.addListener(this, PlayerEvent.bytesLoaded, event -> {
+            PlayerEvent.BytesLoaded bytesLoaded = event;
+            //log.d("BYTES_LOADED " + bytesLoaded.bytesLoaded);
+        });
+
+        player.addListener(this, PlayerEvent.stateChanged, new PKEvent.Listener<PlayerEvent.StateChanged>() {
             @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.AdBufferEnd adBufferEnd = (AdEvent.AdBufferEnd) event;
-                log.d("AD_BUFFER_END pos = " + adBufferEnd.adPosition);
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.AD_BUFFER_END);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_FIRST_PLAY");
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.AD_FIRST_PLAY);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_STARTED");
-                AdEvent.AdStartedEvent adStartedEvent = (AdEvent.AdStartedEvent) event;
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.STARTED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("Ad Event AD_RESUMED");
-                nowPlaying = true;
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.RESUMED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                appProgressBar.setVisibility(View.INVISIBLE);
-                AdEvent.AdPlayHeadEvent adEventProress = (AdEvent.AdPlayHeadEvent) event;
-                //log.d("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
-            }
-        }, AdEvent.Type.PLAY_HEAD_CHANGED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("Ad Event AD_ALL_ADS_COMPLETED");
-                appProgressBar.setVisibility(View.INVISIBLE);
-                if (adCuePoints != null && adCuePoints.hasPostRoll()) {
-                    controlsView.setPlayerState(PlayerState.IDLE);
-                }
-            }
-        }, AdEvent.Type.ALL_ADS_COMPLETED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = true;
-            }
-        }, PlayerEvent.Type.PLAY);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = true;
-            }
-        }, PlayerEvent.Type.PLAYING);
-
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.Error adErrorEvent = (AdEvent.Error) event;
-                if (adErrorEvent != null && adErrorEvent.error != null) {
-                    log.e("ERROR: " + adErrorEvent.error.errorType + ", " + adErrorEvent.error.message);
-                }
-            }
-        }, AdEvent.Type.ERROR);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = false;
-            }
-        }, PlayerEvent.Type.PAUSE);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = true;
-            }
-        }, AdEvent.Type.SKIPPED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PlayerEvent.PlaybackRateChanged playbackRateChanged = (PlayerEvent.PlaybackRateChanged) event;
-                log.d("playbackRateChanged event  rate = " + playbackRateChanged.rate);
-            }
-        }, PlayerEvent.Type.PLAYBACK_RATE_CHANGED);
-
-        player.addStateChangeListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                if (event instanceof PlayerEvent.StateChanged) {
-                    PlayerEvent.StateChanged stateChanged = (PlayerEvent.StateChanged) event;
-                    log.d("State changed from " + stateChanged.oldState + " to " + stateChanged.newState);
-                    if(controlsView != null){
-                        controlsView.setPlayerState(stateChanged.newState);
-                    }
+            public void onEvent(PlayerEvent.StateChanged event) {
+                PlayerEvent.StateChanged stateChanged = event;
+                log.d("State changed from " + stateChanged.oldState + " to " + stateChanged.newState);
+                if(controlsView != null){
+                    controlsView.setPlayerState(stateChanged.newState);
                 }
             }
         });
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //When the track data available, this event occurs. It brings the info object with it.
-                PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
-                tracksInfo = tracksAvailable.tracksInfo;
-                populateSpinnersWithTrackInfo(tracksAvailable.tracksInfo);
 
-            }
-        }, PlayerEvent.Type.TRACKS_AVAILABLE);
+        /////Phoenox events
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //When the track data available, this event occurs. It brings the info object with it.
-                PlayerEvent.Error playerError = (PlayerEvent.Error) event;
-                if (playerError != null && playerError.error != null) {
-                    log.d("PlayerEvent.Error event  position = " + playerError.error.errorType + " errorMessage = " + playerError.error.message);
-                }
-            }
-        }, PlayerEvent.Type.ERROR);
+        player.addListener(this, PhoenixAnalyticsEvent.bookmarkError, event -> {
+            PhoenixAnalyticsEvent.BookmarkErrorEvent bookmarkErrorEvent = event;
+            log.d("bookmarkErrorEvent errorCode = " + bookmarkErrorEvent.errorCode + " message = " + bookmarkErrorEvent.errorMessage);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //When the track data available, this event occurs. It brings the info object with it.
-                PlayerEvent.PlayheadUpdated playheadUpdated = (PlayerEvent.PlayheadUpdated) event;
-                //log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
-            }
-        }, PlayerEvent.Type.PLAYHEAD_UPDATED);
+        player.addListener(this, PhoenixAnalyticsEvent.concurrencyError, event -> {
+            PhoenixAnalyticsEvent.ConcurrencyErrorEvent concurrencyErrorEvent = event;
+            log.d("ConcurrencyErrorEvent errorCode = " + concurrencyErrorEvent.errorCode + " message = " + concurrencyErrorEvent.errorMessage);
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PhoenixAnalyticsEvent.BookmarkErrorEvent bookmarkErrorEvent = (PhoenixAnalyticsEvent.BookmarkErrorEvent) event;
-                log.d("bookmarkErrorEvent errorCode = " + bookmarkErrorEvent.errorCode + " message = " + bookmarkErrorEvent.errorMessage);
-            }
-        }, PhoenixAnalyticsEvent.Type.BOOKMARK_ERROR);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PhoenixAnalyticsEvent.ConcurrencyErrorEvent concurrencyErrorEvent = (PhoenixAnalyticsEvent.ConcurrencyErrorEvent) event;
-                log.d("ConcurrencyErrorEvent errorCode = " + concurrencyErrorEvent.errorCode + " message = " + concurrencyErrorEvent.errorMessage);
-            }
-        }, PhoenixAnalyticsEvent.Type.CONCURRENCY_ERROR);
+        player.addListener(this, PhoenixAnalyticsEvent.error, event -> {
+            PhoenixAnalyticsEvent.ErrorEvent errorEvent = event;
+            log.d("Phoenox Analytics errorEvent errorCode = " + errorEvent.errorCode + " message = " + errorEvent.errorMessage);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PhoenixAnalyticsEvent.ErrorEvent errorEvent = (PhoenixAnalyticsEvent.ErrorEvent) event;
-                log.d("Phoenox Analytics errorEvent errorCode = " + errorEvent.errorCode + " message = " + errorEvent.errorMessage);
-            }
-        }, PhoenixAnalyticsEvent.Type.ERROR);
+        player.addListener(this, PhoenixAnalyticsEvent.error, event -> {
+            PhoenixAnalyticsEvent.ErrorEvent errorEvent = event;
+            log.d("Phoenox Analytics errorEvent errorCode = " + errorEvent.errorCode + " message = " + errorEvent.errorMessage);
+        });
 
-        //OLD WAY FOR GETTING THE CONCURRENCY
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("Concurrency event");
-            }
-        }, OttEvent.OttEventType.Concurrency);
+        player.addListener(this, OttEvent.ottEvent, event -> {
+            OttEvent concEvent = (OttEvent) event;
+            log.d("Concurrency event = " + concEvent.type);
+        });
     }
 
     @Override
@@ -1146,7 +1116,14 @@ String xxx_voot = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&i
                            bitrate = buildAudioChannelString(audioTrackInfo.getChannelCount());
                         }
                         if (audioTrackInfo.isAdaptive()) {
-                            bitrate += " Adaptive";
+                            if (bitrate != null) {
+                                bitrate += " Adaptive";
+                            } else {
+                                bitrate = "Adaptive";
+                            }
+                            if (label == null) {
+                                label = "";
+                            }
                         }
                         trackItems[i] = new TrackItem(label + " " + bitrate, audioTrackInfo.getUniqueId());
                 }

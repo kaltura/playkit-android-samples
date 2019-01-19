@@ -36,6 +36,8 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.ads.AdController;
+
+import com.kaltura.playkit.ads.AdEnabledPlayerController;
 import com.kaltura.playkit.player.PlayerSettings;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
@@ -185,9 +187,6 @@ public class VideoFragment extends android.support.v4.app.Fragment {
         if (player == null) {
             return;
         }
-        //Before changing media we must call stop on the player.
-        player.pause();
-        player.stop();
         player.getSettings().setPreferredMediaFormat(PKMediaFormat.mp3);
         ((PlayerSettings)player.getSettings()).getPreferredMediaFormat();
         clearLog();
@@ -286,7 +285,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
         //Set id for the entry.
         mediaEntry.setId(FIRST_ENTRY_ID);
-
+        mediaEntry.setDuration(300 * 1000);
         //Set media entry type. It could be Live,Vod or Unknown.
         //For now we will use Unknown.
         mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
@@ -316,7 +315,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
         //Set id for the entry.
         mediaEntry.setId(SECOND_ENTRY_ID);
-
+        mediaEntry.setDuration(450 * 1000);
         //Set media entry type. It could be Live,Vod or Unknown.
         //For now we will use Unknown.
         mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
@@ -771,236 +770,121 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
     private void addPlayerListeners(final ProgressBar appProgressBar) {
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("ADS_PLAYBACK_ENDED");
-            }
-        }, AdEvent.Type.CONTENT_RESUME_REQUESTED);
+        player.addListener(this, AdEvent.contentResumeRequested, event -> {
+            log("ADS_PLAYBACK_ENDED");
+        });
 
+        player.addListener(this, AdEvent.adPlaybackInfoUpdated, event -> {
+            log("AD_PLAYBACK_INFO_UPDATED");
+            AdEvent.AdPlaybackInfoUpdated playbackInfoUpdated = event;
+            //log.d("XXX playbackInfoUpdated  = " + playbackInfoUpdated.width + "/" + playbackInfoUpdated.height + "/" + playbackInfoUpdated.bitrate);
+            log("AD_PLAYBACK_INFO_UPDATED bitrate = " + playbackInfoUpdated.bitrate);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_PLAYBACK_INFO_UPDATED");
-                AdEvent.AdPlaybackInfoUpdated playbackInfoUpdated = (AdEvent.AdPlaybackInfoUpdated) event;
-                //log.d("XXX playbackInfoUpdated  = " + playbackInfoUpdated.width + "/" + playbackInfoUpdated.height + "/" + playbackInfoUpdated.bitrate);
-                log("AD_PLAYBACK_INFO_UPDATED bitrate = " + playbackInfoUpdated.bitrate);
-            }
+        player.addListener(this, AdEvent.skippableStateChanged, event -> {
+            log("SKIPPABLE_STATE_CHANGED");
+        });
 
-        }, AdEvent.Type.AD_PLAYBACK_INFO_UPDATED);
+        player.addListener(this, AdEvent.adRequested, event -> {
+            AdEvent.AdRequestedEvent adRequestEvent = event;
+            log("AD_REQUESTED");// adtag = " + adRequestEvent.adTagUrl);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("SKIPPABLE_STATE_CHANGED");
-            }
-        }, AdEvent.Type.SKIPPABLE_STATE_CHANGED);
+        player.addListener(this, AdEvent.playHeadChanged, event -> {
+            appProgressBar.setVisibility(View.INVISIBLE);
+            AdEvent.AdPlayHeadEvent adEventProress = event;
+            //log.d("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.AdRequestedEvent adRequestEvent = (AdEvent.AdRequestedEvent) event;
-                log("AD_REQUESTED");// adtag = " + adRequestEvent.adTagUrl);
-            }
-        }, AdEvent.Type.AD_REQUESTED);
+        player.addListener(this, AdEvent.error, event -> {
+            AdEvent.Error adError = event;
+            Log.d(TAG, "AD_ERROR " + adError.type + " "  + adError.error.message);
+            appProgressBar.setVisibility(View.INVISIBLE);
+            log("AD_ERROR");
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                appProgressBar.setVisibility(View.INVISIBLE);
-                AdEvent.AdPlayHeadEvent adEventProress = (AdEvent.AdPlayHeadEvent) event;
-                //log.d("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
-            }
-        }, AdEvent.Type.PLAY_HEAD_CHANGED);
+        player.addListener(this, AdEvent.adBreakStarted, event -> {
+            log("AD_BREAK_STARTED");
+            appProgressBar.setVisibility(View.VISIBLE);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.Error adError = (AdEvent.Error) event;
-                Log.d(TAG, "AD_ERROR " + adError.type + " "  + adError.error.message);
-                appProgressBar.setVisibility(View.INVISIBLE);
-                log("AD_ERROR");
-            }
-        }, AdEvent.Type.ERROR);
+        player.addListener(this, AdEvent.cuepointsChanged, event -> {
+            AdEvent.AdCuePointsUpdateEvent cuePointsList = event;
+            Log.d(TAG, "Has Postroll = " + cuePointsList.cuePoints.hasPostRoll());
+            log("AD_CUEPOINTS_UPDATED");
+            onCuePointChanged();
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_BREAK_STARTED");
-                appProgressBar.setVisibility(View.VISIBLE);
-            }
-        }, AdEvent.Type.AD_BREAK_STARTED);
+        player.addListener(this, AdEvent.loaded, event -> {
+            AdEvent.AdLoadedEvent adLoadedEvent = event;
+            log("AD_LOADED " + adLoadedEvent.adInfo.getAdIndexInPod() + "/" + adLoadedEvent.adInfo.getTotalAdsInPod());
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.AdCuePointsUpdateEvent cuePointsList = (AdEvent.AdCuePointsUpdateEvent) event;
-                Log.d(TAG, "Has Postroll = " + cuePointsList.cuePoints.hasPostRoll());
-                log("AD_CUEPOINTS_UPDATED");
-                onCuePointChanged();
-            }
-        }, AdEvent.Type.CUEPOINTS_CHANGED);
+        player.addListener(this, AdEvent.started, event -> {
+            AdEvent.AdStartedEvent adStartedEvent = event;
+            log("AD_STARTED w/h - " + adStartedEvent.adInfo.getAdWidth() + "/" + adStartedEvent.adInfo.getAdHeight());
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.AdLoadedEvent adLoadedEvent = (AdEvent.AdLoadedEvent) event;
-                log("AD_LOADED " + adLoadedEvent.adInfo.getAdIndexInPod() + "/" + adLoadedEvent.adInfo.getTotalAdsInPod());
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.LOADED);
+        player.addListener(this, AdEvent.resumed, event -> {
+            log("AD_RESUMED");
+            nowPlaying = true;
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_STARTED ");
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.STARTED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_COMPLETED");
-//                AdEvent.AdEndedEvent adEndedEvent = (AdEvent.AdEndedEvent) event;
-//                if (adEndedEvent.adEndedReason == PKAdEndedReason.COMPLETED) {
-//                    log("AD_ENDED-" + adEndedEvent.adEndedReason);
-//                } else if (adEndedEvent.adEndedReason == PKAdEndedReason.SKIPPED) {
-//                    log("AD_ENDED-" + adEndedEvent.adEndedReason);
-//                    nowPlaying = false;
-//                }
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.COMPLETED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_RESUMED");
-                nowPlaying = true;
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.RESUMED);
-
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_PAUSED");
-                nowPlaying = true;
-                if (player != null) {
-                    AdController adController = player.getController(AdController.class);
-                    if (adController != null && adController.isAdDisplayed()) {
-                        log("Ad " + adController.getCurrentPosition() + "/" + adController.getDuration());
-                    } else {
-                        log("Player " + player.getCurrentPosition() + "/" + player.getDuration());
-                    }
-                }
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.PAUSED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_ALL_ADS_COMPLETED");
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.ALL_ADS_COMPLETED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //log("PLAYER PLAY");
-                nowPlaying = true;
-            }
-        }, PlayerEvent.Type.PLAY);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //log("PLAYER PAUSE");
-                nowPlaying = false;
-                if (player != null) {
-                    AdController adController = player.getController(AdController.class);
-                    if (adController != null && adController.isAdDisplayed()) {
-                        log("Ad " + adController.getCurrentPosition() + "/" + adController.getDuration());
-                    } else {
-                        log("Player " + player.getCurrentPosition() + "/" + player.getDuration());
-                    }
+        player.addListener(this, AdEvent.paused, event -> {
+            log("AD_PAUSED");
+            nowPlaying = true;
+            if (player != null) {
+                AdController adController = player.getController(AdController.class);
+                if (adController != null && adController.isAdDisplayed()) {
+                    log("Ad " + adController.getAdCurrentPosition() + "/" + adController.getAdDuration());
+                } else {
+                    log("Player " + player.getCurrentPosition() + "/" + player.getDuration());
                 }
             }
-        }, PlayerEvent.Type.PAUSE);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //log("PLAYER ENDED");
-                appProgressBar.setVisibility(View.INVISIBLE);
-                nowPlaying = false;
-            }
+        player.addListener(this, AdEvent.skipped, event -> {
+            log("AD_SKIPPED");
+        });
 
-        }, PlayerEvent.Type.ENDED);
+        player.addListener(this, AdEvent.allAdsCompleted, event -> {
+            log("AD_ALL_ADS_COMPLETED");
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                appProgressBar.setVisibility(View.INVISIBLE);
-                nowPlaying = false;
-            }
-        }, PlayerEvent.Type.ERROR);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("FIRST_QUARTILE");
-
-            }
-        }, AdEvent.Type.FIRST_QUARTILE);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("MIDPOINT");
-                if (player != null) {
-                    AdController adController = player.getController(AdController.class);
-                    if (adController != null) {
-                        if (adController.isAdDisplayed()) {
-                            log(adController.getCurrentPosition() + "/" + adController.getDuration());
-                        }
-                        log("" + adController.getCuePoints().getAdCuePoints().size());
-                        log(adController.getAdInfo().toString());
-                        //adController.skip();
+        player.addListener(this, AdEvent.midpoint, event -> {
+            log("MIDPOINT");
+            if (player != null) {
+                AdController adController = player.getController(AdController.class);
+                if (adController != null) {
+                    if (adController.isAdDisplayed()) {
+                        log(adController.getAdCurrentPosition() + "/" + adController.getAdDuration());
                     }
+                    //log("" + adController.getCuePoints().getAdCuePoints().size());
+                    //log(adController.getAdInfo().toString());
+                    //adController.skip();
                 }
             }
-        }, AdEvent.Type.MIDPOINT);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("THIRD_QUARTILE");
-            }
-        }, AdEvent.Type.THIRD_QUARTILE);
+        player.addListener(this, AdEvent.thirdQuartile, event -> {
+            log("THIRD_QUARTILE");
+        });
 
+        player.addListener(this, AdEvent.adBreakEnded, event -> {
+            log("AD_BREAK_ENDED");
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_BREAK_ENDED");
-            }
-        }, AdEvent.Type.AD_BREAK_ENDED);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_CLICKED");
-//                AdEvent.AdClickEvent advtClickEvent = (AdEvent.AdClickEvent) event;
-//                Log.d(TAG, "AD_CLICKED url = " + advtClickEvent.advtLink);
+        player.addListener(this, AdEvent.adClickedEvent, event -> {
+            log("AD_CLICKED");
+                AdEvent.AdClickedEvent advtClickEvent = event;
+                Log.d(TAG, "AD_CLICKED url = " + advtClickEvent.clickThruUrl);
 //                nowPlaying = false;
-            }
-        }, AdEvent.Type.CLICKED);
+        });
+
 
 //        player.addEventListener(new PKEvent.Listener() {
 //            @Override
@@ -1012,83 +896,114 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 //            }
 //        }, AdEvent.Type.COMPANION_AD_CLICKED);
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_STARTED_BUFFERING");
+        player.addListener(this, AdEvent.adBufferStart, event -> {
+            log("AD_STARTED_BUFFERING");
+            appProgressBar.setVisibility(View.VISIBLE);
+        });
+
+        player.addListener(this, AdEvent.adBufferEnd, event -> {
+            log("AD_BUFFER_END");
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+        player.addListener(this, AdEvent.adBreakEnded, event -> {
+            log("AD_BREAK_ENDED");
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+
+        ////PLAYER Events
+
+        player.addListener(this, PlayerEvent.videoFramesDropped, event -> {
+            PlayerEvent.VideoFramesDropped videoFramesDropped = event;
+            //log("VIDEO_FRAMES_DROPPED " + videoFramesDropped.droppedVideoFrames);
+        });
+
+        player.addListener(this, PlayerEvent.bytesLoaded, event -> {
+            PlayerEvent.BytesLoaded bytesLoaded = event;
+            //log("BYTES_LOADED " + bytesLoaded.bytesLoaded);
+        });
+
+        player.addListener(this, PlayerEvent.play, event -> {
+            log("PLAYER PLAY");
+            nowPlaying = true;
+        });
+
+        player.addListener(this, PlayerEvent.pause, event -> {
+            log("PLAYER PAUSE");
+            nowPlaying = false;
+            if (player != null) {
+                AdController adController = player.getController(AdController.class);
+                if (adController != null && adController.isAdDisplayed()) {
+                    log("Ad " + adController.getAdCurrentPosition() + "/" + adController.getAdDuration());
+                } else {
+                    log("Player " + player.getCurrentPosition() + "/" + player.getDuration());
+                }
+            }
+        });
+
+        player.addListener(this, PlayerEvent.error, event -> {
+            log("PLAYER ERROR " + event.error.message);
+            appProgressBar.setVisibility(View.INVISIBLE);
+            nowPlaying = false;
+        });
+
+        player.addListener(this, PlayerEvent.ended, event -> {
+            log("PLAYER ENDED");
+            appProgressBar.setVisibility(View.INVISIBLE);
+            nowPlaying = false;
+        });
+
+        player.addListener(this, PlayerEvent.stateChanged, event -> {
+            PlayerEvent.StateChanged stateChanged = event;
+            //log("State changed from " + stateChanged.oldState + " to " + stateChanged.newState);
+            if (stateChanged.newState == PlayerState.BUFFERING) {
                 appProgressBar.setVisibility(View.VISIBLE);
 
-            }
-        }, AdEvent.Type.AD_BUFFER_START);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_PLAYBACK_READY");
+            } else if (stateChanged.newState == PlayerState.READY) {
                 appProgressBar.setVisibility(View.INVISIBLE);
-
             }
-        }, AdEvent.Type.AD_BREAK_ENDED);
+            if(controlsView != null){
+                controlsView.setPlayerState(stateChanged.newState);
+            }
+        });
 
-        player.addStateChangeListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                if (event instanceof PlayerEvent.StateChanged) {
-                    PlayerEvent.StateChanged stateChanged = (PlayerEvent.StateChanged) event;
-                    //log("State changed from " + stateChanged.oldState + " to " + stateChanged.newState);
-                    if (stateChanged.newState == PlayerState.BUFFERING) {
-                        appProgressBar.setVisibility(View.VISIBLE);
+        player.addListener(this, PlayerEvent.tracksAvailable, event -> {
+            log("TRACKS_AVAILABLE");
+            //When the track data available, this event occurs. It brings the info object with it.
+            //PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
+            //populateSpinnersWithTrackInfo(tracksAvailable.tracksInfo);
+            //log("PLAYER TRACKS_AVAILABLE");
 
-                    } else if (stateChanged.newState == PlayerState.READY) {
-                        appProgressBar.setVisibility(View.INVISIBLE);
-                    }
-                    if(controlsView != null){
-                        controlsView.setPlayerState(stateChanged.newState);
+            if (player != null) {
+                AdController adController = player.getController(AdController.class);
+                if (adController != null) {
+                    if (adController.isAdDisplayed()) {
+                        //log(adController.getCurrentPosition() + "/" + adController.getDuration());
                     }
                 }
             }
         });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log("AD_PLAYBACK_READY");
-                //When the track data available, this event occurs. It brings the info object with it.
-                //PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
-                //populateSpinnersWithTrackInfo(tracksAvailable.tracksInfo);
-                //log("PLAYER TRACKS_AVAILABLE");
-
-                if (player != null) {
-                    AdController adController = player.getController(AdController.class);
-                    if (adController != null) {
-                        if (adController.isAdDisplayed()) {
-                            log(adController.getCurrentPosition() + "/" + adController.getDuration());
-                        }
-                    }
-                }
-            }
-        }, PlayerEvent.Type.TRACKS_AVAILABLE);
-
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //When the track data available, this event occurs. It brings the info object with it.
-                //PlayerEvent.PlayheadUpdated playheadUpdated = (PlayerEvent.PlayheadUpdated) event;
-                //log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
-
-            }
-        }, PlayerEvent.Type.PLAYHEAD_UPDATED);
+        player.addListener(this, PlayerEvent.playheadUpdated, event -> {
+            //When the track data available, this event occurs. It brings the info object with it.
+            PlayerEvent.PlayheadUpdated playheadUpdated = event;
+            //log.d("playheadUpdated event  position = " + playheadUpdated.position + " duration = " + playheadUpdated.duration);
+        });
     }
-
 
     private void onCuePointChanged() {
 
         (adSkin).findViewById(R.id.skip_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (player != null && player.getController(AdController.class) != null)
-                    log("Controller skip");
-                player.getController(AdController.class).skip();
+                if (player != null) {
+                    log("Controller skipAd");
+                    AdController adController = player.getController(AdEnabledPlayerController.class);
+                    if (adController != null) {
+                        adController.skip();
+                    }
+                }
             }
         });
 

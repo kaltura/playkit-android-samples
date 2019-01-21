@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
     private void subscribeToKalturaLiveStatsReportEvent() {
         //Subscribe to the event.
 
-        player.addListener(this, KalturaLiveStatsEvent.kalturaLiveStatsReport, event -> {
+        player.addListener(this, KalturaLiveStatsEvent.reportSent, event -> {
             KalturaLiveStatsEvent.KalturaLiveStatsReport liveReportEvent = event;
 
             //Get the buffer time from the report.

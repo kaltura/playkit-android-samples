@@ -12,7 +12,6 @@ import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.connect.response.ResultElement;
 import com.kaltura.netkit.utils.OnCompletion;
 import com.kaltura.netkit.utils.SessionProvider;
-import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKPluginConfigs;
@@ -21,7 +20,6 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
 import com.kaltura.playkit.player.vr.VRPKMediaEntry;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
-import com.kaltura.playkit.plugins.kava.KavaAnalyticsEvent;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
@@ -71,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
 
         //Subscribe to analytics report event.
-        subscribePhoenixAnalyticsReportEvent();
+        subscribePhoenixAnalyticsEvents();
 
         //Add player to the view hierarchy.
         addPlayerToView();
@@ -124,14 +122,24 @@ public class MainActivity extends AppCompatActivity {
      * This event will be received each and every time
      * the analytics report is sent.
      */
-    private void subscribePhoenixAnalyticsReportEvent() {
+    private void subscribePhoenixAnalyticsEvents() {
         //Subscribe to the event.
-        player.addListener(this, PhoenixAnalyticsEvent.phoenixAnalyticsReport, event -> {
+        player.addListener(this, PhoenixAnalyticsEvent.reportSent, event -> {
             PhoenixAnalyticsEvent.PhoenixAnalyticsReport reportEvent = event;
 
             //Get the event name from the report.
             String reportedEventName = reportEvent.reportedEventName;
             Log.i(TAG, "PhoenixAnalytics report sent. Reported event name: " + reportedEventName);
+        });
+
+        player.addListener(this, PhoenixAnalyticsEvent.bookmarkError, event -> {
+            PhoenixAnalyticsEvent.BookmarkErrorEvent bookmarkErrorEvent = event;
+            Log.i(TAG, "PhoenixAnalytics bookmarkErrorEvent event name: " + bookmarkErrorEvent.errorMessage + " - " + bookmarkErrorEvent.errorCode);
+        });
+
+        player.addListener(this, PhoenixAnalyticsEvent.concurrencyError, event -> {
+            PhoenixAnalyticsEvent.ConcurrencyErrorEvent concurrencyError = event;
+            Log.i(TAG, "PhoenixAnalytics bookmarkErrorEvent event name: " + concurrencyError.errorMessage + " - " + concurrencyError.errorCode);
         });
     }
 

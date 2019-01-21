@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToKalturaStatsReportEvent() {
         //Subscribe to the event.
-        player.addListener(this, KavaAnalyticsEvent.kavaAnalyticsReport, event -> {
+        player.addListener(this, KavaAnalyticsEvent.reportSent, event -> {
             KavaAnalyticsEvent.KavaAnalyticsReport reportEvent = event;
 
             //Get the event name from the report.

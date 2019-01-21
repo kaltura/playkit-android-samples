@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToYouboraReportEvent() {
         //Subscribe to the event.
-        player.addListener(this, YouboraEvent.youboraReport, event -> {
+        player.addListener(this, YouboraEvent.reportSent, event -> {
             YouboraEvent.YouboraReport reportEvent = event;
 
             //Get the event name from the report.

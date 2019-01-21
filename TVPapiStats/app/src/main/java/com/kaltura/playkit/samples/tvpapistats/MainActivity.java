@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
     private void subscribeToTVPapiReportEvent() {
 
         //Subscribe to the event.
-        player.addListener(this, TVPAPIAnalyticsEvent.tvpapiAnalyticsReport, event -> {
+        player.addListener(this, TVPAPIAnalyticsEvent.reportSent, event -> {
             TVPAPIAnalyticsEvent.TVPAPIAnalyticsReport reportEvent = event;
 
             //Get the event name from the report.

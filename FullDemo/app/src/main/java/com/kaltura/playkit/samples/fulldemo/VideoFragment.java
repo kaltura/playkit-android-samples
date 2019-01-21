@@ -750,6 +750,7 @@ public class VideoFragment extends android.support.v4.app.Fragment {
     @Override
     public void onDestroy() {
         if (player != null) {
+            player.removeListeners(this);
             player.destroy();
             player = null;
         }

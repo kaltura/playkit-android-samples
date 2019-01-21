@@ -298,6 +298,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        if (player != null) {
+            player.removeListeners(this);
+            player.destroy();
+            player = null;
+        }
+        super.onDestroy();
+    }
+
+
     class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
 
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {

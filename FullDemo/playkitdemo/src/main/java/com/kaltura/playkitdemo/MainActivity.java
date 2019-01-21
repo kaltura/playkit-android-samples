@@ -676,6 +676,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    @Override
+    public void onDestroy() {
+        if (player != null) {
+            player.removeListeners(this);
+            player.destroy();
+            player = null;
+        }
+        super.onDestroy();
+    }
 
     private void addPlayerListeners(final ProgressBar appProgressBar) {
 

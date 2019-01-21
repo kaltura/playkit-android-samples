@@ -178,8 +178,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         registerPlugins();
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
-  //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
-//        startSimpleOvpMediaLoadingHls(playLoadedEntry);
+  //     startSimpleOvpMediaLoadingLive1(playLoadedEntry);
+         startSimpleOvpMediaLoadingHls(playLoadedEntry);
 
 //      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);

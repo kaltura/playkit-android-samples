@@ -90,6 +90,7 @@ import static com.kaltura.playkitdemo.MockParams.Format_SD_Dash;
 import static com.kaltura.playkitdemo.MockParams.OvpUserKS;
 import static com.kaltura.playkitdemo.MockParams.PnxKS;
 import static com.kaltura.playkitdemo.MockParams.SingMediaId;
+import static com.kaltura.playkitdemo.MockParams.SingMediaId4;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
@@ -172,14 +173,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
         registerPlugins();
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
   //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
-        startSimpleOvpMediaLoadingHls(playLoadedEntry);
+//        startSimpleOvpMediaLoadingHls(playLoadedEntry);
 
 //      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
@@ -327,10 +327,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         mediaProvider = new PhoenixMediaProvider()
                 .setSessionProvider(ksSessionProvider)
-                .setAssetId(SingMediaId) //bunny no horses id = "485380"
+                .setAssetId(SingMediaId4) //bunny no horses id = "485380"
                 .setAssetType(APIDefines.KalturaAssetType.Media)
-                .setFormats(Format_SD_Dash, Format_HD_Dash, Format, Format2);
-
+                .setAssetReferenceType(APIDefines.AssetReferenceType.Media)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Http)
+                .setFormats(Format2);
         mediaProvider.load(completion);
     }
 
@@ -377,6 +379,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
+            //player.getSettings().setAllowCrossProtocolRedirect(true);
             // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
 
             //player.setPlaybackRate(1.5f);

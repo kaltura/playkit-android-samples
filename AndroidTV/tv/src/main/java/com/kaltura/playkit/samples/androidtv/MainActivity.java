@@ -21,9 +21,9 @@ import android.util.Log;
 import com.kaltura.netkit.connect.response.ResultElement;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
-import com.kaltura.playkit.api.ovp.SimpleOvpSessionProvider;
-import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
-import com.kaltura.playkit.mediaproviders.ovp.KalturaOvpMediaProvider;
+import com.kaltura.playkit.providers.api.SimpleSessionProvider;
+import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
+import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class MainActivity extends Activity {
             Log.e(TAG, "movieIdex ALREADY == 5 return");
             return;
         }
-        PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(0);
+        PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(0L);
         if (list != null && mediaConfig != null) {
             String thumbnailUrl = CDN_URL + "/p/" + PARTNER_ID + "/sp/" + PARTNER_ID + "00" + "/thumbnail/entry_id/" + mediaEntry.getId() + "/version/100007/width/1200/hight/780";
             Log.d(TAG, "onMediaLoaded  "  + mediaConfig.getMediaEntry().getName() + " " + mediaEntry.getId()  + " " + PARTNER_ID);
@@ -110,7 +110,7 @@ public class MainActivity extends Activity {
 
     private static void startSimpleOvpMediaLoading(OnMediaLoadCompletion completion, String cdnUrl , int partnerId, String entryId) {
         new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleOvpSessionProvider(cdnUrl, partnerId, null))
+                .setSessionProvider(new SimpleSessionProvider(cdnUrl, partnerId, null))
                 .setEntryId(entryId)
                 .load(completion);
     }

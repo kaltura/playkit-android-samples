@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerState;
-import com.kaltura.playkit.ads.AdEnabledPlayerController;
+import com.kaltura.playkit.ads.AdController;
 import com.kaltura.playkit.utils.Consts;
 
 import java.util.Formatter;
@@ -86,9 +86,19 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         long position = Consts.POSITION_UNSET;
         long bufferedPosition = 0;
         if(player != null){
-            duration = player.getDuration();
-            position = player.getCurrentPosition();
-            bufferedPosition = player.getBufferedPosition();
+            AdController adController = player.getController(AdController.class);
+            if (adController != null && adController.isAdDisplayed()) {
+                duration = adController.getAdDuration();
+                position = adController.getAdCurrentPosition();
+                //log.d("XXX adController Duration:" + duration);
+                //log.d("XXX adController Position:" + position);
+            } else {
+                duration = player.getDuration();
+                position = player.getCurrentPosition();
+                //log.d("XXX Duration:" + duration);
+                //log.d("XXX Position:" + position);
+                bufferedPosition = player.getBufferedPosition();
+            }
         }
 
         if(duration != Consts.TIME_UNSET){
@@ -106,7 +116,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         // Remove scheduled updates.
         removeCallbacks(updateProgressAction);
         // Schedule an update if necessary.
-        if (playerState != PlayerState.IDLE || (player.getController(AdEnabledPlayerController.class)  != null && player.getController(AdEnabledPlayerController.class) .getAdCurrentPosition() >= 0)) {
+        if (playerState != PlayerState.IDLE || (player.getController(AdController.class)  != null && player.getController(AdController.class).getAdCurrentPosition() >= 0)) {
             long delayMs = 1000;
             postDelayed(updateProgressAction, delayMs);
         }
@@ -116,6 +126,10 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         int progressValue = 0;
         if(player != null){
             long duration = player.getDuration();
+            AdController adController = player.getController(AdController.class);
+            if (adController != null && adController.isAdDisplayed()) {
+                duration = adController.getAdDuration();
+            }
             if (duration > 0) {
                 progressValue = (int) ((position * PROGRESS_BAR_MAX) / duration);
             }
@@ -128,6 +142,10 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         long positionValue = 0;
         if(player != null){
             long duration = player.getDuration();
+            AdController adController = player.getController(AdController.class);
+            if (adController != null && adController.isAdDisplayed()) {
+                duration = adController.getAdDuration();
+            }
             positionValue = (duration * progress) / PROGRESS_BAR_MAX;
         }
 

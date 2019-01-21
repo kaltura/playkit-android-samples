@@ -179,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
   //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
-  //      startVootOttMediaLoadingProd1(playLoadedEntry);
         startSimpleOvpMediaLoadingHls(playLoadedEntry);
 
 //      startMockMediaLoading(playLoadedEntry);

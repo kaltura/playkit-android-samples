@@ -83,8 +83,8 @@ public class VideoFragment extends android.support.v4.app.Fragment {
 
 
     //Youbora analytics Constants
-    public static final String ACCOUNT_CODE = "your_account_code";
-    public static final String USER_NAME = "your_user_name";
+    public static final String ACCOUNT_CODE = "kalturatest";
+    public static final String USER_NAME = "your_user_name@gmail.com";
     public static final String MEDIA_TITLE = "your_media_title";
     public static final boolean IS_LIVE = false;
     public static final boolean ENABLE_SMART_ADS = true;
@@ -510,6 +510,57 @@ public class VideoFragment extends android.support.v4.app.Fragment {
        ConverterYoubora converterYoubora = getConverterYoubora(MEDIA_TITLE, false);
 
         pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), converterYoubora.toJson());
+    }
+
+    @NonNull
+    private JsonObject getYouboraJsonObject(boolean isLive, String title) {
+        JsonObject pluginEntry = new JsonObject();
+
+        pluginEntry.addProperty("accountCode", "kalturatest");
+        pluginEntry.addProperty("username", "a@a.com");
+        pluginEntry.addProperty("haltOnError", true);
+        pluginEntry.addProperty("enableAnalytics", true);
+        pluginEntry.addProperty("enableSmartAds", true);
+
+
+        //Media entry json.
+        JsonObject mediaEntryJson = new JsonObject();
+        mediaEntryJson.addProperty("isLive", isLive);
+        mediaEntryJson.addProperty("title", title);
+
+        //Youbora ads configuration json.
+        JsonObject adsJson = new JsonObject();
+        adsJson.addProperty("adsExpected", true);
+        adsJson.addProperty("campaign", "zzz");
+
+        //Configure custom properties here:
+        JsonObject propertiesJson = new JsonObject();
+        propertiesJson.addProperty("genre", "");
+        propertiesJson.addProperty("type", "");
+        propertiesJson.addProperty("transaction_type", "");
+        propertiesJson.addProperty("year", "");
+        propertiesJson.addProperty("cast", "");
+        propertiesJson.addProperty("director", "");
+        propertiesJson.addProperty("owner", "");
+        propertiesJson.addProperty("parental", "");
+        propertiesJson.addProperty("price", "");
+        propertiesJson.addProperty("rating", "");
+        propertiesJson.addProperty("audioType", "");
+        propertiesJson.addProperty("audioChannels", "");
+        propertiesJson.addProperty("device", "");
+        propertiesJson.addProperty("quality", "");
+
+        //You can add some extra params here:
+        JsonObject extraParamJson = new JsonObject();
+        extraParamJson.addProperty("param1", "param1");
+        extraParamJson.addProperty("param2", "param2");
+
+        //Add all the json objects created before to the pluginEntry json.
+        pluginEntry.add("media", mediaEntryJson);
+        pluginEntry.add("ads", adsJson);
+        pluginEntry.add("properties", propertiesJson);
+        pluginEntry.add("extraParams", extraParamJson);
+        return pluginEntry;
     }
 
     private ConverterYoubora getConverterYoubora(String mediaTitle, boolean isLive) {

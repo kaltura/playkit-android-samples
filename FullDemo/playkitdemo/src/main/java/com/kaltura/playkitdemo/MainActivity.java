@@ -397,21 +397,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void addYouboraPluginConfig(PKPluginConfigs pluginConfigs) {
+        //Set plugin entry to the plugin configs.
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "the media title"));
+    }
+
+    @NonNull
+    private JsonObject getYouboraJsonObject(boolean isLive, String title) {
         JsonObject pluginEntry = new JsonObject();
 
-        //Youbora config json. Main config goes here.
-        JsonObject youboraConfigJson = new JsonObject();
-        youboraConfigJson.addProperty("accountCode", "KALTURA_TEST");
-        youboraConfigJson.addProperty("username", "a@a.com");
-        youboraConfigJson.addProperty("haltOnError", true);
-        youboraConfigJson.addProperty("enableAnalytics", true);
-        youboraConfigJson.addProperty("enableSmartAds", true);
+        pluginEntry.addProperty("accountCode", "kalturatest");
+        pluginEntry.addProperty("username", "a@a.com");
+        pluginEntry.addProperty("haltOnError", true);
+        pluginEntry.addProperty("enableAnalytics", true);
+        pluginEntry.addProperty("enableSmartAds", true);
 
 
         //Media entry json.
         JsonObject mediaEntryJson = new JsonObject();
-        mediaEntryJson.addProperty("isLive", false);
-        mediaEntryJson.addProperty("title", "the media title");
+        mediaEntryJson.addProperty("isLive", isLive);
+        mediaEntryJson.addProperty("title", title);
 
         //Youbora ads configuration json.
         JsonObject adsJson = new JsonObject();
@@ -445,9 +449,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         pluginEntry.add("ads", adsJson);
         pluginEntry.add("properties", propertiesJson);
         pluginEntry.add("extraParams", extraParamJson);
-
-        //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
+        return pluginEntry;
     }
 
     private void addPhoenixAnalyticsPluginConfig(PKPluginConfigs config) {

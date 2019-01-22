@@ -363,10 +363,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
 
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
-            START_POSITION = null;
-        } else {
-            START_POSITION = 0L;
+            START_POSITION = null; // force live streams to play from live edge
         }
+
         PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(START_POSITION);
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         if (player == null) {

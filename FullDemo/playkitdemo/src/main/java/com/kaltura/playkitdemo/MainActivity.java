@@ -178,13 +178,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         registerPlugins();
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
-  //     startSimpleOvpMediaLoadingLive1(playLoadedEntry);
-         startSimpleOvpMediaLoadingHls(playLoadedEntry);
-
+        
+        startSimpleOvpMediaLoadingHls(playLoadedEntry);
+//      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
 //      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startOttMediaLoading(playLoadedEntry);
-//      startSimpleOvpMediaLoading(playLoadedEntry);
+//      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);

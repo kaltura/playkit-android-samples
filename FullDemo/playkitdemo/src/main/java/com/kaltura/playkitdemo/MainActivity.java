@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.connect.response.ResultElement;
@@ -53,6 +54,8 @@ import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
 //import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
 //import com.kaltura.playkit.plugins.imadai.IMADAIPlugin;
+import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
+import com.kaltura.playkit.plugins.imadai.IMADAIPlugin;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ott.OttEvent;
@@ -128,8 +131,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void registerPlugins() {
 
         PlayKitManager.registerPlugins(this, SamplePlugin.factory);
-        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
-        //PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
+        //PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+        PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
         PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
         PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
@@ -394,26 +397,30 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
             if (changeMediaIndex % 4 == 0) {
                 log.d("Play Ad preMidPostAdTagUrl");
-                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostAdTagUrl));
+                //player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostAdTagUrl));
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getDAIConfig2());
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preMidPostAdTagUrl media2"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(2222401, "1_f93tepsn"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(2222401, "1_f93tepsn"));
 
             } else if (changeMediaIndex % 4 == 1) {
                 log.d("Play Ad inLinePreAdTagUrl");
-                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(inLinePreAdTagUrl));
+                //player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(inLinePreAdTagUrl));
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getDAIConfig1());
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(true, "inLinePreAdTagUrl media3"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1740481, "1_fdv46dba"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1740481, "1_fdv46dba"));
             } if (changeMediaIndex % 4 == 2) {
                 log.d("Play NO Ad");
-                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(""));
+                //player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(""));
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getDAIConfig2());
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "NO AD media4"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1091, "0_wu32qrt3"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1091, "0_wu32qrt3"));
             } if (changeMediaIndex % 4 == 3) {
                 log.d("Play Ad preSKipAdTagUrl");
-                player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSKipAdTagUrl));
+                //player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSKipAdTagUrl));
+                player.updatePluginConfig(IMAPlugin.factory.getName(), getDAIConfig1());
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preSKipAdTagUrl media1"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1734751, "1_3o1seqnv"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1734751, "1_3o1seqnv"));
@@ -435,10 +442,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
-        addIMAPluginConfig(pluginConfigs);
-        //addIMADAIPluginConfig(pluginConfigs);
+        //addIMAPluginConfig(pluginConfigs);
+        addIMADAIPluginConfig(pluginConfigs, 1);
         addKaluraStatsPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
-
         addYouboraPluginConfig(pluginConfigs, false, "preMidPostSingleAdTagUrl Title1");
         addKavaPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
         //addPhoenixAnalyticsPluginConfig(pluginConfigs);
@@ -560,110 +566,159 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-    //IMA CONFIG
-//    private void addIMADAIPluginConfig(PKPluginConfigs config) {
-//        String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
-//        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-//        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
-//        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
-//        List<String> videoMimeTypes = new ArrayList<>();
-//        videoMimeTypes.add("video/mp4");
-//        videoMimeTypes.add("application/x-mpegURL");
-//        // videoMimeTypes.add("application/dash+xml");
-//        //Map<Double, String> tagTimesMap = new HashMap<>();
-//        //tagTimesMap.put(2.0,"ADTAG");
-//
-//
-//        String assetTitle = "VOD - Tears of Steel";
-//        String assetKey = null;
-//        String apiKey = null;
-//        String contentSourceId = "19463";
-//        String videoId = "tears-of-steel";
-//        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
-//        String licenseUrl = null;
-//
-//        IMADAIConfig adsConfig = new IMADAIConfig(assetTitle,
-//                assetKey, // null for VOD
-//                contentSourceId, // null for Live
-//                apiKey, // seems to be always null in demos
-//                videoId, // null for Live
-//                streamFormat,
-//                licenseUrl).enableDebugMode(true);
-//
-//
-//        String assetTitle1 = "Live Video - Big Buck Bunny";
-//        String assetKey1 = "sN_IYUG8STe1ZzhIIE_ksA";
-//        String apiKey1 = null;
-//        String contentSourceId1 = null;
-//        String videoId1 = null;
-//        StreamRequest.StreamFormat streamFormat1 = StreamRequest.StreamFormat.HLS;
-//        String licenseUrl1 = null;
-//        IMADAIConfig adsConfigLive = new IMADAIConfig(assetTitle1,
-//                assetKey1, // null for VOD
-//                contentSourceId1, // null for Live
-//                apiKey1, // seems to be always null in demos
-//                videoId1, // null for Live
-//                streamFormat1,
-//                licenseUrl1).enableDebugMode(true);
-//
-//
-//        String assetTitle2 = "BBB-widevine";
-//        String assetKey2 = null;
-//        String apiKey2 = null;
-//        String contentSourceId2 = "2474148";
-//        String videoId2 = "bbb-widevine";
-//        StreamRequest.StreamFormat streamFormat2 = StreamRequest.StreamFormat.DASH;
-//        String licenseUrl2 = "https://proxy.uat.widevine.com/proxy";
-//        IMADAIConfig adsConfigDash = new IMADAIConfig(assetTitle2,
-//                assetKey2, // null for VOD
-//                contentSourceId2, // null for Live
-//                apiKey2, // seems to be always null in demos
-//                videoId2, // null for Live
-//                streamFormat2,
-//                licenseUrl2).enableDebugMode(true);
-//
-//        String assetTitle3 = "JW1";
-//        String assetKey3 = null;
-//        String apiKey3 = null;
-//        String contentSourceId3 = "2472176";
-//        String videoId3 = "2504847";
-//        StreamRequest.StreamFormat streamFormat3 = StreamRequest.StreamFormat.HLS;
-//        String licenseUrl3 = null;
-//        IMADAIConfig adsConfigVod2 = new IMADAIConfig(assetTitle3,
-//                assetKey3, // null for VOD
-//                contentSourceId3, // null for Live
-//                apiKey3, // seems to be always null in demos
-//                videoId3, // null for Live
-//                streamFormat3,
-//                licenseUrl3);
-//
-//
-//        String assetTitle4 = "JW4";
-//        String assetKey4 = null;
-//        String apiKey4 = null;
-//        String contentSourceId4 = "19823";
-//        String videoId4 = "ima-test";
-//        StreamRequest.StreamFormat streamFormat4 = StreamRequest.StreamFormat.HLS;
-//        String licenseUrl4 = null;
-//        IMADAIConfig adsConfigVod4 = new IMADAIConfig(assetTitle4,
-//                assetKey4, // null for VOD
-//                contentSourceId4, // null for Live
-//                apiKey4, // seems to be always null in demos
-//                videoId4, // null for Live
-//                streamFormat4,
-//                licenseUrl4).enableDebugMode(true);
-//
-//
-//        IMADAIConfig adsConfigError = new IMADAIConfig(assetTitle4,
-//                assetKey4, // null for VOD
-//                contentSourceId4 + "AAAA", // null for Live
-//                apiKey4, // seems to be always null in demos
-//                videoId4, // null for Live
-//                streamFormat4,
-//                licenseUrl4).enableDebugMode(true);
-//
-//        config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig);
-//    }
+    //IMA DAI CONFIG
+    private void addIMADAIPluginConfig(PKPluginConfigs config, int daiType) {
+        String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
+        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
+        //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
+        List<String> videoMimeTypes = new ArrayList<>();
+        videoMimeTypes.add("video/mp4");
+        videoMimeTypes.add("application/x-mpegURL");
+        // videoMimeTypes.add("application/dash+xml");
+        //Map<Double, String> tagTimesMap = new HashMap<>();
+        //tagTimesMap.put(2.0,"ADTAG");
+
+        switch (daiType) {
+            case 1: {
+                IMADAIConfig adsConfig = getDAIConfig1();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig);
+                }
+                break;
+            case 2: {
+                IMADAIConfig adsConfigLive = getDAIConfig2();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigLive);
+                }
+                break;
+            case 3: {
+                IMADAIConfig adsConfigDash = getDAIConfig3();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigDash);
+                }
+                break;
+            case 4: {
+                IMADAIConfig adsConfigVod2 = getDAIConfig4();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigVod2);
+                }
+                break;
+            case 5: {
+                IMADAIConfig adsConfig6 = getDAIConfig6();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig6);
+                }
+                break;
+            case 6: {
+                IMADAIConfig adsConfigError = getDAIConfig6();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private IMADAIConfig getDAIConfig6() {
+        String assetTitle4 = "JW4";
+        String assetKey4 = null;
+        String apiKey4 = null;
+        String contentSourceId4 = "19823";
+        String videoId4 = "ima-test";
+        StreamRequest.StreamFormat streamFormat4 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl4 = null;
+        return new IMADAIConfig(assetTitle4,
+                assetKey4, // null for VOD
+                contentSourceId4 + "AAAA", // null for Live
+                apiKey4, // seems to be always null in demos
+                videoId4, // null for Live
+                streamFormat4,
+                licenseUrl4).enableDebugMode(true);
+    }
+
+    private void getDAIConfig5(PKPluginConfigs config) {
+        String assetTitle4 = "JW4";
+        String assetKey4 = null;
+        String apiKey4 = null;
+        String contentSourceId4 = "19823";
+        String videoId4 = "ima-test";
+        StreamRequest.StreamFormat streamFormat4 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl4 = null;
+        IMADAIConfig adsConfigVod4 = new IMADAIConfig(assetTitle4,
+                assetKey4, // null for VOD
+                contentSourceId4, // null for Live
+                apiKey4, // seems to be always null in demos
+                videoId4, // null for Live
+                streamFormat4,
+                licenseUrl4).enableDebugMode(true);
+        config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigVod4);
+    }
+
+    @NonNull
+    private IMADAIConfig getDAIConfig4() {
+        String assetTitle3 = "JW1";
+        String assetKey3 = null;
+        String apiKey3 = null;
+        String contentSourceId3 = "2472176";
+        String videoId3 = "2504847";
+        StreamRequest.StreamFormat streamFormat3 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl3 = null;
+        return new IMADAIConfig(assetTitle3,
+                assetKey3, // null for VOD
+                contentSourceId3, // null for Live
+                apiKey3, // seems to be always null in demos
+                videoId3, // null for Live
+                streamFormat3,
+                licenseUrl3);
+    }
+
+    private IMADAIConfig getDAIConfig3() {
+        String assetTitle2 = "BBB-widevine";
+        String assetKey2 = null;
+        String apiKey2 = null;
+        String contentSourceId2 = "2474148";
+        String videoId2 = "bbb-widevine";
+        StreamRequest.StreamFormat streamFormat2 = StreamRequest.StreamFormat.DASH;
+        String licenseUrl2 = "https://proxy.uat.widevine.com/proxy";
+        return new IMADAIConfig(assetTitle2,
+                assetKey2, // null for VOD
+                contentSourceId2, // null for Live
+                apiKey2, // seems to be always null in demos
+                videoId2, // null for Live
+                streamFormat2,
+                licenseUrl2).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfig2() {
+        String assetTitle1 = "Live Video - Big Buck Bunny";
+        String assetKey1 = "sN_IYUG8STe1ZzhIIE_ksA";
+        String apiKey1 = null;
+        String contentSourceId1 = null;
+        String videoId1 = null;
+        StreamRequest.StreamFormat streamFormat1 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl1 = null;
+        return new IMADAIConfig(assetTitle1,
+                assetKey1, // null for VOD
+                contentSourceId1, // null for Live
+                apiKey1, // seems to be always null in demos
+                videoId1, // null for Live
+                streamFormat1,
+                licenseUrl1).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfig1() {
+        String assetTitle = "VOD - Tears of Steel";
+        String assetKey = null;
+        String apiKey = null;
+        String contentSourceId = "19463";
+        String videoId = "tears-of-steel";
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+
+        return new IMADAIConfig(assetTitle,
+                assetKey, // null for VOD
+                contentSourceId, // null for Live
+                apiKey, // seems to be always null in demos
+                videoId, // null for Live
+                streamFormat,
+                licenseUrl).enableDebugMode(true);
+    }
 
     @Override
     protected void onPause() {

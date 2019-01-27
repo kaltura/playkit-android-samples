@@ -53,8 +53,8 @@ import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
 //import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
 //import com.kaltura.playkit.plugins.imadai.IMADAIPlugin;
-import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
-import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
+//import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
+//import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ott.OttEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
@@ -63,7 +63,7 @@ import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
 import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.playback.KalturaPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.playback.KalturaUDRMLicenseRequestAdapter;
-import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
+//import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 import com.kaltura.playkit.providers.MediaEntryProvider;
 import com.kaltura.playkit.providers.api.SimpleSessionProvider;
 import com.kaltura.playkit.providers.api.phoenix.APIDefines;
@@ -123,8 +123,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         PlayKitManager.registerPlugins(this, IMAPlugin.factory);
         //PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
         PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
-        PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
-        PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
+        //PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
+        //PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
         //PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
         //PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
     }
@@ -387,18 +387,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     private void addKavaPluginConfig(PKPluginConfigs pluginConfigs) {
-        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
-                .setApplicationVersion(BuildConfig.VERSION_NAME)
-                .setPartnerId(Integer.valueOf(2222401))
-                .setEntryId("1_f93tepsn")
-                .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
-        //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
+//        KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
+//                .setApplicationVersion(BuildConfig.VERSION_NAME)
+//                .setPartnerId(Integer.valueOf(2222401))
+//                .setEntryId("1_f93tepsn")
+//                .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
+//        //Set plugin entry to the plugin configs.
+//        pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
     }
 
     private void addYouboraPluginConfig(PKPluginConfigs pluginConfigs) {
-        //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "the media title"));
+//        //Set plugin entry to the plugin configs.
+//        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "the media title"));
     }
 
     @NonNull

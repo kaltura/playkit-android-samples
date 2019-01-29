@@ -26,22 +26,22 @@ android {
 
 dependencies {
 
-    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
-    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
-    implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
-    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
-    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
-    implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
 
 
-//    implementation project(":playkit")
-//    implementation project(path: ':providers')
-//    //implementation project(":admanager")
-//    //implementation project(":adsplugin")
-//    implementation project(":youbora")
-//    implementation project(":ima")
-//    implementation project(":kava")
-//    implementation project(":googlecast")
+    implementation project(":playkit")
+    implementation project(path: ':providers')
+    //implementation project(":admanager")
+    //implementation project(":adsplugin")
+    implementation project(":youbora")
+    implementation project(":ima")
+    implementation project(":kava")
+    implementation project(":googlecast")
 
 //    implementation 'com.kaltura.playkit:playkit:3.6.2'
 //    implementation 'com.kaltura.playkit:playkitproviders:1.0.3'

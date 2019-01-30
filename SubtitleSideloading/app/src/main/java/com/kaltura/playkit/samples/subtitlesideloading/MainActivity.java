@@ -17,12 +17,12 @@ import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
-//import com.kaltura.playkit.PKTrackConfig;
+import com.kaltura.playkit.PKSubtitleFormat;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.player.AudioTrack;
-//import com.kaltura.playkit.player.PKExternalSubtitle;
+import com.kaltura.playkit.player.PKExternalSubtitle;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.SubtitleStyleSettings;
 import com.kaltura.playkit.player.TextTrack;
@@ -41,7 +41,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private static final String TAG = "MainActivity";
     //The url of the source to play
-    private static final String SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8";
+ //   private static final String SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8";
+    private static final String SOURCE_URL = "http://api-preprod.ott.kaltura.com/v4_2/api_v3/service/assetFile/action/playManifest/partnerId/198/assetId/259295/assetType/media/assetFileId/516109/contextType/PLAYBACK/a.m3u8";
+
+    // Subtitles Embedded in stream
+    //  private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/1982541/sp/198254100/playManifest/protocol/https/entryId/0_hbcra6nc/format/applehttp/tags/iphonenew/f/a.m3u8";
+
+
     // Source to see subtitles any source can be used
     //   private static final String SOURCE_URL = "http://www.streambox.fr/playlists/test_001/stream.m3u8";
 
@@ -108,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
 
-      //  setExternalSubtitles(mediaEntry);
+        setExternalSubtitles(mediaEntry);
 
     }
 
@@ -117,28 +123,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * @param mediaEntry PKMediaEntry object
      */
 
-   /* private void setExternalSubtitles(PKMediaEntry mediaEntry) {
+    private void setExternalSubtitles(PKMediaEntry mediaEntry) {
 
         List<PKExternalSubtitle> mList = new ArrayList<>();
 
         PKExternalSubtitle pkExternalSubtitle = new PKExternalSubtitle()
-                .setMimeType(PKExternalSubtitle.SubtitleMimeType.TEXT_VTT)
                 .setUrl("http://brenopolanski.com/html5-video-webvtt-example/MIB2-subtitles-pt-BR.vtt")
-                .setId(null)
+                .setMimeType(PKSubtitleFormat.vtt)
                 .setLabel("de")
                 .setLanguage("deu");
         mList.add(pkExternalSubtitle);
 
         PKExternalSubtitle pkExternalSubtitleDe = new PKExternalSubtitle()
                 .setUrl("https://mkvtoolnix.download/samples/vsshort-en.srt")
-                .setId(null)
-                .setMimeType(PKExternalSubtitle.SubtitleMimeType.APPLICATION_SUBRIP)
+                .setMimeType(PKSubtitleFormat.srt)
                 .setLabel("en")
-                .setLanguage("eng");
+                .setLanguage("eng")
+                .setDefault();
         mList.add(pkExternalSubtitleDe);
 
-        mediaEntry.setSubtitleList(mList);
-    }*/
+        mediaEntry.setExternalSubtitleList(mList);
+    }
 
     /**
      * Will add player to the view.

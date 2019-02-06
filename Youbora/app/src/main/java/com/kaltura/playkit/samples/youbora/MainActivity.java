@@ -167,18 +167,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToYouboraReportEvent() {
         //Subscribe to the event.
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                YouboraEvent.YouboraReport reportEvent = (YouboraEvent.YouboraReport) event;
+        player.addListener(this, YouboraEvent.reportSent, event -> {
+            YouboraEvent.YouboraReport reportEvent = event;
 
-                //Get the event name from the report.
-                String reportedEventName = reportEvent.reportedEventName;
-                Log.i(TAG, "Youbora report sent. Reported event name: " + reportedEventName);
-            }
-            //Event subscription.
-        }, YouboraEvent.Type.REPORT_SENT);
+            //Get the event name from the report.
+            String reportedEventName = reportEvent.reportedEventName;
+            Log.i(TAG, "Youbora report sent. Reported event name: " + reportedEventName);
+        });
     }
 
     /**

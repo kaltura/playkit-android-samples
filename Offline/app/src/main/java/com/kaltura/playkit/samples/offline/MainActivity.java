@@ -27,6 +27,7 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -189,12 +190,17 @@ public class MainActivity extends AppCompatActivity {
                 trackSelector.setSelectedTracks(DownloadItem.TrackType.TEXT, trackSelector.getAvailableTracks(DownloadItem.TrackType.TEXT));
             }
         });
-        contentManager.start(new ContentManager.OnStartedListener() {
-            @Override
-            public void onStarted() {
-                Log.d(TAG, "Download Service started");
-            }
-        });
+
+        try {
+            contentManager.start(new ContentManager.OnStartedListener() {
+                @Override
+                public void onStarted() {
+                    Log.d(TAG, "Download Service started");
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // Find the minimal "good enough" track. In other words, the track that has bitrate greater than or equal
@@ -355,7 +361,11 @@ public class MainActivity extends AppCompatActivity {
         
         DownloadItem item = contentManager.findItem(ASSET_ID);
         if (item == null) {
-            item = contentManager.createItem(ASSET_ID, ASSET_URL);
+            try {
+                item = contentManager.createItem(ASSET_ID, ASSET_URL);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             item.loadMetadata();
         } else {
             item.startDownload();

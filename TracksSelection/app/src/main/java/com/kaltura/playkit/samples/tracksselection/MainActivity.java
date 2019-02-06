@@ -20,6 +20,7 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
+import com.kaltura.playkit.player.ABRSettings;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.SubtitleStyleSettings;
@@ -84,10 +85,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ////player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO));
 
         // --->  Min-Max video bitrate
-        // player.getSettings().setMinVideoBitrate(10000000);
-        // player.getSettings().setMaxVideoBitrate(90000000);
         // --->  Sets the initial bitrate estimate in bits per second that should be assumed when a bandwidth estimate is unavailable.
-        //player.getSettings().setInitialBitrateEstimate(200000);
+        player.getSettings().setABRSettings(new ABRSettings().setMinVideoBitrate(900000).setMaxVideoBitrate(3000000).setInitialBitrateEstimate(100000));
 
         player.getSettings().setSubtitleStyle(getDefaultPositionDefault());
 

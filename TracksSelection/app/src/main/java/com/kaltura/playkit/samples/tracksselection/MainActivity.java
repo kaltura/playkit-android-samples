@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -21,7 +20,6 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.ads.AdController;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.SubtitleStyleSettings;
@@ -84,6 +82,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ////player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO)); // select the track by locale if does not exist manifest default
         //player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.EXPLICIT).setTrackLanguage("rus")); // select specific track lang if not exist select manifest default
         ////player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO));
+
+        // --->  Min-Max video bitrate
+        // player.getSettings().setMinVideoBitrate(10000000);
+        // player.getSettings().setMaxVideoBitrate(90000000);
+        // --->  Sets the initial bitrate estimate in bits per second that should be assumed when a bandwidth estimate is unavailable.
+        //player.getSettings().setInitialBitrateEstimate(200000);
 
         player.getSettings().setSubtitleStyle(getDefaultPositionDefault());
 
@@ -263,6 +267,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         player.addListener(this, PlayerEvent.subtitlesStyleChanged, event -> {
             Log.d(TAG, "Event SubtitlesStyleChanged " + event.styleName);
+
+        });
+
+        player.addListener(this, PlayerEvent.error, event -> {
+            PlayerEvent.Error playerError = event;
+            if (playerError != null && playerError.error != null) {
+                Log.d(TAG, "PlayerEvent.Error event  position = " + playerError.error.errorType + " errorMessage = " + playerError.error.message);
+            }
 
         });
     }

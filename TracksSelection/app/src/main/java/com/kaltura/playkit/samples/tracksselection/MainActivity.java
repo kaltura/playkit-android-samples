@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         // --->  Min-Max video bitrate
         // --->  Sets the initial bitrate estimate in bits per second that should be assumed when a bandwidth estimate is unavailable.
-        player.getSettings().setABRSettings(new ABRSettings().setMinVideoBitrate(900000).setMaxVideoBitrate(3000000).setInitialBitrateEstimate(100000));
+        player.getSettings().setABRSettings(new ABRSettings().setMinVideoBitrate(250000).setMaxVideoBitrate(3000000).setInitialBitrateEstimate(100000));
 
         player.getSettings().setSubtitleStyle(getDefaultPositionDefault());
 

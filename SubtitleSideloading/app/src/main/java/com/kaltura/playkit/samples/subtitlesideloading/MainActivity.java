@@ -1,4 +1,4 @@
-package com.kaltura.playkit.samples.tracksselection;
+package com.kaltura.playkit.samples.subtitlesideloading;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,22 +12,23 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
-//import com.kaltura.playkit.PKTrackConfig;
+import com.kaltura.playkit.PKSubtitleFormat;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.player.ABRSettings;
 import com.kaltura.playkit.player.AudioTrack;
+import com.kaltura.playkit.player.PKExternalSubtitle;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.SubtitleStyleSettings;
 import com.kaltura.playkit.player.TextTrack;
 import com.kaltura.playkit.player.VideoTrack;
-import com.kaltura.playkit.samples.tracksselection.tracks.TrackItem;
-import com.kaltura.playkit.samples.tracksselection.tracks.TrackItemAdapter;
+import com.kaltura.playkit.samples.subtitlesideloading.tracks.TrackItem;
+import com.kaltura.playkit.samples.subtitlesideloading.tracks.TrackItemAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +41,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private static final String TAG = "MainActivity";
     //The url of the source to play
-    private static final String SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8";
+ //   private static final String SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8";
+    private static final String SOURCE_URL = "http://api-preprod.ott.kaltura.com/v4_2/api_v3/service/assetFile/action/playManifest/partnerId/198/assetId/259295/assetType/media/assetFileId/516109/contextType/PLAYBACK/a.m3u8";
+
+    // Source to see subtitles any source can be used
+    //   private static final String SOURCE_URL = "http://www.streambox.fr/playlists/test_001/stream.m3u8";
 
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
@@ -84,10 +89,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //player.getSettings().setPreferredTextTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.EXPLICIT).setTrackLanguage("rus")); // select specific track lang if not exist select manifest default
         ////player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO));
 
-        // --->  Min-Max video bitrate
-        // --->  Sets the initial bitrate estimate in bits per second that should be assumed when a bandwidth estimate is unavailable.
-        player.getSettings().setABRSettings(new ABRSettings().setMinVideoBitrate(250000).setMaxVideoBitrate(3000000).setInitialBitrateEstimate(100000));
-
         player.getSettings().setSubtitleStyle(getDefaultPositionDefault());
 
         //Prepare player with media configuration.
@@ -108,6 +109,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
+
+        setExternalSubtitles(mediaEntry);
+
+    }
+
+    /**
+     * Side load the external subtitles
+     * @param mediaEntry PKMediaEntry object
+     */
+
+    private void setExternalSubtitles(PKMediaEntry mediaEntry) {
+
+        List<PKExternalSubtitle> mList = new ArrayList<>();
+
+        PKExternalSubtitle pkExternalSubtitle = new PKExternalSubtitle()
+                .setUrl("http://brenopolanski.com/html5-video-webvtt-example/MIB2-subtitles-pt-BR.vtt")
+                .setMimeType(PKSubtitleFormat.vtt)
+                .setLabel("de")
+                .setLanguage("deu");
+        mList.add(pkExternalSubtitle);
+
+        PKExternalSubtitle pkExternalSubtitleDe = new PKExternalSubtitle()
+                .setUrl("https://mkvtoolnix.download/samples/vsshort-en.srt")
+                .setMimeType(PKSubtitleFormat.srt)
+                .setLabel("en")
+                .setLanguage("eng")
+                .setDefault();
+        mList.add(pkExternalSubtitleDe);
+
+        mediaEntry.setExternalSubtitleList(mList);
     }
 
     /**
@@ -220,62 +251,47 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * by the player.
      */
     private void subscribeToTracksAvailableEvent() {
+        player.addEventListener(new PKEvent.Listener() {
+            @Override
+            public void onEvent(PKEvent event) {
+                if (event instanceof PlayerEvent.VideoTrackChanged) {
+                    Log.d(TAG, "Event VideoTrackChanged " + ((PlayerEvent.VideoTrackChanged) event).newTrack.getBitrate());
+                } else if (event instanceof PlayerEvent.AudioTrackChanged) {
+                    Log.d(TAG, "Event AudioTrackChanged " + ((PlayerEvent.AudioTrackChanged) event).newTrack.getLanguage());
+                } else if (event instanceof PlayerEvent.TextTrackChanged) {
+                    Log.d(TAG, "Event TextTrackChanged " + ((PlayerEvent.TextTrackChanged) event).newTrack.getLanguage());
+                } else if (event instanceof PlayerEvent.SubtitlesStyleChanged) {
+                    Log.d(TAG, "Event SubtitlesStyleChanged " + ((PlayerEvent.SubtitlesStyleChanged) event).styleName);
+                } else if (event instanceof PlayerEvent.TracksAvailable) {
+                    Log.d(TAG, "Event TRACKS_AVAILABLE");
 
-        player.addListener(this, PlayerEvent.tracksAvailable, event -> {
-            Log.d(TAG, "Event TRACKS_AVAILABLE");
+                    //Cast event to the TracksAvailable object that is actually holding the necessary data.
+                    PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
 
-            //Cast event to the TracksAvailable object that is actually holding the necessary data.
-            PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
+                    //Obtain the actual tracks info from it. Default track index values are coming from manifest
+                    PKTracks tracks = tracksAvailable.tracksInfo;
+                    int defaultAudioTrackIndex = tracks.getDefaultAudioTrackIndex();
+                    int defaultTextTrackIndex = tracks.getDefaultTextTrackIndex();
+                    if (tracks.getAudioTracks().size() > 0) {
+                        Log.d(TAG, "Default Audio langae = " + tracks.getAudioTracks().get(defaultAudioTrackIndex).getLabel());
+                    }
+                    if (tracks.getTextTracks().size() > 0) {
+                        Log.d(TAG, "Default Text langae = " + tracks.getTextTracks().get(defaultTextTrackIndex).getLabel());
+                        if(ccStyleLayout != null) {
+                            ccStyleLayout.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    if (tracks.getVideoTracks().size() > 0) {
+                        Log.d(TAG, "Default video isAdaptive = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).isAdaptive() + " bitrate = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).getBitrate());
+                    }
+                    //player.changeTrack(tracksAvailable.tracksInfo.getVideoTracks().get(1).getUniqueId());
+                    //Populate Android spinner views with received data.
+                    populateSpinnersWithTrackInfo(tracks);
 
-            //Obtain the actual tracks info from it. Default track index values are coming from manifest
-            PKTracks tracks = tracksAvailable.tracksInfo;
-            int defaultAudioTrackIndex = tracks.getDefaultAudioTrackIndex();
-            int defaultTextTrackIndex = tracks.getDefaultTextTrackIndex();
-            if (tracks.getAudioTracks().size() > 0) {
-                Log.d(TAG, "Default Audio langae = " + tracks.getAudioTracks().get(defaultAudioTrackIndex).getLabel());
-            }
-            if (tracks.getTextTracks().size() > 0) {
-                Log.d(TAG, "Default Text langae = " + tracks.getTextTracks().get(defaultTextTrackIndex).getLabel());
-                if(ccStyleLayout != null) {
-                    ccStyleLayout.setVisibility(View.VISIBLE);
                 }
             }
-            if (tracks.getVideoTracks().size() > 0) {
-                Log.d(TAG, "Default video isAdaptive = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).isAdaptive() + " bitrate = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).getBitrate());
-            }
-            //player.changeTrack(tracksAvailable.tracksInfo.getVideoTracks().get(1).getUniqueId());
-            //Populate Android spinner views with received data.
-            populateSpinnersWithTrackInfo(tracks);
-        });
-
-
-        player.addListener(this, PlayerEvent.videoTrackChanged, event -> {
-            Log.d(TAG, "Event VideoTrackChanged " + event.newTrack.getBitrate());
-
-        });
-
-        player.addListener(this, PlayerEvent.audioTrackChanged, event -> {
-            Log.d(TAG, "Event AudioTrackChanged " + event.newTrack.getLanguage());
-
-        });
-
-        player.addListener(this, PlayerEvent.textTrackChanged, event -> {
-            Log.d(TAG, "Event TextTrackChanged " + event.newTrack.getLanguage());
-
-        });
-
-        player.addListener(this, PlayerEvent.subtitlesStyleChanged, event -> {
-            Log.d(TAG, "Event SubtitlesStyleChanged " + event.styleName);
-
-        });
-
-        player.addListener(this, PlayerEvent.error, event -> {
-            PlayerEvent.Error playerError = event;
-            if (playerError != null && playerError.error != null) {
-                Log.d(TAG, "PlayerEvent.Error event  position = " + playerError.error.errorType + " errorMessage = " + playerError.error.message);
-            }
-
-        });
+            //Event that will be sent when tracks data is available.
+        }, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.AUDIO_TRACK_CHANGED, PlayerEvent.Type.TEXT_TRACK_CHANGED, PlayerEvent.Type.VIDEO_TRACK_CHANGED, PlayerEvent.Type.SUBTITLE_STYLE_CHANGED);
     }
 
     /**

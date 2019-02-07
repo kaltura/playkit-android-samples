@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final boolean AUTO_PLAY_ON_RESUME = true;
 
     private static final PKLog log = PKLog.get("MainActivity");
+    public static int READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 123;
     public static int changeMediaIndex = -1;
     public static Long START_POSITION = 0L;
 
@@ -140,17 +141,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getPermissionToReadExternalStorage();
         initDrm();
 
         mOrientationManager = new OrientationManager(this, SensorManager.SENSOR_DELAY_NORMAL, this);
         mOrientationManager.enable();
         setContentView(R.layout.activity_main);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-            Toast.makeText(this, "Please tap ALLOW", Toast.LENGTH_LONG).show();
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    1);
-        }
 
         log.i("PlayKitManager: " + PlayKitManager.CLIENT_TAG);
 
@@ -179,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
-        
         startSimpleOvpMediaLoadingHls(playLoadedEntry);
 //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
 //      startMockMediaLoading(playLoadedEntry);
@@ -205,25 +200,54 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
+    private void getPermissionToReadExternalStorage() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            }
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST);
+        }
+    }
+
+    // Callback with the request from calling requestPermissions(...)
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        // Make sure it's our original READ_CONTACTS request
+        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST) {
+            if (grantResults.length == 1 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Read Storage permission granted", Toast.LENGTH_SHORT).show();
+            } else {
+                boolean showRationale = ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                if (showRationale) {
+                    // do something here to handle degraded mode
+                } else {
+                    Toast.makeText(this, "Read Storage permission denied", Toast.LENGTH_SHORT).show();
+                }
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
     @NonNull
     private OnMediaLoadCompletion registerToLoadedMediaCallback() {
-        return new OnMediaLoadCompletion() {
-                            @Override
-                            public void onComplete(final ResultElement<PKMediaEntry> response) {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (response.isSuccess()) {
-                                            onMediaLoaded(response.getResponse());
-                                        } else {
-
-                                            Toast.makeText(MainActivity.this, "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""), Toast.LENGTH_LONG).show();
-                                            log.e("failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""));
-                                        }
-                                    }
-                                });
-                            }
-                        };
+        return response -> runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (response.isSuccess()) {
+                    onMediaLoaded(response.getResponse());
+                } else {
+                    Toast.makeText(MainActivity.this, "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""), Toast.LENGTH_LONG).show();
+                    log.e("failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""));
+                }
+            }
+        });
     }
 
     private void initDrm() {

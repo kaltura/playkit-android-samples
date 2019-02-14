@@ -95,13 +95,13 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
             if (adController != null && adController.isAdDisplayed()) {
                 duration = adController.getAdDuration();
                 position = adController.getAdCurrentPosition();
-                //log.d("XXX adController Duration:" + duration);
-                //log.d("XXX adController Position:" + position);
+                //log.d("adController Duration:" + duration);
+                //log.d("adController Position:" + position);
             } else {
                 duration = player.getDuration();
                 position = player.getCurrentPosition();
-                //log.d("XXX Duration:" + duration);
-                //log.d("XXX Position:" + position);
+                //log.d("Duration:" + duration);
+                //log.d("Position:" + position);
                 bufferedPosition = player.getBufferedPosition();
             }
         }
@@ -136,8 +136,10 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
                 duration = adController.getAdDuration();
             }
             if (duration > 0) {
-                progressValue = (int) ((position * PROGRESS_BAR_MAX) / duration);
+                //log.e("position = "  + position);
+                progressValue = Math.round((position * PROGRESS_BAR_MAX) / duration);
             }
+            //log.e("progressValue = "  + progressValue);
         }
 
         return progressValue;
@@ -151,7 +153,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
             if (adController != null && adController.isAdDisplayed()) {
                 duration = adController.getAdDuration();
             }
-            positionValue = (duration * progress) / PROGRESS_BAR_MAX;
+            positionValue =  Math.round((duration * progress) / PROGRESS_BAR_MAX);
         }
 
         return positionValue;
@@ -186,7 +188,9 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
                 }
                 break;
             case R.id.pause:
-                player.pause();
+                if(player != null) {
+                    player.pause();
+                }
                 break;
             case R.id.ffwd:
                 //Do nothing for now

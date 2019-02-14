@@ -136,10 +136,10 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
                 duration = adController.getAdDuration();
             }
             if (duration > 0) {
-                //log.e("position = "  + position);
+                //log.d("position = "  + position);
                 progressValue = Math.round((position * PROGRESS_BAR_MAX) / duration);
             }
-            //log.e("progressValue = "  + progressValue);
+            //log.d("progressValue = "  + progressValue);
         }
 
         return progressValue;

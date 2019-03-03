@@ -25,6 +25,7 @@ def samples = [
         'TracksSelection',
         'ChangeMedia',
         'IMASample',
+        'IMADAISample',
         'Offline',
         'Youbora',
         'PhoenixAnalytics',

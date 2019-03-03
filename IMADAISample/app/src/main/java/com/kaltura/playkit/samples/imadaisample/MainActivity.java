@@ -1,4 +1,4 @@
-package com.kaltura.playkit.samples.imasample;
+package com.kaltura.playkit.samples.imadaisample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
@@ -21,6 +22,8 @@ import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.AdInfo;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
+import com.kaltura.playkit.plugins.imadai.IMADAIPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         createMediaConfig();
 
         //Create plugin configurations.
-        PKPluginConfigs pluginConfigs = createIMAPlugin();
+        PKPluginConfigs pluginConfigs = createIMADAIPlugin();
 
         //Create instance of the player with plugin configurations.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
@@ -80,38 +83,152 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return - {@link PKPluginConfigs} object with IMAPlugin.
      */
-    private PKPluginConfigs createIMAPlugin() {
+    private PKPluginConfigs createIMADAIPlugin() {
 
-        //First register your IMAPlugin.
-        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+        //First register your IMADAIPlugin.
+        PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
 
         //Initialize plugin configuration object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
 
-        //Initialize imaConfigs object.
-        IMAConfig imaConfig = new IMAConfig();
+        //Initialize + Configure  IMADAIConfig object.
+        IMADAIConfig adsConfigVodHls1 = getDAIConfigVodHls1().enableDebugMode(true).setAlwaysStartWithPreroll(true);
+        IMADAIConfig adsConfigVodLive = getDAIConfigLiveHls().enableDebugMode(true).setAlwaysStartWithPreroll(true);
+        IMADAIConfig adsConfigVodDash = getDAIConfigVodDash().enableDebugMode(true).setAlwaysStartWithPreroll(true);
+        IMADAIConfig adsConfigError = getDAIConfigError().enableDebugMode(true).setAlwaysStartWithPreroll(true);
 
-        //Configure ima.
-        imaConfig.setAdTagURL(AD_TAG_URL);
-        imaConfig.setVideoBitrate(PREFERRED_AD_BITRATE);
-        imaConfig.setAlwaysStartWithPreroll(true);
-        imaConfig.enableDebugMode(true);
+        IMADAIConfig adsConfigVodHls2 = getDAIConfigVodHls2().enableDebugMode(true).setAlwaysStartWithPreroll(true);
+        IMADAIConfig adsConfigVodHls3 = getDAIConfigVodHls3().enableDebugMode(true).setAlwaysStartWithPreroll(true);
+
+
+
+        IMADAIConfig adsConfigVodHls4 = getDAIConfigVodHls4().enableDebugMode(true).setAlwaysStartWithPreroll(true);
 
         /* For MOAT call this API:
         List<View> overlaysList = new ArrayList<>();
-        overlaysList.add(....)
-        imaConfig.setControlsOverlayList(overlaysList);
+        //overlaysList.add(....)
+        adsConfigVodHls4.setControlsOverlayList(overlaysList);
         */
 
         //Set jsonObject to the main pluginConfigs object.
-        pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfig);
+        pluginConfigs.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigVodHls1);
 
-
-       
+        /*
+            NOTE!  for change media before player.prepare api please call:
+            player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigVodHls2());
+        */
 
         //Return created PluginConfigs object.
         return pluginConfigs;
     }
+
+    private IMADAIConfig getDAIConfigLiveHls() {
+        String assetTitle = "Live Video - Big Buck Bunny";
+        String assetKey = "sN_IYUG8STe1ZzhIIE_ksA";
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getLiveIMADAIConfig(assetTitle,
+                assetKey,
+                apiKey,
+                streamFormat,
+                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfigVodHls1() {
+        String assetTitle = "VOD - Tears of Steel";
+        String apiKey = null;
+        String contentSourceId = "19463";
+        String videoId = "tears-of-steel";
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+
+        return IMADAIConfig.getVodIMADAIConfig(assetTitle,
+                contentSourceId,
+                videoId,
+                apiKey,
+                streamFormat,
+                licenseUrl).enableDebugMode(true).setAlwaysStartWithPreroll(true);
+    }
+
+    private IMADAIConfig getDAIConfigVodHls2() {
+        String assetTitle = "VOD - Google I/O";
+        String apiKey = null;
+        String contentSourceId = "19463";
+        String videoId = "googleio-highlights";
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getVodIMADAIConfig(assetTitle,
+                contentSourceId,
+                videoId,
+                apiKey,
+                streamFormat,
+                licenseUrl).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfigVodHls3() {
+        String assetTitle = "HLS3";
+        String apiKey = null;
+        String contentSourceId = "19823";
+        String videoId = "ima-test";
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getVodIMADAIConfig(assetTitle,
+                contentSourceId,
+                videoId,
+                apiKey,
+                streamFormat,
+                licenseUrl).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfigVodHls4() {
+        String assetTitle3 = "HLS4";
+        String assetKey3 = null;
+        String apiKey3 = null;
+        String contentSourceId3 = "2472176";
+        String videoId3 = "2504847";
+        StreamRequest.StreamFormat streamFormat3 = StreamRequest.StreamFormat.HLS;
+        String licenseUrl3 = null;
+        return IMADAIConfig.getVodIMADAIConfig(assetTitle3,
+                contentSourceId3,
+                videoId3,
+                apiKey3,
+                streamFormat3,
+                licenseUrl3);
+    }
+
+    private IMADAIConfig getDAIConfigVodDash() {
+        String assetTitle = "BBB-widevine";
+        String apiKey = null;
+        String contentSourceId = "2474148";
+        String videoId = "bbb-widevine";
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.DASH;
+        String licenseUrl = "https://proxy.uat.widevine.com/proxy";
+        return IMADAIConfig.getVodIMADAIConfig(assetTitle,
+                contentSourceId,
+                videoId,
+                apiKey,
+                streamFormat,
+                licenseUrl).enableDebugMode(true);
+    }
+
+
+    private IMADAIConfig getDAIConfigError() {
+        String assetTitle = "ERROR";
+        String assetKey = null;
+        String apiKey = null;
+        String contentSourceId = "19823";
+        String videoId = "ima-test";
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getVodIMADAIConfig(assetTitle,
+                contentSourceId + "AAAA",
+                videoId,
+                apiKey,
+                streamFormat,
+                licenseUrl).enableDebugMode(true);
+    }
+
 
     /**
      * Will subscribe to ad events.

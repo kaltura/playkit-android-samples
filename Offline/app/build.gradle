@@ -27,14 +27,14 @@ android {
 }
 
 dependencies {
-    //implementation 'com.kaltura.playkit:playkit:3.7.1'
-    //implementation 'com.kaltura.playkit:playkitproviders:3.7.1'
+    implementation 'com.kaltura.playkit:playkit:3.9.0'
+    implementation 'com.kaltura.playkit:playkitproviders:3.9.0'
 
 //    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
 
-    implementation project(':playkit')
-    implementation project(':providers')
+//    implementation project(':playkit')
+//    implementation project(':providers')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 

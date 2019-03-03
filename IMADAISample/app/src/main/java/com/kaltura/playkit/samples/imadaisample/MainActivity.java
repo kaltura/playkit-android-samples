@@ -100,15 +100,12 @@ public class MainActivity extends AppCompatActivity {
 
         IMADAIConfig adsConfigVodHls2 = getDAIConfigVodHls2().enableDebugMode(true).setAlwaysStartWithPreroll(true);
         IMADAIConfig adsConfigVodHls3 = getDAIConfigVodHls3().enableDebugMode(true).setAlwaysStartWithPreroll(true);
-
-
-
         IMADAIConfig adsConfigVodHls4 = getDAIConfigVodHls4().enableDebugMode(true).setAlwaysStartWithPreroll(true);
 
         /* For MOAT call this API:
-        List<View> overlaysList = new ArrayList<>();
-        //overlaysList.add(....)
-        adsConfigVodHls4.setControlsOverlayList(overlaysList);
+            List<View> overlaysList = new ArrayList<>();
+            //overlaysList.add(....)
+            adsConfigVodHls4.setControlsOverlayList(overlaysList);
         */
 
         //Set jsonObject to the main pluginConfigs object.

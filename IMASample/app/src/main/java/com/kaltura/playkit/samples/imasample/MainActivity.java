@@ -90,18 +90,25 @@ public class MainActivity extends AppCompatActivity {
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
 
         //Initialize imaConfigs object.
-        IMAConfig imaConfigs = new IMAConfig();
+        IMAConfig imaConfig = new IMAConfig();
 
         //Configure ima.
-        imaConfigs.setAdTagURL(AD_TAG_URL);
-        imaConfigs.setVideoBitrate(PREFERRED_AD_BITRATE);
-        imaConfigs.enableDebugMode(true);
+        imaConfig.setAdTagURL(AD_TAG_URL);
+        imaConfig.setVideoBitrate(PREFERRED_AD_BITRATE);
+        imaConfig.enableDebugMode(true);
 
-        //Convert imaConfigs to jsonObject.
-        JsonObject imaConfigJsonObject = imaConfigs.toJSONObject();
+        /* For MOAT call this API:
+            List<View> overlaysList = new ArrayList<>();
+            //overlaysList.add(....)
+            imaConfig.setControlsOverlayList(overlaysList);
+        */
 
         //Set jsonObject to the main pluginConfigs object.
-        pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfigJsonObject);
+        pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfig);
+        /*
+            NOTE!  for change media before player.prepare api please call:
+            player.updatePluginConfig(IMAlugin.factory.getName(), imaConfig);
+        */
 
         //Return created PluginConfigs object.
         return pluginConfigs;

@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isDAIMode = true;
+    private boolean isDAIMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

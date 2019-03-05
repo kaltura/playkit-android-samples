@@ -122,7 +122,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         removeCallbacks(updateProgressAction);
         // Schedule an update if necessary.
         if (playerState != PlayerState.IDLE) {
-            long delayMs = 200;
+            long delayMs = 500;
             postDelayed(updateProgressAction, delayMs);
         }
     }

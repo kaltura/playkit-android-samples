@@ -29,6 +29,16 @@
       }
     ]
   },
+  "dash_multi": {
+    "id": "0_pl5lbfo0",
+    "sources": [
+      {
+        "id": "0_pl5lbfo0_dash",
+        "url": "http://externaltests.dev.kaltura.com/player/library_Player_V3/Clive/my.mpd",
+        "mimeType": "application/dash+xml"
+      }
+    ]
+  },
   "dash": {
     "duration": 102000,
     "id": "1_1h1vsv3z",
@@ -83,17 +93,28 @@
       }
     ]
   },
-
-  "live": {
+  "harold": {
     "duration": 102000,
-    "id": "0_f8re4ujs",
-    "name": "Live",
+    "id": "0_uka1msg4",
+    "name": "Harold",
     "sources": [
       {
-        "id": "0_f8re4ujs_live",
+        "id": "0_uka1msg4",
         "mimeType": "application/x-mpegURL",
-        "url": "http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_f8re4ujs/format/applehttp/protocol/http/uiConfId/15068781/a.m3u8"
+        "url": "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8"
       }
     ]
-  }
+  },
+"live": {
+  "duration": 102000,
+  "id": "0_f8re4ujs",
+  "name": "Live",
+  "sources": [
+    {
+      "id": "0_f8re4ujs_live",
+      "mimeType": "application/x-mpegURL",
+      "url": "http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_f8re4ujs/format/applehttp/protocol/http/uiConfId/15068781/a.m3u8"
+    }
+  ]
+}
 }

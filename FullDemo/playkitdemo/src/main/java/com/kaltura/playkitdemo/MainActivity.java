@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isAdsEnabled = true;       
+    private boolean isAdsEnabled = true;
     private boolean isDAIMode = false;
 
     @Override
@@ -443,58 +443,58 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             initSpinners();
         } else {
             if (changeMediaIndex % 4 == 0) {
-                if (isAdsEnabled) {    
+                if (isAdsEnabled) {
                     if (isDAIMode) {
                         promptMessage(DAI_PLUGIN, getDAIConfig2().getAssetTitle());
                         player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig2());
-                     } else {
-                         log.d("Play Ad preMidPostAdTagUrl");
-                          promptMessage(IMA_PLUGIN, "preMidPostAdTagUrl");
-                          player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostAdTagUrl));
-                     }
+                    } else {
+                        log.d("Play Ad preMidPostAdTagUrl");
+                        promptMessage(IMA_PLUGIN, "preMidPostAdTagUrl");
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostAdTagUrl));
+                    }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preMidPostAdTagUrl media2"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(2222401, "1_f93tepsn"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(2222401, "1_f93tepsn"));
 
             } else if (changeMediaIndex % 4 == 1) {
-                if (isAdsEnabled) {     
-                   if (isDAIMode) {
-                       promptMessage(DAI_PLUGIN, getDAIConfig3().getAssetTitle());
-                       player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig3());
-                   } else {
-                       log.d("Play Ad inLinePreAdTagUrl");
-                       promptMessage(IMA_PLUGIN, "inLinePreAdTagUrl");
-                       player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(inLinePreAdTagUrl));
-                   }
+                if (isAdsEnabled) {
+                    if (isDAIMode) {
+                        promptMessage(DAI_PLUGIN, getDAIConfig3().getAssetTitle());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig3());
+                    } else {
+                        log.d("Play Ad inLinePreAdTagUrl");
+                        promptMessage(IMA_PLUGIN, "inLinePreAdTagUrl");
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(inLinePreAdTagUrl));
+                    }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(true, "inLinePreAdTagUrl media3"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1740481, "1_fdv46dba"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1740481, "1_fdv46dba"));
             } if (changeMediaIndex % 4 == 2) {
-                if (isAdsEnabled) {    
-                   if (isDAIMode) {
-                       promptMessage(DAI_PLUGIN, getDAIConfig4().getAssetTitle());
-                       player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig4());
-                   } else {
-                       log.d("Play NO Ad");
-                       promptMessage(IMA_PLUGIN, "Enpty AdTag");
-                       player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(""));
-                   }
+                if (isAdsEnabled) {
+                    if (isDAIMode) {
+                        promptMessage(DAI_PLUGIN, getDAIConfig4().getAssetTitle());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig4());
+                    } else {
+                        log.d("Play NO Ad");
+                        promptMessage(IMA_PLUGIN, "Enpty AdTag");
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(""));
+                    }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "NO AD media4"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1091, "0_wu32qrt3"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1091, "0_wu32qrt3"));
             } if (changeMediaIndex % 4 == 3) {
-                if (isAdsEnabled) { 
-                   if (isDAIMode) {
-                      promptMessage(DAI_PLUGIN, getDAIConfig5().getAssetTitle());
-                      player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig5());
-                   } else {
-                       log.d("Play Ad preSkipAdTagUrl");
-                       promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
-                       player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSkipAdTagUrl));
-                   }
+                if (isAdsEnabled) {
+                    if (isDAIMode) {
+                        promptMessage(DAI_PLUGIN, getDAIConfig5().getAssetTitle());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig5());
+                    } else {
+                        log.d("Play Ad preSkipAdTagUrl");
+                        promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSkipAdTagUrl));
+                    }
                 }
                 player.getSettings().setPlayerBuffers(new LoadControlBuffers().
                         setMinPlayerBufferMs(2500).
@@ -525,12 +525,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
-        if (isAdsEnabled) {     
-           if (isDAIMode) {
-              addIMADAIPluginConfig(pluginConfigs, 1);
-           } else {
-               addIMAPluginConfig(pluginConfigs);
-           }
+        if (isAdsEnabled) {
+            if (isDAIMode) {
+                addIMADAIPluginConfig(pluginConfigs, 1);
+            } else {
+                addIMAPluginConfig(pluginConfigs);
+            }
         }
         //addKaluraStatsPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
         addYouboraPluginConfig(pluginConfigs, false, "preMidPostSingleAdTagUrl Title1");

@@ -496,10 +496,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSkipAdTagUrl));
                     }
                 }
-                player.getSettings().setPlayerBuffers(new LoadControlBuffers().
-                        setMinPlayerBufferMs(2500).
-                        setMaxPlayerBufferMs(50000));
-
+                
                 player.getSettings().setPlayerBuffers(new LoadControlBuffers().
                         setMinPlayerBufferMs(2500).
                         setMaxPlayerBufferMs(50000).setAllowedVideoJoiningTimeMs(4000));

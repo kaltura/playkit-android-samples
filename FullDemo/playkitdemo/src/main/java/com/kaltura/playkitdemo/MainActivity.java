@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static Long START_POSITION = 0L;//65L;
 
     String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
-    String preSKipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+    String preSkipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
     String inLinePreAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
     String preMidPostSingleAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
     String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
@@ -491,9 +491,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                       promptMessage(DAI_PLUGIN, getDAIConfig5().getAssetTitle());
                       player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig5());
                    } else {
-                       log.d("Play Ad preSKipAdTagUrl");
-                       promptMessage(IMA_PLUGIN, "preSKipAdTagUrl");
-                       player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSKipAdTagUrl));
+                       log.d("Play Ad preSkipAdTagUrl");
+                       promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
+                       player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSkipAdTagUrl));
                    }
                 }
                 player.getSettings().setPlayerBuffers(new LoadControlBuffers().
@@ -504,7 +504,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         setMinPlayerBufferMs(2500).
                         setMaxPlayerBufferMs(50000).setAllowedVideoJoiningTimeMs(4000));
 
-                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preSKipAdTagUrl media1"));
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preSkipAdTagUrl media1"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1734751, "1_3o1seqnv"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1734751, "1_3o1seqnv"));
             }
@@ -637,8 +637,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
 
-        log.d("Play Ad preSKipAdTagUrl");
-        promptMessage(IMA_PLUGIN, "preSKipAdTagUrl");
+        log.d("Play Ad preSkipAdTagUrl");
+        promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
         IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }

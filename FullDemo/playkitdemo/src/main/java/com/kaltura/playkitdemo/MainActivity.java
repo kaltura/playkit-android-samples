@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
         //startSimpleOvpMediaLoadingVR(playLoadedEntry);
-      startSimpleOvpMediaLoadingHls(playLoadedEntry);
+        startSimpleOvpMediaLoadingHls(playLoadedEntry);
 //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
 //      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
@@ -635,8 +635,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private IMAConfig getAdsConfig(String adTagUrl) {
         List<String> videoMimeTypes = new ArrayList<>();
         videoMimeTypes.add("video/mp4");
-         videoMimeTypes.add("application/x-mpegURL");
-         videoMimeTypes.add("application/dash+xml");
+        videoMimeTypes.add("application/x-mpegURL");
+        videoMimeTypes.add("application/dash+xml");
         return new IMAConfig().setAdTagURL(adTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
     }
 

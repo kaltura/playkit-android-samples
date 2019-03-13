@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String LICENSE_URL = null;
 
     private Player player;
-    private PKMediaConfig mediaConfig;
     private Button playPauseButton;
 
     @Override
@@ -35,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Initialize media config object.
-        createMediaConfig();
+        PKMediaConfig mediaConfig = createMediaConfig();
 
         //Create instance of the player without plugins.
         player = PlayKitManager.loadPlayer(this, null);
@@ -56,9 +55,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Will create {@link } object.
      */
-    private void createMediaConfig() {
+    private PKMediaConfig createMediaConfig() {
         //First. Create PKMediaConfig object.
-        mediaConfig = new PKMediaConfig();
+        PKMediaConfig mediaConfig = new PKMediaConfig();
 
         //Set start position of the media. This will
         //automatically start playback from specified position.
@@ -69,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
+
+        return mediaConfig;
     }
 
     /**

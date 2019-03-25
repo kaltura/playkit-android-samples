@@ -124,9 +124,9 @@ public class MainActivity extends AppCompatActivity {
         //Optional - Device json o/w youbora will decide by its own.
         JsonObject deviceJson = new JsonObject();
         deviceJson.addProperty("deviceCode", "AndroidTV");
-        deviceJson.addProperty("brand", "Xiomi");
-        deviceJson.addProperty("model", "Mi3");
-        deviceJson.addProperty("type", "tv");
+        deviceJson.addProperty("brand", "Xiaomi");
+        deviceJson.addProperty("model", "Mii3");
+        deviceJson.addProperty("type", "TvBox");
         deviceJson.addProperty("osName", "Android/Oreo");
         deviceJson.addProperty("osVersion", "8.1");
 

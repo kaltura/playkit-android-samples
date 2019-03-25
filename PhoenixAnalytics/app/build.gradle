@@ -30,20 +30,20 @@ configurations.all {
 }
 
 dependencies {
-//    implementation 'com.kaltura.playkit:playkit:3.7.1'
-//    implementation 'com.kaltura.playkit:playkitproviders:3.7.1'
-//    implementation 'com.kaltura.playkit:vrplugin:3.7.1'
-//    implementation 'com.kaltura.playkit:kavaplugin:3.7.1'
+    implementation 'com.kaltura.playkit:playkit:3.9.2'
+    implementation 'com.kaltura.playkit:playkitproviders:3.9.2'
+    implementation 'com.kaltura.playkit:vrplugin:3.9.2'
+    implementation 'com.kaltura.playkit:kavaplugin:3.9.2'
 
 //    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-vr:develop-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
 
-    implementation project(':playkit')
-    implementation project(':providers')
-    implementation project(':playkitvr')
-    implementation project(':kava')
+//    implementation project(':playkit')
+//    implementation project(':providers')
+//    implementation project(':playkitvr')
+//    implementation project(':kava')
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

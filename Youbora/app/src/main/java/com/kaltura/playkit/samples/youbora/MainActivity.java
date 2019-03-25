@@ -121,6 +121,15 @@ public class MainActivity extends AppCompatActivity {
         mediaEntryJson.addProperty("isLive", IS_LIVE);
         mediaEntryJson.addProperty("title", MEDIA_TITLE);
 
+        //Optional - Device json o/w youbora will decide by its own.
+        JsonObject deviceJson = new JsonObject();
+        deviceJson.addProperty("deviceCode", "AndroidTV");
+        deviceJson.addProperty("brand", "Xiomi");
+        deviceJson.addProperty("model", "Mi3");
+        deviceJson.addProperty("type", "tv");
+        deviceJson.addProperty("osName", "Android/Oreo");
+        deviceJson.addProperty("osVersion", "8.1");
+
         //Youbora ads configuration json.
         JsonObject adsJson = new JsonObject();
         adsJson.addProperty("adsExpected", true);
@@ -150,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Add all the json objects created before to the pluginEntry json.
         youboraConfigJson.add("media", mediaEntryJson);
+        youboraConfigJson.add("device", deviceJson);
         youboraConfigJson.add("ads", adsJson);
         youboraConfigJson.add("properties", propertiesJson);
         youboraConfigJson.add("extraParams", extraParamJson);

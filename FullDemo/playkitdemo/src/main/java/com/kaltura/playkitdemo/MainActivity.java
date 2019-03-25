@@ -583,14 +583,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         pluginEntry.addProperty("enableSmartAds", true);
 
 
-//        //Device json.
-//        JsonObject deviceJson = new JsonObject();
-//        deviceJson.addProperty("deviceCode", "AndroidTV");
-//        deviceJson.addProperty("brand", "Xiomi");
-//        deviceJson.addProperty("model", "Mi3");
-//        deviceJson.addProperty("type", "tv");
-//        deviceJson.addProperty("osName", "Android/Oreo");
-//        deviceJson.addProperty("osVersion", "8.1");
+        //Optional - Device json o/w youbora will decide by its own.
+        JsonObject deviceJson = new JsonObject();
+        deviceJson.addProperty("deviceCode", "AndroidTV");
+        deviceJson.addProperty("brand", "Xiomi");
+        deviceJson.addProperty("model", "Mi3");
+        deviceJson.addProperty("type", "tv");
+        deviceJson.addProperty("osName", "Android/Oreo");
+        deviceJson.addProperty("osVersion", "8.1");
 
 
         //Media entry json.
@@ -626,7 +626,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         extraParamJson.addProperty("param2", "param2");
 
         //Add all the json objects created before to the pluginEntry json.
-        //pluginEntry.add("device", deviceJson);
+        pluginEntry.add("device", deviceJson);
         pluginEntry.add("media", mediaEntryJson);
         pluginEntry.add("ads", adsJson);
         pluginEntry.add("properties", propertiesJson);

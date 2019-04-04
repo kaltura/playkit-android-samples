@@ -648,7 +648,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         videoMimeTypes.add("video/mp4");
         videoMimeTypes.add("application/x-mpegURL");
         videoMimeTypes.add("application/dash+xml");
-        return new IMAConfig().setAdTagURL(adTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
+        return new IMAConfig().setAdTagUrl(adTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
     }
 
 

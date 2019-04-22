@@ -19,6 +19,8 @@ project(':kava').projectDir = new File('../../playkit-android-kava/kavaplugin')
 include ':googlecast'
 project(':googlecast').projectDir = new File('../../playkit-android-googlecast/googlecast')
 
+include ':fbads'
+project(':fbads').projectDir = new File('../../playkit-android-fb-ads/fbadsplugin')
 
 //include ':admanager'
 //project(':admanager').projectDir = new File(settingsDir, '../../playkit-admanager-android/admanager')

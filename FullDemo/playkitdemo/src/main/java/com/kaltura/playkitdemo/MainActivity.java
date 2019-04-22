@@ -50,10 +50,11 @@ import com.kaltura.playkit.plugins.SamplePlugin;
 import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.AdPositionType;
-import com.kaltura.playkit.plugins.fbinstream.FBInStreamAd;
-import com.kaltura.playkit.plugins.fbinstream.FBInStreamAdBreak;
-import com.kaltura.playkit.plugins.fbinstream.FBInstreamConfig;
-import com.kaltura.playkit.plugins.fbinstream.FBInstreamPlugin;
+
+import com.kaltura.playkit.plugins.fbads.fbinstream.FBInStreamAd;
+import com.kaltura.playkit.plugins.fbads.fbinstream.FBInStreamAdBreak;
+import com.kaltura.playkit.plugins.fbads.fbinstream.FBInstreamConfig;
+import com.kaltura.playkit.plugins.fbads.fbinstream.FBInstreamPlugin;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
 //import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
@@ -637,7 +638,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         preRollFBInStreamAdList.add(preRoll1);
         //preRollFBInStreamAdList.add(preRoll2);
         FBInStreamAdBreak preRollAdBreak = new FBInStreamAdBreak(AdPositionType.PRE_ROLL, 0L, preRollFBInStreamAdList);
-
 
         List<FBInStreamAd> midRoll1FBInStreamAdList = new ArrayList<>();
         FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 60000, 0);

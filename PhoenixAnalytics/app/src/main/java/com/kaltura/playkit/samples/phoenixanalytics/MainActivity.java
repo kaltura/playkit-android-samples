@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribePhoenixAnalyticsReportEvent() {
         //Subscribe to the event.
-        player.addListener(this, PhoenixAnalyticsEvent.phoenixAnalyticsReport, event -> {
+        player.addListener(this, PhoenixAnalyticsEvent.reportSent, event -> {
             PhoenixAnalyticsEvent.PhoenixAnalyticsReport reportEvent = event;
 
             //Get the event name from the report.

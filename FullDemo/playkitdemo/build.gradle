@@ -42,6 +42,7 @@ dependencies {
     implementation project(path: ':youbora')
     implementation project(path: ':kava')
     implementation project(path: ':googlecast')
+    implementation project(path: ':fbads')
 
 //    implementation 'com.kaltura.playkit:playkit:3.6.2'
 //    implementation 'com.kaltura.playkit:playkitproviders:1.0.3'

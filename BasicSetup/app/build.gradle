@@ -30,26 +30,18 @@ configurations.all {
 }
 
 dependencies {
-//    implementation 'com.kaltura.playkit:playkit:3.7.1'
-//    implementation 'com.kaltura.playkit:playkitproviders:3.7.1'
+    implementation 'com.kaltura.playkit:playkit:3.9.1'
 
 //    implementation ('com.kaltura:playkit-android:dev-SNAPSHOT')
-//    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
 
-    implementation project(":playkit")
-    implementation project(':providers')
+//    implementation project(":playkit")
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
     implementation 'com.android.support:appcompat-v7:28.0.0', {
         exclude group: 'com.android.support', module: 'support-v4'
     }
     implementation 'com.android.support:design:28.0.0', {
         exclude group: 'com.android.support', module: 'support-v4'
     }
-    testImplementation 'junit:junit:4.12'
 }
 
 repositories {

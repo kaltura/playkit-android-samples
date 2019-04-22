@@ -188,11 +188,6 @@ public class SamplePlugin extends PKPlugin {
             }
 
             @Override
-            public void prepareNext(@NonNull PKMediaConfig mediaConfig) {
-                super.prepareNext(mediaConfig);
-            }
-
-            @Override
             public long getBufferedPosition() {
                 return super.getBufferedPosition();
             }

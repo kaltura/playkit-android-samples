@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final String TAG = "MainActivity";
     //The url of the source to play
  //   private static final String SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8";
-    private static final String SOURCE_URL = "http://api-preprod.ott.kaltura.com/v4_2/api_v3/service/assetFile/action/playManifest/partnerId/198/assetId/259295/assetType/media/assetFileId/516109/contextType/PLAYBACK/a.m3u8";
+    private static final String SOURCE_URL = "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
 
     // Source to see subtitles any source can be used
     //   private static final String SOURCE_URL = "http://www.streambox.fr/playlists/test_001/stream.m3u8";
@@ -126,14 +126,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         PKExternalSubtitle pkExternalSubtitle = new PKExternalSubtitle()
                 .setUrl("http://brenopolanski.com/html5-video-webvtt-example/MIB2-subtitles-pt-BR.vtt")
                 .setMimeType(PKSubtitleFormat.vtt)
-                .setLabel("de")
+                .setLabel("External_Deutsch")
                 .setLanguage("deu");
         mList.add(pkExternalSubtitle);
 
         PKExternalSubtitle pkExternalSubtitleDe = new PKExternalSubtitle()
                 .setUrl("https://mkvtoolnix.download/samples/vsshort-en.srt")
                 .setMimeType(PKSubtitleFormat.srt)
-                .setLabel("en")
+                .setLabel("External_English")
                 .setLanguage("eng")
                 .setDefault();
         mList.add(pkExternalSubtitleDe);

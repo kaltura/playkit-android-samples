@@ -496,10 +496,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSkipAdTagUrl));
                     }
                 }
-                player.getSettings().setPlayerBuffers(new LoadControlBuffers().
-                        setMinPlayerBufferMs(2500).
-                        setMaxPlayerBufferMs(50000));
-
+                
                 player.getSettings().setPlayerBuffers(new LoadControlBuffers().
                         setMinPlayerBufferMs(2500).
                         setMaxPlayerBufferMs(50000).setAllowedVideoJoiningTimeMs(4000));
@@ -586,6 +583,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         pluginEntry.addProperty("enableSmartAds", true);
 
 
+        //Optional - Device json o/w youbora will decide by its own.
+        JsonObject deviceJson = new JsonObject();
+        deviceJson.addProperty("deviceCode", "AndroidTV");
+        deviceJson.addProperty("brand", "Xiaomi");
+        deviceJson.addProperty("model", "Mii3");
+        deviceJson.addProperty("type", "TvBox");
+        deviceJson.addProperty("osName", "Android/Oreo");
+        deviceJson.addProperty("osVersion", "8.1");
+
+
         //Media entry json.
         JsonObject mediaEntryJson = new JsonObject();
         mediaEntryJson.addProperty("isLive", isLive);
@@ -619,6 +626,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         extraParamJson.addProperty("param2", "param2");
 
         //Add all the json objects created before to the pluginEntry json.
+        pluginEntry.add("device", deviceJson);
         pluginEntry.add("media", mediaEntryJson);
         pluginEntry.add("ads", adsJson);
         pluginEntry.add("properties", propertiesJson);

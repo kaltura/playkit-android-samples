@@ -14,6 +14,7 @@ import com.kaltura.netkit.utils.OnCompletion;
 import com.kaltura.netkit.utils.SessionProvider;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
+import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
@@ -36,13 +37,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //Phoenix analytics constants
-    private static final String PHOENIX_ANALYTICS_BASE_URL = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/"; // analytics base url
+    private static final String PHOENIX_ANALYTICS_BASE_URL = "https://api-preprod.ott.kaltura.com/v5_1_0/api_v3/"; // analytics base url
     private static final int PHOENIX_ANALYTICS_PARTNER_ID = 198; // your OTT partner id
     private static final String PHOENIX_ANALYTICS_KS = "";
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
     //Phoenix provider constans.
-    private static final String PHOENIX_PROVIDER_BASE_URL = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/"; //your provider base url
+    private static final String PHOENIX_PROVIDER_BASE_URL = "https://api-preprod.ott.kaltura.com/v5_1_0/api_v3/"; //your provider base url
     private static final String PHOENIX_PROVIDER_KS = ""; // your user ks if required
     private static final int PHOENIX_PROVIDER_PARTNER_ID = 198; // your OTT partner id
     private static final String FORMAT = "Mobile_Devices_Main_SD";
@@ -67,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
+        player.getSettings().setAllowCrossProtocolRedirect(true);
+        player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls); // usually dash
 
         //Subscribe to analytics report event.
         subscribePhoenixAnalyticsEvents();
@@ -192,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         mediaProvider.setAssetReferenceType(APIDefines.AssetReferenceType.Media);
         mediaProvider.setContextType(APIDefines.PlaybackContextType.Playback);
         mediaProvider.setFormats(FORMAT);
+        mediaProvider.setProtocol(PhoenixMediaProvider.HttpProtocol.Http); // usually HTTPS
 
         //Set session provider to media provider.
         mediaProvider.setSessionProvider(sessionProvider);

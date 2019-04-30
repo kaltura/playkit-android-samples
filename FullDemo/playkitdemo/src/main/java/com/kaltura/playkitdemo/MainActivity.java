@@ -498,8 +498,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         promptMessage(DAI_PLUGIN, getDAIConfig2().getAssetTitle());
                         player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig2());
                     } else {
-                        log.d("Play Ad preMidPostAdTagUrl");
-                        promptMessage(IMA_PLUGIN, "preMidPostAdTagUrl");
+                        log.d("AUDIO ONLY Play Ad preMidPostAdTagUrl");
+                        promptMessage(IMA_PLUGIN, "AUDIO ONLY preMidPostAdTagUrl");
                         player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostAdTagUrl));
                     }
                 }
@@ -529,7 +529,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig4());
                     } else {
                         log.d("Play NO Ad");
-                        promptMessage(IMA_PLUGIN, "Enpty AdTag");
+                        promptMessage(IMA_PLUGIN, "Empty AdTag");
                         player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(""));
                     }
                 }

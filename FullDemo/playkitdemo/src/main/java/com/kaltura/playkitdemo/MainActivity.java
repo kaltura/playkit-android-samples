@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
 import android.os.Bundle;
@@ -82,8 +80,6 @@ import com.kaltura.playkit.providers.mock.MockMediaProvider;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
 import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.utils.Consts;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -142,6 +138,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //getPermissionToReadExternalStorage();
+        artworkDrawable = getResources().getDrawable( R.drawable.harold);
+
         initDrm();
         try {
             ProviderInstaller.installIfNeeded(this);
@@ -161,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(View v) {
                 if (player != null) {
                     changeMediaIndex++;
-                    artworkDrawable = null;
                     OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
                     if (changeMediaIndex % 4 == 0) {
                         getDrawableForAudioContent(playLoadedEntry);
@@ -213,23 +210,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void getDrawableForAudioContent(OnMediaLoadCompletion playLoadedEntry) {
-        Picasso.get().load(audioOnlyDrawable).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                artworkDrawable = new BitmapDrawable(getResources(), bitmap);
-                startMockAudioOnlyContent(playLoadedEntry);
-            }
-
-            @Override
-            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
+        startMockAudioOnlyContent(playLoadedEntry);
     }
 
     private void getPermissionToReadExternalStorage() {
@@ -374,11 +355,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .load(completion);
     }
 
-    private void startMockMediaLoading(OnMediaLoadCompletion completion) {
-
+    private void startMockMediaLoading(OnMediaLoadCompletion playLoadedEntry) {
         mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "mp4");
-
-        mediaProvider.load(completion);
+        mediaProvider.load(playLoadedEntry);
     }
 
     private void startMockAudioOnlyContent(OnMediaLoadCompletion playLoadedEntry) {
@@ -447,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             START_POSITION = null; // force live streams to play from live edge
         }
 
-        if (artworkDrawable != null) {
+        if (changeMediaIndex % 4 == 0) {
             List<PKExternalSubtitle> mList = new ArrayList<>();
             PKExternalSubtitle pkExternalSubtitle = new PKExternalSubtitle()
                     .setMimeType(PKSubtitleFormat.vtt)
@@ -498,8 +477,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         promptMessage(DAI_PLUGIN, getDAIConfig2().getAssetTitle());
                         player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig2());
                     } else {
-                        log.d("Play Ad preMidPostAdTagUrl");
-                        promptMessage(IMA_PLUGIN, "preMidPostAdTagUrl");
+                        log.d("AUDIO OLNY Play Ad preMidPostAdTagUrl");
+                        promptMessage(IMA_PLUGIN, "AUDIO OLNY preMidPostAdTagUrl");
                         player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostAdTagUrl));
                     }
                 }
@@ -529,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig4());
                     } else {
                         log.d("Play NO Ad");
-                        promptMessage(IMA_PLUGIN, "Enpty AdTag");
+                        promptMessage(IMA_PLUGIN, "Empty AdTag");
                         player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(""));
                     }
                 }

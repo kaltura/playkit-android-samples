@@ -460,7 +460,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mediaEntry.setArtworkDrawable(artworkDrawable);
         }
 
-
         PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(START_POSITION);
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         if (player == null) {

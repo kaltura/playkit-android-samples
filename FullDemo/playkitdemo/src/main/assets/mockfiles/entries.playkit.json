@@ -105,16 +105,28 @@
       }
     ]
   },
-"live": {
-  "duration": 102000,
-  "id": "0_f8re4ujs",
-  "name": "Live",
-  "sources": [
-    {
-      "id": "0_f8re4ujs_live",
-      "mimeType": "application/x-mpegURL",
-      "url": "http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_f8re4ujs/format/applehttp/protocol/http/uiConfId/15068781/a.m3u8"
-    }
-  ]
-}
+  "live": {
+    "duration": 102000,
+    "id": "0_f8re4ujs",
+    "name": "Live",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live",
+        "mimeType": "application/x-mpegURL",
+        "url": "http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_f8re4ujs/format/applehttp/protocol/http/uiConfId/15068781/a.m3u8"
+      }
+    ]
+  },
+  "audioonly": {
+    "duration": 102000,
+    "id": "1_o8ngrq02",
+    "name": "audioonly",
+    "sources": [
+      {
+        "id": "1_o8ngrq02",
+        "url": "http://www.largesound.com/ashborytour/sound/brobob.mp3",
+        "mimeType": "audio/mpeg"
+      }
+    ]
+  }
 }

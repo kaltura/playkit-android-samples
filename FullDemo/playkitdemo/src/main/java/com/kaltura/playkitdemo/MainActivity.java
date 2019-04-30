@@ -4,6 +4,9 @@ import android.Manifest;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -41,6 +44,7 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
+import com.kaltura.playkit.PKSubtitleFormat;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -49,6 +53,7 @@ import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
 import com.kaltura.playkit.player.LoadControlBuffers;
 import com.kaltura.playkit.player.MediaSupport;
+import com.kaltura.playkit.player.PKExternalSubtitle;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.TextTrack;
 import com.kaltura.playkit.player.VideoTrack;
@@ -77,6 +82,8 @@ import com.kaltura.playkit.providers.mock.MockMediaProvider;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
 import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.utils.Consts;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,10 +113,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static Long START_POSITION = 0L;//65L;
 
     String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
-    String preSkipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+    String preSkipAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
     String inLinePreAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
     String preMidPostSingleAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
     String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
+    String audioOnlyDrawable = "http://cfvod.kaltura.com/p/243342/sp/24334200/thumbnail/entry_id/0_uka1msg4/version/100007/width/1200/hight/780";
 
     private Player player;
     private MediaEntryProvider mediaProvider;
@@ -128,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private PKTracks tracksInfo;
     private boolean isAdsEnabled = true;
     private boolean isDAIMode = false;
+    private Drawable artworkDrawable = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,16 +161,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onClick(View v) {
                 if (player != null) {
                     changeMediaIndex++;
+                    artworkDrawable = null;
                     OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
                     if (changeMediaIndex % 4 == 0) {
-                        startSimpleOvpMediaLoadingDRM(playLoadedEntry);
+                        getDrawableForAudioContent(playLoadedEntry);
+                        //startSimpleOvpMediaLoadingDRM(playLoadedEntry);
                         //startSimpleOvpMediaLoadingVR(playLoadedEntry);
                         //startMockMediaLoading(playLoadedEntry);
                     } else if (changeMediaIndex % 4 == 1) {
                         startSimpleOvpMediaLoadingHls(playLoadedEntry);
-                    } if (changeMediaIndex % 4 == 2) {
+                    }
+                    if (changeMediaIndex % 4 == 2) {
                         startSimpleOvpMediaLoadingClear(playLoadedEntry);
-                    } if (changeMediaIndex % 4 == 3) {
+                    }
+                    if (changeMediaIndex % 4 == 3) {
                         startSimpleOvpMediaLoadingHls(playLoadedEntry);
                     }
                 }
@@ -182,20 +195,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //      startOttMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
-        playerContainer = (RelativeLayout)findViewById(R.id.player_container);
-        spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
-        fullScreenBtn = (AppCompatImageView)findViewById(R.id.full_screen_switcher);
+        playerContainer = (RelativeLayout) findViewById(R.id.player_container);
+        spinerContainer = (RelativeLayout) findViewById(R.id.spiner_container);
+        fullScreenBtn = (AppCompatImageView) findViewById(R.id.full_screen_switcher);
         fullScreenBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int orient;
                 if (isFullScreen) {
                     orient = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-                }
-                else {
+                } else {
                     orient = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
                 }
                 setRequestedOrientation(orient);
+            }
+        });
+    }
+
+    private void getDrawableForAudioContent(OnMediaLoadCompletion playLoadedEntry) {
+        Picasso.get().load(audioOnlyDrawable).into(new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                artworkDrawable = new BitmapDrawable(getResources(), bitmap);
+                startMockAudioOnlyContent(playLoadedEntry);
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
             }
         });
     }
@@ -349,6 +381,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mediaProvider.load(completion);
     }
 
+    private void startMockAudioOnlyContent(OnMediaLoadCompletion playLoadedEntry) {
+        mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "audioonly");
+        mediaProvider.load(playLoadedEntry);
+    }
+
     private void startOttMediaLoading(final OnMediaLoadCompletion completion) {
         SessionProvider ksSessionProvider = new SessionProvider() {
             @Override
@@ -410,6 +447,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             START_POSITION = null; // force live streams to play from live edge
         }
 
+        if (artworkDrawable != null) {
+            List<PKExternalSubtitle> mList = new ArrayList<>();
+            PKExternalSubtitle pkExternalSubtitle = new PKExternalSubtitle()
+                    .setMimeType(PKSubtitleFormat.vtt)
+                    .setUrl("http://brenopolanski.com/html5-video-webvtt-example/MIB2-subtitles-pt-BR.vtt")
+                    .setLabel("de")
+                    .setLanguage("deu");
+
+            mList.add(pkExternalSubtitle);
+            mediaEntry.setExternalSubtitleList(mList);
+            mediaEntry.setArtworkDrawable(artworkDrawable);
+        }
+
+
         PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(START_POSITION);
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         if (player == null) {
@@ -455,7 +506,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preMidPostAdTagUrl media2"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(2222401, "1_f93tepsn"));
-                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(2222401, "1_f93tepsn"));
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), getKavaAnalyticsConfig(2222401, "1_f93tepsn"));
 
             } else if (changeMediaIndex % 4 == 1) {
                 if (isAdsEnabled) {
@@ -470,8 +521,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(true, "inLinePreAdTagUrl media3"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1740481, "1_fdv46dba"));
-                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1740481, "1_fdv46dba"));
-            } if (changeMediaIndex % 4 == 2) {
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), getKavaAnalyticsConfig(1740481, "1_fdv46dba"));
+            }
+            if (changeMediaIndex % 4 == 2) {
                 if (isAdsEnabled) {
                     if (isDAIMode) {
                         promptMessage(DAI_PLUGIN, getDAIConfig4().getAssetTitle());
@@ -484,8 +536,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "NO AD media4"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1091, "0_wu32qrt3"));
-                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1091, "0_wu32qrt3"));
-            } if (changeMediaIndex % 4 == 3) {
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), getKavaAnalyticsConfig(1091, "0_wu32qrt3"));
+            }
+            if (changeMediaIndex % 4 == 3) {
                 if (isAdsEnabled) {
                     if (isDAIMode) {
                         promptMessage(DAI_PLUGIN, getDAIConfig5().getAssetTitle());
@@ -496,14 +549,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSkipAdTagUrl));
                     }
                 }
-                
+
                 player.getSettings().setPlayerBuffers(new LoadControlBuffers().
                         setMinPlayerBufferMs(2500).
                         setMaxPlayerBufferMs(50000).setAllowedVideoJoiningTimeMs(4000));
 
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preSkipAdTagUrl media1"));
                 player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1734751, "1_3o1seqnv"));
-                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1734751, "1_3o1seqnv"));
+                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), getKavaAnalyticsConfig(1734751, "1_3o1seqnv"));
             }
         }
 
@@ -1002,7 +1055,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     appProgressBar.setVisibility(View.INVISIBLE);
 
                 }
-                if(controlsView != null){
+                if (controlsView != null) {
                     controlsView.setPlayerState(event.newState);
                 }
             }
@@ -1047,12 +1100,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onConfigurationChanged(Configuration newConfig) {
         setFullScreen(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE);
         super.onConfigurationChanged(newConfig);
-        Log.v("orientation", "state = "+newConfig.orientation);
+        Log.v("orientation", "state = " + newConfig.orientation);
     }
 
 
     private void setFullScreen(boolean isFullScreen) {
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)playerContainer.getLayoutParams();
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) playerContainer.getLayoutParams();
         // Checks the orientation of the screen
         this.isFullScreen = isFullScreen;
         if (isFullScreen) {
@@ -1066,7 +1119,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             fullScreenBtn.setImageResource(R.drawable.ic_fullscreen);
             spinerContainer.setVisibility(View.VISIBLE);
-            params.height = (int)getResources().getDimension(R.dimen.player_height);
+            params.height = (int) getResources().getDimension(R.dimen.player_height);
             params.width = RelativeLayout.LayoutParams.MATCH_PARENT;
         }
         playerContainer.requestLayout();
@@ -1110,9 +1163,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 for (int i = 0; i < trackInfos.size(); i++) {
                     VideoTrack videoTrackInfo = (VideoTrack) trackInfos.get(i);
-                    if(videoTrackInfo.isAdaptive()){
+                    if (videoTrackInfo.isAdaptive()) {
                         trackItems[i] = new TrackItem("Auto", videoTrackInfo.getUniqueId());
-                    }else{
+                    } else {
                         trackItems[i] = new TrackItem(String.valueOf(videoTrackInfo.getBitrate()), videoTrackInfo.getUniqueId());
                     }
                 }
@@ -1138,7 +1191,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 for (int i = 0; i < trackInfos.size(); i++) {
                     AudioTrack audioTrackInfo = (AudioTrack) trackInfos.get(i);
                     String label = audioTrackInfo.getLabel() != null ? audioTrackInfo.getLabel() : audioTrackInfo.getLanguage();
-                    String bitrate = (audioTrackInfo.getBitrate() >  0) ? "" + audioTrackInfo.getBitrate() : "";
+                    String bitrate = (audioTrackInfo.getBitrate() > 0) ? "" + audioTrackInfo.getBitrate() : "";
                     if (TextUtils.isEmpty(bitrate) && addChannel) {
                         bitrate = buildAudioChannelString(audioTrackInfo.getChannelCount());
                     }
@@ -1215,7 +1268,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onOrientationChange(OrientationManager.ScreenOrientation screenOrientation) {
-        switch(screenOrientation){
+        switch (screenOrientation) {
             case PORTRAIT:
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 break;
@@ -1296,7 +1349,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private static List<VideoTrack> getVideoTracksInRange(List<VideoTrack> videoTracks, BitRateRange bitRateRange) {
-        List<VideoTrack> videoTrackInfo = new ArrayList<>() ;
+        List<VideoTrack> videoTrackInfo = new ArrayList<>();
         long bitRate;
         for (VideoTrack track : videoTracks) {
             bitRate = track.getBitrate();
@@ -1341,6 +1394,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     static class DRMAdapter implements PKRequestParams.Adapter {
 
         public static String customData;
+
         @Override
         public PKRequestParams adapt(PKRequestParams requestParams) {
             requestParams.headers.put("customData", customData);

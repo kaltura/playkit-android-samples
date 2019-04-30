@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //getPermissionToReadExternalStorage();
-        artworkDrawable = getResources().getDrawable( R.drawable.harold);
+        artworkDrawable = getResources().getDrawable(R.drawable.harold);
 
         initDrm();
         try {
@@ -436,7 +436,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             mList.add(pkExternalSubtitle);
             mediaEntry.setExternalSubtitleList(mList);
-            mediaEntry.setArtworkDrawable(artworkDrawable);
+            if (artworkDrawable != null) {
+                mediaEntry.setArtworkDrawable(artworkDrawable);
+            }
         }
 
         PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(START_POSITION);

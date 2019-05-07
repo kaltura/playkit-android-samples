@@ -435,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
 
-            FrameLayout layout = (FrameLayout) findViewById(R.id.player_root);
+            FrameLayout layout = (FrameLayout) findViewById(R.id.player_view);
             layout.addView(player.getView());
 
             controlsView = (PlaybackControlsView) this.findViewById(R.id.playerControls);

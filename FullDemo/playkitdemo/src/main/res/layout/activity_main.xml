@@ -82,19 +82,18 @@
         android:layout_below="@id/spiner_container"
         >
 
-        <FrameLayout
-            android:id="@+id/player_root"
+        <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/player_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="80dp">
-            <Button
-                android:id="@+id/changeMedia"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAllCaps="false"
-                android:text="Change" />
-        </FrameLayout>
+            android:layout_above="@+id/controls_container"/>
 
+        <Button
+            android:id="@+id/changeMedia"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="Change" />
 
         <ProgressBar
             android:id="@+id/progressBar"

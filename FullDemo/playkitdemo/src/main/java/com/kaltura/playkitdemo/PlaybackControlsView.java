@@ -1,15 +1,18 @@
 package com.kaltura.playkitdemo;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.ui.DefaultTimeBar;
+import com.google.android.exoplayer2.ui.TimeBar;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerState;
@@ -22,7 +25,7 @@ import java.util.Locale;
  * Created by anton.afanasiev on 07/11/2016.
  */
 
-public class PlaybackControlsView extends LinearLayout implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class PlaybackControlsView extends LinearLayout implements View.OnClickListener {
 
     private static final PKLog log = PKLog.get("PlaybackControlsView");
     private static final int PROGRESS_BAR_MAX = 100;
@@ -33,18 +36,15 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
     private Formatter formatter;
     private StringBuilder formatBuilder;
 
-    private SeekBar seekBar;
+    private DefaultTimeBar seekBar;
     private TextView tvCurTime, tvTime;
-    private ImageButton btnPlay, btnPause, btnFastForward, btnRewind, btnNext, btnPrevious;
+    private ImageButton btnPlay, btnPause, btnFastForward, btnRewind, btnNext, btnPrevious, btnShuffle, btnRepeatToggle;
 
     private boolean dragging = false;
 
-    private Runnable updateProgressAction = new Runnable() {
-        @Override
-        public void run() {
-            updateProgress();
-        }
-    };
+    private ComponentListener componentListener;
+
+    private Runnable updateProgressAction = this::updateProgress;
 
     public PlaybackControlsView(Context context) {
         this(context, null);
@@ -56,20 +56,27 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
 
     public PlaybackControlsView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        LayoutInflater.from(context).inflate(R.layout.playback_layout, this);
+        LayoutInflater.from(context).inflate(R.layout.exo_playback_control_view, this);
         formatBuilder = new StringBuilder();
         formatter = new Formatter(formatBuilder, Locale.getDefault());
+        componentListener = new ComponentListener();
         initPlaybackControls();
     }
 
     private void initPlaybackControls() {
 
-        btnPlay = this.findViewById(R.id.play);
-        btnPause = this.findViewById(R.id.pause);
-        btnFastForward = this.findViewById(R.id.ffwd);
-        btnRewind = this.findViewById(R.id.rew);
-        btnNext = this.findViewById(R.id.next);
-        btnPrevious = this.findViewById(R.id.prev);
+        btnPlay = this.findViewById(R.id.exo_play);
+        btnPause = this.findViewById(R.id.exo_pause);
+        btnFastForward = this.findViewById(R.id.exo_ffwd);
+        btnFastForward.setVisibility(GONE);
+        btnRewind = this.findViewById(R.id.exo_rew);
+        btnRewind.setVisibility(GONE);
+        btnNext = this.findViewById(R.id.exo_next);
+        btnPrevious = this.findViewById(R.id.exo_prev);
+        btnRepeatToggle = this.findViewById(R.id.exo_repeat_toggle);
+        btnRepeatToggle.setVisibility(GONE);
+        btnShuffle = this.findViewById(R.id.exo_shuffle);
+        btnShuffle.setVisibility(GONE);
 
         btnPlay.setOnClickListener(this);
         btnPause.setOnClickListener(this);
@@ -78,11 +85,15 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         btnNext.setOnClickListener(this);
         btnPrevious.setOnClickListener(this);
 
-        seekBar = this.findViewById(R.id.mediacontroller_progress);
-        seekBar.setOnSeekBarChangeListener(this);
+        seekBar = this.findViewById(R.id.exo_progress);
+        seekBar.setPlayedColor(getResources().getColor(R.color.colorAccent));
+        seekBar.setBufferedColor(getResources().getColor(R.color.grey));
+        seekBar.setUnplayedColor(getResources().getColor(R.color.black));
+        seekBar.setScrubberColor(getResources().getColor(R.color.colorAccent));
+        seekBar.addListener(componentListener);
 
-        tvCurTime = this.findViewById(R.id.time_current);
-        tvTime = this.findViewById(R.id.time);
+        tvCurTime = this.findViewById(R.id.exo_position);
+        tvTime = this.findViewById(R.id.exo_duration);
     }
 
 
@@ -90,11 +101,12 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         long duration = C.TIME_UNSET;
         long position = C.POSITION_UNSET;
         long bufferedPosition = 0;
-        if(player != null) {
+        if (player != null) {
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
                 duration = adController.getAdDuration();
                 position = adController.getAdCurrentPosition();
+
                 //log.d("adController Duration:" + duration);
                 //log.d("adController Position:" + position);
             } else {
@@ -106,7 +118,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
             }
         }
 
-        if(duration != C.TIME_UNSET){
+        if (duration != C.TIME_UNSET) {
             //log.d("updateProgress Set Duration:" + duration);
             tvTime.setText(stringForTime(duration));
         }
@@ -114,10 +126,11 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         if (!dragging && position != C.POSITION_UNSET && duration != C.TIME_UNSET) {
             //log.d("updateProgress Set Position:" + position);
             tvCurTime.setText(stringForTime(position));
-            seekBar.setProgress(progressBarValue(position));
+            seekBar.setPosition(progressBarValue(position));
+            seekBar.setDuration(progressBarValue(duration));
         }
 
-        seekBar.setSecondaryProgress(progressBarValue(bufferedPosition));
+        seekBar.setBufferedPosition(progressBarValue(bufferedPosition));
         // Remove scheduled updates.
         removeCallbacks(updateProgressAction);
         // Schedule an update if necessary.
@@ -127,9 +140,53 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         }
     }
 
+    /**
+     * Component Listener for Default time bar from ExoPlayer UI
+     */
+    private final class ComponentListener
+            implements com.google.android.exoplayer2.Player.EventListener, TimeBar.OnScrubListener, OnClickListener {
+
+        @Override
+        public void onScrubStart(TimeBar timeBar, long position) {
+            dragging = true;
+        }
+
+        @Override
+        public void onScrubMove(TimeBar timeBar, long position) {
+            tvCurTime.setText(stringForTime(position));
+        }
+
+        @Override
+        public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
+            dragging = false;
+            if (player != null) {
+                player.seekTo(positionValue(position));
+            }
+        }
+
+        @Override
+        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            updateProgress();
+        }
+
+        @Override
+        public void onPositionDiscontinuity(@com.google.android.exoplayer2.Player.DiscontinuityReason int reason) {
+            updateProgress();
+        }
+
+        @Override
+        public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, @com.google.android.exoplayer2.Player.TimelineChangeReason int reason) {
+            updateProgress();
+        }
+
+        @Override
+        public void onClick(View view) {
+        }
+    }
+
     private int progressBarValue(long position) {
         int progressValue = 0;
-        if(player != null){
+        if (player != null) {
             long duration = player.getDuration();
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
@@ -145,15 +202,15 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         return progressValue;
     }
 
-    private long positionValue(int progress) {
+    private long positionValue(long progress) {
         long positionValue = 0;
-        if(player != null){
+        if (player != null) {
             long duration = player.getDuration();
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
                 duration = adController.getAdDuration();
             }
-            positionValue =  Math.round((duration * progress) / PROGRESS_BAR_MAX);
+            positionValue = Math.round((duration * progress) / PROGRESS_BAR_MAX);
         }
 
         return positionValue;
@@ -179,51 +236,35 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         updateProgress();
     }
 
+    public void setSeekBarStateForAd(boolean isAdPlaying) {
+        seekBar.setEnabled(!isAdPlaying);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.play:
-                if(player != null) {
+            case R.id.exo_play:
+                if (player != null) {
                     player.play();
                 }
                 break;
-            case R.id.pause:
-                if(player != null) {
+            case R.id.exo_pause:
+                if (player != null) {
                     player.pause();
                 }
                 break;
-            case R.id.ffwd:
+            case R.id.exo_ffwd:
                 //Do nothing for now
                 break;
-            case R.id.rew:
+            case R.id.exo_rew:
                 ///Do nothing for now
                 break;
-            case R.id.next:
+            case R.id.exo_next:
                 //Do nothing for now
                 break;
-            case R.id.prev:
+            case R.id.exo_prev:
                 //Do nothing for now
                 break;
-        }
-    }
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (fromUser) {
-            tvCurTime.setText(stringForTime(positionValue(progress)));
-        }
-    }
-
-
-    public void onStartTrackingTouch(SeekBar seekBar) {
-        dragging = true;
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-        dragging = false;
-        if (player != null) {
-            player.seekTo(positionValue(seekBar.getProgress()));
         }
     }
 
@@ -234,4 +275,5 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
     public void resume() {
         updateProgress();
     }
+
 }

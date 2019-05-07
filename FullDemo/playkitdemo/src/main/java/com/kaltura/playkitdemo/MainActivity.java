@@ -853,6 +853,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, AdEvent.contentResumeRequested, event -> {
             log.d("CONTENT_RESUME_REQUESTED");
             appProgressBar.setVisibility(View.INVISIBLE);
+            controlsView.setSeekBarStateForAd(false);
             controlsView.setPlayerState(PlayerState.READY);
         });
 
@@ -864,6 +865,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, AdEvent.contentPauseRequested, event -> {
             log.d("AD_CONTENT_PAUSE_REQUESTED");
             appProgressBar.setVisibility(View.VISIBLE);
+            controlsView.setSeekBarStateForAd(true);
             controlsView.setPlayerState(PlayerState.READY);
         });
 
@@ -921,6 +923,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         player.addListener(this, AdEvent.error, event -> {
             if (event != null && event.error != null) {
+                controlsView.setSeekBarStateForAd(false);
                 log.e("ERROR: " + event.error.errorType + ", " + event.error.message);
             }
         });

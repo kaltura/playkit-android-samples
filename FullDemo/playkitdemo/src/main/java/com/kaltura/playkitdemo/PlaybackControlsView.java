@@ -106,6 +106,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
             if (adController != null && adController.isAdDisplayed()) {
                 duration = adController.getAdDuration();
                 position = adController.getAdCurrentPosition();
+
                 //log.d("adController Duration:" + duration);
                 //log.d("adController Position:" + position);
             } else {
@@ -235,6 +236,10 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         updateProgress();
     }
 
+    public void setSeekBarStateForAd(boolean isAdPlaying) {
+        seekBar.setEnabled(!isAdPlaying);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -270,4 +275,5 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
     public void resume() {
         updateProgress();
     }
+
 }

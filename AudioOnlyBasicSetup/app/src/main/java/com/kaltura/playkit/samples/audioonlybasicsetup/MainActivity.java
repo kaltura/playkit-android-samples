@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setArtworkViewForAudioContent() {
-        player.getSettings().setAudioOnlyArtworkVisibility(true);
+        player.getSettings().setHideVideoViews(true);
         artworkView.setVisibility(View.VISIBLE);
     }
 

@@ -47,17 +47,16 @@ public class MainActivity extends AppCompatActivity {
         //Initialize media config object.
         PKMediaConfig mediaConfig = createMediaConfig();
 
+        PKPluginConfigs pkPluginConfigs = null;
+
         if (isAdEnabled) {
             //Initialize plugin config object.
-            PKPluginConfigs pkPluginConfigs = addIMAPluginConfig();
-            //Create instance of the player with plugins.
-            player = PlayKitManager.loadPlayer(this, pkPluginConfigs);
-        } else {
-            //Create instance of the player without plugins.
-            player = PlayKitManager.loadPlayer(this, null);
+            pkPluginConfigs = addIMAPluginConfig();
         }
 
-        setArtworkViewForAudioContent();
+        player = PlayKitManager.loadPlayer(this, pkPluginConfigs);
+
+        showArtworkForAudioContent();
 
         //Add player to the view hierarchy.
         addPlayerToView();
@@ -178,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setArtworkViewForAudioContent() {
+    private void showArtworkForAudioContent() {
         player.getSettings().setHideVideoViews(true);
         artworkView.setVisibility(View.VISIBLE);
     }

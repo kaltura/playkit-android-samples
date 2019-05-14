@@ -12,9 +12,13 @@ import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
+import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.plugins.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ima.IMAPlugin;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,11 +29,13 @@ public class MainActivity extends AppCompatActivity {
 
     private static final PKMediaFormat MEDIA_FORMAT = PKMediaFormat.mp3;
     private static final String SOURCE_URL = "http://www.largesound.com/ashborytour/sound/brobob.mp3";
+    private static final String AD_TAG_URL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
     private static final String LICENSE_URL = null;
 
     private Player player;
     private Button playPauseButton;
     private ImageView artworkView;
+    private boolean isAdEnabled = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +47,15 @@ public class MainActivity extends AppCompatActivity {
         //Initialize media config object.
         PKMediaConfig mediaConfig = createMediaConfig();
 
-        //Create instance of the player without plugins.
-        player = PlayKitManager.loadPlayer(this, null);
+        if (isAdEnabled) {
+            //Initialize plugin config object.
+            PKPluginConfigs pkPluginConfigs = addIMAPluginConfig();
+            //Create instance of the player with plugins.
+            player = PlayKitManager.loadPlayer(this, pkPluginConfigs);
+        } else {
+            //Create instance of the player without plugins.
+            player = PlayKitManager.loadPlayer(this, null);
+        }
 
         setArtworkViewForAudioContent();
 
@@ -54,9 +67,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
-
-        //Start playback.
-        player.play();
     }
 
     /**
@@ -171,6 +181,26 @@ public class MainActivity extends AppCompatActivity {
     private void setArtworkViewForAudioContent() {
         player.getSettings().setAudioOnlyArtworkVisibility(true);
         artworkView.setVisibility(View.VISIBLE);
+    }
+
+    private PKPluginConfigs addIMAPluginConfig() {
+
+        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+
+        PKPluginConfigs pluginConfig = new PKPluginConfigs();
+
+        IMAConfig adsConfig = getAdsConfig();
+        pluginConfig.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
+
+        return pluginConfig;
+    }
+
+    private IMAConfig getAdsConfig() {
+        List<String> videoMimeTypes = new ArrayList<>();
+        videoMimeTypes.add("video/mp4");
+        videoMimeTypes.add("application/x-mpegURL");
+        videoMimeTypes.add("application/dash+xml");
+        return new IMAConfig().setAdTagURL(AD_TAG_URL).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAdLoadTimeOut(8);
     }
 
     @Override

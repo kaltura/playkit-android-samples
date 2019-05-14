@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private Player player;
     private Button playPauseButton;
     private ImageView artworkView;
-    private boolean isAdEnabled = true;
+    private boolean isAdEnabled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

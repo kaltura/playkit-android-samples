@@ -384,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 phoenixCastBuilder.setAdsConfig(createAdsConfigVmap(adTagUrl));
             }
+            //phoenixCastBuilder.setDefaultTextLangaugeCode("en")
         }
         return returnResult(phoenixCastBuilder);
     }
@@ -401,6 +402,8 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 ovpV3CastBuilder.setAdsConfig(createAdsConfigVmap(adTagUrl));
             }
+            //ovpV3CastBuilder.setDefaultTextLangaugeCode("en")
+
         }
         return returnResult(ovpV3CastBuilder);
     }

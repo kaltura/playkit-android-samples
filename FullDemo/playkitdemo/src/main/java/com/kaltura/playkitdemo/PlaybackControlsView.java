@@ -40,7 +40,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
 
     private DefaultTimeBar seekBar;
     private TextView tvCurTime, tvTime;
-    private ImageButton btnPlay, btnPause, btnFastForward, btnRewind, btnNext, btnPrevious, btnShuffle, btnRepeatToggle;
+    private ImageButton btnPlay, btnPause, btnFastForward, btnRewind, btnNext, btnPrevious, btnShuffle, btnRepeatToggle, btnVr;
 
     private boolean dragging = false;
 
@@ -79,6 +79,8 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         btnRepeatToggle.setVisibility(GONE);
         btnShuffle = this.findViewById(R.id.exo_shuffle);
         btnShuffle.setVisibility(GONE);
+        btnVr = this.findViewById(R.id.exo_vr);
+        btnVr.setVisibility(GONE);
 
         btnPlay.setOnClickListener(this);
         btnPause.setOnClickListener(this);

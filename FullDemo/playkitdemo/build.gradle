@@ -25,6 +25,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    /*tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }*/
+
+   /* lintOptions {
+        // The demo app isn't indexed, doesn't have translations, and has a
+        // banner for AndroidTV that's only in xhdpi density.
+        disable 'GoogleAppIndexingWarning','MissingTranslation','IconDensities'
+    }*/
 }
 
 dependencies {
@@ -35,7 +45,7 @@ dependencies {
 //    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
 
-
+    implementation 'androidx.annotation:annotation:1.0.2'
     implementation project(":playkit")
     implementation project(":providers")
     implementation project(":ima")
@@ -43,7 +53,7 @@ dependencies {
     implementation project(":kava")
     implementation project(":googlecast")
     implementation project(":playkitvr")
-    implementation project(":MD360")
+    implementation project(":MD360Player4Android")
 
 //    implementation 'com.kaltura.playkit:playkitproviders:3.9.0'
 //    implementation 'com.kaltura.playkit:youboraplugin:3.9.0'
@@ -52,8 +62,8 @@ dependencies {
 //    implementation 'com.kaltura.playkit:googlecast:3.9.0'
 //    implementation 'com.kaltura.playkit:vrplugin:3.9.0'
 
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
     //implementation 'com.github.kaltura:playkit-dtg-android:v2.3.0'
 }
 

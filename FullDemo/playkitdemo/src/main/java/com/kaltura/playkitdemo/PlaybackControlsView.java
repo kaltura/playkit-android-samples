@@ -1,7 +1,9 @@
 package com.kaltura.playkitdemo;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,10 +88,10 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         btnPrevious.setOnClickListener(this);
 
         seekBar = this.findViewById(R.id.exo_progress);
-        seekBar.setPlayedColor(getResources().getColor(R.color.colorAccent));
-        seekBar.setBufferedColor(getResources().getColor(R.color.grey));
-        seekBar.setUnplayedColor(getResources().getColor(R.color.black));
-        seekBar.setScrubberColor(getResources().getColor(R.color.colorAccent));
+        seekBar.setPlayedColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+        seekBar.setBufferedColor(ContextCompat.getColor(getContext(), R.color.grey));
+        seekBar.setUnplayedColor(ContextCompat.getColor(getContext(), R.color.black));
+        seekBar.setScrubberColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
         seekBar.addListener(componentListener);
 
         tvCurTime = this.findViewById(R.id.exo_position);

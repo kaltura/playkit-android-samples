@@ -17,6 +17,7 @@ import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.ads.AdController;
+import com.kaltura.playkit.utils.Consts;
 
 import java.util.Formatter;
 import java.util.Locale;
@@ -153,7 +154,8 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
 
         @Override
         public void onScrubMove(TimeBar timeBar, long position) {
-            tvCurTime.setText(stringForTime(position));
+            //log.d(position + " " + stringForTime(position * Consts.MILLISECONDS_MULTIPLIER));
+            tvCurTime.setText(stringForTime(position * Consts.MILLISECONDS_MULTIPLIER));
         }
 
         @Override

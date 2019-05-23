@@ -154,15 +154,17 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
 
         @Override
         public void onScrubMove(TimeBar timeBar, long position) {
-            //log.d(position + " " + stringForTime(position * Consts.MILLISECONDS_MULTIPLIER));
-            tvCurTime.setText(stringForTime(position * Consts.MILLISECONDS_MULTIPLIER));
+            if (player != null) {
+                tvCurTime.setText(stringForTime((position * player.getDuration()) / PROGRESS_BAR_MAX));
+            }
         }
 
         @Override
         public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
             dragging = false;
             if (player != null) {
-                player.seekTo(positionValue(position));
+                player.seekTo((position * player.getDuration()) / PROGRESS_BAR_MAX);
+
             }
         }
 
@@ -189,7 +191,10 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
     private int progressBarValue(long position) {
         int progressValue = 0;
         if (player != null) {
+
             long duration = player.getDuration();
+            //log.d("position = "  + position);
+            //log.d("duration = "  + duration);
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
                 duration = adController.getAdDuration();

@@ -1,7 +1,7 @@
 package com.kaltura.playkit.samples.eventsregistration;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,7 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.kaltura.playkit.PKEvent;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -19,8 +20,6 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.PlayerState;
-import com.kaltura.playkit.ads.AdController;
 import com.kaltura.playkit.player.PKTracks;
 
 import java.util.ArrayList;

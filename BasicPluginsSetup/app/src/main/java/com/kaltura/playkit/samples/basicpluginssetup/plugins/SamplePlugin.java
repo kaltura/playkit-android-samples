@@ -1,8 +1,9 @@
 package com.kaltura.playkit.samples.basicpluginssetup.plugins;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.google.gson.JsonObject;
 import com.kaltura.playkit.MessageBus;
@@ -12,7 +13,6 @@ import com.kaltura.playkit.PKPlugin;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerDecorator;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.ads.AdController;
 
 /**
  * This is a Sample custom plugin. Which is overriding the {@link PKPlugin}.

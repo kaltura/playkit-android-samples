@@ -66,8 +66,6 @@ import static com.kaltura.playkit.ads.PKAdErrorType.VAST_LINEAR_ASSET_MISMATCH;
 import static com.kaltura.playkit.ads.PKAdErrorType.VAST_LOAD_TIMEOUT;
 import static com.kaltura.playkit.ads.PKAdErrorType.VAST_MALFORMED_RESPONSE;
 import static com.kaltura.playkit.ads.PKAdErrorType.VAST_TOO_MANY_REDIRECTS;
-import static com.kaltura.playkit.plugins.ads.AdEvent.Type.CUEPOINTS_CHANGED;
-import static com.kaltura.playkit.plugins.ads.AdEvent.Type.LOADED;
 
 
 /**
@@ -145,7 +143,7 @@ public class PlaybackOverlayActivity extends Activity implements
             currentMovie.setDuration((int) mediaEntry.getDuration());
             PKMediaConfig mediaConfig = new PKMediaConfig();
             mediaConfig.setMediaEntry(mediaEntry);
-            mediaConfig.setStartPosition(position);
+            mediaConfig.setStartPosition((long)position);
             if (isFirstPlay) {
                 player.prepare(mediaConfig);
                 isFirstPlay = false;

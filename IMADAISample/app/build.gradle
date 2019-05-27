@@ -42,9 +42,9 @@ dependencies {
 //    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
 //    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
 
-    implementation project(':playkit')
-    implementation project(':providers')
-    implementation project(':ima')
+//    implementation project(':playkit')
+//    implementation project(':providers')
+//    implementation project(':ima')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {

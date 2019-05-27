@@ -38,23 +38,22 @@ android {
 }
 
 dependencies {
-//    implementation 'com.kaltura.playkit:playkit:3.7.1'
-//    implementation 'com.kaltura.playkit:playkitproviders:3.7.1'
-//    implementation 'com.kaltura.playkit:youboraplugin:3.7.1'
-//    implementation 'com.kaltura.playkit:imaplugin:3.7.1'
-//    implementation 'com.kaltura.playkit:googlecast:3.7.1'
-
+    implementation 'com.kaltura.playkit:playkit:3.9.4'
+    implementation 'com.kaltura.playkit:playkitproviders:3.9.4'
+    implementation 'com.kaltura.playkit:youboraplugin:3.9.4'
+    implementation 'com.kaltura.playkit:imaplugin:3.9.4'
+    implementation 'com.kaltura.playkit:googlecast:3.9.4'
 //    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
 
-    implementation project(':playkit')
-    implementation project(':providers')
-    implementation project(':ima')
-    implementation project(':youbora')
-    implementation project(':googlecast')
+//    implementation project(':playkit')
+//    implementation project(':providers')
+//    implementation project(':ima')
+//    implementation project(':youbora')
+//    implementation project(':googlecast')
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

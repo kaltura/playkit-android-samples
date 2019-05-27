@@ -32,7 +32,7 @@ configurations.all {
 dependencies {
 
     implementation 'com.kaltura.playkit:playkit:3.9.4'
-    implementation 'com.kaltura.playkit:imaplugin:3.9.4'`
+    implementation 'com.kaltura.playkit:imaplugin:3.9.4'
 
 //    implementation ('com.kaltura:playkit-android:dev-SNAPSHOT')
 //    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'

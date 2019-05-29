@@ -50,6 +50,9 @@ import com.kaltura.playkit.player.MediaSupport;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.TextTrack;
 import com.kaltura.playkit.player.VideoTrack;
+import com.kaltura.playkit.player.vr.VRInteractionMode;
+import com.kaltura.playkit.player.vr.VRPKMediaEntry;
+import com.kaltura.playkit.player.vr.VRSettings;
 import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
@@ -75,6 +78,7 @@ import com.kaltura.playkit.providers.mock.MockMediaProvider;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
 import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.utils.Consts;
+import com.kaltura.playkitvr.VRUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -403,6 +407,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
+
+        if (mediaEntry instanceof VRPKMediaEntry) {
+            VRSettings mediaEntryVRSettings = ((VRPKMediaEntry) mediaEntry).getVrSettings();
+            mediaEntryVRSettings.setFlingEnabled(true);
+            mediaEntryVRSettings.setVrModeEnabled(false);
+            mediaEntryVRSettings.setInteractionMode(VRInteractionMode.MotionWithTouch);
+            mediaEntryVRSettings.setZoomWithPinchEnabled(true);
+            VRInteractionMode interactionMode = mediaEntryVRSettings.getInteractionMode();
+            if (!VRUtil.isModeSupported(MainActivity.this, interactionMode)) {
+                //In case when mode is not supported we switch to supported mode.
+                mediaEntryVRSettings.setInteractionMode(VRInteractionMode.Touch);
+            }
+        }
 
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
             START_POSITION = null; // force live streams to play from live edge

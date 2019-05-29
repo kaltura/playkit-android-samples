@@ -54,6 +54,7 @@ import com.kaltura.playkit.player.TextTrack;
 import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
 import com.kaltura.playkit.player.vr.VRPKMediaEntry;
+import com.kaltura.playkit.player.vr.VRSettings;
 import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
@@ -410,14 +411,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
 
         if (mediaEntry instanceof VRPKMediaEntry) {
-            ((VRPKMediaEntry) mediaEntry).getVrSettings().setFlingEnabled(true);
-            ((VRPKMediaEntry) mediaEntry).getVrSettings().setVrModeEnabled(false);
-            ((VRPKMediaEntry) mediaEntry).getVrSettings().setInteractionMode(VRInteractionMode.MotionWithTouch);
-            ((VRPKMediaEntry) mediaEntry).getVrSettings().setZoomWithPinchEnabled(true);
-            VRInteractionMode interactionMode = ((VRPKMediaEntry) mediaEntry).getVrSettings().getInteractionMode();
+            VRSettings mediaEntryVRSettings = ((VRPKMediaEntry) mediaEntry).getVrSettings();
+            mediaEntryVRSettings.setFlingEnabled(true);
+            mediaEntryVRSettings.setVrModeEnabled(false);
+            mediaEntryVRSettings.setInteractionMode(VRInteractionMode.MotionWithTouch);
+            mediaEntryVRSettings.setZoomWithPinchEnabled(true);
+            VRInteractionMode interactionMode = mediaEntryVRSettings.getInteractionMode();
             if (!VRUtil.isModeSupported(MainActivity.this, interactionMode)) {
                 //In case when mode is not supported we switch to supported mode.
-                ((VRPKMediaEntry) mediaEntry).getVrSettings().setInteractionMode(VRInteractionMode.Touch);
+                mediaEntryVRSettings.setInteractionMode(VRInteractionMode.Touch);
             }
         }
 

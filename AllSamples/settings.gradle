@@ -19,6 +19,7 @@ project(':playkitvr').projectDir = new File('../../playkit-android-vr/playkitvr'
 // Sample apps
 def samples = [
         'BasicSetup',
+        'AudioOnlyBasicSetup',
         'EventsRegistration',
         'ErHandling',
         'SubtitleSideloading',

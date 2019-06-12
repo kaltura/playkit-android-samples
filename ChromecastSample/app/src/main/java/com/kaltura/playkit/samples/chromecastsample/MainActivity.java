@@ -302,12 +302,11 @@ public class MainActivity extends AppCompatActivity {
 
     private MediaInfo getOttCastMediaInfo(ConverterOttCast converterOttCast, boolean setAdTagUrl) {
 
-        TVPAPICastBuilder TVPAPICastBuilder = new TVPAPICastBuilder()
+        TVPAPICastBuilder tvpapiCastBuilder = new TVPAPICastBuilder()
                 .setFormat(converterOttCast.getFormat())
                 .setInitObject(converterOttCast.getInitObject().toString());
-
-
-        return returnResult(TVPAPICastBuilder, converterOttCast, setAdTagUrl);
+        //tvpapiCastBuilder.setDefaultTextLanguageLabel("en");
+        return returnResult(tvpapiCastBuilder, converterOttCast, setAdTagUrl);
     }
 
 
@@ -320,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(ks)) { // ks isn't mandatory in OVP environment
             ovpCastBuilder.setKs(ks);
         }
-
+        //ovpCastBuilder.setDefaultTextLanguageLabel("en");
         return returnResult(ovpCastBuilder, converterOvpCast, setAdTagUrl);
     }
 

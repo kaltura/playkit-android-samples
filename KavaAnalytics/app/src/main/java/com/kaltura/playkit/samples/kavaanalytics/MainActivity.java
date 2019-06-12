@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -18,8 +17,6 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsEvent;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
-import com.kaltura.playkit.plugins.ovp.KalturaStatsEvent;
-import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         createMediaConfig();
 
         //Initialize PKPluginConfigs object with KalturaStatsPlugin.
-        PKPluginConfigs pluginConfigs = createKalturaStatsPlugin();
+        PKPluginConfigs pluginConfigs = createKavaPluginConfig();
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
@@ -78,12 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * Will create {@link PKPluginConfigs} object with {@link KalturaStatsPlugin}.
-     *
-     * @return - the pluginConfig object that should be passed as parameter when loading the player.
-     */
-    private PKPluginConfigs createKalturaStatsPlugin() {
+
+    private PKPluginConfigs createKavaPluginConfig() {
 
         //First register your plugin.
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);

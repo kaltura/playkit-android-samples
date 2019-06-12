@@ -59,8 +59,8 @@ import java.util.List;
 /*
  * Class for video playback with media control
  */
-public class PlaybackOverlayFragment extends android.support.v17.leanback.app.PlaybackOverlayFragment {
-    private static final String TAG = "PlaybackControlsFragmnt";
+public class PlaybackOverlayFragment extends android.support.v17.leanback.app.PlaybackFragment {
+    private static final String TAG = "PlaybackOverlayFragment";
 
     private static final boolean SHOW_DETAIL = true;
     private static final boolean HIDE_MORE_ACTIONS = false;

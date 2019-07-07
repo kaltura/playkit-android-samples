@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         //Initialize media config object.
         createMediaConfig();
 
-        //Initialize PKPluginConfigs object with KalturaStatsPlugin.
+        //Initialize PKPluginConfigs object with KavaPlugin.
         PKPluginConfigs pluginConfigs = createKavaPluginConfig();
 
         //Create instance of the player with specified pluginConfigs.

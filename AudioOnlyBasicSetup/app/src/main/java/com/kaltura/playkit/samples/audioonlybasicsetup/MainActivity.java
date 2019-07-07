@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
         videoMimeTypes.add("video/mp4");
         videoMimeTypes.add("application/x-mpegURL");
         videoMimeTypes.add("application/dash+xml");
-        return new IMAConfig().setAdTagURL(AD_TAG_URL).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAdLoadTimeOut(8);
+        return new IMAConfig().setAdTagUrl(AD_TAG_URL).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAdLoadTimeOut(8);
     }
 
     @Override

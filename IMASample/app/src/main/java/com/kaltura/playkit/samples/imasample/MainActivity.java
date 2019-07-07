@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         IMAConfig imaConfig = new IMAConfig();
 
         //Configure ima.
-        imaConfig.setAdTagURL(AD_TAG_URL);
+        imaConfig.setAdTagUrl(AD_TAG_URL);
         imaConfig.setVideoBitrate(PREFERRED_AD_BITRATE);
         imaConfig.enableDebugMode(true);
 

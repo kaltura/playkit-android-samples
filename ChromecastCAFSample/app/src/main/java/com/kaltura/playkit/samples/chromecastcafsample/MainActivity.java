@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    pendingResult = remoteMediaClient.load(getOttCastMediaInfo("258459","Mobile_Devices_Main_SD", "", null), loadOptions);
+                    pendingResult = remoteMediaClient.load(getOttCastMediaInfo("258459","Mobile_Devices_Main_SD", "", null, CAFCastBuilder.HttpProtocol.Http), loadOptions);
                     pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
                         @Override
@@ -379,7 +379,7 @@ public class MainActivity extends AppCompatActivity {
         });
         PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = null;
         MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(position).build();
-        pendingResult = remoteMediaClient.load(getOttCastMediaInfo("259153","Mobile_Devices_Main_SD", "", null), loadOptions);
+        pendingResult = remoteMediaClient.load(getOttCastMediaInfo("259153","Mobile_Devices_Main_SD", "", null, CAFCastBuilder.HttpProtocol.Http), loadOptions);
         pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
             @Override
@@ -408,23 +408,23 @@ public class MainActivity extends AppCompatActivity {
         return MediaInfoUtils.createAdsConfigVmap(adTagUrl);
     }
 
-    private MediaInfo getOttCastMediaInfo(String entryId, String mediaFormt, String adTagUrl, CAFCastBuilder.AdTagType adTagType) {
+    private MediaInfo getOttCastMediaInfo(String mediaId, String mediaFormat, String adTagUrl, CAFCastBuilder.AdTagType adTagType, CAFCastBuilder.HttpProtocol protocol) {
 
         List<String> formats = null;
-        if (mediaFormt != null) {
+        if (mediaFormat != null) {
             formats = new ArrayList<>();
-            formats.add(mediaFormt);
+            formats.add(mediaFormat);
         }
 
         CAFCastBuilder phoenixCastBuilder = new KalturaPhoenixCastBuilder()
-                .setMediaEntryId(entryId)
+                .setMediaEntryId(mediaId)
                 .setKs("")
                 .setFormats(formats)
                 .setStreamType(CAFCastBuilder.StreamType.VOD)
                 .setAssetReferenceType(CAFCastBuilder.AssetReferenceType.Media)
                 .setContextType(CAFCastBuilder.PlaybackContextType.Playback)
                 .setMediaType(CAFCastBuilder.KalturaAssetType.Media)
-                .setProtocol(CAFCastBuilder.HttpProtocol.Http);
+                .setProtocol(protocol);
 
         if (!TextUtils.isEmpty(adTagUrl)) {
             if (adTagType == CAFCastBuilder.AdTagType.VAST) {

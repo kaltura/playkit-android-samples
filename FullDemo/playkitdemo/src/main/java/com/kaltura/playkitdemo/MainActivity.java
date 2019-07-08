@@ -51,7 +51,6 @@ import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.TextTrack;
 import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
-import com.kaltura.playkit.player.vr.VRPKMediaEntry;
 import com.kaltura.playkit.player.vr.VRSettings;
 import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
@@ -65,8 +64,6 @@ import com.kaltura.playkit.plugins.ott.OttEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
-import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
-import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.playback.KalturaPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.playback.KalturaUDRMLicenseRequestAdapter;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
@@ -408,19 +405,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
 
-        if (mediaEntry instanceof VRPKMediaEntry) {
-            VRSettings mediaEntryVRSettings = ((VRPKMediaEntry) mediaEntry).getVrSettings();
-            mediaEntryVRSettings.setFlingEnabled(true);
-            mediaEntryVRSettings.setVrModeEnabled(false);
-            mediaEntryVRSettings.setInteractionMode(VRInteractionMode.MotionWithTouch);
-            mediaEntryVRSettings.setZoomWithPinchEnabled(true);
-            VRInteractionMode interactionMode = mediaEntryVRSettings.getInteractionMode();
-            if (!VRUtil.isModeSupported(MainActivity.this, interactionMode)) {
-                //In case when mode is not supported we switch to supported mode.
-                mediaEntryVRSettings.setInteractionMode(VRInteractionMode.Touch);
-            }
-        }
-
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
             START_POSITION = null; // force live streams to play from live edge
         }
@@ -440,6 +424,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //            DRMAdapter.customData = customAdapterData;
 //            final DRMAdapter licenseRequestAdapter = new DRMAdapter();
 //            player.getSettings().setLicenseRequestAdapter(licenseRequestAdapter);
+
+            if (mediaEntry.isVRMediaType()) {
+                VRSettings vrSettings = new VRSettings();
+                vrSettings.setFlingEnabled(true);
+                vrSettings.setVrModeEnabled(false);
+                vrSettings.setInteractionMode(VRInteractionMode.MotionWithTouch);
+                vrSettings.setZoomWithPinchEnabled(true);
+                VRInteractionMode interactionMode = vrSettings.getInteractionMode();
+                if (!VRUtil.isModeSupported(MainActivity.this, interactionMode)) {
+                    //In case when mode is not supported we switch to supported mode.
+                    vrSettings.setInteractionMode(VRInteractionMode.Touch);
+                }
+                player.getSettings().setVRSettings(vrSettings);
+            }
 
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
@@ -469,7 +467,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preMidPostAdTagUrl media2"));
-                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(2222401, "1_f93tepsn"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(2222401, "1_f93tepsn"));
 
             } else if (changeMediaIndex % 4 == 1) {
@@ -484,7 +481,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(true, "inLinePreAdTagUrl media3"));
-                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1740481, "1_fdv46dba"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1740481, "1_fdv46dba"));
             } if (changeMediaIndex % 4 == 2) {
                 if (isAdsEnabled) {
@@ -498,7 +494,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "NO AD media4"));
-                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1091, "0_wu32qrt3"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1091, "0_wu32qrt3"));
             } if (changeMediaIndex % 4 == 3) {
                 if (isAdsEnabled) {
@@ -517,7 +512,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         setMaxPlayerBufferMs(50000).setAllowedVideoJoiningTimeMs(4000));
 
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preSkipAdTagUrl media1"));
-                player.updatePluginConfig(KalturaStatsPlugin.factory.getName(), getKalturaStatsConfig(1734751, "1_3o1seqnv"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1734751, "1_3o1seqnv"));
             }
         }
@@ -549,21 +543,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         addKavaPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
         //addPhoenixAnalyticsPluginConfig(pluginConfigs);
         //addTVPAPIAnalyticsPluginConfig(pluginConfigs);
-    }
-
-    private void addKaluraStatsPluginConfig(PKPluginConfigs pluginConfigs, int partnerId, String ovpEntryId) {
-
-        KalturaStatsConfig kalturaStatsConfig = getKalturaStatsConfig(partnerId, ovpEntryId);
-        //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(KalturaStatsPlugin.factory.getName(), kalturaStatsConfig);
-    }
-
-    private KalturaStatsConfig getKalturaStatsConfig(int partnerId, String ovpEntryId) {
-        return new KalturaStatsConfig(true)
-                .setBaseUrl(KALTURA_STATS_URL)
-                .setPartnerId(partnerId)
-                .setEntryId(ovpEntryId)
-                .setTimerInterval(30);
     }
 
     private void addKavaPluginConfig(PKPluginConfigs pluginConfigs, int partnerId, String ovpEntryId) {
@@ -671,7 +650,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         videoMimeTypes.add("video/mp4");
         videoMimeTypes.add("application/x-mpegURL");
         videoMimeTypes.add("application/dash+xml");
-        return new IMAConfig().setAdTagURL(adTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
+        return new IMAConfig().setAdTagUrl(adTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
     }
 
 

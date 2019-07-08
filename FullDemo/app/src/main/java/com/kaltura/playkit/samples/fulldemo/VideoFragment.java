@@ -47,8 +47,6 @@ import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
-import com.kaltura.playkit.plugins.ovp.KalturaStatsConfig;
-import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 
 import java.util.ArrayList;
@@ -202,7 +200,7 @@ public class VideoFragment extends Fragment {
         if (mediaConfig.getMediaEntry().getId().equals(FIRST_ENTRY_ID)) {
             String AD_HOND = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";//"http://externaltests.dev.kaltura.com/player/Vast_xml/alexs.qacore-vast3-rol_02.xml";
 
-            IMAConfig adsConfig = new IMAConfig().setAdTagURL(AD_HOND).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes);
+            IMAConfig adsConfig = new IMAConfig().setAdTagUrl(AD_HOND).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes);
             //"http://pubads.g.doubleclick.net/gampad/ads?sz=400x300&iu=%2F6062%2Fhanna_MA_group%2Fvideo_comp_app&ciu_szs=&impl=s&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&m_ast=vast&url=";
 //            AdsConfig adsConfig = new AdsConfig().
 //                    setAdTagURL(AD_HOND).
@@ -226,7 +224,7 @@ public class VideoFragment extends Fragment {
             //If first one is active, prepare second one.
             prepareSecondEntry();
         } else {
-            IMAConfig adsConfig = new IMAConfig().setAdTagURL(AD_HONDA2).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes);
+            IMAConfig adsConfig = new IMAConfig().setAdTagUrl(AD_HONDA2).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes);
 
 //            AdsConfig adsConfig = new AdsConfig().setAdTagURL(AD_HONDA2).
 //                    setPlayerViewContainer(playerLayout).
@@ -398,7 +396,6 @@ public class VideoFragment extends Fragment {
         PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
         PlayKitManager.registerPlugins(this.getActivity(), PhoenixAnalyticsPlugin.factory);
         //PlayKitManager.registerPlugins(this.getActivity(), IMADAIPlugin.factory);
-        PlayKitManager.registerPlugins(this.getActivity(), KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(getActivity(), YouboraPlugin.factory);
         PlayKitManager.registerPlugins(getActivity(), KavaAnalyticsPlugin.factory);
 
@@ -406,7 +403,6 @@ public class VideoFragment extends Fragment {
         //addAdPluginConfig(pluginConfig, playerLayout, adSkin);
         addPhoenixAnalyticsPluginConfig(pluginConfig);
         addIMAPluginConfig(pluginConfig, mVideoItem.getAdTagUrl());
-        addKalturaStatsPlugin(pluginConfig);
         addKavaPlugin(pluginConfig);
         addYouboraPlugin(pluginConfig);
 
@@ -483,20 +479,11 @@ public class VideoFragment extends Fragment {
         List<String> videoMimeTypes = new ArrayList<>();
         videoMimeTypes.add("video/mp4");
         videoMimeTypes.add(MimeTypes.APPLICATION_M3U8);
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes);
+        IMAConfig adsConfig = new IMAConfig().setAdTagUrl(adTagUrl).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
-    private void addKalturaStatsPlugin(PKPluginConfigs config) {
-        KalturaStatsConfig kalturaStatsPluginConfig = new KalturaStatsConfig(true)
-                .setBaseUrl(STATS_KALTURA_URL)
-                .setUiconfId(38713161)
-                .setPartnerId(2222401)
-                .setEntryId("1_f93tepsn")
-                .setTimerInterval(150000)
-                .setUserId("TestUser");
-        config.setPluginConfig(KalturaStatsPlugin.factory.getName(), kalturaStatsPluginConfig);
-    }
+
 
     private void addKavaPlugin(PKPluginConfigs config) {
         String referrer = "app://NonDefaultReferrer/"  + getActivity().getPackageName();

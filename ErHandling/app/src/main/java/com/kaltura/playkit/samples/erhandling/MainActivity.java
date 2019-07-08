@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Configure ima.
         //!!!NOTE we in purpose place incorrect url as adTag, in order to produce ad error.
-        imaConfigs.setAdTagURL(INCORRECT_AD_TAG_URL);
+        imaConfigs.setAdTagUrl(INCORRECT_AD_TAG_URL);
         imaConfigs.setVideoBitrate(PREFERRED_AD_BITRATE);
 
         //Convert imaConfigs to jsonObject.

@@ -19,7 +19,7 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
-import com.kaltura.playkit.player.vr.VRPKMediaEntry;
+import com.kaltura.playkit.player.vr.VRSettings;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
@@ -253,14 +253,19 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //Initialize media config object.
-                if (mediaEntry instanceof VRPKMediaEntry) {
+                if (mediaEntry.isVRMediaType()) {
                     boolean modeSupported = VRUtil.isModeSupported(getApplicationContext(), VRInteractionMode.Motion);
                     if (modeSupported) {
-                        ((VRPKMediaEntry) mediaEntry).getVrSettings().setInteractionMode(VRInteractionMode.MotionWithTouch);
+                        VRSettings vrSettings = new VRSettings();
+                        vrSettings.setInteractionMode(VRInteractionMode.MotionWithTouch);
+                        player.getSettings().setVRSettings(vrSettings);
                     }
                 }
+                //Initialize media config object.
                 createMediaConfig(mediaEntry);
+
+                //Prepare player with media configurations.
+                player.prepare(mediaConfig);
             }
         });
     }
@@ -271,8 +276,5 @@ public class MainActivity extends AppCompatActivity {
 
         //Set media entry we received from provider.
         mediaConfig.setMediaEntry(mediaEntry);
-
-        //Prepare player with media configurations.
-        player.prepare(mediaConfig);
     }
 }

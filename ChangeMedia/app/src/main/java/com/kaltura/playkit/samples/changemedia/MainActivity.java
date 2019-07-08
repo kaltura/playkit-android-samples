@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             IMAConfig imaConfig = new IMAConfig();
 
             //Configure ima.
-            imaConfig.setAdTagURL(adTagUrl2).enableDebugMode(true);
+            imaConfig.setAdTagUrl(adTagUrl2).enableDebugMode(true);
             player.updatePluginConfig(IMAPlugin.factory.getName(),imaConfig);
 
             //If first one is active, prepare second one.
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             IMAConfig imaConfig = new IMAConfig();
 
             //Configure ima.
-            imaConfig.setAdTagURL(adTagUrl).enableDebugMode(true);
+            imaConfig.setAdTagUrl(adTagUrl).enableDebugMode(true);
             player.updatePluginConfig(IMAPlugin.factory.getName(), imaConfig);
 
             prepareFirstEntry();
@@ -312,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize imaConfigs object.
         IMAConfig imaConfigs = new IMAConfig();
-        imaConfigs.setAdTagURL(adtag).enableDebugMode(true).setAdLoadTimeOut(8);
+        imaConfigs.setAdTagUrl(adtag).enableDebugMode(true).setAdLoadTimeOut(8);
 
         //Set jsonObject to the main pluginConfigs object.
         pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfigs);

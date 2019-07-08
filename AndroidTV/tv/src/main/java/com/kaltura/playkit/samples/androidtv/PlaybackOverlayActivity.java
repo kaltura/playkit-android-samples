@@ -162,7 +162,7 @@ public class PlaybackOverlayActivity extends Activity implements
             mPlaybackState = LeanbackPlaybackState.PAUSED;
             player.pause();
         }
-        updatePlaybackState(position);
+        updatePlaybackState((long)position);
         updateMetadata(movie);
     }
 
@@ -215,7 +215,7 @@ public class PlaybackOverlayActivity extends Activity implements
         }
     }
 
-    private void updatePlaybackState(int position) {
+    private void updatePlaybackState(Long position) {
         long actions = PlaybackState.ACTION_PLAY |
                 PlaybackState.ACTION_PLAY_FROM_MEDIA_ID |
                 PlaybackState.ACTION_PLAY_FROM_SEARCH;
@@ -362,7 +362,7 @@ public class PlaybackOverlayActivity extends Activity implements
         //Map<Double, String> tagTimesMap = new HashMap<>();
         //tagTimesMap.put(2.0,"ADTAG");
 
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl);//.enableDebugMode(true);
+        IMAConfig adsConfig = new IMAConfig().setAdTagUrl(adTagUrl);//.enableDebugMode(true);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
     }
 
@@ -562,6 +562,11 @@ public class PlaybackOverlayActivity extends Activity implements
 
             player.stop();
         }
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 
     /*

@@ -45,6 +45,7 @@ dependencies {
 //    implementation project(":playkitvr")
 //    implementation project(":MD360")
 
+    implementation 'com.kaltura.playkit:playkit:3.9.4'
     implementation 'com.kaltura.playkit:playkitproviders:3.9.4'
     implementation 'com.kaltura.playkit:youboraplugin:3.9.4'
     implementation 'com.kaltura.playkit:imaplugin:3.9.4'

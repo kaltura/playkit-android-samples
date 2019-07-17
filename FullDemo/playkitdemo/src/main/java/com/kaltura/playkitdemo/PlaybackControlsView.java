@@ -59,7 +59,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
 
     public PlaybackControlsView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        LayoutInflater.from(context).inflate(R.layout.exo_playback_control_view, this);
+        LayoutInflater.from(context).inflate(R.layout.exo_playback_control_view_old, this);
         formatBuilder = new StringBuilder();
         formatter = new Formatter(formatBuilder, Locale.getDefault());
         componentListener = new ComponentListener();

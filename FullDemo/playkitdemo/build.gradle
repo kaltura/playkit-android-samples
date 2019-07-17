@@ -53,7 +53,7 @@ dependencies {
     implementation project(":kava")
     implementation project(":googlecast")
     implementation project(":playkitvr")
-    implementation project(":MD360Player4Android")
+    implementation project(":MD360")
 
 //    implementation 'com.kaltura.playkit:playkitproviders:3.9.0'
 //    implementation 'com.kaltura.playkit:youboraplugin:3.9.0'

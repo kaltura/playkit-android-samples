@@ -124,6 +124,82 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Youbora options Bundle (Recommended)
+     *
+     * Will create {@link PKPluginConfigs} object with {@link YouboraPlugin}.
+     *
+     * @return - the pluginConfig object that should be passed as parameter when loading the player.
+     */
+    private PKPluginConfigs getYouboraBundle() {
+
+        //Important!!! First you need to register your plugin.
+        PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
+
+        //Initialize PKPluginConfigs object.
+        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+        //Initialize Json object that will hold all the configurations for the plugin.
+
+        Bundle optBundle = new Bundle();
+
+        //Youbora config bundle. Main config goes here.
+        optBundle.putString(KEY_ACCOUNT_CODE, ACCOUNT_CODE);
+        optBundle.putString(KEY_USERNAME, UNIQUE_USER_NAME);
+        optBundle.putString(KEY_USER_EMAIL, UNIQUE_USER_NAME);
+        optBundle.putBoolean(KEY_ENABLED, true);
+
+        //Media entry bundle.
+        optBundle.putString(KEY_CONTENT_TITLE, MEDIA_TITLE);
+
+        //Optional - Device bundle o/w youbora will decide by its own.
+        optBundle.putString(KEY_DEVICE_CODE, "AndroidTV");
+        optBundle.putString(KEY_DEVICE_BRAND, "Xiaomi");
+        optBundle.putString(KEY_DEVICE_MODEL, "Mii3");
+        optBundle.putString(KEY_DEVICE_TYPE, "TvBox");
+        optBundle.putString(KEY_DEVICE_OS_NAME, "Android/Oreo");
+        optBundle.putString(KEY_DEVICE_OS_VERSION, "8.1");
+
+        //Youbora ads configuration bundle.
+        optBundle.putString(KEY_AD_CAMPAIGN, CAMPAIGN);
+
+        optBundle.putString(KEY_HOUSEHOLD_ID, "householdId");
+
+        //Configure custom properties here:
+        optBundle.putString(KEY_CONTENT_GENRE, GENRE);
+        optBundle.putString(KEY_CONTENT_TYPE, TYPE);
+        optBundle.putString(KEY_CONTENT_TRANSACTION_CODE, TRANSACTION_TYPE); // NEED TO CHECK
+
+        // Create Content Metadata bundle
+        Bundle contentMetaDataBundle = new Bundle();
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_YEAR, YEAR);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_CAST, CAST);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_DIRECTOR, DIRECTOR);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_OWNER, OWNER);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_PARENTAL, PARENTAL);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_RATING, RATING);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_QUALITY, QUALITY);
+
+        // Add Content Metadata bundle to the main Options bundle
+        optBundle.putBundle(KEY_CONTENT_METADATA, contentMetaDataBundle);
+
+        optBundle.putString(KEY_CONTENT_PRICE, PRICE);
+        optBundle.putString(KEY_CONTENT_ENCODING_AUDIO_CODEC, AUDIO_TYPE); // NEED TO CHECK
+        optBundle.putString(KEY_CONTENT_CHANNEL, AUDIO_CHANNELS);  // NEED TO CHECK
+
+        //You can add some extra params here:
+        optBundle.putString(KEY_CUSTOM_DIMENSION_1, EXTRA_PARAM_1);
+        optBundle.putString(KEY_CUSTOM_DIMENSION_2, EXTRA_PARAM_2);
+
+        //Set plugin entry to the plugin configs.
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), optBundle);
+
+        return pluginConfigs;
+    }
+
+    /**
+     * @Deprecated
+     *
+     * To send the Youbora options as JSON object is deprecated now, instead of this use {@link MainActivity#getYouboraBundle()}
+     *
      * Will create {@link PKPluginConfigs} object with {@link YouboraPlugin}.
      *
      * @return - the pluginConfig object that should be passed as parameter when loading the player.
@@ -200,70 +276,7 @@ public class MainActivity extends AppCompatActivity {
         return pluginConfigs;
     }
 
-    private PKPluginConfigs getYouboraBundle() {
 
-        //Important!!! First you need to register your plugin.
-        PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
-
-        //Initialize PKPluginConfigs object.
-        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
-        //Initialize Json object that will hold all the configurations for the plugin.
-
-        Bundle optBundle = new Bundle();
-
-        //Youbora config bundle. Main config goes here.
-        optBundle.putString(KEY_ACCOUNT_CODE, ACCOUNT_CODE);
-        optBundle.putString(KEY_USERNAME, UNIQUE_USER_NAME);
-        optBundle.putString(KEY_USER_EMAIL, UNIQUE_USER_NAME);
-        optBundle.putBoolean(KEY_ENABLED, true);
-
-        //Media entry bundle.
-        optBundle.putString(KEY_CONTENT_TITLE, MEDIA_TITLE);
-
-        //Optional - Device bundle o/w youbora will decide by its own.
-        optBundle.putString(KEY_DEVICE_CODE, "AndroidTV");
-        optBundle.putString(KEY_DEVICE_BRAND, "Xiaomi");
-        optBundle.putString(KEY_DEVICE_MODEL, "Mii3");
-        optBundle.putString(KEY_DEVICE_TYPE, "TvBox");
-        optBundle.putString(KEY_DEVICE_OS_NAME, "Android/Oreo");
-        optBundle.putString(KEY_DEVICE_OS_VERSION, "8.1");
-
-        //Youbora ads configuration bundle.
-        optBundle.putString(KEY_AD_CAMPAIGN, CAMPAIGN);
-
-        optBundle.putString(KEY_HOUSEHOLD_ID, "householdId");
-
-        //Configure custom properties here:
-        optBundle.putString(KEY_CONTENT_GENRE, GENRE);
-        optBundle.putString(KEY_CONTENT_TYPE, TYPE);
-        optBundle.putString(KEY_CONTENT_TRANSACTION_CODE, TRANSACTION_TYPE); // NEED TO CHECK
-
-        // Create Content Metadata bundle
-        Bundle contentMetaDataBundle = new Bundle();
-        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_YEAR, YEAR);
-        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_CAST, CAST);
-        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_DIRECTOR, DIRECTOR);
-        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_OWNER, OWNER);
-        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_PARENTAL, PARENTAL);
-        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_RATING, RATING);
-        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_QUALITY, QUALITY);
-
-        // Add Content Metadata bundle to the main Options bundle
-        optBundle.putBundle(KEY_CONTENT_METADATA, contentMetaDataBundle);
-
-        optBundle.putString(KEY_CONTENT_PRICE, PRICE);
-        optBundle.putString(KEY_CONTENT_ENCODING_AUDIO_CODEC, AUDIO_TYPE); // NEED TO CHECK
-        optBundle.putString(KEY_CONTENT_CHANNEL, AUDIO_CHANNELS);  // NEED TO CHECK
-
-        //You can add some extra params here:
-        optBundle.putString(KEY_CUSTOM_DIMENSION_1, EXTRA_PARAM_1);
-        optBundle.putString(KEY_CUSTOM_DIMENSION_2, EXTRA_PARAM_2);
-
-        //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), optBundle);
-
-        return pluginConfigs;
-    }
 
     /**
      * Subscribe to kaltura stats report event.

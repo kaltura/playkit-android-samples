@@ -22,27 +22,7 @@ import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_HOUSEHOLD_ID;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_ACCOUNT_CODE;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_AD_CAMPAIGN;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CHANNEL;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_ENCODING_AUDIO_CODEC;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_GENRE;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_METADATA;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_PRICE;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TITLE;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TRANSACTION_CODE;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TYPE;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_1;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_2;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_BRAND;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_CODE;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_MODEL;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_NAME;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_VERSION;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_TYPE;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_ENABLED;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_USERNAME;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -197,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         return pluginConfigs;
     }
 
-   /* private Bundle getYouboraBundle() {
+    private Bundle getYouboraBundle() {
 
         Bundle optBundle = new Bundle();
 
@@ -243,7 +223,6 @@ public class MainActivity extends AppCompatActivity {
 
         return optBundle;
     }
-*/
 
     /**
      * Subscribe to kaltura stats report event.

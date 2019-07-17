@@ -1,4 +1,4 @@
-////PlayKit Library
+    ////PlayKit Library
 include ':playkit'
 project(':playkit').projectDir = new File('../../playkit-android/playkit')
 include ':providers'

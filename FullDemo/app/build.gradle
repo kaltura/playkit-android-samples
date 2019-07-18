@@ -34,22 +34,22 @@ dependencies {
 //    implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
 
 
-    implementation project(":playkit")
-    implementation project(":providers")
-    implementation project(":youbora")
-    implementation project(":ima")
-    implementation project(":kava")
-    implementation project(":googlecast")
+//    implementation project(":playkit")
+//    implementation project(":providers")
+//    implementation project(":youbora")
+//    implementation project(":ima")
+//    implementation project(":kava")
+//    implementation project(":googlecast")
     //implementation project(":admanager")
     //implementation project(":adsplugin")
 
-//    implementation 'com.kaltura.playkit:playkit:3.9.0'
-//    implementation 'com.kaltura.playkit:playkitproviders:3.9.0'
-//    implementation 'com.kaltura.playkit:youboraplugin:3.9.0'
-//    implementation 'com.kaltura.playkit:imaplugin:3.9.0'
-//    implementation 'com.kaltura.playkit:kavaplugin:3.9.0'
-//    implementation 'com.kaltura.playkit:googlecast:3.9.0'
-//    implementation 'com.kaltura.playkit:vrplugin:3.9.0'
+    implementation 'com.kaltura.playkit:playkit:4.0.0'
+    implementation 'com.kaltura.playkit:playkitproviders:4.0.0'
+    implementation 'com.kaltura.playkit:youboraplugin:4.0.0'
+    implementation 'com.kaltura.playkit:imaplugin:4.0.0'
+    implementation 'com.kaltura.playkit:kavaplugin:4.0.0'
+    implementation 'com.kaltura.playkit:googlecast:4.0.0'
+    implementation 'com.kaltura.playkit:vrplugin:4.0.0'
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:support-v4:28.0.0'

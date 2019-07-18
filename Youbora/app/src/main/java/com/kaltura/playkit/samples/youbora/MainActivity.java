@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Media entry json.
         JsonObject mediaEntryJson = new JsonObject();
-        mediaEntryJson.addProperty("isLive", IS_LIVE);
+        //mediaEntryJson.addProperty("isLive", IS_LIVE); // done inside plugin in case that provider is used
         mediaEntryJson.addProperty("title", MEDIA_TITLE);
 
         //Optional - Device json o/w youbora will decide by its own.

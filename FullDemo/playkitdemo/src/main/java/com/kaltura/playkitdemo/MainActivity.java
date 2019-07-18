@@ -263,20 +263,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void initDrm() {
-        MediaSupport.initializeDrm(this, new MediaSupport.DrmInitCallback() {
-            @Override
-            public void onDrmInitComplete(Set<PKDrmParams.Scheme> supportedDrmSchemes, boolean provisionPerformed, Exception provisionError) {
-                if (provisionPerformed) {
-                    if (provisionError != null) {
-                        log.e("DRM Provisioning failed", provisionError);
-                    } else {
-                        log.d("DRM Provisioning succeeded");
-                    }
+        MediaSupport.initializeDrm(this, (supportedDrmSchemes, provisionPerformed, provisionError) -> {
+            if (provisionPerformed) {
+                if (provisionError != null) {
+                    log.e("DRM Provisioning failed", provisionError);
+                } else {
+                    log.d("DRM Provisioning succeeded");
                 }
-                log.d("DRM initialized; supported: " + supportedDrmSchemes);
-
-                // Now it's safe to look at `supportedDrmSchemes`
             }
+            log.d("DRM initialized; supported: " + supportedDrmSchemes);
+
+            // Now it's safe to look at `supportedDrmSchemes`
         });
     }
 
@@ -443,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player.getSettings().setAdAutoPlayOnResume(true);
             player.getSettings().setAllowCrossProtocolRedirect(true);
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
-
+            player.getSettings().enableDecoderFallback(true);
             //player.setPlaybackRate(1.5f);
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
@@ -521,9 +518,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void initSpinners() {
-        videoSpinner = (Spinner) this.findViewById(R.id.videoSpinner);
-        audioSpinner = (Spinner) this.findViewById(R.id.audioSpinner);
-        textSpinner = (Spinner) this.findViewById(R.id.subtitleSpinner);
+        videoSpinner = this.findViewById(R.id.videoSpinner);
+        audioSpinner = this.findViewById(R.id.audioSpinner);
+        textSpinner =  this.findViewById(R.id.subtitleSpinner);
 
         textSpinner.setOnItemSelectedListener(this);
         audioSpinner.setOnItemSelectedListener(this);

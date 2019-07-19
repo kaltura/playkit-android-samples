@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
         player.play();
-
     }
 
     /**

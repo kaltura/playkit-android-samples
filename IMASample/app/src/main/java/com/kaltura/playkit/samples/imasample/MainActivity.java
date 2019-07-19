@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
+        player.play();
 
     }
 
@@ -334,7 +335,8 @@ public class MainActivity extends AppCompatActivity {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (player.isPlaying()) {
+                AdController adController = player.getController(AdController.class);
+                if (player.isPlaying() || adController != null && adController.isAdPlaying()) {
                     //If player is playing, change text of the button and pause.
                     playPauseButton.setText(R.string.play_text);
                     player.pause();
@@ -346,6 +348,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
 }

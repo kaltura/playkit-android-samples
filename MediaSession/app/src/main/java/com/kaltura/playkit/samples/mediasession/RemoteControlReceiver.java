@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import androidx.media.session.MediaButtonReceiver;
+
 import static android.view.KeyEvent.KEYCODE_MEDIA_NEXT;
 import static android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS;
 
@@ -12,7 +14,7 @@ import static android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS;
  * Created by gilad.nadav on 07/06/2017.
  */
 
-public class RemoteControlReceiver extends android.support.v4.media.session.MediaButtonReceiver {
+public class RemoteControlReceiver extends MediaButtonReceiver {
 
     private static final String TAG = "RemoteControlReceiver";
     @Override

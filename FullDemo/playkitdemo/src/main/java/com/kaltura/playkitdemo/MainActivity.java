@@ -6,11 +6,12 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatImageView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
@@ -26,9 +27,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.security.ProviderInstaller;
 import com.google.gson.JsonObject;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.utils.OnCompletion;
@@ -135,13 +133,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         //getPermissionToReadExternalStorage();
         initDrm();
-        try {
+        /*try {
             ProviderInstaller.installIfNeeded(this);
         } catch (GooglePlayServicesRepairableException e) {
             e.printStackTrace();
         } catch (GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
-        }
+        }*/
         mOrientationManager = new OrientationManager(this, SensorManager.SENSOR_DELAY_NORMAL, this);
         mOrientationManager.enable();
         setContentView(R.layout.activity_main);
@@ -265,20 +263,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void initDrm() {
-        MediaSupport.initializeDrm(this, new MediaSupport.DrmInitCallback() {
-            @Override
-            public void onDrmInitComplete(Set<PKDrmParams.Scheme> supportedDrmSchemes, boolean provisionPerformed, Exception provisionError) {
-                if (provisionPerformed) {
-                    if (provisionError != null) {
-                        log.e("DRM Provisioning failed", provisionError);
-                    } else {
-                        log.d("DRM Provisioning succeeded");
-                    }
+        MediaSupport.initializeDrm(this, (supportedDrmSchemes, provisionPerformed, provisionError) -> {
+            if (provisionPerformed) {
+                if (provisionError != null) {
+                    log.e("DRM Provisioning failed", provisionError);
+                } else {
+                    log.d("DRM Provisioning succeeded");
                 }
-                log.d("DRM initialized; supported: " + supportedDrmSchemes);
-
-                // Now it's safe to look at `supportedDrmSchemes`
             }
+            log.d("DRM initialized; supported: " + supportedDrmSchemes);
+
+            // Now it's safe to look at `supportedDrmSchemes`
         });
     }
 
@@ -445,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player.getSettings().setAdAutoPlayOnResume(true);
             player.getSettings().setAllowCrossProtocolRedirect(true);
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
-
+            player.getSettings().enableDecoderFallback(true);
             //player.setPlaybackRate(1.5f);
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
@@ -523,9 +518,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void initSpinners() {
-        videoSpinner = (Spinner) this.findViewById(R.id.videoSpinner);
-        audioSpinner = (Spinner) this.findViewById(R.id.audioSpinner);
-        textSpinner = (Spinner) this.findViewById(R.id.subtitleSpinner);
+        videoSpinner = this.findViewById(R.id.videoSpinner);
+        audioSpinner = this.findViewById(R.id.audioSpinner);
+        textSpinner =  this.findViewById(R.id.subtitleSpinner);
 
         textSpinner.setOnItemSelectedListener(this);
         audioSpinner.setOnItemSelectedListener(this);

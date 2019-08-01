@@ -1,9 +1,10 @@
 package com.kaltura.playkit.samples.basicsample;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.LinearLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.kaltura.playkit.PKDrmParams;
 import com.kaltura.playkit.PKMediaConfig;

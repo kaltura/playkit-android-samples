@@ -1,14 +1,14 @@
 package com.kaltura.playkit.samples.youbora;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.gson.JsonObject;
-import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -21,6 +21,36 @@ import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_CAST;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_DIRECTOR;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_OWNER;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_PARENTAL;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_QUALITY;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_RATING;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_YEAR;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_HOUSEHOLD_ID;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_ACCOUNT_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_AD_CAMPAIGN;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CHANNEL;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_ENCODING_AUDIO_CODEC;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_GENRE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_METADATA;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_PRICE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TITLE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TRANSACTION_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TYPE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_1;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_2;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_BRAND;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_MODEL;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_NAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_VERSION;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_TYPE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_ENABLED;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_USERNAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_USER_EMAIL;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -37,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String MEDIA_SOURCE_ID = "source_id";
 
     //Youbora analytics Constants
-    public static final String ACCOUNT_CODE = "your_account_code";
-    public static final String UNIQUE_USER_NAME = "your_app_logged_in_user_email_or_userId";
+    public static final String ACCOUNT_CODE = "kalturatest";
+    public static final String UNIQUE_USER_NAME = "a@a.com";
     public static final String MEDIA_TITLE = "your_media_title";
     public static final boolean IS_LIVE = false;
     public static final boolean ENABLE_SMART_ADS = true;
@@ -47,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_PARAM_2 = "";
     public static final String GENRE = "your_genre";
     public static final String TYPE = "your_type";
-    public static final String TRANSACTION_TYPE = "your_trasnsaction_type";
+    public static final String TRANSACTION_TYPE = "your_transaction_type";
     public static final String YEAR = "your_year";
     public static final String CAST = "your_cast";
     public static final String DIRECTOR = "your_director";
@@ -56,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String PRICE = "your_price";
     public static final String RATING = "your_rating";
     public static final String AUDIO_TYPE = "your_audio_type";
-    public static final String AUDIO_CHANNELS = "your_audoi_channels";
+    public static final String AUDIO_CHANNELS = "your_audio_channels";
     public static final String DEVICE = "your_device";
     public static final String QUALITY = "your_quality";
 
@@ -74,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         createMediaConfig();
 
         //Initialize PKPluginConfigs object with Youbora.
-        PKPluginConfigs pluginConfigs = createYouboraPlugin();
+        PKPluginConfigs pluginConfigs = getYouboraBundle();
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
@@ -94,6 +124,82 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Youbora options Bundle (Recommended)
+     *
+     * Will create {@link PKPluginConfigs} object with {@link YouboraPlugin}.
+     *
+     * @return - the pluginConfig object that should be passed as parameter when loading the player.
+     */
+    private PKPluginConfigs getYouboraBundle() {
+
+        //Important!!! First you need to register your plugin.
+        PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
+
+        //Initialize PKPluginConfigs object.
+        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+        //Initialize Json object that will hold all the configurations for the plugin.
+
+        Bundle optBundle = new Bundle();
+
+        //Youbora config bundle. Main config goes here.
+        optBundle.putString(KEY_ACCOUNT_CODE, ACCOUNT_CODE);
+        optBundle.putString(KEY_USERNAME, UNIQUE_USER_NAME);
+        optBundle.putString(KEY_USER_EMAIL, UNIQUE_USER_NAME);
+        optBundle.putBoolean(KEY_ENABLED, true);
+
+        //Media entry bundle.
+        optBundle.putString(KEY_CONTENT_TITLE, MEDIA_TITLE);
+
+        //Optional - Device bundle o/w youbora will decide by its own.
+        optBundle.putString(KEY_DEVICE_CODE, "AndroidTV");
+        optBundle.putString(KEY_DEVICE_BRAND, "Xiaomi");
+        optBundle.putString(KEY_DEVICE_MODEL, "Mii3");
+        optBundle.putString(KEY_DEVICE_TYPE, "TvBox");
+        optBundle.putString(KEY_DEVICE_OS_NAME, "Android/Oreo");
+        optBundle.putString(KEY_DEVICE_OS_VERSION, "8.1");
+
+        //Youbora ads configuration bundle.
+        optBundle.putString(KEY_AD_CAMPAIGN, CAMPAIGN);
+
+        optBundle.putString(KEY_HOUSEHOLD_ID, "householdId");
+
+        //Configure custom properties here:
+        optBundle.putString(KEY_CONTENT_GENRE, GENRE);
+        optBundle.putString(KEY_CONTENT_TYPE, TYPE);
+        optBundle.putString(KEY_CONTENT_TRANSACTION_CODE, TRANSACTION_TYPE); // NEED TO CHECK
+
+        // Create Content Metadata bundle
+        Bundle contentMetaDataBundle = new Bundle();
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_YEAR, YEAR);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_CAST, CAST);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_DIRECTOR, DIRECTOR);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_OWNER, OWNER);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_PARENTAL, PARENTAL);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_RATING, RATING);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_QUALITY, QUALITY);
+
+        // Add Content Metadata bundle to the main Options bundle
+        optBundle.putBundle(KEY_CONTENT_METADATA, contentMetaDataBundle);
+
+        optBundle.putString(KEY_CONTENT_PRICE, PRICE);
+        optBundle.putString(KEY_CONTENT_ENCODING_AUDIO_CODEC, AUDIO_TYPE); // NEED TO CHECK
+        optBundle.putString(KEY_CONTENT_CHANNEL, AUDIO_CHANNELS);  // NEED TO CHECK
+
+        //You can add some extra params here:
+        optBundle.putString(KEY_CUSTOM_DIMENSION_1, EXTRA_PARAM_1);
+        optBundle.putString(KEY_CUSTOM_DIMENSION_2, EXTRA_PARAM_2);
+
+        //Set plugin entry to the plugin configs.
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), optBundle);
+
+        return pluginConfigs;
+    }
+
+    /**
+     * @Deprecated
+     *
+     * To send the Youbora options as JSON object is deprecated now, instead of this use {@link MainActivity#getYouboraBundle()}
+     *
      * Will create {@link PKPluginConfigs} object with {@link YouboraPlugin}.
      *
      * @return - the pluginConfig object that should be passed as parameter when loading the player.
@@ -107,19 +213,14 @@ public class MainActivity extends AppCompatActivity {
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
         //Initialize Json object that will hold all the configurations for the plugin.
 
-        //Youbora config json. Main config goes here.
-        JsonObject youboraConfigJson = new JsonObject();
-        youboraConfigJson.addProperty("accountCode", ACCOUNT_CODE);
-        youboraConfigJson.addProperty("username", UNIQUE_USER_NAME);
-        youboraConfigJson.addProperty("haltOnError", true);
-        youboraConfigJson.addProperty("enableAnalytics", true);
-        youboraConfigJson.addProperty("enableSmartAds", ENABLE_SMART_ADS);
+        JsonObject pluginEntry = new JsonObject();
 
+        pluginEntry.addProperty("accountCode", "kalturatest");
+        pluginEntry.addProperty("username", "a@a.com");
+        pluginEntry.addProperty("haltOnError", true);
+        pluginEntry.addProperty("enableAnalytics", true);
+        pluginEntry.addProperty("enableSmartAds", true);
 
-        //Media entry json.
-        JsonObject mediaEntryJson = new JsonObject();
-        mediaEntryJson.addProperty("isLive", IS_LIVE);
-        mediaEntryJson.addProperty("title", MEDIA_TITLE);
 
         //Optional - Device json o/w youbora will decide by its own.
         JsonObject deviceJson = new JsonObject();
@@ -130,45 +231,52 @@ public class MainActivity extends AppCompatActivity {
         deviceJson.addProperty("osName", "Android/Oreo");
         deviceJson.addProperty("osVersion", "8.1");
 
+
+        //Media entry json.
+        JsonObject mediaEntryJson = new JsonObject();
+        //    mediaEntryJson.addProperty("isLive", isLive);
+        //    mediaEntryJson.addProperty("title", title);
+
         //Youbora ads configuration json.
         JsonObject adsJson = new JsonObject();
         adsJson.addProperty("adsExpected", true);
-        adsJson.addProperty("campaign", CAMPAIGN);
+        adsJson.addProperty("campaign", "zzz");
 
         //Configure custom properties here:
         JsonObject propertiesJson = new JsonObject();
-        propertiesJson.addProperty("genre", GENRE);
-        propertiesJson.addProperty("type", TYPE);
-        propertiesJson.addProperty("transaction_type", TRANSACTION_TYPE);
-        propertiesJson.addProperty("year", YEAR);
-        propertiesJson.addProperty("cast", CAST);
-        propertiesJson.addProperty("director", DIRECTOR);
-        propertiesJson.addProperty("owner", OWNER);
-        propertiesJson.addProperty("parental", PARENTAL);
-        propertiesJson.addProperty("price", PRICE);
-        propertiesJson.addProperty("rating", RATING);
-        propertiesJson.addProperty("audioType", AUDIO_TYPE);
-        propertiesJson.addProperty("audioChannels", AUDIO_CHANNELS);
-        propertiesJson.addProperty("device", DEVICE);
-        propertiesJson.addProperty("quality", QUALITY);
+        propertiesJson.addProperty("genre", "");
+        propertiesJson.addProperty("type", "");
+        propertiesJson.addProperty("transaction_type", "");
+        propertiesJson.addProperty("year", "");
+        propertiesJson.addProperty("cast", "");
+        propertiesJson.addProperty("director", "");
+        propertiesJson.addProperty("owner", "");
+        propertiesJson.addProperty("parental", "");
+        propertiesJson.addProperty("price", "");
+        propertiesJson.addProperty("rating", "");
+        propertiesJson.addProperty("audioType", "");
+        propertiesJson.addProperty("audioChannels", "");
+        propertiesJson.addProperty("device", "");
+        propertiesJson.addProperty("quality", "");
 
         //You can add some extra params here:
         JsonObject extraParamJson = new JsonObject();
-        extraParamJson.addProperty("param1", EXTRA_PARAM_1);
-        extraParamJson.addProperty("param2", EXTRA_PARAM_2);
+        extraParamJson.addProperty("param1", "param1");
+        extraParamJson.addProperty("param2", "param2");
 
         //Add all the json objects created before to the pluginEntry json.
-        youboraConfigJson.add("media", mediaEntryJson);
-        youboraConfigJson.add("device", deviceJson);
-        youboraConfigJson.add("ads", adsJson);
-        youboraConfigJson.add("properties", propertiesJson);
-        youboraConfigJson.add("extraParams", extraParamJson);
-
+        pluginEntry.add("device", deviceJson);
+        pluginEntry.add("media", mediaEntryJson);
+        pluginEntry.add("ads", adsJson);
+        pluginEntry.add("properties", propertiesJson);
+        pluginEntry.add("extraParams", extraParamJson);
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), youboraConfigJson);
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
 
         return pluginConfigs;
     }
+
+
 
     /**
      * Subscribe to kaltura stats report event.

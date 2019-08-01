@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
-
+        player.play();
     }
 
     /**
@@ -325,14 +325,15 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Just add a simple button which will start/pause playback.
      */
-    private void addPlayPauseButton() {
+        private void addPlayPauseButton() {
         //Get reference to the play/pause button.
         playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
         //Add clickListener.
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (player.isPlaying()) {
+                AdController adController = player.getController(AdController.class);
+                if (player.isPlaying() || adController != null && adController.isAdPlaying()) {
                     //If player is playing, change text of the button and pause.
                     playPauseButton.setText(R.string.play_text);
                     player.pause();
@@ -344,6 +345,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
 }

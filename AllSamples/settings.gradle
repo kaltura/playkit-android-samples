@@ -36,7 +36,8 @@ def samples = [
         'TVPapiStats',
         'ChromecastSample',
         'ChromecastCAFSample',
-        'MediaSession'
+        'MediaSession',
+        'FBAdsSample'
 ]
 
 samples.each {

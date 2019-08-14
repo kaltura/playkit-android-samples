@@ -8,8 +8,6 @@ import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.facebook.ads.internal.protocol.AdPlacementType;
-import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -26,9 +24,42 @@ import com.kaltura.playkit.plugins.fbads.fbinstream.FBInStreamAd;
 import com.kaltura.playkit.plugins.fbads.fbinstream.FBInStreamAdBreak;
 import com.kaltura.playkit.plugins.fbads.fbinstream.FBInstreamConfig;
 import com.kaltura.playkit.plugins.fbads.fbinstream.FBInstreamPlugin;
+import com.kaltura.playkit.plugins.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_CAST;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_DIRECTOR;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_OWNER;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_PARENTAL;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_QUALITY;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_RATING;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_YEAR;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_HOUSEHOLD_ID;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_ACCOUNT_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_AD_CAMPAIGN;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CHANNEL;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_ENCODING_AUDIO_CODEC;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_GENRE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_METADATA;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_PRICE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TITLE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TRANSACTION_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TYPE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_1;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_2;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_BRAND;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_MODEL;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_NAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_VERSION;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_TYPE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_ENABLED;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_USERNAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_USER_EMAIL;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -52,6 +83,30 @@ public class MainActivity extends AppCompatActivity {
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
 
+    //Youbora analytics Constants
+    public static final String ACCOUNT_CODE = "kalturatest";
+    public static final String UNIQUE_USER_NAME = "a@a.com";
+    public static final String MEDIA_TITLE = "your_media_title";
+    public static final boolean IS_LIVE = false;
+    public static final boolean ENABLE_SMART_ADS = true;
+    private static final String CAMPAIGN = "your_campaign_name";
+    public static final String EXTRA_PARAM_1 = "playKitPlayer";
+    public static final String EXTRA_PARAM_2 = "";
+    public static final String GENRE = "your_genre";
+    public static final String TYPE = "your_type";
+    public static final String TRANSACTION_TYPE = "your_transaction_type";
+    public static final String YEAR = "your_year";
+    public static final String CAST = "your_cast";
+    public static final String DIRECTOR = "your_director";
+    private static final String OWNER = "your_owner";
+    public static final String PARENTAL = "your_parental";
+    public static final String PRICE = "your_price";
+    public static final String RATING = "your_rating";
+    public static final String AUDIO_TYPE = "your_audio_type";
+    public static final String AUDIO_CHANNELS = "your_audio_channels";
+    public static final String DEVICE = "your_device";
+    public static final String QUALITY = "your_quality";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,11 +115,18 @@ public class MainActivity extends AppCompatActivity {
         //Initialize media config object.
         createMediaConfig();
 
+        //Initialize plugin configuration object.
+        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+
         //Create plugin configurations.
-        PKPluginConfigs pluginConfigs = createFBInStreamPlugin();
+        PKPluginConfigs setPlugins = createFBInStreamPlugin(pluginConfigs);
+
+//        PKPluginConfigs setPlugins = createIMAPlugin(pluginConfigs);
+
+//        getYouboraBundle(pluginConfigs);
 
         //Create instance of the player with plugin configurations.
-        player = PlayKitManager.loadPlayer(this, pluginConfigs);
+        player = PlayKitManager.loadPlayer(this, setPlugins);
 
         //Subscribe to the ad events.
         subscribeToAdEvents();
@@ -85,15 +147,47 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return - {@link PKPluginConfigs} object with FBInStreamPlugin.
      */
-    private PKPluginConfigs createFBInStreamPlugin() {
+    private PKPluginConfigs createFBInStreamPlugin(PKPluginConfigs pluginConfigs) {
 
         //First register your IMAPlugin.
         PlayKitManager.registerPlugins(this, FBInstreamPlugin.factory);
 
-        //Initialize plugin configuration object.
-        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
-
         addFBInStreamPluginConfig(pluginConfigs);
+
+        //Return created PluginConfigs object.
+        return pluginConfigs;
+    }
+
+    /**
+     * Create IMAPlugin object.
+     *
+     * @return - {@link PKPluginConfigs} object with IMAPlugin.
+     */
+    private PKPluginConfigs createIMAPlugin(PKPluginConfigs pluginConfigs) {
+
+        //First register your IMAPlugin.
+        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+
+        //Initialize imaConfigs object.
+        IMAConfig imaConfig = new IMAConfig();
+
+        //Configure ima.
+        imaConfig.setAdTagUrl(AD_TAG_URL);
+        imaConfig.setVideoBitrate(PREFERRED_AD_BITRATE);
+        imaConfig.enableDebugMode(true);
+
+        /* For MOAT call this API:
+            List<View> overlaysList = new ArrayList<>();
+            //overlaysList.add(....)
+            imaConfig.setControlsOverlayList(overlaysList);
+        */
+
+        //Set jsonObject to the main pluginConfigs object.
+        pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfig);
+        /*
+            NOTE!  for change media before player.prepare api please call:
+            player.updatePluginConfig(IMAlugin.factory.getName(), imaConfig);
+        */
 
         //Return created PluginConfigs object.
         return pluginConfigs;
@@ -158,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
 
         player.addListener(this, AdEvent.loaded, event -> {
             AdEvent.AdLoadedEvent adLoadedEvent = event;
-            Log.d(TAG, "AD_LOADED " + adLoadedEvent.adInfo.getAdIndexInPod() + "/" + adLoadedEvent.adInfo.getTotalAdsInPod());
+//            Log.d(TAG, "AD_LOADED " + adLoadedEvent.adInfo.getAdIndexInPod() + "/" + adLoadedEvent.adInfo.getTotalAdsInPod());
         });
 
         player.addListener(this, AdEvent.started, event -> {
@@ -241,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
 
-       // mediaConfig.setStartPosition(181L);
+        // mediaConfig.setStartPosition(181L);
     }
 
     /**
@@ -337,38 +431,109 @@ public class MainActivity extends AppCompatActivity {
 
     private void addFBInStreamPluginConfig(PKPluginConfigs config) {
         List<FBInStreamAd> preRollFBInStreamAdList = new ArrayList<>();
-        FBInStreamAd preRoll1 = new FBInStreamAd("521823934664910_1104188646428433", AdPlacementType.INSTREAM, 0, 0);
-        FBInStreamAd preRoll2 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 0, 1);
+        FBInStreamAd preRoll1 = new FBInStreamAd("156903085045437_239184776817267",0, 0);
+        FBInStreamAd preRoll2 = new FBInStreamAd("156903085045437_239184776817267",0, 1);
         preRollFBInStreamAdList.add(preRoll1);
         //preRollFBInStreamAdList.add(preRoll2);
         FBInStreamAdBreak preRollAdBreak = new FBInStreamAdBreak(AdPositionType.PRE_ROLL, 0L, preRollFBInStreamAdList);
 
         List<FBInStreamAd> midRoll1FBInStreamAdList = new ArrayList<>();
-        FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 60000, 0);
+        FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267",60000, 0);
         midRoll1FBInStreamAdList.add(midRoll1);
         FBInStreamAdBreak midRoll1AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 60000, midRoll1FBInStreamAdList);
 
 
         List<FBInStreamAd> midRoll2FBInStreamAdList = new ArrayList<>();
-        FBInStreamAd midRoll2 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, 180000, 0);
+        FBInStreamAd midRoll2 = new FBInStreamAd("156903085045437_239184776817267", 180000, 0);
         midRoll2FBInStreamAdList.add(midRoll2);
         FBInStreamAdBreak midRoll2AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 180000, midRoll2FBInStreamAdList);
 
 
         List<FBInStreamAd> postRollFBInStreamAdList = new ArrayList<>();
-        FBInStreamAd postRoll1 = new FBInStreamAd("156903085045437_239184776817267", AdPlacementType.INSTREAM, Long.MAX_VALUE, 0);
+        FBInStreamAd postRoll1 = new FBInStreamAd("156903085045437_239184776817267", Long.MAX_VALUE, 0);
         postRollFBInStreamAdList.add(postRoll1);
         FBInStreamAdBreak postRollAdBreak = new FBInStreamAdBreak(AdPositionType.POST_ROLL, Long.MAX_VALUE, postRollFBInStreamAdList);
 
         List<FBInStreamAdBreak> fbInStreamAdBreakList = new ArrayList<>();
         fbInStreamAdBreakList.add(preRollAdBreak);
-        //fbInStreamAdBreakList.add(midRoll1AdBreak);
-        //fbInStreamAdBreakList.add(midRoll2AdBreak);
-        //fbInStreamAdBreakList.add(postRollAdBreak);
+        fbInStreamAdBreakList.add(midRoll1AdBreak);
+        fbInStreamAdBreakList.add(midRoll2AdBreak);
+        fbInStreamAdBreakList.add(postRollAdBreak);
 
 
         FBInstreamConfig fbInstreamConfig = new FBInstreamConfig(fbInStreamAdBreakList);
         config.setPluginConfig(FBInstreamPlugin.factory.getName(), fbInstreamConfig);
     }
+
+    /**
+     * Youbora options Bundle (Recommended)
+     *
+     * Will create {@link PKPluginConfigs} object with {@link YouboraPlugin}.
+     *
+     * @return - the pluginConfig object that should be passed as parameter when loading the player.
+     */
+    private PKPluginConfigs getYouboraBundle(PKPluginConfigs pluginConfigs) {
+
+        //Important!!! First you need to register your plugin.
+        PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
+
+        //Initialize Json object that will hold all the configurations for the plugin.
+
+        Bundle optBundle = new Bundle();
+
+        //Youbora config bundle. Main config goes here.
+        optBundle.putString(KEY_ACCOUNT_CODE, ACCOUNT_CODE);
+        optBundle.putString(KEY_USERNAME, UNIQUE_USER_NAME);
+        optBundle.putString(KEY_USER_EMAIL, UNIQUE_USER_NAME);
+        optBundle.putBoolean(KEY_ENABLED, true);
+
+        //Media entry bundle.
+        optBundle.putString(KEY_CONTENT_TITLE, MEDIA_TITLE);
+
+        //Optional - Device bundle o/w youbora will decide by its own.
+        optBundle.putString(KEY_DEVICE_CODE, "AndroidTV");
+        optBundle.putString(KEY_DEVICE_BRAND, "Xiaomi");
+        optBundle.putString(KEY_DEVICE_MODEL, "Mii3");
+        optBundle.putString(KEY_DEVICE_TYPE, "TvBox");
+        optBundle.putString(KEY_DEVICE_OS_NAME, "Android/Oreo");
+        optBundle.putString(KEY_DEVICE_OS_VERSION, "8.1");
+
+        //Youbora ads configuration bundle.
+        optBundle.putString(KEY_AD_CAMPAIGN, CAMPAIGN);
+
+        optBundle.putString(KEY_HOUSEHOLD_ID, "householdId");
+
+        //Configure custom properties here:
+        optBundle.putString(KEY_CONTENT_GENRE, GENRE);
+        optBundle.putString(KEY_CONTENT_TYPE, TYPE);
+        optBundle.putString(KEY_CONTENT_TRANSACTION_CODE, TRANSACTION_TYPE); // NEED TO CHECK
+
+        // Create Content Metadata bundle
+        Bundle contentMetaDataBundle = new Bundle();
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_YEAR, YEAR);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_CAST, CAST);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_DIRECTOR, DIRECTOR);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_OWNER, OWNER);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_PARENTAL, PARENTAL);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_RATING, RATING);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_QUALITY, QUALITY);
+
+        // Add Content Metadata bundle to the main Options bundle
+        optBundle.putBundle(KEY_CONTENT_METADATA, contentMetaDataBundle);
+
+        optBundle.putString(KEY_CONTENT_PRICE, PRICE);
+        optBundle.putString(KEY_CONTENT_ENCODING_AUDIO_CODEC, AUDIO_TYPE); // NEED TO CHECK
+        optBundle.putString(KEY_CONTENT_CHANNEL, AUDIO_CHANNELS);  // NEED TO CHECK
+
+        //You can add some extra params here:
+        optBundle.putString(KEY_CUSTOM_DIMENSION_1, EXTRA_PARAM_1);
+        optBundle.putString(KEY_CUSTOM_DIMENSION_2, EXTRA_PARAM_2);
+
+        //Set plugin entry to the plugin configs.
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), optBundle);
+
+        return pluginConfigs;
+    }
+
 
 }

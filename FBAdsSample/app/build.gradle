@@ -45,6 +45,8 @@ dependencies {
 
     implementation project(':playkit')
     implementation project(':providers')
+    implementation project(':ima')
+    implementation project(":youbora")
     implementation project(':fbads')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])

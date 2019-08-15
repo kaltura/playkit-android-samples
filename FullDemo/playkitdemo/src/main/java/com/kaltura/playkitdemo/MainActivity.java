@@ -86,6 +86,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
 import static com.kaltura.playkitdemo.MockParams.Format2;
+import static com.kaltura.playkitdemo.MockParams.FormatTest;
+import static com.kaltura.playkitdemo.MockParams.MediaIdTest;
 import static com.kaltura.playkitdemo.MockParams.OvpUserKS;
 import static com.kaltura.playkitdemo.MockParams.PnxKS;
 import static com.kaltura.playkitdemo.MockParams.SingMediaId4;
@@ -173,12 +175,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
+        startOttMediaLoading(playLoadedEntry);
         //startSimpleOvpMediaLoadingVR(playLoadedEntry);
-        startSimpleOvpMediaLoadingHls(playLoadedEntry);
+//        startSimpleOvpMediaLoadingHls(playLoadedEntry);
 //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
 //      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
-//      startOttMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
@@ -346,33 +348,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void startOttMediaLoading(final OnMediaLoadCompletion completion) {
-        SessionProvider ksSessionProvider = new SessionProvider() {
-            @Override
-            public String baseUrl() {
-                return MockParams.PhoenixBaseUrl;
-            }
-
-            @Override
-            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
-                if (completion != null) {
-                    completion.onComplete(new PrimitiveResult(PnxKS));
-                }
-            }
-
-            @Override
-            public int partnerId() {
-                return MockParams.OttPartnerId;
-            }
-        };
-
+        SessionProvider ksSessionProvider = new SimpleSessionProvider(MockParams.PhoenixBaseUrlUS, MockParams.OttPartnerIdTest, null);
         mediaProvider = new PhoenixMediaProvider()
                 .setSessionProvider(ksSessionProvider)
-                .setAssetId(SingMediaId4) //bunny no horses id = "485380"
+                .setAssetId(MediaIdTest)
                 .setAssetType(APIDefines.KalturaAssetType.Media)
                 .setAssetReferenceType(APIDefines.AssetReferenceType.Media)
                 .setContextType(APIDefines.PlaybackContextType.Playback)
-                .setProtocol(PhoenixMediaProvider.HttpProtocol.Http)
-                .setFormats(Format2);
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.All)
+                .setFormats(FormatTest);
         mediaProvider.load(completion);
     }
 

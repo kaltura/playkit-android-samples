@@ -1,0 +1,61 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    defaultConfig {
+        applicationId "com.kaltura.playkit.samples.kavaanalytics"
+        minSdkVersion 17
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        warning 'InvalidPackage'
+    }
+}
+
+dependencies {
+//    implementation 'com.kaltura.playkit:playkit:3.7.1'
+//    implementation 'com.kaltura.playkit:playkitproviders:3.7.1'
+//    implementation 'com.kaltura.playkit:imaplugin:3.7.1'
+//    implementation 'com.kaltura.playkit:kavaplugin:3.7.1'
+
+//    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+
+    implementation project(':playkit')
+    implementation project(':providers')
+    implementation project(':kava')
+    implementation project(':ima')
+
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.test.espresso:espresso-core:3.1.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    testImplementation 'junit:junit:4.12'
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+repositories {
+    google()
+    jcenter()
+    maven { url 'https://jitpack.io' }
+}

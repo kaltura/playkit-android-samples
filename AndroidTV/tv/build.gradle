@@ -1,14 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 28
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     defaultConfig {
         applicationId "com.kaltura.playkit.samples.androidtv"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 28
         versionCode 1
+        multiDexEnabled true
         versionName "1.0"
+
     }
     buildTypes {
         release {
@@ -19,9 +24,33 @@ android {
 }
 
 dependencies {
-    compile project(':playkit')
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:leanback-v17:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.github.bumptech.glide:glide:3.7.0'
+//    implementation 'com.kaltura.playkit:playkit:3.7.1'
+//    implementation 'com.kaltura.playkit:playkitproviders:3.7.1'
+//    implementation 'com.kaltura.playkit:imaplugin:3.7.1'
+//    implementation 'com.kaltura.playkit:youboraplugin:3.7.1'
+
+//    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+//    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+//    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+
+    implementation project(':playkit')
+    implementation project(':providers')
+    implementation project(':ima')
+    implementation project(':youbora')
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.leanback:leanback:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+repositories {
+    google()
+    jcenter()
+    maven { url 'https://jitpack.io' }
 }

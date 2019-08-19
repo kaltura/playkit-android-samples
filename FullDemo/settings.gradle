@@ -1,0 +1,41 @@
+include ':app'
+include ':playkitdemo'
+
+include ':playkit'
+project(':playkit').projectDir = new File(settingsDir, '../../playkit-android/playkit')
+
+include ':providers'
+project(':providers').projectDir = new File('../../playkit-android-providers/mediaproviders')
+
+include ':youbora'
+project(':youbora').projectDir = new File('../../playkit-android-youbora/youboraplugin')
+
+include ':ima'
+project(':ima').projectDir = new File('../../playkit-android-ima/imaplugin')
+
+include ':kava'
+project(':kava').projectDir = new File('../../playkit-android-kava/kavaplugin')
+
+include ':googlecast'
+project(':googlecast').projectDir = new File('../../playkit-android-googlecast/googlecast')
+
+include ':MD360'
+project(':MD360').projectDir = new File('../../MD360Player4Android/vrlib')
+
+include ':playkitvr'
+project(':playkitvr').projectDir = new File('../../playkit-android-vr/playkitvr')
+
+//include ':netkit'
+//project(':netkit').projectDir = new File('../../netkit-android/netkit')
+
+//gradle.ext.exoplayerRoot = '../../../../../Dev/android/google/ExoPlayer'
+//gradle.ext.exoplayerModulePrefix = 'exoplayer-'
+//apply from: new File(
+//        gradle.ext.exoplayerRoot, 'core_settings.gradle')
+
+
+
+//include ':admanager'
+//project(':admanager').projectDir = new File(settingsDir, '../../playkit-admanager-android/admanager')
+//include ':adsplugin'
+//project(':adsplugin').projectDir = new File(settingsDir, '../../playkit-android-ads-plugin/adsplugin')

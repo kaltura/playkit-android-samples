@@ -1,0 +1,74 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    defaultConfig {
+        applicationId "com.kaltura.playkitdemo"
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+    }
+
+    dexOptions {
+        jumboMode true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    /*tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }*/
+
+   /* lintOptions {
+        // The demo app isn't indexed, doesn't have translations, and has a
+        // banner for AndroidTV that's only in xhdpi density.
+        disable 'GoogleAppIndexingWarning','MissingTranslation','IconDensities'
+    }*/
+}
+
+dependencies {
+//    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
+
+    implementation 'androidx.annotation:annotation:1.0.2'
+    implementation project(":playkit")
+    implementation project(":providers")
+    implementation project(":ima")
+    implementation project(":youbora")
+    implementation project(":kava")
+    implementation project(":googlecast")
+    implementation project(":playkitvr")
+    implementation project(":MD360")
+
+//    implementation 'com.kaltura.playkit:playkitproviders:3.9.0'
+//    implementation 'com.kaltura.playkit:youboraplugin:3.9.0'
+//    implementation 'com.kaltura.playkit:imaplugin:3.9.0'
+//    implementation 'com.kaltura.playkit:kavaplugin:3.9.0'
+//    implementation 'com.kaltura.playkit:googlecast:3.9.0'
+//    implementation 'com.kaltura.playkit:vrplugin:3.9.0'
+
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    //implementation 'com.github.kaltura:playkit-dtg-android:v2.3.0'
+}
+
+repositories {
+    google()
+    jcenter()
+    maven { url "https://jitpack.io" }
+}

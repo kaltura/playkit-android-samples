@@ -4,12 +4,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
@@ -24,9 +25,9 @@ import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.images.WebImage;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.addon.cast.BasicCastBuilder;
-import com.kaltura.playkit.addon.cast.OVPCastBuilder;
-import com.kaltura.playkit.addon.cast.TVPAPICastBuilder;
+import com.kaltura.playkit.plugins.googlecast.BasicCastBuilder;
+import com.kaltura.playkit.plugins.googlecast.OVPCastBuilder;
+import com.kaltura.playkit.plugins.googlecast.TVPAPICastBuilder;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //NOTE - FOR OTT CASTING YOU HAVE TO CHANGE THE REVIVER ID TO E4D66C10 in strings.xml
         mCastStateListener = new CastStateListener() {
             @Override
             public void onCastStateChanged(int newState) {
@@ -76,9 +78,7 @@ public class MainActivity extends AppCompatActivity {
         mCastContext = CastContext.getSharedInstance(this);
         mCastContext.getSessionManager().addSessionManagerListener(
                 mSessionManagerListener, CastSession.class);
-        mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
-
-
+        // mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
         // mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
 
 
@@ -294,7 +294,6 @@ public class MainActivity extends AppCompatActivity {
             public void onAdBreakStatusUpdated() {
             }
         });
-
         remoteMediaClient.load(getOttCastMediaInfo(getConverterCastForOtt(), false), autoPlay, position);
     }
 
@@ -304,12 +303,11 @@ public class MainActivity extends AppCompatActivity {
 
     private MediaInfo getOttCastMediaInfo(ConverterOttCast converterOttCast, boolean setAdTagUrl) {
 
-        TVPAPICastBuilder TVPAPICastBuilder = new TVPAPICastBuilder()
+        TVPAPICastBuilder tvpapiCastBuilder = new TVPAPICastBuilder()
                 .setFormat(converterOttCast.getFormat())
                 .setInitObject(converterOttCast.getInitObject().toString());
-
-
-        return returnResult(TVPAPICastBuilder, converterOttCast, setAdTagUrl);
+        //tvpapiCastBuilder.setDefaultTextLanguageLabel("en");
+        return returnResult(tvpapiCastBuilder, converterOttCast, setAdTagUrl);
     }
 
 
@@ -322,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(ks)) { // ks isn't mandatory in OVP environment
             ovpCastBuilder.setKs(ks);
         }
-
+        //ovpCastBuilder.setDefaultTextLanguageLabel("en");
         return returnResult(ovpCastBuilder, converterOvpCast, setAdTagUrl);
     }
 
@@ -335,6 +333,7 @@ public class MainActivity extends AppCompatActivity {
         MediaInfo mediaInfo = basicCastBuilder
                 .setMwEmbedUrl(converterGoogleCast.getMwEmbedURL())
                 .setPartnerId(converterGoogleCast.getPartnerId())
+                .setAdTagUrl(converterGoogleCast.getAdTagURL())
                 .setUiConfId(converterGoogleCast.getUiconfId())
                 .setMediaEntryId(converterGoogleCast.getEntryId())
                 .setStreamType(BasicCastBuilder.StreamType.VOD)
@@ -399,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
                 ConverterGoogleCast.ReceiverEnvironmentType.RECEIVER_OVP_ENVIRONMENT,
                 "", //ks
                 "0_uka1msg4",
-                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=",
+                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
                 "", //mwEmbed
                 "243342",
                 "21099702",
@@ -429,10 +428,10 @@ public class MainActivity extends AppCompatActivity {
         ConverterOttCast converterOttCast = new ConverterOttCast(
                 ConverterGoogleCast.ReceiverEnvironmentType.RECEIVER_TVPAPI_ENVIRONMENT,
                 initObj.toJson(),
-                "Web_HD_Dash",
-                "480097",
-                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=",
-                "https://player-preprod.ott.kaltura.com/v2.58/mwEmbed/",
+                "Mobile_Devices_Main_SD",
+                "259153",
+                "https://pubsssads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=",
+                "http://player-preprod.ott.kaltura.com/v2.61/mwEmbed/",
                 "198",
                 "8413355",
                 converterMediaMetadata);

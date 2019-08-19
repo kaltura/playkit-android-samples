@@ -1,8 +1,9 @@
 package com.kaltura.playkit.samples.basicpluginssetup.plugins;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.google.gson.JsonObject;
 import com.kaltura.playkit.MessageBus;
@@ -12,7 +13,6 @@ import com.kaltura.playkit.PKPlugin;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerDecorator;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.ads.AdController;
 
 /**
  * This is a Sample custom plugin. Which is overriding the {@link PKPlugin}.
@@ -44,6 +44,11 @@ public class SamplePlugin extends PKPlugin {
         @Override
         public PKPlugin newInstance() {
             return new SamplePlugin();
+        }
+
+        @Override
+        public String getVersion() {
+            return "1.1";
         }
 
         @Override
@@ -158,11 +163,6 @@ public class SamplePlugin extends PKPlugin {
             }
 
             @Override
-            public AdController getAdController() {
-                return super.getAdController();
-            }
-
-            @Override
             public void play() {
                 super.play();
             }
@@ -185,11 +185,6 @@ public class SamplePlugin extends PKPlugin {
             @Override
             public boolean isPlaying() {
                 return super.isPlaying();
-            }
-
-            @Override
-            public void prepareNext(@NonNull PKMediaConfig mediaConfig) {
-                super.prepareNext(mediaConfig);
             }
 
             @Override

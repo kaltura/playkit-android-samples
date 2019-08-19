@@ -1,11 +1,12 @@
 package com.kaltura.playkit.samples.erhandling;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKEvent;
@@ -18,7 +19,8 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.plugins.ads.AdEvent;
-import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ima.IMAPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private PKPluginConfigs createIMAPlugin() {
 
         //First register your IMAPlugin.
-        PlayKitManager.registerPlugins(this, com.kaltura.playkit.plugins.ads.ima.IMAPlugin.factory);
+        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
 
         //Initialize plugin configuration object.
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
@@ -87,14 +89,14 @@ public class MainActivity extends AppCompatActivity {
 
         //Configure ima.
         //!!!NOTE we in purpose place incorrect url as adTag, in order to produce ad error.
-        imaConfigs.setAdTagURL(INCORRECT_AD_TAG_URL);
+        imaConfigs.setAdTagUrl(INCORRECT_AD_TAG_URL);
         imaConfigs.setVideoBitrate(PREFERRED_AD_BITRATE);
 
         //Convert imaConfigs to jsonObject.
         JsonObject imaConfigJsonObject = imaConfigs.toJSONObject();
 
         //Set jsonObject to the main pluginConfigs object.
-        pluginConfigs.setPluginConfig(com.kaltura.playkit.plugins.ads.ima.IMAPlugin.factory.getName(), imaConfigJsonObject);
+        pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfigJsonObject);
 
         //Return created PluginConfigs object.
         return pluginConfigs;
@@ -108,32 +110,15 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToErrorEvents() {
 
-        //Add event listener. Note, that it have two parameters.
-        // 1. PKEvent.Listener itself.
-        // 2. Array of events you want to listen to.
-        player.addEventListener(new PKEvent.Listener() {
+        player.addListener(this, PlayerEvent.error, event -> {
+            PlayerEvent.Error playerErrorvEent = event;
+            Log.e(TAG, "PLAYER ERROR " +  playerErrorvEent.error.errorType.name() + " " + playerErrorvEent.error.message);
+        });
 
-                                    //Event received.
-                                    @Override
-                                    public void onEvent(PKEvent event) {
-                                        //Check type of the received event.
-                                        if (event.eventType() == PlayerEvent.Type.ERROR) {
-                                            //In case of PlayerEvent.Type.ERROR cast the event object to PlayerEvent.Error
-                                            PlayerEvent.Error errorEvent = (PlayerEvent.Error) event;
-                                            //Print the type of the received error.
-                                            Log.e(TAG, "Error: " + errorEvent.error.errorType.name());
-                                        } else if (event.eventType() == AdEvent.Type.ERROR) {
-                                            //In case of AdEvent.Type.ERROR cast the event object to AdEvent.Error
-                                            AdEvent.Error errorEvent = (AdEvent.Error) event;
-                                            //Print the type of the received error.
-                                            Log.e(TAG, "Error: " + errorEvent.error.errorType.name());
-                                        }
-                                    }
-                                },
-                //Subscribe to the events you are interested in.
-                PlayerEvent.Type.ERROR,
-                AdEvent.Type.ERROR
-        );
+        player.addListener(this, AdEvent.error, event -> {
+            AdEvent.Error adError = event;
+            Log.e(TAG, "AD_ERROR : " +   adError.error.errorType.name() + " " + adError.error.errorType.name());
+        });
     }
 
     /**

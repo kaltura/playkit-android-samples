@@ -29,9 +29,18 @@ repositories {
 }
 
 dependencies {
+//    implementation 'com.kaltura.playkit:playkit:3.7.1'
+//    implementation 'com.kaltura.playkit:playkitproviders:3.7.1'
+//    implementation 'com.kaltura.playkit:imaplugin:3.7.1'
+
+//    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+//    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+//    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+
     implementation project(path: ':playkit')
     implementation project(path: ':providers')
     implementation project(":ima")
+    
     implementation 'androidx.annotation:annotation:1.0.2'
     implementation 'androidx.recyclerview:recyclerview:1.0.0-alpha1'
     implementation 'androidx.appcompat:appcompat:1.0.0'

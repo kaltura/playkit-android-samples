@@ -16,6 +16,9 @@ project(':MD360').projectDir = new File('../../MD360Player4Android/vrlib')
 include ':playkitvr'
 project(':playkitvr').projectDir = new File('../../playkit-android-vr/playkitvr')
 
+//include ':netkit'
+//project(':netkit').projectDir = new File('../../netkit-android/netkit')
+
 // Sample apps
 def samples = [
         'BasicSetup',
@@ -36,6 +39,7 @@ def samples = [
         'TVPapiStats',
         'ChromecastSample',
         'ChromecastCAFSample',
+        'PlaykitDragScale',
         'MediaSession'
 ]
 
@@ -47,6 +51,3 @@ samples.each {
 
 include ":AndroidTV"
 project(":AndroidTV").projectDir = new File ('../AndroidTV/tv')
-include ":playkitDragScale"
-project(":playkitDragScale").projectDir = new File ('../playkitDragScale')
-

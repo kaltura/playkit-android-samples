@@ -48,8 +48,8 @@ dependencies {
     implementation project(":ima")
     implementation project(":kava")
     implementation project(":googlecast")
-    implementation project(":admanager")
-    implementation project(":adsplugin")
+    //implementation project(":admanager")
+    //implementation project(":adsplugin")
 
     implementation 'androidx.annotation:annotation:1.0.2'
 

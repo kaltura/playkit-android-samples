@@ -18,6 +18,9 @@
 //include ':playkitvr'
 //project(':playkitvr').projectDir = new File('../../playkit-android-vr/playkitvr')
 
+//include ':netkit'
+//project(':netkit').projectDir = new File('../../netkit-android/netkit')
+
 // Sample apps
 def samples = [
         'BasicSetup',
@@ -38,6 +41,7 @@ def samples = [
         'TVPapiStats',
         'ChromecastSample',
         'ChromecastCAFSample',
+        'PlaykitDragScale',
         'MediaSession'
 ]
 

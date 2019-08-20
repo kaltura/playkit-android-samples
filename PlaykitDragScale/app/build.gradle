@@ -37,9 +37,9 @@ dependencies {
 //    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
 //    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
 
-    implementation project(path: ':playkit')
-    implementation project(path: ':providers')
-    implementation project(":ima")
+    implementation project(':playkit')
+    implementation project(':providers')
+    implementation project(':ima')
 
 
     implementation 'androidx.annotation:annotation:1.0.2'

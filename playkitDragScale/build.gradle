@@ -1,14 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion 28
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
     defaultConfig {
         applicationId "com.kaltura.playkitdemo"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 28
         versionCode 1
+        multiDexEnabled true
         versionName "1.0"
     }
     buildTypes {
@@ -25,9 +29,11 @@ repositories {
 }
 
 dependencies {
-    compile project(path: ':playkit')
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:support-v4:25.0.0'
-    compile 'com.nineoldandroids:library:2.4.0'
+    implementation project(path: ':playkit')
+    implementation project(path: ':providers')
+    implementation project(":ima")
+    implementation 'androidx.annotation:annotation:1.0.2'
+    implementation 'androidx.recyclerview:recyclerview:1.0.0-alpha1'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.nineoldandroids:library:2.4.0'
 }

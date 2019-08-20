@@ -8,15 +8,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.ViewParent;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.kaltura.netkit.utils.OnCompletion;
+import androidx.annotation.NonNull;
 
 /**
  * Sample of TextView with added gesture controls.

@@ -15,8 +15,9 @@
  */
 package com.github.pedrovgs;
 
-import android.support.v4.widget.ViewDragHelper;
 import android.view.View;
+
+import androidx.customview.widget.ViewDragHelper;
 
 /**
  * ViewDragHelper.Callback implementation used to work with DraggableView to perform the scale

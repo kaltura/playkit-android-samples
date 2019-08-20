@@ -1,17 +1,14 @@
 package com.kaltura.playkitdemo;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
-import com.kaltura.playkit.MediaEntryProvider;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
@@ -24,8 +21,9 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
-import com.kaltura.playkit.plugins.ads.ima.IMAConfig;
-import com.kaltura.playkit.plugins.ads.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.ima.IMAConfig;
+import com.kaltura.playkit.plugins.ima.IMAPlugin;
+import com.kaltura.playkit.providers.MediaEntryProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +49,7 @@ public class PlayerFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    @Nullable
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.player_fragment, null);
@@ -88,7 +86,7 @@ public class PlayerFragment extends Fragment {
     }*/
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
-        PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(0);
+        PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(0L);
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         if (player == null) {
 
@@ -113,7 +111,7 @@ public class PlayerFragment extends Fragment {
         //String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
         String adTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
         List<String> videoMimeTypes = new ArrayList<>();
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl);
+        IMAConfig adsConfig = new IMAConfig().setAdTagUrl(adTagUrl);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 

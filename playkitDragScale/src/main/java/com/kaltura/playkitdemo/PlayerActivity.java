@@ -17,10 +17,9 @@ package com.kaltura.playkitdemo;
 
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.View;
-import android.widget.ImageView;
 
+import androidx.fragment.app.FragmentActivity;
 import com.github.pedrovgs.DraggableListener;
 import com.github.pedrovgs.DraggablePanel;
 

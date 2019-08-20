@@ -17,10 +17,11 @@ package com.github.pedrovgs;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.kaltura.playkitdemo.R;
 

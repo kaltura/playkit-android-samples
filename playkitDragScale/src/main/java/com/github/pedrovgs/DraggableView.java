@@ -18,15 +18,17 @@ package com.github.pedrovgs;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.ViewDragHelper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
+
+import androidx.core.view.MotionEventCompat;
+import androidx.core.view.ViewCompat;
+import androidx.customview.widget.ViewDragHelper;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 import com.github.pedrovgs.transformer.Transformer;
 import com.github.pedrovgs.transformer.TransformerFactory;
 import com.kaltura.playkitdemo.R;
@@ -411,7 +413,7 @@ public class DraggableView extends RelativeLayout {
   /**
    * Clone given motion event and set specified action. This method is useful, when we want to
    * cancel event propagation in child views by sending event with {@link
-   * android.view.MotionEvent#ACTION_CANCEL}
+   * MotionEvent#ACTION_CANCEL}
    * action.
    *
    * @param event event to clone

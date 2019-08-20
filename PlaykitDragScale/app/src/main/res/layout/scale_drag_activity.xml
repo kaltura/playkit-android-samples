@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/list"
+        android:background="#777777"
+        >
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <com.kaltura.playkitdemo.dragging.DragView
+        android:layout_width="match_parent"
+        android:layout_height="290dp"
+        android:id="@+id/drag_view"
+        >
+        <FrameLayout
+            android:id="@+id/player_root"
+            android:layout_width="match_parent"
+            android:layout_height="290dp"
+            android:paddingBottom="@dimen/player_controls_height"
+            >
+        </FrameLayout>
+
+        <com.kaltura.playkitdemo.PlaybackControlsView
+            android:id="@+id/playerControls"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/player_controls_height"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            />
+    </com.kaltura.playkitdemo.dragging.DragView>
+
+</RelativeLayout>

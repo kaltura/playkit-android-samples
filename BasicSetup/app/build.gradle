@@ -31,11 +31,11 @@ configurations.all {
 }
 
 dependencies {
-    implementation 'com.kaltura.playkit:playkit:4.1.0'
+    //implementation 'com.kaltura.playkit:playkit:4.1.0'
 
-//    implementation ('com.kaltura:playkit-android:dev-SNAPSHOT')
+    //implementation ('com.kaltura:playkit-android:dev-SNAPSHOT')
 
-//    implementation project(":playkit")
+    implementation project(":playkit")
 
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'

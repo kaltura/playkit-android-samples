@@ -31,8 +31,8 @@ configurations.all {
 }
 
 dependencies {
-//    implementation 'com.kaltura.playkit:playkit:3.9.3'
-//    implementation 'com.kaltura.playkit:playkitproviders:3.9.3'
+//    implementation 'com.kaltura.playkit:playkit:4.1.0'
+//    implementation 'com.kaltura.playkit:playkitproviders:4.1.0'
 
 //    implementation ('com.kaltura:playkit-android:dev-SNAPSHOT')
 //    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')

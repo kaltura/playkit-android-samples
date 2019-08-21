@@ -24,10 +24,10 @@ android {
 }
 
 dependencies {
-//    implementation 'com.kaltura.playkit:playkit:3.7.1'
-//    implementation 'com.kaltura.playkit:playkitproviders:3.7.1'
-//    implementation 'com.kaltura.playkit:imaplugin:3.7.1'
-//    implementation 'com.kaltura.playkit:youboraplugin:3.7.1'
+//    implementation 'com.kaltura.playkit:playkit:4.1.0'
+//    implementation 'com.kaltura.playkit:playkitproviders:4.1.0'
+//    implementation 'com.kaltura.playkit:imaplugin:4.1.0'
+//    implementation 'com.kaltura.playkit:youboraplugin:4.1.0'
 
 //    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
 //    implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')

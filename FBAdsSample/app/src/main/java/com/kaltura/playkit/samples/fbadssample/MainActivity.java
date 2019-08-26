@@ -123,10 +123,10 @@ public class MainActivity extends AppCompatActivity {
 
 //        PKPluginConfigs setPlugins = createIMAPlugin(pluginConfigs);
 
-//        getYouboraBundle(pluginConfigs);
+        getYouboraBundle(pluginConfigs);
 
         //Create instance of the player with plugin configurations.
-        player = PlayKitManager.loadPlayer(this, setPlugins);
+        player = PlayKitManager.loadPlayer(this, pluginConfigs);
 
         //Subscribe to the ad events.
         subscribeToAdEvents();
@@ -429,6 +429,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause");
+        super.onPause();
+
+        if (player != null) {
+            player.onApplicationPaused();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+
+        if (player != null && player.getView() != null &&  player.getView().getChildCount() > 0) {
+            player.onApplicationResumed();
+            player.play();
+        }
+    }
+
     private void addFBInStreamPluginConfig(PKPluginConfigs config) {
         List<FBInStreamAd> preRollFBInStreamAdList = new ArrayList<>();
         FBInStreamAd preRoll1 = new FBInStreamAd("156903085045437_239184776817267",0, 0);
@@ -438,15 +459,15 @@ public class MainActivity extends AppCompatActivity {
         FBInStreamAdBreak preRollAdBreak = new FBInStreamAdBreak(AdPositionType.PRE_ROLL, 0L, preRollFBInStreamAdList);
 
         List<FBInStreamAd> midRoll1FBInStreamAdList = new ArrayList<>();
-        FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267",60000, 0);
+        FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267",15000, 0);
         midRoll1FBInStreamAdList.add(midRoll1);
-        FBInStreamAdBreak midRoll1AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 60000, midRoll1FBInStreamAdList);
+        FBInStreamAdBreak midRoll1AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 15000, midRoll1FBInStreamAdList);
 
 
         List<FBInStreamAd> midRoll2FBInStreamAdList = new ArrayList<>();
-        FBInStreamAd midRoll2 = new FBInStreamAd("156903085045437_239184776817267", 180000, 0);
+        FBInStreamAd midRoll2 = new FBInStreamAd("156903085045437_239184776817267", 30000, 0);
         midRoll2FBInStreamAdList.add(midRoll2);
-        FBInStreamAdBreak midRoll2AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 180000, midRoll2FBInStreamAdList);
+        FBInStreamAdBreak midRoll2AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 30000, midRoll2FBInStreamAdList);
 
 
         List<FBInStreamAd> postRollFBInStreamAdList = new ArrayList<>();

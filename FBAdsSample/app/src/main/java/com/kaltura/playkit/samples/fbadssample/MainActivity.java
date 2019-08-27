@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
 //        PKPluginConfigs setPlugins = createIMAPlugin(pluginConfigs);
 
-        getYouboraBundle(pluginConfigs);
+        setYouboraConfigBundle(pluginConfigs);
 
         //Create instance of the player with plugin configurations.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
@@ -493,7 +493,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return - the pluginConfig object that should be passed as parameter when loading the player.
      */
-    private PKPluginConfigs getYouboraBundle(PKPluginConfigs pluginConfigs) {
+    private PKPluginConfigs setYouboraConfigBundle(PKPluginConfigs pluginConfigs) {
 
         //Important!!! First you need to register your plugin.
         PlayKitManager.registerPlugins(this, YouboraPlugin.factory);

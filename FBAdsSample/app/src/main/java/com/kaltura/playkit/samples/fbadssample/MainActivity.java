@@ -433,7 +433,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         Log.d(TAG, "onPause");
         super.onPause();
-
         if (player != null) {
             player.onApplicationPaused();
         }
@@ -481,8 +480,8 @@ public class MainActivity extends AppCompatActivity {
         fbInStreamAdBreakList.add(midRoll2AdBreak);
         fbInStreamAdBreakList.add(postRollAdBreak);
 
-
-        FBInstreamConfig fbInstreamConfig = new FBInstreamConfig(fbInStreamAdBreakList).enableDebugMode(true);
+        //"294d7470-4781-4795-9493-36602bf29231");//("7450a453-4ba6-464b-85b6-6f319c7f7326");
+        FBInstreamConfig fbInstreamConfig = new FBInstreamConfig(fbInStreamAdBreakList).enableDebugMode(true).setTestDevice("294d7470-4781-4795-9493-36602bf29231");
         config.setPluginConfig(FBInstreamPlugin.factory.getName(), fbInstreamConfig);
     }
 

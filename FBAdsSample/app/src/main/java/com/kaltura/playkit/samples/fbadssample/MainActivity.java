@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //Media entry configuration constants.
-    private static final String SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
+    private static final String SOURCE_URL = "https://playertest.longtailvideo.com/adaptive/eleph-audio/playlist.m3u8";//https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Set media entry type. It could be Live,Vod or Unknown.
         //For now we will use Unknown.
-        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Unknown);
+        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
 
         //Create list that contains at least 1 media source.
         //Each media entry can contain a couple of different media sources.
@@ -482,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
         fbInStreamAdBreakList.add(postRollAdBreak);
 
 
-        FBInstreamConfig fbInstreamConfig = new FBInstreamConfig(fbInStreamAdBreakList);
+        FBInstreamConfig fbInstreamConfig = new FBInstreamConfig(fbInStreamAdBreakList).enableDebugMode(true);
         config.setPluginConfig(FBInstreamPlugin.factory.getName(), fbInstreamConfig);
     }
 

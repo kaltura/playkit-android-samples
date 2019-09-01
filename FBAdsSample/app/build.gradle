@@ -45,7 +45,6 @@ dependencies {
 
     implementation project(':playkit')
     implementation project(':providers')
-    implementation project(':ima')
     implementation project(":youbora")
     implementation project(':fbads')
 

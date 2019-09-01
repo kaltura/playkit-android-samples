@@ -2,7 +2,6 @@ package com.kaltura.playkit.samples.fbadssample;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
@@ -24,8 +23,6 @@ import com.kaltura.playkit.plugins.fbads.fbinstream.FBInStreamAd;
 import com.kaltura.playkit.plugins.fbads.fbinstream.FBInStreamAdBreak;
 import com.kaltura.playkit.plugins.fbads.fbinstream.FBInstreamConfig;
 import com.kaltura.playkit.plugins.fbads.fbinstream.FBInstreamPlugin;
-import com.kaltura.playkit.plugins.ima.IMAConfig;
-import com.kaltura.playkit.plugins.ima.IMAPlugin;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 
 import java.util.ArrayList;
@@ -72,16 +69,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
-    //Ad configuration constants.
-    private static final String AD_TAG_URL = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
-    //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
-    //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
-    private static final String INCORRECT_AD_TAG_URL = "incorrect_ad_tag_url";
-    private static final int PREFERRED_AD_BITRATE = 600;
-
     private Player player;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
+    private Button seekButton;
 
     //Youbora analytics Constants
     public static final String ACCOUNT_CODE = "kalturatest";
@@ -107,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String DEVICE = "your_device";
     public static final String QUALITY = "your_quality";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,8 +113,6 @@ public class MainActivity extends AppCompatActivity {
         //Create plugin configurations.
         PKPluginConfigs setPlugins = createFBInStreamPlugin(pluginConfigs);
 
-//        PKPluginConfigs setPlugins = createIMAPlugin(pluginConfigs);
-
         setYouboraConfigBundle(pluginConfigs);
 
         //Create instance of the player with plugin configurations.
@@ -136,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Add simple play/pause button.
         addPlayPauseButton();
-
+        addSeekButton();
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
         player.play();
@@ -149,45 +139,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private PKPluginConfigs createFBInStreamPlugin(PKPluginConfigs pluginConfigs) {
 
-        //First register your IMAPlugin.
+        //First register FBIntreamPlugin.
         PlayKitManager.registerPlugins(this, FBInstreamPlugin.factory);
 
         addFBInStreamPluginConfig(pluginConfigs);
-
-        //Return created PluginConfigs object.
-        return pluginConfigs;
-    }
-
-    /**
-     * Create IMAPlugin object.
-     *
-     * @return - {@link PKPluginConfigs} object with IMAPlugin.
-     */
-    private PKPluginConfigs createIMAPlugin(PKPluginConfigs pluginConfigs) {
-
-        //First register your IMAPlugin.
-        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
-
-        //Initialize imaConfigs object.
-        IMAConfig imaConfig = new IMAConfig();
-
-        //Configure ima.
-        imaConfig.setAdTagUrl(AD_TAG_URL);
-        imaConfig.setVideoBitrate(PREFERRED_AD_BITRATE);
-        imaConfig.enableDebugMode(true);
-
-        /* For MOAT call this API:
-            List<View> overlaysList = new ArrayList<>();
-            //overlaysList.add(....)
-            imaConfig.setControlsOverlayList(overlaysList);
-        */
-
-        //Set jsonObject to the main pluginConfigs object.
-        pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfig);
-        /*
-            NOTE!  for change media before player.prepare api please call:
-            player.updatePluginConfig(IMAlugin.factory.getName(), imaConfig);
-        */
 
         //Return created PluginConfigs object.
         return pluginConfigs;
@@ -280,29 +235,6 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "AD_COMPLETED");
         });
 
-        player.addListener(this, AdEvent.firstQuartile, event -> {
-            Log.d(TAG, "FIRST_QUARTILE");
-        });
-
-        player.addListener(this, AdEvent.midpoint, event -> {
-            Log.d(TAG, "MIDPOINT");
-            if (player != null) {
-                AdController adController = player.getController(AdController.class);
-                if (adController != null) {
-                    if (adController.isAdDisplayed()) {
-                        Log.d(TAG, "AD CONTROLLER API: " + adController.getAdCurrentPosition() + "/" + adController.getAdDuration());
-                    }
-                    //Log.d(TAG, "adController.getCuePoints().getAdCuePoints().size());
-                    //Log.d(TAG, adController.getAdInfo().toString());
-                    //adController.skip();
-                }
-            }
-        });
-
-        player.addListener(this, AdEvent.thirdQuartile, event -> {
-            Log.d(TAG, "THIRD_QUARTILE");
-        });
-
         player.addListener(this, AdEvent.adBreakEnded, event -> {
             Log.d(TAG, "AD_BREAK_ENDED");
         });
@@ -335,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
         //Add it to the mediaConfig.
         mediaConfig.setMediaEntry(mediaEntry);
 
-        // mediaConfig.setStartPosition(181L);
+        mediaConfig.setStartPosition(0L);
     }
 
     /**
@@ -410,21 +342,37 @@ public class MainActivity extends AppCompatActivity {
      */
     private void addPlayPauseButton() {
         //Get reference to the play/pause button.
-        playPauseButton = (Button) this.findViewById(R.id.play_pause_button);
+        playPauseButton = this.findViewById(R.id.play_pause_button);
         //Add clickListener.
-        playPauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AdController adController = player.getController(AdController.class);
-                if (player.isPlaying() || adController != null && adController.isAdPlaying()) {
-                    //If player is playing, change text of the button and pause.
-                    playPauseButton.setText(R.string.play_text);
-                    player.pause();
-                } else {
-                    //If player is not playing, change text of the button and play.
-                    playPauseButton.setText(R.string.pause_text);
-                    player.play();
-                }
+        playPauseButton.setOnClickListener(v -> {
+            if (player == null) {
+                return;
+            }
+            AdController adController = player.getController(AdController.class);
+            if (player.isPlaying() || adController != null && adController.isAdPlaying()) {
+                //If player is playing, change text of the button and pause.
+                playPauseButton.setText(R.string.play_text);
+                player.pause();
+            } else {
+                //If player is not playing, change text of the button and play.
+                playPauseButton.setText(R.string.pause_text);
+                player.play();
+            }
+        });
+    }
+
+    private void addSeekButton() {
+
+        seekButton = this.findViewById(R.id.seekTo0);
+        seekButton.setOnClickListener(v -> {
+            if (player == null) {
+                return;
+            }
+            AdController adController = player.getController(AdController.class);
+            if (adController != null && adController.isAdPlaying()) {
+               return;
+            } else {
+                player.seekTo(0L);
             }
         });
     }
@@ -455,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
         FBInStreamAd preRoll2 = new FBInStreamAd("156903085045437_239184776817267",0, 1);
         preRollFBInStreamAdList.add(preRoll1);
         //preRollFBInStreamAdList.add(preRoll2);
-        FBInStreamAdBreak preRollAdBreak = new FBInStreamAdBreak(AdPositionType.PRE_ROLL, 0L, preRollFBInStreamAdList);
+        FBInStreamAdBreak preRollAdBreak = new FBInStreamAdBreak(AdPositionType.PRE_ROLL, 0, preRollFBInStreamAdList);
 
         List<FBInStreamAd> midRoll1FBInStreamAdList = new ArrayList<>();
         FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267",15000, 0);
@@ -481,7 +429,9 @@ public class MainActivity extends AppCompatActivity {
         fbInStreamAdBreakList.add(postRollAdBreak);
 
         //"294d7470-4781-4795-9493-36602bf29231");//("7450a453-4ba6-464b-85b6-6f319c7f7326");
-        FBInstreamConfig fbInstreamConfig = new FBInstreamConfig(fbInStreamAdBreakList).enableDebugMode(true).setTestDevice("294d7470-4781-4795-9493-36602bf29231");
+        FBInstreamConfig fbInstreamConfig = new FBInstreamConfig(fbInStreamAdBreakList).enableDebugMode(true).
+                setTestDevice("294d7470-4781-4795-9493-36602bf29231").
+                setAlwaysStartWithPreroll(false);
         config.setPluginConfig(FBInstreamPlugin.factory.getName(), fbInstreamConfig);
     }
 

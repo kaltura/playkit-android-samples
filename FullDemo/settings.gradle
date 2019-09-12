@@ -28,9 +28,8 @@ project(':playkitvr').projectDir = new File('../../playkit-android-vr/playkitvr'
 //include ':netkit'
 //project(':netkit').projectDir = new File('../../netkit-android/netkit')
 
-services
-include ':services'
-project(':services').projectDir = new File('../../netkit-android/services')
+//include ':services'
+//project(':services').projectDir = new File('../../netkit-android/services')
 
 //gradle.ext.exoplayerRoot = '../../../../../Dev/android/google/ExoPlayer'
 //gradle.ext.exoplayerModulePrefix = 'exoplayer-'

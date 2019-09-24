@@ -537,6 +537,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setApplicationVersion(BuildConfig.VERSION_NAME)
                 .setPartnerId(partnerId)
                 .setEntryId(ovpEntryId)
+                .setUserId("aaa@gmail.com")
                 .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
     }
 

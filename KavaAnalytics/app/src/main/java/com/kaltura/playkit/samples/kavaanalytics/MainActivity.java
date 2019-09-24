@@ -1,11 +1,12 @@
 package com.kaltura.playkit.samples.kavaanalytics;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -89,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
         KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
                 .setPartnerId(PARTNER_ID)
                 .setReferrer(referrer)
+                .setUserId("AppUserId")
+                //.setEntryId("MyOvpEntryId")
                 .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
 
 

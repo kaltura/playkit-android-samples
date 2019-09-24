@@ -62,7 +62,7 @@ dependencies {
 //    implementation project(":playkitvr")
 //    implementation project(":MD360")
 
-    //implementation project(":netkit")
+//implementation project(":netkit")
 
 
 

@@ -144,6 +144,7 @@ public class PlaybackOverlayActivity extends Activity implements
             PKMediaConfig mediaConfig = new PKMediaConfig();
             mediaConfig.setMediaEntry(mediaEntry);
             mediaConfig.setStartPosition((long)position);
+            player.getSettings().setAllowCrossProtocolRedirect(true);
             if (isFirstPlay) {
                 player.prepare(mediaConfig);
                 isFirstPlay = false;
@@ -270,6 +271,7 @@ public class PlaybackOverlayActivity extends Activity implements
             //addIMAPluginConfig(pluginConfigs);
             //addYouboraPlugin(pluginConfigs);
             player = PlayKitManager.loadPlayer(this, pluginConfigs);
+            player.getSettings().setAllowCrossProtocolRedirect(true);
             setupCallbacks();
             getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override

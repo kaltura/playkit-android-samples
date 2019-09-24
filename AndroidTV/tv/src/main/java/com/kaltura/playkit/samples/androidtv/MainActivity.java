@@ -34,7 +34,7 @@ import java.util.List;
 public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
     public static int movieIdex = 0;
-    public static String CDN_URL  = "http://cdnapi.kaltura.com";
+    public static String CDN_URL  = "https://cdnapisec.kaltura.com";
      public static int PARTNER_ID = 2222401;
     public static List<Movie> list = new ArrayList<>();
     /**

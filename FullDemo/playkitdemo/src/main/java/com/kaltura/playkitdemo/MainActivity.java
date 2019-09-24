@@ -536,6 +536,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return new KavaAnalyticsConfig()
                 .setApplicationVersion(BuildConfig.VERSION_NAME)
                 .setPartnerId(partnerId)
+                .setUserId("aaa@gmail.com")
                 .setEntryId(ovpEntryId)
                 .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
     }

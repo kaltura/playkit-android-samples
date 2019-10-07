@@ -63,6 +63,18 @@
       }
     ]
   },
+  "vp9": {
+    "duration": 102000,
+    "id": "1_1h1vsv3z",
+    "name": "VP9",
+    "sources": [
+      {
+        "id": "1_1h1vsv3z_dash",
+        "mimeType": "application/dash+xml",
+        "url": "https://www.youtube.com/api/manifest/dash/id/bf5bb2419360daf1/source/youtube?as=fmp4_audio_clear,webm2_sd_hd_clear&sparams=ip,ipbits,expire,source,id,as&ip=0.0.0.0&ipbits=0&expire=19000000000&signature=249B04F79E984D7F86B4D8DB48AE6FAF41C17AB3.7B9F0EC0505E1566E59B8E488E9419F253DDF413&key=ik0"
+      }
+    ]
+  },
   "wvc": {
     "duration": 102000,
     "id": "0_hbhe2o9x",

@@ -24,8 +24,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
-import androidx.fragment.app.Fragment;
-
 /*
  * BrowseErrorActivity shows how to use ErrorFragment
  */
@@ -65,7 +63,7 @@ public class BrowseErrorActivity extends Activity {
         }, TIMER_DELAY);
     }
 
-    static public class SpinnerFragment extends Fragment {
+    static public class SpinnerFragment extends android.app.Fragment {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {

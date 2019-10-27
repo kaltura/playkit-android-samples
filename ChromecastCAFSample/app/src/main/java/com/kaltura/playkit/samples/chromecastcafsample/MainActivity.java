@@ -1,10 +1,10 @@
 package com.kaltura.playkit.samples.chromecastcafsample;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaLoadOptions;
-import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.MediaTrack;
 import com.google.android.gms.cast.framework.CastButtonFactory;
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
@@ -26,10 +26,8 @@ import com.google.android.gms.cast.framework.SessionManagerListener;
 import com.google.android.gms.cast.framework.media.RemoteMediaClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.images.WebImage;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.Player;
-import com.kaltura.playkit.plugins.googlecast.BasicCastBuilder;
 import com.kaltura.playkit.plugins.googlecast.caf.CAFCastBuilder;
 import com.kaltura.playkit.plugins.googlecast.caf.KalturaCastBuilder;
 import com.kaltura.playkit.plugins.googlecast.caf.KalturaPhoenixCastBuilder;
@@ -39,7 +37,9 @@ import com.kaltura.playkit.plugins.googlecast.caf.adsconfig.AdsConfig;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -326,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
         MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(position).build();
         String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=" +  11223;
         //using QA partner 1091
-        pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_fl4ioobl", vastAdTag, CAFCastBuilder.AdTagType.VAST), loadOptions);
+        pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_ttfy4uu0", vastAdTag, CAFCastBuilder.AdTagType.VAST), loadOptions);
         pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
             @Override
@@ -338,6 +338,58 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     //log.v("loadMediaInfo. customData == null");
                 }
+
+                List<MediaTrack> tracksList = remoteMediaClient.getMediaInfo().getMediaTracks();
+
+                Map<String, Long> audioTracks = new HashMap<>();
+                Map<String, Long> textTracks = new HashMap<>();
+
+                for (MediaTrack mediaTrack : tracksList) {
+                    if (MediaTrack.TYPE_AUDIO == mediaTrack.getType()) {
+                        audioTracks.put(mediaTrack.getLanguage(), mediaTrack.getId());
+                    } else if (MediaTrack.TYPE_TEXT == mediaTrack.getType()) {
+                        textTracks.put(mediaTrack.getLanguage(), mediaTrack.getId());
+                    }
+                }
+
+                long [] tracksIndexsArray = null;  // starting from index 1
+                if (audioTracks.isEmpty() && textTracks.isEmpty()) {
+                    // not able to switch tracks
+                    return;
+                } else if (!audioTracks.isEmpty() && !textTracks.isEmpty()) {
+                    if (audioTracks.get("ru") != null && textTracks.get("ru") != null) {
+                        //do your tracks logic for choosing the default audio and text track
+                        tracksIndexsArray = new long[]{textTracks.get("ru").longValue(), audioTracks.get("ru").longValue()};
+                    }
+                } else if (!audioTracks.isEmpty() && textTracks.isEmpty()) {
+                    //do your default audio track logic  starting from index 1
+                    if (audioTracks.get("ru") != null) {
+                        tracksIndexsArray = new long[]{audioTracks.get("ru").longValue()};
+                    }
+                } else if (audioTracks.isEmpty() && !textTracks.isEmpty()) {
+                    //do your default text track logic starting from index 1
+                    if (textTracks.get("ru") != null) {
+                        tracksIndexsArray = new long[]{textTracks.get("ru").longValue()};
+                    }
+                }
+
+                if (tracksIndexsArray == null) {
+                    return;
+                }
+                long[] finalTracksIndexsArray = tracksIndexsArray;
+                remoteMediaClient.setActiveMediaTracks(finalTracksIndexsArray)
+                        .setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+                            @Override
+                            public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
+                                if (!mediaChannelResult.getStatus().isSuccess()) {
+                                    Log.e(TAG, "Failed with status code:" +
+                                            mediaChannelResult.getStatus().getStatusCode());
+                                } else {
+                                    Log.e(TAG, "OK with status code:" +
+                                            mediaChannelResult.getStatus().getStatusCode());
+                                }
+                            }
+                        });
             }
         });
     }

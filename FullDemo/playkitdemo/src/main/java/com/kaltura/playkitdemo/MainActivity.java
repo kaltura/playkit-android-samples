@@ -39,6 +39,7 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
+import com.kaltura.playkit.PKVideoCodec;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -49,6 +50,7 @@ import com.kaltura.playkit.player.LoadControlBuffers;
 import com.kaltura.playkit.player.MediaSupport;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.TextTrack;
+import com.kaltura.playkit.player.VideoCodecSettings;
 import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
 import com.kaltura.playkit.player.vr.VRSettings;
@@ -81,7 +83,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
@@ -175,13 +176,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
+
         startOttMediaLoading(playLoadedEntry);
-        //startSimpleOvpMediaLoadingVR(playLoadedEntry);
-//        startSimpleOvpMediaLoadingHls(playLoadedEntry);
+//      startSimpleOvpMediaLoadingVR(playLoadedEntry);
+//      startSimpleOvpMediaLoadingHls(playLoadedEntry);
 //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
 //      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
+//        startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
@@ -305,6 +308,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .load(completion);
     }
 
+    private void startSimpleOvpMediaLoadingHEVC(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2215841, null))
+                .setEntryId("1_zhpdyrr2")
+                .load(completion);
+    }
+
     private void startSimpleOvpMediaLoadingDRM(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
                 .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2222401, null))
@@ -422,6 +432,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
+            player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(PKVideoCodec.AVC, true));
             player.getSettings().setAllowCrossProtocolRedirect(true);
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
             player.getSettings().enableDecoderFallback(true);
@@ -536,6 +547,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return new KavaAnalyticsConfig()
                 .setApplicationVersion(BuildConfig.VERSION_NAME)
                 .setPartnerId(partnerId)
+                .setUserId("aaa@gmail.com")
                 .setEntryId(ovpEntryId)
                 .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
     }
@@ -939,6 +951,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //When the track data available, this event occurs. It brings the info object with it.
             tracksInfo = event.tracksInfo;
             populateSpinnersWithTrackInfo(event.tracksInfo);
+        });
+
+        player.addListener(this, PlayerEvent.sourceSelected, event -> {
+            log.d("sourceSelected event source = " + event.source);
         });
 
         player.addListener(this, PlayerEvent.playbackRateChanged, event -> {

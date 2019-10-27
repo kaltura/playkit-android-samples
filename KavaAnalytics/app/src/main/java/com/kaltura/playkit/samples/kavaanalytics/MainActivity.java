@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
         KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
                 .setPartnerId(PARTNER_ID)
                 .setReferrer(referrer)
+                .setUserId("AppUserId")
+                //.setEntryId("MyOvpEntryId")
                 .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
 
 

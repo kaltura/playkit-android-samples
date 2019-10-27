@@ -400,26 +400,29 @@ public class MainActivity extends AppCompatActivity {
 
     private void addFBInStreamPluginConfig(PKPluginConfigs config) {
         List<FBInStreamAd> preRollFBInStreamAdList = new ArrayList<>();
-        FBInStreamAd preRoll1 = new FBInStreamAd("156903085045437_239184776817267",0, 0);
-        FBInStreamAd preRoll2 = new FBInStreamAd("156903085045437_239184776817267",0, 1);
+        FBInStreamAd preRoll1 = new FBInStreamAd("156903085045437_239184776817267");
+        FBInStreamAd preRoll2 = new FBInStreamAd("156903085045437_239184776817267");
         preRollFBInStreamAdList.add(preRoll1);
-        //preRollFBInStreamAdList.add(preRoll2);
+        preRollFBInStreamAdList.add(preRoll2);
         FBInStreamAdBreak preRollAdBreak = new FBInStreamAdBreak(AdPositionType.PRE_ROLL, 0, preRollFBInStreamAdList);
 
         List<FBInStreamAd> midRoll1FBInStreamAdList = new ArrayList<>();
-        FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267",15000, 0);
+        FBInStreamAd midRoll1 = new FBInStreamAd("156903085045437_239184776817267");
         midRoll1FBInStreamAdList.add(midRoll1);
+        FBInStreamAd midRoll11 = new FBInStreamAd("156903085045437_239184776817267");
+        midRoll1FBInStreamAdList.add(midRoll11);
+        FBInStreamAd midRoll111 = new FBInStreamAd("156903085045437_239184776817267");
+        midRoll1FBInStreamAdList.add(midRoll111);
         FBInStreamAdBreak midRoll1AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 15000, midRoll1FBInStreamAdList);
 
 
         List<FBInStreamAd> midRoll2FBInStreamAdList = new ArrayList<>();
-        FBInStreamAd midRoll2 = new FBInStreamAd("156903085045437_239184776817267", 30000, 0);
+        FBInStreamAd midRoll2 = new FBInStreamAd("156903085045437_239184776817267");
         midRoll2FBInStreamAdList.add(midRoll2);
         FBInStreamAdBreak midRoll2AdBreak = new FBInStreamAdBreak(AdPositionType.MID_ROLL, 30000, midRoll2FBInStreamAdList);
 
-
         List<FBInStreamAd> postRollFBInStreamAdList = new ArrayList<>();
-        FBInStreamAd postRoll1 = new FBInStreamAd("156903085045437_239184776817267", Long.MAX_VALUE, 0);
+        FBInStreamAd postRoll1 = new FBInStreamAd("156903085045437_239184776817267");
         postRollFBInStreamAdList.add(postRoll1);
         FBInStreamAdBreak postRollAdBreak = new FBInStreamAdBreak(AdPositionType.POST_ROLL, Long.MAX_VALUE, postRollFBInStreamAdList);
 

@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //Media entry configuration constants.
-    private static final String SOURCE_URL = "https://playertest.longtailvideo.com/adaptive/eleph-audio/playlist.m3u8";//https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
+    private static final String SOURCE_URL = "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8";
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
 
@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         addPlayPauseButton();
         addSeekButton();
         //Prepare player with media configuration.
+        player.getSettings().setAllowCrossProtocolRedirect(true);
         player.prepare(mediaConfig);
         player.play();
     }

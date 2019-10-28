@@ -39,7 +39,7 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
-import com.kaltura.playkit.PKVideoCodec;
+//import com.kaltura.playkit.PKVideoCodec;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -50,7 +50,7 @@ import com.kaltura.playkit.player.LoadControlBuffers;
 import com.kaltura.playkit.player.MediaSupport;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.TextTrack;
-import com.kaltura.playkit.player.VideoCodecSettings;
+//import com.kaltura.playkit.player.VideoCodecSettings;
 import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
 import com.kaltura.playkit.player.vr.VRSettings;
@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
-            player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(PKVideoCodec.AVC, true));
+            //player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(PKVideoCodec.AVC, true));
             player.getSettings().setAllowCrossProtocolRedirect(true);
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
             player.getSettings().enableDecoderFallback(true);

@@ -1,20 +1,19 @@
 package com.kaltura.playkit.samples.vttthumbnailsample
 
 import android.os.Bundle
-import android.widget.Button
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.kaltura.playkit.*
 
 class MainActivity : AppCompatActivity() {
 
-    val START_POSITION : Long = 0L
-    val MEDIA_FORMAT : PKMediaFormat = PKMediaFormat.hls
-    val SOURCE_URL : String = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8"
-    val LICENSE_URL : String? = null
+    private val startPosition : Long = 0L
+    private val mediaFormat : PKMediaFormat = PKMediaFormat.hls
+    private val sourceUrl : String = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8"
+    private val licenseUrl : String? = null
 
-    var player : Player? = null
-    var playPauseButton : Button? = null
+    private var player : Player? = null
+    private var controlsView : PlaybackControlsView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +27,6 @@ class MainActivity : AppCompatActivity() {
 
         //Add player to the view hierarchy.
         addPlayerToView()
-
-        //Add simple play/pause button.
-        addPlayPauseButton()
 
         //Prepare player with media configuration.
         player?.prepare(mediaConfig)
@@ -49,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
         //Set start position of the media. This will
         //automatically start playback from specified position.
-        mediaConfig.startPosition = START_POSITION
+        mediaConfig.startPosition = startPosition
 
         //Second. Create PKMediaEntry object.
         val mediaEntry = createMediaEntry()
@@ -104,14 +100,14 @@ class MainActivity : AppCompatActivity() {
         mediaSource.id = "testSource"
 
         //Set the content url. In our case it will be link to hls source(.m3u8).
-        mediaSource.url = SOURCE_URL
+        mediaSource.url = sourceUrl
 
         //Set the format of the source. In our case it will be hls in case of mpd/wvm formats you have to to call mediaSource.setDrmData method as well
-        mediaSource.mediaFormat = MEDIA_FORMAT
+        mediaSource.mediaFormat = mediaFormat
 
         // Add DRM data if required
-        if (LICENSE_URL != null) {
-            mediaSource.drmData = listOf(PKDrmParams(LICENSE_URL, PKDrmParams.Scheme.WidevineCENC))
+        if (licenseUrl != null) {
+            mediaSource.drmData = listOf(PKDrmParams(licenseUrl, PKDrmParams.Scheme.WidevineCENC))
         }
 
         return listOf(mediaSource)
@@ -125,26 +121,9 @@ class MainActivity : AppCompatActivity() {
         val layout = findViewById<LinearLayout>(R.id.player_root)
         //Add player view to the layout.
         layout.addView(player?.view)
-    }
 
-    /**
-     * Just add a simple button which will start/pause playback.
-     */
-    private fun addPlayPauseButton() {
-        //Get reference to the play/pause button.
-        playPauseButton = this.findViewById(R.id.play_pause_button)
-        //Add clickListener.
-        playPauseButton?.setOnClickListener { v ->
-            if (player!!.isPlaying) {
-                //If player is playing, change text of the button and pause.
-                playPauseButton?.setText(R.string.play_text)
-                player?.pause()
-            } else {
-                //If player is not playing, change text of the button and play.
-                playPauseButton?.setText(R.string.pause_text)
-                player?.play()
-            }
-        }
+        controlsView = findViewById(R.id.playerControls)
+        controlsView?.setPlayer(player!!)
     }
 
     override fun onResume() {
@@ -153,10 +132,16 @@ class MainActivity : AppCompatActivity() {
             player?.onApplicationResumed()
             player?.play()
         }
+        if (controlsView != null) {
+            controlsView?.resume()
+        }
     }
 
     override fun onPause() {
         super.onPause()
+        if (controlsView != null) {
+            controlsView?.release()
+        }
         if (player != null) {
             player?.onApplicationPaused()
         }

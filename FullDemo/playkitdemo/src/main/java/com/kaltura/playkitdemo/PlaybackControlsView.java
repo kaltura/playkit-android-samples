@@ -101,7 +101,6 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         tvTime = this.findViewById(R.id.exo_duration);
     }
 
-
     private void updateProgress() {
         long duration = C.TIME_UNSET;
         long position = C.POSITION_UNSET;

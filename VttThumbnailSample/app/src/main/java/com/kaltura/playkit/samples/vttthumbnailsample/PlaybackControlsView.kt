@@ -39,7 +39,7 @@ class PlaybackControlsView @JvmOverloads constructor(context: Context, attrs: At
     private val updateProgressAction = Runnable { this.updateProgress() }
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.exo_playback_control_view_old, this)
+        LayoutInflater.from(context).inflate(R.layout.player_control, this)
         formatBuilder = StringBuilder()
         formatter = Formatter(formatBuilder, Locale.getDefault())
         componentListener = ComponentListener()

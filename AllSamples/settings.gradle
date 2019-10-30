@@ -42,7 +42,8 @@ def samples = [
         'ChromecastSample',
         'ChromecastCAFSample',
         'PlaykitDragScale',
-        'MediaSession'
+        'MediaSession',
+	    'VttThumbnailSample'
 ]
 
 samples.each {

@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -48,6 +49,7 @@ import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
 import com.kaltura.playkit.player.LoadControlBuffers;
 import com.kaltura.playkit.player.MediaSupport;
+import com.kaltura.playkit.player.PKHttpClientManager;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.TextTrack;
 //import com.kaltura.playkit.player.VideoCodecSettings;
@@ -124,12 +126,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private AppCompatImageView fullScreenBtn;
     private AdCuePoints adCuePoints;
     private Spinner videoSpinner, audioSpinner, textSpinner;
+    private ViewGroup companionAdSlot;
 
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
     private boolean isAdsEnabled = true;
     private boolean isDAIMode = false;
+
+    static {
+        PKHttpClientManager.setHttpProvider("okhttp");
+        PKHttpClientManager.warmUp(
+                "https://rest-as.ott.kaltura.com/crossdomain.xml", // Some Phoenix URL
+                "https://cdnapisec.kaltura.com/favicon.ico",
+                "https://cfvod.kaltura.com/favicon.ico"
+        );
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,6 +184,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE);
+        companionAdSlot = findViewById(R.id.companionAdSlot);
+
         registerPlugins();
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
@@ -634,7 +648,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         log.d("Play Ad preSkipAdTagUrl");
         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
-        IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl);
+        IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl).setCompanionAdConfig(companionAdSlot, 300, 250);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 

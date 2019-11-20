@@ -1,27 +1,25 @@
 package com.kaltura.appanalyticssample;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.kaltura.netkit.connect.response.ResultElement;
-import com.kaltura.playkit.PKEvent;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
-import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
-import com.kaltura.playkit.api.ovp.SimpleOvpSessionProvider;
-import com.kaltura.playkit.mediaproviders.base.OnMediaLoadCompletion;
-import com.kaltura.playkit.mediaproviders.ovp.KalturaOvpMediaProvider;
-import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.plugins.ads.AdEvent;
+
+import com.kaltura.playkit.providers.api.SimpleSessionProvider;
+import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 
 class AnalyticsEventHandler {
     private static final String TAG = "AnalyticsEventHandler";
-
+    private static final PKLog log = PKLog.get(TAG);
     // Should be replaced by an instance of the analytics engine.
     private Object analyticsEngine;
 
@@ -31,61 +29,92 @@ class AnalyticsEventHandler {
 
     void register(Player player) {
 
-        // Basic events.
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PlayerEvent e = (PlayerEvent) event;
-                switch (e.type) {
-                    // Handle
-                }
-            }
-        }, PlayerEvent.Type.CAN_PLAY, PlayerEvent.Type.ENDED, PlayerEvent.Type.PAUSE, PlayerEvent.Type.PLAY, PlayerEvent.Type.PLAYING, PlayerEvent.Type.SEEKED, PlayerEvent.Type.STOPPED);
+        player.addListener(this, PlayerEvent.canPlay, event -> {
+            log.d("canPlay event");
+        });
+
+        player.addListener(this, PlayerEvent.ended, event -> {
+            log.d("ended event");
+        });
+
+        player.addListener(this, PlayerEvent.pause, event -> {
+            log.d("pause event");
+        });
+
+        player.addListener(this, PlayerEvent.play, event -> {
+            log.d("play event");
+        });
+
+        player.addListener(this, PlayerEvent.playing, event -> {
+            log.d("playing event");
+        });
+
+        player.addListener(this, PlayerEvent.seeked, event -> {
+            log.d("seeked event");
+        });
+
+        player.addListener(this, PlayerEvent.stopped, event -> {
+            log.d("stopped event");
+        });
+
+        player.addListener(this, PlayerEvent.sourceSelected, event -> {
+            log.d("sourceSelected event");
+            PlayerEvent.SourceSelected e = (PlayerEvent.SourceSelected) event;
+            // A specific source (playback url) was selected.
+            Log.d(TAG, "Player will play: " + e.source.getUrl());
+        });
+
+        player.addListener(this, PlayerEvent.sourceSelected, event -> {
+            log.d("sourceSelected event");
+            PlayerEvent.SourceSelected e = (PlayerEvent.SourceSelected) event;
+            // A specific source (playback url) was selected.
+            Log.d(TAG, "Player will play: " + e.source.getUrl());
+        });
+
+        player.addListener(this, PlayerEvent.tracksAvailable, event -> {
+            log.d("tracksAvailable event");
+        });
+
+        player.addListener(this, PlayerEvent.videoTrackChanged, event -> {
+            log.d("videoTrackChanged event");
+        });
+
+        player.addListener(this, PlayerEvent.audioTrackChanged, event -> {
+            log.d("audioTrackChanged event");
+        });
+
+        player.addListener(this, PlayerEvent.textTrackChanged, event -> {
+            log.d("textTrackChanged event");
+        });
+
+        player.addListener(this, PlayerEvent.playheadUpdated, event -> {
+            log.d("playheadUpdated event");
+        });
+
+        player.addListener(this, PlayerEvent.metadataAvailable, event -> {
+            log.d("metadataAvailable event");
+        });
+
+        player.addListener(this, PlayerEvent.durationChanged, event -> {
+            log.d("durationChanged event");
+        });
 
 
-        // Other events typically have companion classes -- cast the event to the matching type.
+        player.addListener(this, AdEvent.started, event -> {
+            log.d("ad started event");
+        });
 
-        // Source selected
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PlayerEvent.SourceSelected e = (PlayerEvent.SourceSelected) event;
-                // A specific source (playback url) was selected.
-                Log.d(TAG, "Player will play: " + e.source.getUrl());
-            }
-        }, PlayerEvent.Type.SOURCE_SELECTED);
+        player.addListener(this, AdEvent.contentPauseRequested, event -> {
+            log.d("ad contentPauseRequested event");
+        });
 
-        // Tracks availability and selection
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                PlayerEvent e = (PlayerEvent) event;
-            }
-        }, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.AUDIO_TRACK_CHANGED, PlayerEvent.Type.VIDEO_TRACK_CHANGED, PlayerEvent.Type.TEXT_TRACK_CHANGED);
+        player.addListener(this, AdEvent.contentResumeRequested, event -> {
+            log.d("ad contentResumeRequested event");
+        });
 
-        // Playhead
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                // Report first quartile, midpoint, etc
-            }
-        }, PlayerEvent.Type.PLAYHEAD_UPDATED);
-
-        // More metadata
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-
-            }
-        }, PlayerEvent.Type.DURATION_CHANGE, PlayerEvent.Type.METADATA_AVAILABLE);
-
-        // Ad events
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-
-            }
-        }, AdEvent.Type.values());
+        player.addListener(this, AdEvent.allAdsCompleted, event -> {
+            log.d("ad allAdsCompleted event");
+        });
     }
 
     void setEngine(Object engine) {
@@ -93,11 +122,15 @@ class AnalyticsEventHandler {
     }
 }
 
+
+
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private Player player;
     private AnalyticsEventHandler listener;
+    private static final PKLog log = PKLog.get("MainActivity");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,11 +144,15 @@ public class MainActivity extends AppCompatActivity {
 
         loadMedia();
 
-        findViewById(R.id.play).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (player != null) {
+        findViewById(R.id.play).setOnClickListener(v -> {
+            if (player != null) {
+                if (player.isPlaying()) {
+                    player.pause();
+                    ((android.widget.Button)findViewById(R.id.play)).setText("play");
+                } else {
                     player.play();
+                    ((android.widget.Button)findViewById(R.id.play)).setText("pause");
+
                 }
             }
         });
@@ -123,19 +160,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadMedia() {
         new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleOvpSessionProvider("https://cdnapisec.kaltura.com", 2215841, null))
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2215841, null))
                 .setEntryId("1_cl4ic86v")
-                .load(new OnMediaLoadCompletion() {
-                    @Override
-                    public void onComplete(final ResultElement<PKMediaEntry> response) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                player.prepare(new PKMediaConfig().setMediaEntry(response.getResponse()));
-                            }
-                        });
-                    }
-                });
+                .load(response -> runOnUiThread(() -> player.prepare(new PKMediaConfig().setMediaEntry(response.getResponse()))));
     }
 
     private void setupPlayer() {
@@ -146,4 +173,34 @@ public class MainActivity extends AppCompatActivity {
 
         container.addView(player.getView());
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (player != null) {
+            player.onApplicationPaused();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        log.d("Application onResume");
+        super.onResume();
+        if (player != null) {
+            player.onApplicationResumed();
+            player.play();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (player != null) {
+            player.removeListeners(this);
+            player.destroy();
+            player = null;
+        }
+        super.onDestroy();
+    }
+
 }

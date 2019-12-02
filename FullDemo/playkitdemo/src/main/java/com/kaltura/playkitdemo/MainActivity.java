@@ -114,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String inLinePreAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
     String preMidPostSingleAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
     String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
+    String AD_GOOGLE_SEARCH = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
+
 
     private Player player;
     private MediaEntryProvider mediaProvider;
@@ -191,9 +193,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
 
-        startOttMediaLoading(playLoadedEntry);
+//        startOttMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingVR(playLoadedEntry);
-//      startSimpleOvpMediaLoadingHls(playLoadedEntry);
+      startSimpleOvpMediaLoadingHls(playLoadedEntry);
 //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
 //      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
@@ -467,12 +469,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         promptMessage(DAI_PLUGIN, getDAIConfig2().getAssetTitle());
                         player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig2());
                     } else {
-                        log.d("Play Ad preMidPostAdTagUrl");
-                        promptMessage(IMA_PLUGIN, "preMidPostAdTagUrl");
-                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostAdTagUrl));
+                        log.d("Play Ad Google Search");
+                        promptMessage(IMA_PLUGIN, "Google Search");
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(AD_GOOGLE_SEARCH).setCompanionAdConfig(companionAdSlot, 728, 90));
                     }
                 }
-                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preMidPostAdTagUrl media2"));
+                player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "Google Search media2"));
                 player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(2222401, "1_f93tepsn"));
 
             } else if (changeMediaIndex % 4 == 1) {

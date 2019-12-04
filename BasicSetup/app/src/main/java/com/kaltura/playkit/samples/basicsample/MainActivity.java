@@ -84,7 +84,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Set id for the entry.
         mediaEntry.setId("testEntry");
-
+        mediaEntry.setName("testEntryName");
+        mediaEntry.setDuration(881000);
         //Set media entry type. It could be Live,Vod or Unknown.
         //In this sample we use Vod.
         mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Vod);
@@ -128,6 +129,31 @@ public class MainActivity extends AppCompatActivity {
                     new PKDrmParams(LICENSE_URL, PKDrmParams.Scheme.WidevineCENC)
             ));
         }
+
+        return Collections.singletonList(mediaSource);
+    }
+
+    private List<PKMediaSource> createMediaSourcesDRM() {
+
+        //Create new PKMediaSource instance.
+        PKMediaSource mediaSource = new PKMediaSource();
+        mediaSource.setId("1_f93tepsn");
+        //Set the id.
+        mediaSource.setId("drmTestSource");
+
+        String DRM_SOURCE_URL =  "https://cdnapisec.kaltura.com/p/2222401/sp/222240100/playManifest/entryId/1_f93tepsn/protocol/https/format/mpegdash/flavorIds/1_7cgwjy2a,1_xc3jlgr7,1_cn83nztu,1_pgoeohrs/a.mpd";
+        String DRM_LICENSE_URL = "https://udrm.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJPVlAiLCJ1c2VyX3Rva2VuIjoiZGpKOE1qSXlNalF3TVh5czdLYlZZV0xaZURuWGpOTXR4LVBidWh4aDU4SUF6d3V2LW9MeHo3aUl4cmZGc3k4UUJ6VFR2ek1sS3JNRmFmV2FpQVNJWUFzYWZVWW5xcTNqQkltSXdwbGtSZFJsM1FiUnRmc3NTV0dXNXc9PSIsImFjY291bnRfaWQiOjIyMjI0MDEsImNvbnRlbnRfaWQiOiIxX2Y5M3RlcHNuIiwiZmlsZXMiOiIxXzdjZ3dqeTJhLDFfeGMzamxncjcsMV9jbjgzbnp0dSwxX3Bnb2VvaHJzIn0%3D&signature=nOnF%2FmHC0vO0j9OGKRgex8BlfMg%3D";
+        mediaSource.setUrl(DRM_SOURCE_URL);
+
+        // Add DRM data if required
+        if (DRM_LICENSE_URL != null) {
+            mediaSource.setDrmData(Collections.singletonList(
+                    new PKDrmParams(DRM_LICENSE_URL, PKDrmParams.Scheme.WidevineCENC)
+            ));
+        }
+
+        //Set the format of the source. In our case it will be hls in case of mpd/wvm formats you have to to call mediaSource.setDrmData method as well
+        mediaSource.setMediaFormat(PKMediaFormat.dash);
 
         return Collections.singletonList(mediaSource);
     }

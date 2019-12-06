@@ -1,7 +1,7 @@
 package com.kaltura.playkit.samples.kalturastats;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -148,18 +148,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToKalturaStatsReportEvent() {
         //Subscribe to the event.
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                KalturaStatsEvent.KalturaStatsReport reportEvent = (KalturaStatsEvent.KalturaStatsReport) event;
+        player.addListener(this, KalturaStatsEvent.reportSent, event -> {
+            KalturaStatsEvent.KalturaStatsReport reportEvent = event;
 
-                //Get the event name from the report.
-                String reportedEventName = reportEvent.reportedEventName;
-                Log.i(TAG, "Kaltura stats report sent. Reported event name: " + reportedEventName);
-            }
-            //Event subscription.
-        }, KalturaStatsEvent.Type.REPORT_SENT);
+            //Get the event name from the report.
+            String reportedEventName = reportEvent.reportedEventName;
+            Log.i(TAG, "Kaltura stats report sent. Reported event name: " + reportedEventName);
+        });
     }
 
     /**
@@ -169,18 +164,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToKavaReportEvent() {
         //Subscribe to the event.
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                KavaAnalyticsEvent.KavaAnalyticsReport reportEvent = (KavaAnalyticsEvent.KavaAnalyticsReport) event;
+        player.addListener(this, KavaAnalyticsEvent.reportSent, event -> {
+            KavaAnalyticsEvent.KavaAnalyticsReport reportEvent = event;
 
-                //Get the event name from the report.
-                String reportedEventName = reportEvent.reportedEventName;
-                Log.i(TAG, "Kava Analytics report sent. Reported event name: " + reportedEventName);
-            }
-            //Event subscription.
-        }, KavaAnalyticsEvent.Type.REPORT_SENT);
+            //Get the event name from the report.
+            String reportedEventName = reportEvent.reportedEventName;
+            Log.i(TAG, "Kava Analytics report sent. Reported event name: " + reportedEventName);
+        });
     }
 
 

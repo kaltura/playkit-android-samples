@@ -1,13 +1,15 @@
 package com.kaltura.playkit.samples.metadatasample;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.google.android.exoplayer2.metadata.id3.TextInformationFrame;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -29,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //The url of the source to play
-    private static final String SOURCE_URL = "https://devimages.apple.com.edgekey.net/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
+
+    private static final String SOURCE_URL = "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8";
 
     private static final String ENTRY_ID = "entry_id";
     private static final String MEDIA_SOURCE_ID = "source_id";
@@ -65,44 +68,30 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Subscribe to the METADATA_AVAILABLE event. When received we will retrieve the
-     * metadata info of type {@link TextInformationFrame}. To the full documentation of all
-     * available Metadata types and how to use them, please refer to the documentation.
-     * The link you can find in README.md file of the following sample.
+
      */
     private void subscribeToMetadataAvailableEvent() {
-        //Add event listener. Note, that it have two parameters.
-        // 1. PKEvent.Listener itself.
-        // 2. Array of events you want to listen to.
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
 
-                //Cast received event to MetadataAvailable event, which holds the data object with actual metadata.
-                PlayerEvent.MetadataAvailable metadataAvailableEvent = (PlayerEvent.MetadataAvailable) event;
+        player.addListener(this, PlayerEvent.metadataAvailable, event -> {
+            Log.d(TAG, "Player Event metadataAvailable");
+            List<PKMetadata> metadataList = event.metadataList;
+            //Iterate through all entries in metadata object.
+            for (int i = 0; i < metadataList.size(); i++) {
 
-                //Retrieve the list of metadata objects.
-                List<PKMetadata> metadataList = metadataAvailableEvent.getMetadataList();
+                //Obtain the PKMetadata object.
+                PKMetadata metadataEntry = metadataList.get(i);
 
-                //Iterate through all entries in metadata object.
-                for (int i = 0; i < metadataList.size(); i++) {
+                //For simplicity, in this example, we are interested only in PKTextInformationFrame.
+                if (metadataEntry instanceof PKTextInformationFrame) {
 
-                    //Obtain the PKMetadata object.
-                    PKMetadata metadataEntry = metadataList.get(i);
+                    //Cast mediaEntry to PKTextInformationFrame.
+                    PKTextInformationFrame textInformationFrame = (PKTextInformationFrame) metadataEntry;
 
-                    //For simplicity, in this example, we are interested only in PKTextInformationFrame.
-                    if (metadataEntry instanceof PKTextInformationFrame) {
-
-                        //Cast mediaEntry to PKTextInformationFrame.
-                        PKTextInformationFrame textInformationFrame = (PKTextInformationFrame) metadataEntry;
-
-                        //Print to log.
-                        Log.d(TAG, "metadata text information: " + textInformationFrame.value);
-                    }
+                    //Print to log.
+                    Log.d(TAG, "metadata text information: " + textInformationFrame.value);
                 }
             }
-
-            //Subscribe to the events you are interested in.
-        }, PlayerEvent.Type.METADATA_AVAILABLE);
+        });
     }
 
     /**

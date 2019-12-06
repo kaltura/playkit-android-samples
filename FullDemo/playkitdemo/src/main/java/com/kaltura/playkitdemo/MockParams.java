@@ -10,16 +10,22 @@ import java.util.List;
 public class MockParams {
 
 /*Ott Mock params: */
-    public static String PhoenixBaseUrl = "https://api-preprod.ott.kaltura.com/v4_2/api_v3/";
+    public static String PhoenixBaseUrl = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/";
     public static int OttPartnerId = 198;
 
+    public static String PhoenixBaseUrlUS = "https://rest-us.ott.kaltura.com/v4_5/api_v3/";
+    public static int OttPartnerIdTest = 3009;
+    public static final String MediaIdTest = "548576";//frozen
+    public static final String FormatTest = "Mobile_Main";
+
     //result of login with : [username: albert@gmail.com, pass: 123456]
-    public static String PnxKS = "djJ8MTk4fH6bz_2197wFUNBqv2zRZ3h5YlTwiAEJZvVhJJut1pq13CMVSpgmD-NLVco4pJuthWU9b8Z_XEV7h6uvg5tpJbCj4ODWAzWhslokulcfUrgG0WISPD3wq1YWwD1lzuJ109OFrezv9Ih5Wa8qrUIsaz8=";
+    public static String PnxKS = "";//"djJ8MTk4fH6bz_2197wFUNBqv2zRZ3h5YlTwiAEJZvVhJJut1pq13CMVSpgmD-NLVco4pJuthWU9b8Z_XEV7h6uvg5tpJbCj4ODWAzWhslokulcfUrgG0WISPD3wq1YWwD1lzuJ109OFrezv9Ih5Wa8qrUIsaz8=";
 
     public static final String SingMediaId = "480989";
     public static final String MediaId = "258656";//frozen
     public static final String MediaId2 = "437800";//vild-wV
     public static final String MediaId3 = "259295";//the salt of earth
+    public static final String SingMediaId4 = "258459";
 
     public static final String MediaType = "media";
 

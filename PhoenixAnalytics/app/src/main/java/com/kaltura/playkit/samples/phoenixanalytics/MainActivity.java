@@ -1,7 +1,7 @@
 package com.kaltura.playkit.samples.phoenixanalytics;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -12,14 +12,14 @@ import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.connect.response.ResultElement;
 import com.kaltura.netkit.utils.OnCompletion;
 import com.kaltura.netkit.utils.SessionProvider;
-import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
+import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
-import com.kaltura.playkit.player.vr.VRPKMediaEntry;
+import com.kaltura.playkit.player.vr.VRSettings;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
@@ -37,13 +37,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //Phoenix analytics constants
-    private static final String PHOENIX_ANALYTICS_BASE_URL = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/"; // analytics base url
+    private static final String PHOENIX_ANALYTICS_BASE_URL = "https://api-preprod.ott.kaltura.com/v5_1_0/api_v3/"; // analytics base url
     private static final int PHOENIX_ANALYTICS_PARTNER_ID = 198; // your OTT partner id
     private static final String PHOENIX_ANALYTICS_KS = "";
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
     //Phoenix provider constans.
-    private static final String PHOENIX_PROVIDER_BASE_URL = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/"; //your provider base url
+    private static final String PHOENIX_PROVIDER_BASE_URL = "https://api-preprod.ott.kaltura.com/v5_1_0/api_v3/"; //your provider base url
     private static final String PHOENIX_PROVIDER_KS = ""; // your user ks if required
     private static final int PHOENIX_PROVIDER_PARTNER_ID = 198; // your OTT partner id
     private static final String FORMAT = "Mobile_Devices_Main_SD";
@@ -68,9 +68,11 @@ public class MainActivity extends AppCompatActivity {
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
+        player.getSettings().setAllowCrossProtocolRedirect(true);
+        player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls); // usually dash
 
         //Subscribe to analytics report event.
-        subscribePhoenixAnalyticsReportEvent();
+        subscribePhoenixAnalyticsEvents();
 
         //Add player to the view hierarchy.
         addPlayerToView();
@@ -123,20 +125,25 @@ public class MainActivity extends AppCompatActivity {
      * This event will be received each and every time
      * the analytics report is sent.
      */
-    private void subscribePhoenixAnalyticsReportEvent() {
+    private void subscribePhoenixAnalyticsEvents() {
         //Subscribe to the event.
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                PhoenixAnalyticsEvent.PhoenixAnalyticsReport reportEvent = (PhoenixAnalyticsEvent.PhoenixAnalyticsReport) event;
+        player.addListener(this, PhoenixAnalyticsEvent.reportSent, event -> {
+            PhoenixAnalyticsEvent.PhoenixAnalyticsReport reportEvent = event;
 
-                //Get the event name from the report.
-                String reportedEventName = reportEvent.reportedEventName;
-                Log.i(TAG, "PhoenixAnalytics report sent. Reported event name: " + reportedEventName);
-            }
-            //Event subscription.
-        }, PhoenixAnalyticsEvent.Type.REPORT_SENT);
+            //Get the event name from the report.
+            String reportedEventName = reportEvent.reportedEventName;
+            Log.i(TAG, "PhoenixAnalytics report sent. Reported event name: " + reportedEventName);
+        });
+
+        player.addListener(this, PhoenixAnalyticsEvent.bookmarkError, event -> {
+            PhoenixAnalyticsEvent.BookmarkErrorEvent bookmarkErrorEvent = event;
+            Log.i(TAG, "PhoenixAnalytics bookmarkErrorEvent event name: " + bookmarkErrorEvent.errorMessage + " - " + bookmarkErrorEvent.errorCode);
+        });
+
+        player.addListener(this, PhoenixAnalyticsEvent.concurrencyError, event -> {
+            PhoenixAnalyticsEvent.ConcurrencyErrorEvent concurrencyError = event;
+            Log.i(TAG, "PhoenixAnalytics bookmarkErrorEvent event name: " + concurrencyError.errorMessage + " - " + concurrencyError.errorCode);
+        });
     }
 
     /**
@@ -188,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         mediaProvider.setAssetReferenceType(APIDefines.AssetReferenceType.Media);
         mediaProvider.setContextType(APIDefines.PlaybackContextType.Playback);
         mediaProvider.setFormats(FORMAT);
+        mediaProvider.setProtocol(PhoenixMediaProvider.HttpProtocol.Http); // usually HTTPS
 
         //Set session provider to media provider.
         mediaProvider.setSessionProvider(sessionProvider);
@@ -245,14 +253,19 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //Initialize media config object.
-                if (mediaEntry instanceof VRPKMediaEntry) {
+                if (mediaEntry.isVRMediaType()) {
                     boolean modeSupported = VRUtil.isModeSupported(getApplicationContext(), VRInteractionMode.Motion);
                     if (modeSupported) {
-                        ((VRPKMediaEntry) mediaEntry).getVrSettings().setInteractionMode(VRInteractionMode.MotionWithTouch);
+                        VRSettings vrSettings = new VRSettings();
+                        vrSettings.setInteractionMode(VRInteractionMode.MotionWithTouch);
+                        player.getSettings().setVRSettings(vrSettings);
                     }
                 }
+                //Initialize media config object.
                 createMediaConfig(mediaEntry);
+
+                //Prepare player with media configurations.
+                player.prepare(mediaConfig);
             }
         });
     }
@@ -263,8 +276,5 @@ public class MainActivity extends AppCompatActivity {
 
         //Set media entry we received from provider.
         mediaConfig.setMediaEntry(mediaEntry);
-
-        //Prepare player with media configurations.
-        player.prepare(mediaConfig);
     }
 }

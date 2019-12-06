@@ -1,13 +1,12 @@
 package com.kaltura.playkit.samples.kavaanalytics;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -18,8 +17,6 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsEvent;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
-import com.kaltura.playkit.plugins.ovp.KalturaStatsEvent;
-import com.kaltura.playkit.plugins.ovp.KalturaStatsPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
         //Initialize media config object.
         createMediaConfig();
 
-        //Initialize PKPluginConfigs object with KalturaStatsPlugin.
-        PKPluginConfigs pluginConfigs = createKalturaStatsPlugin();
+        //Initialize PKPluginConfigs object with KavaPlugin.
+        PKPluginConfigs pluginConfigs = createKavaPluginConfig();
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
@@ -78,12 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * Will create {@link PKPluginConfigs} object with {@link KalturaStatsPlugin}.
-     *
-     * @return - the pluginConfig object that should be passed as parameter when loading the player.
-     */
-    private PKPluginConfigs createKalturaStatsPlugin() {
+
+    private PKPluginConfigs createKavaPluginConfig() {
 
         //First register your plugin.
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
@@ -96,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
         KavaAnalyticsConfig kavaAnalyticsConfig = new KavaAnalyticsConfig()
                 .setPartnerId(PARTNER_ID)
                 .setReferrer(referrer)
+                .setUserId("AppUserId")
+                //.setEntryId("MyOvpEntryId")
                 .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
 
 
@@ -112,18 +107,13 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToKalturaStatsReportEvent() {
         //Subscribe to the event.
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                KavaAnalyticsEvent.KavaAnalyticsReport reportEvent= (KavaAnalyticsEvent.KavaAnalyticsReport) event;
+        player.addListener(this, KavaAnalyticsEvent.reportSent, event -> {
+            KavaAnalyticsEvent.KavaAnalyticsReport reportEvent = event;
 
-                //Get the event name from the report.
-                String reportedEventName = reportEvent.reportedEventName;
-                Log.i(TAG, "Kava Analytics report sent. Reported event name: " + reportedEventName);
-            }
-            //Event subscription.
-        }, KavaAnalyticsEvent.Type.REPORT_SENT);
+            //Get the event name from the report.
+            String reportedEventName = reportEvent.reportedEventName;
+            Log.i(TAG, "Kava Analytics report sent. Reported event name: " + reportedEventName);
+        });
     }
 
     /**

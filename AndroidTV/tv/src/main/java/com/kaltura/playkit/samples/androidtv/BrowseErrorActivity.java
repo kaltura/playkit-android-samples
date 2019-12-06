@@ -13,8 +13,8 @@
  */
 package com.kaltura.playkit.samples.androidtv;
 
+
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -63,7 +63,7 @@ public class BrowseErrorActivity extends Activity {
         }, TIMER_DELAY);
     }
 
-    static public class SpinnerFragment extends Fragment {
+    static public class SpinnerFragment extends android.app.Fragment {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {

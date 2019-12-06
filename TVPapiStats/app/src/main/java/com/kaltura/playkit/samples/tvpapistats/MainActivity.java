@@ -1,14 +1,13 @@
 package com.kaltura.playkit.samples.tvpapistats;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.google.gson.JsonObject;
-import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -134,25 +133,16 @@ public class MainActivity extends AppCompatActivity {
         return pluginConfigs;
     }
 
-    /**
-     * Subscribe to TVPapi report event.
-     * This event will be received each and every time
-     * the analytics report is sent.
-     */
     private void subscribeToTVPapiReportEvent() {
-        //Subscribe to the event.
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //Cast received event to AnalyticsEvent.BaseAnalyticsReportEvent.
-                TVPAPIAnalyticsEvent.TVPAPIAnalyticsReport reportEvent = (TVPAPIAnalyticsEvent.TVPAPIAnalyticsReport) event;
 
-                //Get the event name from the report.
-                String reportedEventName = reportEvent.reportedEventName;
-                Log.i(TAG, "TVPapi stats report sent. Reported event name: " + reportedEventName);
-            }
-            //Event subscription.
-        }, TVPAPIAnalyticsEvent.Type.REPORT_SENT);
+        //Subscribe to the event.
+        player.addListener(this, TVPAPIAnalyticsEvent.reportSent, event -> {
+            TVPAPIAnalyticsEvent.TVPAPIAnalyticsReport reportEvent = event;
+
+            //Get the event name from the report.
+            String reportedEventName = reportEvent.reportedEventName;
+            Log.i(TAG, "TVPapi stats report sent. Reported event name: " + reportedEventName);
+        });
     }
 
 

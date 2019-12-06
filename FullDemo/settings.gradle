@@ -18,6 +18,21 @@ include ':playkitdemo'
 //
 //include ':googlecast'
 //project(':googlecast').projectDir = new File('../../playkit-android-googlecast/googlecast')
+//
+//include ':MD360'
+//project(':MD360').projectDir = new File('../../MD360Player4Android/vrlib')
+//
+//include ':playkitvr'
+//project(':playkitvr').projectDir = new File('../../playkit-android-vr/playkitvr')
+
+//include ':netkit'
+//project(':netkit').projectDir = new File('../../netkit-android/netkit')
+
+//gradle.ext.exoplayerRoot = '../../../../../Dev/android/google/ExoPlayer'
+//gradle.ext.exoplayerModulePrefix = 'exoplayer-'
+//apply from: new File(
+//        gradle.ext.exoplayerRoot, 'core_settings.gradle')
+
 
 
 //include ':admanager'

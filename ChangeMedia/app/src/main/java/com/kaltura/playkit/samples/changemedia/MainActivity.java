@@ -1,10 +1,11 @@
 package com.kaltura.playkit.samples.changemedia;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -23,9 +24,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     //The url of the first source to play
-    private static final String FIRST_SOURCE_URL = "http://cdnapi.kaltura.com/p/243342/sp/24334200/playManifest/entryId/0_uka1msg4/flavorIds/1_vqhfu6uy,1_80sohj7p/format/applehttp/protocol/http/a.m3u8";
+    private static final String FIRST_SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8";
     //The url of the second source to play
-    private static final String SECOND_SOURCE_URL = "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/url/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.mp4";
+    private static final String SECOND_SOURCE_URL = "https://cdnapisec.kaltura.com/p/1734751/sp/173475100/playManifest/entryId/1_3o1seqnv/protocol/https/format/url/flavorIds/1_l7xu37er,1_9p9dlin6,1_h6cxfg0z,1_fdpeg81m,1_kxic2y3c,1_fj4n8490/a.mp4";
 
     private static final String adTagUrl  = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
     private static final String adTagUrl2 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             IMAConfig imaConfig = new IMAConfig();
 
             //Configure ima.
-            imaConfig.setAdTagURL(adTagUrl2).enableDebugMode(true);
+            imaConfig.setAdTagUrl(adTagUrl2).enableDebugMode(true);
             player.updatePluginConfig(IMAPlugin.factory.getName(),imaConfig);
 
             //If first one is active, prepare second one.
@@ -114,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             IMAConfig imaConfig = new IMAConfig();
 
             //Configure ima.
-            imaConfig.setAdTagURL(adTagUrl).enableDebugMode(true);
+            imaConfig.setAdTagUrl(adTagUrl).enableDebugMode(true);
             player.updatePluginConfig(IMAPlugin.factory.getName(), imaConfig);
 
             prepareFirstEntry();
@@ -311,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize imaConfigs object.
         IMAConfig imaConfigs = new IMAConfig();
-        imaConfigs.setAdTagURL(adtag).enableDebugMode(true).setAdLoadTimeOut(8);
+        imaConfigs.setAdTagUrl(adtag).enableDebugMode(true).setAdLoadTimeOut(8);
 
         //Set jsonObject to the main pluginConfigs object.
         pluginConfigs.setPluginConfig(IMAPlugin.factory.getName(), imaConfigs);

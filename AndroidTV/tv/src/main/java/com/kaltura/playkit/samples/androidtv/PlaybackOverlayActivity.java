@@ -66,8 +66,6 @@ import static com.kaltura.playkit.ads.PKAdErrorType.VAST_LINEAR_ASSET_MISMATCH;
 import static com.kaltura.playkit.ads.PKAdErrorType.VAST_LOAD_TIMEOUT;
 import static com.kaltura.playkit.ads.PKAdErrorType.VAST_MALFORMED_RESPONSE;
 import static com.kaltura.playkit.ads.PKAdErrorType.VAST_TOO_MANY_REDIRECTS;
-import static com.kaltura.playkit.plugins.ads.AdEvent.Type.CUEPOINTS_CHANGED;
-import static com.kaltura.playkit.plugins.ads.AdEvent.Type.LOADED;
 
 
 /**
@@ -145,7 +143,8 @@ public class PlaybackOverlayActivity extends Activity implements
             currentMovie.setDuration((int) mediaEntry.getDuration());
             PKMediaConfig mediaConfig = new PKMediaConfig();
             mediaConfig.setMediaEntry(mediaEntry);
-            mediaConfig.setStartPosition(position);
+            mediaConfig.setStartPosition((long)position);
+            player.getSettings().setAllowCrossProtocolRedirect(true);
             if (isFirstPlay) {
                 player.prepare(mediaConfig);
                 isFirstPlay = false;
@@ -164,7 +163,7 @@ public class PlaybackOverlayActivity extends Activity implements
             mPlaybackState = LeanbackPlaybackState.PAUSED;
             player.pause();
         }
-        updatePlaybackState(position);
+        updatePlaybackState((long)position);
         updateMetadata(movie);
     }
 
@@ -217,7 +216,7 @@ public class PlaybackOverlayActivity extends Activity implements
         }
     }
 
-    private void updatePlaybackState(int position) {
+    private void updatePlaybackState(Long position) {
         long actions = PlaybackState.ACTION_PLAY |
                 PlaybackState.ACTION_PLAY_FROM_MEDIA_ID |
                 PlaybackState.ACTION_PLAY_FROM_SEARCH;
@@ -272,6 +271,7 @@ public class PlaybackOverlayActivity extends Activity implements
             //addIMAPluginConfig(pluginConfigs);
             //addYouboraPlugin(pluginConfigs);
             player = PlayKitManager.loadPlayer(this, pluginConfigs);
+            player.getSettings().setAllowCrossProtocolRedirect(true);
             setupCallbacks();
             getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @Override
@@ -364,7 +364,7 @@ public class PlaybackOverlayActivity extends Activity implements
         //Map<Double, String> tagTimesMap = new HashMap<>();
         //tagTimesMap.put(2.0,"ADTAG");
 
-        IMAConfig adsConfig = new IMAConfig().setAdTagURL(adTagUrl);//.enableDebugMode(true);
+        IMAConfig adsConfig = new IMAConfig().setAdTagUrl(adTagUrl);//.enableDebugMode(true);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
     }
 
@@ -564,6 +564,11 @@ public class PlaybackOverlayActivity extends Activity implements
 
             player.stop();
         }
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 
     /*

@@ -12,7 +12,8 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -30,26 +31,38 @@ configurations.all {
 }
 
 dependencies {
-    implementation 'com.kaltura.playkit:playkit:3.6.2'
-    implementation 'com.kaltura.playkit:playkitproviders:1.0.3'
 
-    //implementation ('com.kaltura:playkit-android:dev-SNAPSHOT')
-    //implementation ('com.kaltura:playkit-android-providers:develop-SNAPSHOT')
+    implementation 'com.kaltura.playkit:playkit:4.4.0'
+    implementation 'com.kaltura.playkit:playkitproviders:4.4.0'
+    implementation 'com.kaltura.playkit:youboraplugin:4.4.0'
+    implementation 'com.kaltura.playkit:imaplugin:4.4.0'
+    implementation 'com.kaltura.playkit:kavaplugin:4.4.0'
+    implementation 'com.kaltura.playkit:googlecast:4.4.0'
+    implementation 'com.kaltura.playkit:vrplugin:4.4.0'
+    implementation 'com.kaltura.playkit:fbadsplugin:4.4.0'
 
-    //implementation project(":playkit")
-    //implementation project(':providers')
+//    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-vr:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-fb-ads:develop-SNAPSHOT'
 
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    implementation 'com.android.support:appcompat-v7:28.0.0', {
-        exclude group: 'com.android.support', module: 'support-v4'
-    }
-    implementation 'com.android.support:design:28.0.0', {
-        exclude group: 'com.android.support', module: 'support-v4'
-    }
-    testImplementation 'junit:junit:4.12'
+
+//    implementation project(":playkit")
+//    implementation project(":providers")
+//    implementation project(":ima")
+//    implementation project(":youbora")
+//    implementation project(":kava")
+//    implementation project(":googlecast")
+//    implementation project(":playkitvr")
+//    implementation project(":MD360")
+//    implementation project(':fbads')
+
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
 }
 
 repositories {

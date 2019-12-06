@@ -4,12 +4,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.cast.MediaInfo;
 import com.google.android.gms.cast.MediaMetadata;
@@ -302,12 +303,11 @@ public class MainActivity extends AppCompatActivity {
 
     private MediaInfo getOttCastMediaInfo(ConverterOttCast converterOttCast, boolean setAdTagUrl) {
 
-        TVPAPICastBuilder TVPAPICastBuilder = new TVPAPICastBuilder()
+        TVPAPICastBuilder tvpapiCastBuilder = new TVPAPICastBuilder()
                 .setFormat(converterOttCast.getFormat())
                 .setInitObject(converterOttCast.getInitObject().toString());
-
-
-        return returnResult(TVPAPICastBuilder, converterOttCast, setAdTagUrl);
+        //tvpapiCastBuilder.setDefaultTextLanguageLabel("en");
+        return returnResult(tvpapiCastBuilder, converterOttCast, setAdTagUrl);
     }
 
 
@@ -320,7 +320,7 @@ public class MainActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(ks)) { // ks isn't mandatory in OVP environment
             ovpCastBuilder.setKs(ks);
         }
-
+        //ovpCastBuilder.setDefaultTextLanguageLabel("en");
         return returnResult(ovpCastBuilder, converterOvpCast, setAdTagUrl);
     }
 

@@ -1,7 +1,7 @@
 package com.kaltura.playkit.samples.eventsregistration;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,7 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.kaltura.playkit.PKEvent;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -90,38 +91,32 @@ public class MainActivity extends AppCompatActivity {
      * Will subscribe to the changes in the player states.
      */
     private void subscribeToPlayerStateChanges() {
-        //Add event listener to the player.
-        player.addStateChangeListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
 
-                //Cast received event to PlayerEvent.StateChanged.
-                PlayerEvent.StateChanged stateChanged = (PlayerEvent.StateChanged) event;
+        player.addListener(this, PlayerEvent.stateChanged, event -> {
+            PlayerEvent.StateChanged stateChanged = event;
+            //Switch on the new state that is received.
+            switch (stateChanged.newState) {
 
-                //Switch on the new state that is received.
-                switch (stateChanged.newState) {
-
-                    //Player went to the Idle state.
-                    case IDLE:
-                        //Print to log.
-                        Log.d(TAG, "StateChanged: IDLE.");
-                        break;
-                    //The player is in Loading state.
-                    case LOADING:
-                        //Print to log.
-                        Log.d(TAG, "StateChanged: LOADING.");
-                        break;
-                    //The player is ready for playback.
-                    case READY:
-                        //Print to log.
-                        Log.d(TAG, "StateChanged: READY.");
-                        break;
-                    //Player is buffering now.
-                    case BUFFERING:
-                        //Print to log.
-                        Log.d(TAG, "StateChanged: BUFFERING.");
-                        break;
-                }
+                //Player went to the Idle state.
+                case IDLE:
+                    //Print to log.
+                    Log.d(TAG, "StateChanged: IDLE.");
+                    break;
+                //The player is in Loading state.
+                case LOADING:
+                    //Print to log.
+                    Log.d(TAG, "StateChanged: LOADING.");
+                    break;
+                //The player is ready for playback.
+                case READY:
+                    //Print to log.
+                    Log.d(TAG, "StateChanged: READY.");
+                    break;
+                //Player is buffering now.
+                case BUFFERING:
+                    //Print to log.
+                    Log.d(TAG, "StateChanged: BUFFERING.");
+                    break;
             }
         });
     }
@@ -138,61 +133,39 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToPlayerEvents() {
 
-        //Add event listener. Note, that it have two parameters.
-        // 1. PKEvent.Listener itself.
-        // 2. Array of events you want to listen to.
-        player.addEventListener(new PKEvent.Listener() {
+        player.addListener(this, PlayerEvent.play, event -> {
+            Log.d(TAG, "event received: " + event.eventType().name());
 
-                                    //Event received.
-                                    @Override
-                                    public void onEvent(PKEvent event) {
+        });
 
-                                        //First check if event is instance of the PlayerEvent.
-                                        if (event instanceof PlayerEvent) {
+        player.addListener(this, PlayerEvent.pause, event -> {
+            Log.d(TAG, "event received: " + event.eventType().name());
+        });
 
-                                            //Switch on the received events.
-                                            switch (((PlayerEvent) event).type) {
-                                                case PLAYBACK_RATE_CHANGED:
-                                                    PlayerEvent.PlaybackRateChanged playbackRateChanged = (PlayerEvent.PlaybackRateChanged) event;
-                                                    Log.d(TAG, "event received: " + event.eventType().name() + " Rate = " + playbackRateChanged.rate);
-                                                    break;
-                                                //Player play triggered.
-                                                case PLAY:
-                                                    //Print to log.
-                                                    Log.d(TAG, "event received: " + event.eventType().name());
-                                                    break;
+        player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
+            PlayerEvent.PlaybackRateChanged playbackRateChanged = event;
+            Log.d(TAG, "event received: " + event.eventType().name() + " Rate = " + playbackRateChanged.rate);
 
-                                                //Player pause triggered.
-                                                case PAUSE:
-                                                    Log.d(TAG, "event received: " + event.eventType().name());
-                                                    break;
+        });
 
-                                                //Tracks data is available.
-                                                case TRACKS_AVAILABLE:
-                                                    //Some events holds additional data objects in them.
-                                                    //In order to get access to this object you need first cast event to
-                                                    //the object it belongs to. You can learn more about this kind of objects in
-                                                    //our documentation.
-                                                    PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
+        player.addListener(this, PlayerEvent.tracksAvailable, event -> {
+            Log.d(TAG, "Event TRACKS_AVAILABLE");
 
-                                                    //Then you can use the data object itself.
-                                                    PKTracks tracks = tracksAvailable.tracksInfo;
+            PlayerEvent.TracksAvailable tracksAvailable = event;
 
-                                                    //Print to log amount of video tracks that are available for this entry.
-                                                    Log.d(TAG, "event received: " + event.eventType().name()
-                                                            + ". Additional info: Available video tracks number: "
-                                                            + tracks.getVideoTracks().size());
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                },
-                //Subscribe to the events you are interested in.
-                PlayerEvent.Type.PLAY,
-                PlayerEvent.Type.PAUSE,
-                PlayerEvent.Type.PLAYBACK_RATE_CHANGED,
-                PlayerEvent.Type.TRACKS_AVAILABLE
-        );
+            //Then you can use the data object itself.
+            PKTracks tracks = tracksAvailable.tracksInfo;
+
+            //Print to log amount of video tracks that are available for this entry.
+            Log.d(TAG, "event received: " + event.eventType().name()
+                    + ". Additional info: Available video tracks number: "
+                    + tracks.getVideoTracks().size());
+        });
+
+        player.addListener(this, PlayerEvent.error, event -> {
+            PlayerEvent.Error errorEvent = event;
+            Log.e(TAG, "Error Event: " + errorEvent.error.errorType  + " " + event.error.message);
+        });
     }
 
     /**
@@ -323,6 +296,17 @@ public class MainActivity extends AppCompatActivity {
             player.play();
         }
     }
+
+    @Override
+    public void onDestroy() {
+        if (player != null) {
+            player.removeListeners(this);
+            player.destroy();
+            player = null;
+        }
+        super.onDestroy();
+    }
+
 
     class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
 

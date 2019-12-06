@@ -1,15 +1,13 @@
 package com.kaltura.playkit.samples.imadaisample;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
-import com.google.gson.JsonObject;
-import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -18,10 +16,9 @@ import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
+import com.kaltura.playkit.ads.AdController;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ads.AdInfo;
-import com.kaltura.playkit.plugins.ima.IMAConfig;
-import com.kaltura.playkit.plugins.ima.IMAPlugin;
 import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
 import com.kaltura.playkit.plugins.imadai.IMADAIPlugin;
 
@@ -99,15 +96,12 @@ public class MainActivity extends AppCompatActivity {
 
         IMADAIConfig adsConfigVodHls2 = getDAIConfigVodHls2().enableDebugMode(true).setAlwaysStartWithPreroll(true);
         IMADAIConfig adsConfigVodHls3 = getDAIConfigVodHls3().enableDebugMode(true).setAlwaysStartWithPreroll(true);
-
-
-
         IMADAIConfig adsConfigVodHls4 = getDAIConfigVodHls4().enableDebugMode(true).setAlwaysStartWithPreroll(true);
 
         /* For MOAT call this API:
-        List<View> overlaysList = new ArrayList<>();
-        //overlaysList.add(....)
-        adsConfigVodHls4.setControlsOverlayList(overlaysList);
+            List<View> overlaysList = new ArrayList<>();
+            //overlaysList.add(....)
+            adsConfigVodHls4.setControlsOverlayList(overlaysList);
         */
 
         //Set jsonObject to the main pluginConfigs object.
@@ -138,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
     private IMADAIConfig getDAIConfigVodHls1() {
         String assetTitle = "VOD - Tears of Steel";
         String apiKey = null;
-        String contentSourceId = "19463";
+        String contentSourceId = "2477953";
         String videoId = "tears-of-steel";
         StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
         String licenseUrl = null;
@@ -154,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
     private IMADAIConfig getDAIConfigVodHls2() {
         String assetTitle = "VOD - Google I/O";
         String apiKey = null;
-        String contentSourceId = "19463";
+        String contentSourceId = "2477953";
         String videoId = "googleio-highlights";
         StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
         String licenseUrl = null;
@@ -237,65 +231,126 @@ public class MainActivity extends AppCompatActivity {
      * !!!Note, we will receive only ad events, we subscribed to.
      */
     private void subscribeToAdEvents() {
-        // Add ad event listener. Note, that it have two parameters.
-        // 1. PKEvent.Listener itself.
-        // 2. Array of ad events you want to listen to.
-        player.addEventListener(new PKEvent.Listener() {
-                                    @Override
-                                    public void onEvent(PKEvent event) {
-                                        if (event.eventType() == PlayerEvent.Type.ERROR) {
-                                            //In case of PlayerEvent.Type.ERROR cast the event object to PlayerEvent.Error
-                                            PlayerEvent.Error errorEvent = (PlayerEvent.Error) event;
-                                            //Print the type of the received error.
-                                            Log.e(TAG, "Player Error: " + errorEvent.error.errorType.name());
-                                        }
-                                        //First check if event is instance of the AdEvent.
-                                        if (event instanceof AdEvent) {
 
-                                            //Switch on the received events.
-                                            switch (((AdEvent) event).type) {
+        player.addListener(this, AdEvent.started, event -> {
+            //Some events holds additional data objects in them.
+            //In order to get access to this object you need first cast event to
+            //the object it belongs to. You can learn more about this kind of objects in
+            //our documentation.
+            AdEvent.AdStartedEvent adStartedEvent = event;
 
-                                                //Ad started event triggered.
-                                                case STARTED:
-                                                    //Some events holds additional data objects in them.
-                                                    //In order to get access to this object you need first cast event to
-                                                    //the object it belongs to. You can learn more about this kind of objects in
-                                                    //our documentation.
-                                                    AdEvent.AdStartedEvent adStartedEvent = (AdEvent.AdStartedEvent) event;
+            //Then you can use the data object itself.
+            AdInfo adInfo = adStartedEvent.adInfo;
 
-                                                    //Then you can use the data object itself.
-                                                    AdInfo adInfo = adStartedEvent.adInfo;
+            //Print to log content type of this ad.
+            Log.d(TAG, "ad event received: " + event.eventType().name()
+                    + ". Additional info: ad content type is: "
+                    + adInfo.getAdContentType());
+        });
 
-                                                    //Print to log content type of this ad.
-                                                    Log.d(TAG, "ad event received: " + event.eventType().name()
-                                                            + ". Additional info: ad content type is: "
-                                                            + adInfo.getAdContentType());
-                                                    break;
+        player.addListener(this, AdEvent.contentResumeRequested, event -> {
+            Log.d(TAG, "ADS_PLAYBACK_ENDED");
+        });
 
-                                                //Ad skipped triggered.
-                                                case SKIPPED:
-                                                    Log.d(TAG, "ad event received: " + event.eventType().name());
-                                                    break;
-                                                //Ad completed triggered.
-                                                case COMPLETED:
-                                                    Log.d(TAG, "ad event received: " + event.eventType().name());
-                                                    break;
-                                                case ERROR:
-                                                    AdEvent.Error errorEvent = (AdEvent.Error) event;
-                                                    //Print the type of the received error.
-                                                    Log.e(TAG, "Error: " + errorEvent.error.errorType.name());
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                },
-                //Subscribe to the ad events you are interested in.
-                PlayerEvent.Type.ERROR,
-                AdEvent.Type.STARTED,
-                AdEvent.Type.SKIPPED,
-                AdEvent.Type.COMPLETED,
-                AdEvent.Type.ERROR
-        );
+        player.addListener(this, AdEvent.adPlaybackInfoUpdated, event -> {
+            AdEvent.AdPlaybackInfoUpdated playbackInfoUpdated = event;
+            Log.d(TAG, "AD_PLAYBACK_INFO_UPDATED  = " + playbackInfoUpdated.width + "/" + playbackInfoUpdated.height + "/" + playbackInfoUpdated.bitrate);
+        });
+
+        player.addListener(this, AdEvent.skippableStateChanged, event -> {
+            Log.d(TAG, "SKIPPABLE_STATE_CHANGED");
+        });
+
+        player.addListener(this, AdEvent.adRequested, event -> {
+            AdEvent.AdRequestedEvent adRequestEvent = event;
+            Log.d(TAG, "AD_REQUESTED adtag = " + adRequestEvent.adTagUrl);
+        });
+
+        player.addListener(this, AdEvent.playHeadChanged, event -> {
+            AdEvent.AdPlayHeadEvent adEventProress = event;
+            //Log.d(TAG, "received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
+        });
+
+
+        player.addListener(this, AdEvent.adBreakStarted, event -> {
+            Log.d(TAG, "AD_BREAK_STARTED");
+        });
+
+        player.addListener(this, AdEvent.cuepointsChanged, event -> {
+            AdEvent.AdCuePointsUpdateEvent cuePointsList = event;
+            Log.d(TAG, "AD_CUEPOINTS_UPDATED HasPostroll = " + cuePointsList.cuePoints.hasPostRoll());
+        });
+
+        player.addListener(this, AdEvent.loaded, event -> {
+            AdEvent.AdLoadedEvent adLoadedEvent = event;
+            Log.d(TAG, "AD_LOADED " + adLoadedEvent.adInfo.getAdIndexInPod() + "/" + adLoadedEvent.adInfo.getTotalAdsInPod());
+        });
+
+        player.addListener(this, AdEvent.started, event -> {
+            AdEvent.AdStartedEvent adStartedEvent = event;
+            Log.d(TAG, "AD_STARTED w/h - " + adStartedEvent.adInfo.getAdWidth() + "/" + adStartedEvent.adInfo.getAdHeight());
+        });
+
+        player.addListener(this, AdEvent.resumed, event -> {
+            Log.d(TAG, "AD_RESUMED");
+        });
+
+        player.addListener(this, AdEvent.paused, event -> {
+            Log.d(TAG, "AD_PAUSED");
+        });
+
+        player.addListener(this, AdEvent.skipped, event -> {
+            Log.d(TAG, "AD_SKIPPED");
+        });
+
+        player.addListener(this, AdEvent.allAdsCompleted, event -> {
+            Log.d(TAG, "AD_ALL_ADS_COMPLETED");
+        });
+
+        player.addListener(this, AdEvent.completed, event -> {
+            Log.d(TAG, "AD_COMPLETED");
+        });
+
+        player.addListener(this, AdEvent.firstQuartile, event -> {
+            Log.d(TAG, "FIRST_QUARTILE");
+        });
+
+        player.addListener(this, AdEvent.midpoint, event -> {
+            Log.d(TAG, "MIDPOINT");
+            if (player != null) {
+                AdController adController = player.getController(AdController.class);
+                if (adController != null) {
+                    if (adController.isAdDisplayed()) {
+                        Log.d(TAG, "AD CONTROLLER API: " + adController.getAdCurrentPosition() + "/" + adController.getAdDuration());
+                    }
+                    //Log.d(TAG, "adController.getCuePoints().getAdCuePoints().size());
+                    //Log.d(TAG, adController.getAdInfo().toString());
+                    //adController.skip();
+                }
+            }
+        });
+
+        player.addListener(this, AdEvent.thirdQuartile, event -> {
+            Log.d(TAG, "THIRD_QUARTILE");
+        });
+
+        player.addListener(this, AdEvent.adBreakEnded, event -> {
+            Log.d(TAG, "AD_BREAK_ENDED");
+        });
+
+        player.addListener(this, AdEvent.adClickedEvent, event -> {
+            AdEvent.AdClickedEvent advtClickEvent = event;
+            Log.d(TAG, "AD_CLICKED url = " + advtClickEvent.clickThruUrl);
+        });
+
+        player.addListener(this, AdEvent.error, event -> {
+            AdEvent.Error adError = event;
+            Log.e(TAG, "AD_ERROR : " + adError.error.errorType.name());
+        });
+
+        player.addListener(this, PlayerEvent.error, event -> {
+            Log.e(TAG, "PLAYER ERROR " + event.error.message);
+        });
     }
 
     /**

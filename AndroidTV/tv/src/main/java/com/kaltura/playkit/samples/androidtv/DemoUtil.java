@@ -17,8 +17,8 @@ package com.kaltura.playkit.samples.androidtv;
 
 import android.text.TextUtils;
 
-import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.util.MimeTypes;
+import com.kaltura.android.exoplayer2.Format;
+import com.kaltura.android.exoplayer2.util.MimeTypes;
 
 import java.util.Locale;
 

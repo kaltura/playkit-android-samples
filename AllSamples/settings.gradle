@@ -1,4 +1,5 @@
 ////PlayKit Library
+
 //include ':playkit'
 //project(':playkit').projectDir = new File('../../playkit-android/playkit')
 //include ':providers'
@@ -15,12 +16,18 @@
 //project(':MD360').projectDir = new File('../../MD360Player4Android/vrlib')
 //include ':playkitvr'
 //project(':playkitvr').projectDir = new File('../../playkit-android-vr/playkitvr')
+////include ':netkit'
+////project(':netkit').projectDir = new File('../../netkit-android/netkit')
+//include ':fbads'
+//project(':fbads').projectDir = new File('../../playkit-android-fb-ads/fbadsplugin')
 
 // Sample apps
 def samples = [
         'BasicSetup',
+        'AudioOnlyBasicSetup',
         'EventsRegistration',
         'ErHandling',
+        'SubtitleSideloading',
         'BasicPluginsSetup',
         'TracksSelection',
         'ChangeMedia',
@@ -29,13 +36,13 @@ def samples = [
         'Offline',
         'Youbora',
         'PhoenixAnalytics',
-        'KalturaLiveStats',
-        'KalturaStats',
         'KavaAnalytics',
         'Providers',
         'TVPapiStats',
         'ChromecastSample',
         'ChromecastCAFSample',
+        'FBAdsSample',
+        'PlaykitDragScale',
         'MediaSession'
 ]
 

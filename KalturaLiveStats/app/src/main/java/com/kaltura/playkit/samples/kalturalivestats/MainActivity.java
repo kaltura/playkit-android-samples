@@ -1,7 +1,7 @@
 package com.kaltura.playkit.samples.kalturalivestats;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +16,7 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
+import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.ovp.KalturaLiveStatsEvent;
 import com.kaltura.playkit.plugins.ovp.KalturaLiveStatsPlugin;
 
@@ -117,18 +118,14 @@ public class MainActivity extends AppCompatActivity {
      */
     private void subscribeToKalturaLiveStatsReportEvent() {
         //Subscribe to the event.
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //Cast received event to AnalyticsEvent.KalturaLiveStatsReportEvent.
-                KalturaLiveStatsEvent.KalturaLiveStatsReport liveReportEvent = (KalturaLiveStatsEvent.KalturaLiveStatsReport) event;
 
-                //Get the buffer time from the report.
-                long bufferTime = liveReportEvent.bufferTime;
-                Log.i(TAG, "Live stats report sent. Buffer time: " + bufferTime);
-            }
-            //Event subscription.
-        }, KalturaLiveStatsEvent.Type.REPORT_SENT);
+        player.addListener(this, KalturaLiveStatsEvent.reportSent, event -> {
+            KalturaLiveStatsEvent.KalturaLiveStatsReport liveReportEvent = event;
+
+            //Get the buffer time from the report.
+            long bufferTime = liveReportEvent.bufferTime;
+            Log.i(TAG, "Live stats report sent. Buffer time: " + bufferTime);
+        });
     }
 
     /**

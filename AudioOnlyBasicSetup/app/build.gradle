@@ -31,14 +31,35 @@ configurations.all {
 }
 
 dependencies {
-//    implementation 'com.kaltura.playkit:playkit:4.1.0'
-//    implementation 'com.kaltura.playkit:imaplugin:4.1.0'
+
+    implementation 'com.kaltura.playkit:playkit:4.4.0'
+    implementation 'com.kaltura.playkit:playkitproviders:4.4.0'
+    implementation 'com.kaltura.playkit:youboraplugin:4.4.0'
+    implementation 'com.kaltura.playkit:imaplugin:4.4.0'
+    implementation 'com.kaltura.playkit:kavaplugin:4.4.0'
+    implementation 'com.kaltura.playkit:googlecast:4.4.0'
+    implementation 'com.kaltura.playkit:vrplugin:4.4.0'
+    implementation 'com.kaltura.playkit:fbadsplugin:4.4.0'
 
 //    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-kava:develop-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-ima:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-vr:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-fb-ads:develop-SNAPSHOT'
 
-    implementation project(":playkit")
-    implementation project(":ima")
+
+//    implementation project(":playkit")
+//    implementation project(":providers")
+//    implementation project(":ima")
+//    implementation project(":youbora")
+//    implementation project(":kava")
+//    implementation project(":googlecast")
+//    implementation project(":playkitvr")
+//    implementation project(":MD360")
+//    implementation project(':fbads')
 
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'

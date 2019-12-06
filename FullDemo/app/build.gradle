@@ -42,20 +42,19 @@ dependencies {
 //    implementation 'com.kaltura:playkit-android-youbora:develop-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-googlecast:develop-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-vr:develop-SNAPSHOT'
-//    implementation 'com.kaltura:playkit-android-fb-ads:develop-SNAPSHOT'
+//    implementation 'com.kaltura:playkit-android-fbads:develop-SNAPSHOT'
 
 
-//    implementation project(":playkit")
-//    implementation project(":providers")
-//    implementation project(":ima")
-//    implementation project(":youbora")
-//    implementation project(":kava")
-//    implementation project(":googlecast")
-//    implementation project(":playkitvr")
-//    implementation project(":MD360")
-//    implementation project(':fbads')
+    implementation project(":playkit")
+    implementation project(":providers")
+    implementation project(":youbora")
+    implementation project(":ima")
+    implementation project(":kava")
+    implementation project(":googlecast")
+    implementation project(":playkitvr")
+    implementation project(":MD360")
+    implementation project(":fbads")
 
-    //implementation project(":netkit")
     //implementation project(":admanager")
     //implementation project(":adsplugin")
 

@@ -28,6 +28,9 @@ include ':playkitdemo'
 //include ':fbads'
 //project(':fbads').projectDir = new File('../../playkit-android-fb-ads/fbadsplugin')
 
+include ':fbads'
+project(':fbads').projectDir = new File('../../playkit-android-fb-ads/fbadsplugin')
+
 //include ':netkit'
 //project(':netkit').projectDir = new File('../../netkit-android/netkit')
 

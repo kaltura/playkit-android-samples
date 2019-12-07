@@ -44,16 +44,15 @@ dependencies {
 //    implementation 'com.kaltura:playkit-android-vr:develop-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-fb-ads:develop-SNAPSHOT'
 
-
-    implementation project(":playkit")
-    implementation project(":providers")
-    implementation project(":youbora")
-    implementation project(":ima")
-    implementation project(":kava")
-    implementation project(":googlecast")
-    implementation project(":playkitvr")
-    implementation project(":MD360")
-    implementation project(":fbads")
+//    implementation project(":playkit")
+//    implementation project(":providers")
+//    implementation project(":youbora")
+//    implementation project(":ima")
+//    implementation project(":kava")
+//    implementation project(":googlecast")
+//    implementation project(":playkitvr")
+//    implementation project(":MD360")
+//    implementation project(":fbads")
 
     //implementation project(":admanager")
     //implementation project(":adsplugin")

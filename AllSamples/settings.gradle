@@ -42,7 +42,7 @@ def samples = [
         'ChromecastSample',
         'ChromecastCAFSample',
         'FBAdsSample',
-        'PlaykitDragScale',
+        'MiniPlayer',
         'MediaSession'
 ]
 

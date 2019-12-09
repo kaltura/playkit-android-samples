@@ -1,3 +1,5 @@
 include ':app'
-include ':playkit'
-project(':playkit').projectDir = new File('../../playkit-android/playkit')
+//include ':playkit'
+//project(':playkit').projectDir = new File('../../playkit-android/playkit')
+//include ':fbads'
+//project(':fbads').projectDir = new File('../../playkit-android-fb-ads/fbadsplugin')

@@ -1,3 +1,5 @@
 include ':app'
-include ':playkit'
-project(':playkit').projectDir = new File('../../playkit-android/playkit')
+//include ':playkit'
+//project(':playkit').projectDir = new File('../../playkit-android/playkit')
+//include ':providers'
+//project(':providers').projectDir = new File('../../playkit-android-providers/mediaproviders')

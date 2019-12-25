@@ -608,7 +608,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         JsonObject propertiesJson = new JsonObject();
         propertiesJson.addProperty("genre", "");
         propertiesJson.addProperty("type", "");
-        propertiesJson.addProperty("transactionType", "TransactionType-Gourav");
+        propertiesJson.addProperty("transactionType", "TransactionType-1");
         propertiesJson.addProperty("year", "");
         propertiesJson.addProperty("cast", "");
         propertiesJson.addProperty("director", "");

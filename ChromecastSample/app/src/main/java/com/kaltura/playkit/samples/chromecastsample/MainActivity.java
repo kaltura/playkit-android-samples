@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -102,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadRemoteMediaOvp(0,true);
+                Toast.makeText(MainActivity.this, "This DEMO IS DEPRECATED. Instead use ChromecastCAFSample with ovp variant", Toast.LENGTH_LONG).show();
+                //loadRemoteMediaOvp(0,true);
                 return;
             }
         });
@@ -115,14 +117,13 @@ public class MainActivity extends AppCompatActivity {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadRemoteMediaOtt(0,true);
+                Toast.makeText(MainActivity.this, "This DEMO IS DEPRECATED Instead use ChromecastCAFSample with ott variant", Toast.LENGTH_LONG).show();
+                //loadRemoteMediaOtt(0,true);
                 return;
             }
         });
     }
-
-
-
+    
     private void showIntroductoryOverlay() {
         if (mIntroductoryOverlay != null) {
             mIntroductoryOverlay.remove();

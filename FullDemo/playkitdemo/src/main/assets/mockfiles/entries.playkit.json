@@ -29,6 +29,16 @@
       }
     ]
   },
+  "dash_ron": {
+    "id": "0_pl5lbfo0",
+    "sources": [
+      {
+        "id": "0_pl5lbfo0_dash",
+        "url": "https://livesim.dashif.org/dash/vod/testpic_2s/img_subs.mpd",
+        "mimeType": "application/dash+xml"
+      }
+    ]
+  },
   "dash_multi": {
     "id": "0_pl5lbfo0",
     "sources": [
@@ -72,6 +82,30 @@
         "id": "1_1h1vsv3z_dash",
         "mimeType": "application/dash+xml",
         "url": "https://www.youtube.com/api/manifest/dash/id/bf5bb2419360daf1/source/youtube?as=fmp4_audio_clear,webm2_sd_hd_clear&sparams=ip,ipbits,expire,source,id,as&ip=0.0.0.0&ipbits=0&expire=19000000000&signature=249B04F79E984D7F86B4D8DB48AE6FAF41C17AB3.7B9F0EC0505E1566E59B8E488E9419F253DDF413&key=ik0"
+      }
+    ]
+  },
+  "waka": {
+    "duration": 102000,
+    "id": "1_1h1vsv3z",
+    "name": "waka",
+    "sources": [
+      {
+        "id": "1_1h1vsv3z_dash",
+        "mimeType": "application/dash+xml",
+        "url": "https://restv4-as.ott.kaltura.com/api_v3/service/assetFile/action/playManifest/partnerId/3065/assetId/789938/assetType/media/assetFileId/8049990/contextType/PLAYBACK/a.mpd"
+      }
+    ]
+  },
+  "bbc": {
+    "duration": 102000,
+    "id": "1_1h1vsv3z",
+    "name": "bbc",
+    "sources": [
+      {
+        "id": "1_1h1vsv3z_dash",
+        "mimeType": "application/dash+xml",
+        "url": "https://restv4-as.ott.kaltura.com/api_v3/service/assetFile/action/playManifest/partnerId/3065/assetId/789888/assetType/media/assetFileId/8047511/contextType/PLAYBACK/a.mpd"
       }
     ]
   },
@@ -125,7 +159,7 @@
     {
       "id": "0_f8re4ujs_live",
       "mimeType": "application/x-mpegURL",
-      "url": "http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_f8re4ujs/format/applehttp/protocol/http/uiConfId/15068781/a.m3u8"
+      "url": "https://qa-apache-php7.dev.kaltura.com/p/1091/sp/1091/playManifest/entryId/0_nwkp7jtx/flavorIds/0_iju7j519,0_98mlrldo,0_5hts3h5r,0_n6n76xp9/deliveryProfileId/1033/protocol/https/format/applehttp/a.m3u8"
     }
   ]
 }

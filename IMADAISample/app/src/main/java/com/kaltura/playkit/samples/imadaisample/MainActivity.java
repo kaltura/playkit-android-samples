@@ -1,11 +1,12 @@
 package com.kaltura.playkit.samples.imadaisample;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.kaltura.playkit.PKMediaConfig;
@@ -89,14 +90,14 @@ public class MainActivity extends AppCompatActivity {
         PKPluginConfigs pluginConfigs = new PKPluginConfigs();
 
         //Initialize + Configure  IMADAIConfig object.
-        IMADAIConfig adsConfigVodHls1 = getDAIConfigVodHls1().enableDebugMode(true).setAlwaysStartWithPreroll(true);
-        IMADAIConfig adsConfigVodLive = getDAIConfigLiveHls().enableDebugMode(true).setAlwaysStartWithPreroll(true);
-        IMADAIConfig adsConfigVodDash = getDAIConfigVodDash().enableDebugMode(true).setAlwaysStartWithPreroll(true);
-        IMADAIConfig adsConfigError = getDAIConfigError().enableDebugMode(true).setAlwaysStartWithPreroll(true);
+        IMADAIConfig adsConfigVodHls1 = getDAIConfigVodHls1();
+        IMADAIConfig adsConfigVodLive = getDAIConfigLiveHls();
+        IMADAIConfig adsConfigVodDash = getDAIConfigVodDash();
+        IMADAIConfig adsConfigError = getDAIConfigError();
 
-        IMADAIConfig adsConfigVodHls2 = getDAIConfigVodHls2().enableDebugMode(true).setAlwaysStartWithPreroll(true);
-        IMADAIConfig adsConfigVodHls3 = getDAIConfigVodHls3().enableDebugMode(true).setAlwaysStartWithPreroll(true);
-        IMADAIConfig adsConfigVodHls4 = getDAIConfigVodHls4().enableDebugMode(true).setAlwaysStartWithPreroll(true);
+        IMADAIConfig adsConfigVodHls2 = getDAIConfigVodHls2();
+        IMADAIConfig adsConfigVodHls3 = getDAIConfigVodHls3();
+        IMADAIConfig adsConfigVodHls4 = getDAIConfigVodHls4();
 
         /* For MOAT call this API:
             List<View> overlaysList = new ArrayList<>();
@@ -147,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
     private IMADAIConfig getDAIConfigVodHls2() {
         String assetTitle = "VOD - Google I/O";
+        String assetKey = null;
         String apiKey = null;
         String contentSourceId = "2477953";
         String videoId = "googleio-highlights";
@@ -157,11 +159,11 @@ public class MainActivity extends AppCompatActivity {
                 videoId,
                 apiKey,
                 streamFormat,
-                licenseUrl).enableDebugMode(true);
+                licenseUrl).enableDebugMode(true).setAlwaysStartWithPreroll(true);
     }
 
     private IMADAIConfig getDAIConfigVodHls3() {
-        String assetTitle = "HLS3";
+        String assetTitle = "HLS";
         String apiKey = null;
         String contentSourceId = "19823";
         String videoId = "ima-test";
@@ -172,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                 videoId,
                 apiKey,
                 streamFormat,
-                licenseUrl).enableDebugMode(true);
+                licenseUrl).enableDebugMode(true).setAlwaysStartWithPreroll(true);
     }
 
     private IMADAIConfig getDAIConfigVodHls4() {
@@ -188,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                 videoId3,
                 apiKey3,
                 streamFormat3,
-                licenseUrl3);
+                licenseUrl3).enableDebugMode(true).setAlwaysStartWithPreroll(true);
     }
 
     private IMADAIConfig getDAIConfigVodDash() {
@@ -203,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                 videoId,
                 apiKey,
                 streamFormat,
-                licenseUrl).enableDebugMode(true);
+                licenseUrl).enableDebugMode(true).setAlwaysStartWithPreroll(true);
     }
 
 
@@ -220,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
                 videoId,
                 apiKey,
                 streamFormat,
-                licenseUrl).enableDebugMode(true);
+                licenseUrl).enableDebugMode(true).setAlwaysStartWithPreroll(true);
     }
 
 

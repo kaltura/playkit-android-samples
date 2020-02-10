@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    
+
     private void showIntroductoryOverlay() {
         if (mIntroductoryOverlay != null) {
             mIntroductoryOverlay.remove();

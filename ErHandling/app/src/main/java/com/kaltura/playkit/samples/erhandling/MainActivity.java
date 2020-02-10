@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.JsonObject;
-import com.kaltura.playkit.PKEvent;
+import com.kaltura.android.exoplayer2.upstream.HttpDataSource;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -113,6 +113,11 @@ public class MainActivity extends AppCompatActivity {
         player.addListener(this, PlayerEvent.error, event -> {
             PlayerEvent.Error playerErrorvEent = event;
             Log.e(TAG, "PLAYER ERROR " +  playerErrorvEent.error.errorType.name() + " " + playerErrorvEent.error.message);
+
+            if (event.error.exception instanceof HttpDataSource.InvalidResponseCodeException) {
+                Log.e(TAG, "PLAYER ERROR Network error responseCode = " + ((HttpDataSource.InvalidResponseCodeException) event.error.exception).responseCode);
+                Log.e(TAG, "PLAYER ERROR Network error responseMessage = " + ((HttpDataSource.InvalidResponseCodeException) event.error.exception).responseMessage);
+            }
         });
 
         player.addListener(this, AdEvent.error, event -> {
@@ -181,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         mediaSource.setId(MEDIA_SOURCE_ID);
 
         //Set the content url. In our case it will be link to hls source(.m3u8).
-        mediaSource.setUrl(INCORRECT_SOURCE_URL);
+        mediaSource.setUrl("https://playertest.longtailvideo.com/adaptive/eleph-audio/playlist1.m3u8");
 
         //Set the format of the source. In our case it will be hls.
         mediaSource.setMediaFormat(PKMediaFormat.hls);

@@ -341,55 +341,58 @@ public class MainActivity extends AppCompatActivity {
 
                 List<MediaTrack> tracksList = remoteMediaClient.getMediaInfo().getMediaTracks();
 
-                Map<String, Long> audioTracks = new HashMap<>();
-                Map<String, Long> textTracks = new HashMap<>();
 
-                for (MediaTrack mediaTrack : tracksList) {
-                    if (MediaTrack.TYPE_AUDIO == mediaTrack.getType()) {
-                        audioTracks.put(mediaTrack.getLanguage(), mediaTrack.getId());
-                    } else if (MediaTrack.TYPE_TEXT == mediaTrack.getType()) {
-                        textTracks.put(mediaTrack.getLanguage(), mediaTrack.getId());
-                    }
-                }
+                if (tracksList != null) {
+                    Map<String, Long> audioTracks = new HashMap<>();
+                    Map<String, Long> textTracks = new HashMap<>();
 
-                long [] tracksIndexsArray = null;  // starting from index 1
-                if (audioTracks.isEmpty() && textTracks.isEmpty()) {
-                    // not able to switch tracks
-                    return;
-                } else if (!audioTracks.isEmpty() && !textTracks.isEmpty()) {
-                    if (audioTracks.get("ru") != null && textTracks.get("ru") != null) {
-                        //do your tracks logic for choosing the default audio and text track
-                        tracksIndexsArray = new long[]{textTracks.get("ru").longValue(), audioTracks.get("ru").longValue()};
+                    for (MediaTrack mediaTrack : tracksList) {
+                        if (MediaTrack.TYPE_AUDIO == mediaTrack.getType()) {
+                            audioTracks.put(mediaTrack.getLanguage(), mediaTrack.getId());
+                        } else if (MediaTrack.TYPE_TEXT == mediaTrack.getType()) {
+                            textTracks.put(mediaTrack.getLanguage(), mediaTrack.getId());
+                        }
                     }
-                } else if (!audioTracks.isEmpty() && textTracks.isEmpty()) {
-                    //do your default audio track logic  starting from index 1
-                    if (audioTracks.get("ru") != null) {
-                        tracksIndexsArray = new long[]{audioTracks.get("ru").longValue()};
-                    }
-                } else if (audioTracks.isEmpty() && !textTracks.isEmpty()) {
-                    //do your default text track logic starting from index 1
-                    if (textTracks.get("ru") != null) {
-                        tracksIndexsArray = new long[]{textTracks.get("ru").longValue()};
-                    }
-                }
 
-                if (tracksIndexsArray == null) {
-                    return;
-                }
-                long[] finalTracksIndexsArray = tracksIndexsArray;
-                remoteMediaClient.setActiveMediaTracks(finalTracksIndexsArray)
-                        .setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
-                            @Override
-                            public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
-                                if (!mediaChannelResult.getStatus().isSuccess()) {
-                                    Log.e(TAG, "Failed with status code:" +
-                                            mediaChannelResult.getStatus().getStatusCode());
-                                } else {
-                                    Log.e(TAG, "OK with status code:" +
-                                            mediaChannelResult.getStatus().getStatusCode());
+                    long[] tracksIndexsArray = null;  // starting from index 1
+                    if (audioTracks.isEmpty() && textTracks.isEmpty()) {
+                        // not able to switch tracks
+                        return;
+                    } else if (!audioTracks.isEmpty() && !textTracks.isEmpty()) {
+                        if (audioTracks.get("ru") != null && textTracks.get("ru") != null) {
+                            //do your tracks logic for choosing the default audio and text track
+                            tracksIndexsArray = new long[]{textTracks.get("ru").longValue(), audioTracks.get("ru").longValue()};
+                        }
+                    } else if (!audioTracks.isEmpty() && textTracks.isEmpty()) {
+                        //do your default audio track logic  starting from index 1
+                        if (audioTracks.get("ru") != null) {
+                            tracksIndexsArray = new long[]{audioTracks.get("ru").longValue()};
+                        }
+                    } else if (audioTracks.isEmpty() && !textTracks.isEmpty()) {
+                        //do your default text track logic starting from index 1
+                        if (textTracks.get("ru") != null) {
+                            tracksIndexsArray = new long[]{textTracks.get("ru").longValue()};
+                        }
+                    }
+
+                    if (tracksIndexsArray == null) {
+                        return;
+                    }
+                    long[] finalTracksIndexsArray = tracksIndexsArray;
+                    remoteMediaClient.setActiveMediaTracks(finalTracksIndexsArray)
+                            .setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+                                @Override
+                                public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
+                                    if (!mediaChannelResult.getStatus().isSuccess()) {
+                                        Log.e(TAG, "Failed with status code:" +
+                                                mediaChannelResult.getStatus().getStatusCode());
+                                    } else {
+                                        Log.e(TAG, "OK with status code:" +
+                                                mediaChannelResult.getStatus().getStatusCode());
+                                    }
                                 }
-                            }
-                        });
+                            });
+                }
             }
         });
     }

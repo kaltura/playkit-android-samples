@@ -427,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void startMockMediaLoading(OnMediaLoadCompletion completion) {
 
-        mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "live");
+        mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "mp4");
 
         mediaProvider.load(completion);
     }
@@ -1043,7 +1043,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //When the track data available, this event occurs. It brings the info object with it.
             tracksInfo = event.tracksInfo;
             if (player != null) {
-                player.changeTrack(tracksInfo.getVideoTracks().get(0).getUniqueId());
+                if (!tracksInfo.getVideoTracks().isEmpty()) {
+                    player.changeTrack(tracksInfo.getVideoTracks().get(0).getUniqueId());
+                }
             }
             populateSpinnersWithTrackInfo(event.tracksInfo);
         });

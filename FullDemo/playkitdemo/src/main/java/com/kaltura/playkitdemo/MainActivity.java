@@ -88,6 +88,7 @@ import com.kaltura.playkit.providers.api.phoenix.APIDefines;
 import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
 import com.kaltura.playkit.providers.base.OnPlaylistLoadCompletion;
 import com.kaltura.playkit.providers.mock.MockMediaProvider;
+import com.kaltura.playkit.providers.ott.OTTMediaAsset;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
 import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 
@@ -347,8 +348,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void startSimpleOvpMediaLoadingHls(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 1734751, null))
+        new KalturaOvpMediaProvider("https://cdnapisec.kaltura.com", 1734751, null)
                 .setEntryId("1_3o1seqnv")
                 .load(completion);
     }
@@ -360,37 +360,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 // log.d("XXX NetworkError code = " + errorElement.getCode() + " " + errorElement.getMessage());
 //});
 
-        SessionProvider ksSessionProvider = new SimpleSessionProvider( "https://api-preprod.ott.kaltura.com/v5_2_8/api_v3/", //"http://httpbin.org/status/401"?
-                198,
-                null);
-//djJ8MjI1fPzX0HoAMEhNI2RyiLfXurOxE9cPipMNd_HugBn4mZj9Hq9QnBEelnQjzdKsogeO3PRucy0VcU5gzW_nZCsbLLQaUgYaLh5AE4ug2riuTd8XR4WEPt1pWgh854B54vmh7XVCM1WgLUFEyMMx20g3CmvX6VmmrKHv3TRuCQzQy6oXJ8k7W40pP2f9BFBn1Z2ABG7vb0qvpnZxTdTtsOmrrCkIznxULsuYmyi8xowX7C2cE2kCeIaAN7I48SMIzoA1ow==
-        String mediaId = "480989";//"631387";//"550987";//"631387";// "audio 743297";// "749632";//"616436";// "626769";//"610715";//"684891"
-        String formatHls = "Tablet Main"; //"Web New";//
-        String formatDash = "dash Mobile";
+        String mediaId = "259153";
+        String mediaFormat = "Mobile_Devices_Main_SD";
 
-        mediaProvider = new PhoenixMediaProvider()
-                .setSessionProvider(ksSessionProvider)
+        OTTMediaAsset ottMediaAsset = new OTTMediaAsset()
                 .setAssetId(mediaId)
-//.setReferrer()
-                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setKs(null)
+                 //.setReferrer()
+                .setFormats(Collections.singletonList(mediaFormat))
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Http)
                 .setContextType(APIDefines.PlaybackContextType.Playback)
-                .setAssetType(APIDefines.KalturaAssetType.Media).
-        setAssetReferenceType(APIDefines.AssetReferenceType.Media);
-                //.setFormats(formatDash,formatHls/*"Web New"*/);
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                .setAssetReferenceType(APIDefines.AssetReferenceType.Media);
+
+        mediaProvider = new PhoenixMediaProvider(MockParams.PhoenixBaseUrl, MockParams.OttPartnerId, ottMediaAsset);
 
         mediaProvider.load(completion);
     }
 
     private void startSimpleOvpMediaLoadingHEVC(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2215841, null))
+        new KalturaOvpMediaProvider("https://cdnapisec.kaltura.com", 2215841, null)
                 .setEntryId("1_zhpdyrr2")
                 .load(completion);
     }
 
     private void startSimpleOvpMediaLoadingDRM(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2222401, null))
+        new KalturaOvpMediaProvider("https://cdnapisec.kaltura.com", 2222401, null)
                 .setEntryId("1_f93tepsn")//("1_asoyc5ef") //("1_uzea2uje")
                 .load(completion);
     }
@@ -403,8 +398,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void startSimpleOvpMediaLoadingClear(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null))
+        new KalturaOvpMediaProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null)
                 .setEntryId("0_wu32qrt3")
                 .load(completion);
     }
@@ -412,15 +406,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     private void startSimpleOvpMediaLoadingLive(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null))
+        new KalturaOvpMediaProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null)
                 .setEntryId("0_nwkp7jtx")
                 .load(completion);
     }
 
     private void startSimpleOvpMediaLoadingLive1(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com/", 1740481, null))
+        new KalturaOvpMediaProvider("https://cdnapisec.kaltura.com/", 1740481, null)
                 .setEntryId("1_fdv46dba")
                 .load(completion);
     }
@@ -433,15 +425,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void startOttMediaLoading(final OnMediaLoadCompletion completion) {
-        SessionProvider ksSessionProvider = new SimpleSessionProvider(MockParams.PhoenixBaseUrlUS, MockParams.OttPartnerIdTest, null);
-        mediaProvider = new PhoenixMediaProvider()
-                .setSessionProvider(ksSessionProvider)
+
+        OTTMediaAsset ottMediaAsset = new OTTMediaAsset()
                 .setAssetId(MediaIdTest)
+                .setKs(null)
                 .setAssetType(APIDefines.KalturaAssetType.Media)
                 .setAssetReferenceType(APIDefines.AssetReferenceType.Media)
                 .setContextType(APIDefines.PlaybackContextType.Playback)
                 .setProtocol(PhoenixMediaProvider.HttpProtocol.All)
-                .setFormats(FormatTest);
+                .setFormats(Collections.singletonList(FormatTest));
+
+        mediaProvider = new PhoenixMediaProvider(MockParams.PhoenixBaseUrlUS, MockParams.OttPartnerIdTest, ottMediaAsset);
         mediaProvider.load(completion);
     }
 

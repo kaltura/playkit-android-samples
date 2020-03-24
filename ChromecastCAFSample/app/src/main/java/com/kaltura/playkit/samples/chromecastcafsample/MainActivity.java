@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 } else {
-                    pendingResult = remoteMediaClient.load(getOttCastMediaInfo("258459","Mobile_Devices_Main_SD", "", null, CAFCastBuilder.HttpProtocol.Http), loadOptions);
+                    pendingResult = remoteMediaClient.load(getOttCastMediaInfo("548576","Mobile_Main", "", null, CAFCastBuilder.HttpProtocol.Http), loadOptions);
                     pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
                         @Override
@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
         });
         PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = null;
         MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(position).build();
-        pendingResult = remoteMediaClient.load(getOttCastMediaInfo("259153","Mobile_Devices_Main_SD", "", null, CAFCastBuilder.HttpProtocol.Http), loadOptions);
+        pendingResult = remoteMediaClient.load(getOttCastMediaInfo("548575","Mobile_Main", "", null, CAFCastBuilder.HttpProtocol.Http), loadOptions);
         pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
             @Override

@@ -4,7 +4,9 @@ import android.Manifest;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+
 import android.hardware.SensorManager;
+
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -29,24 +32,32 @@ import android.widget.Toast;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
+import com.kaltura.android.exoplayer2.LoadControl;
+import com.kaltura.android.exoplayer2.upstream.BandwidthMeter;
+import com.kaltura.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.kaltura.netkit.connect.executor.APIOkRequestsExecutor;
+import com.kaltura.netkit.connect.request.RequestConfiguration;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.utils.OnCompletion;
 import com.kaltura.netkit.utils.SessionProvider;
 import com.kaltura.playkit.PKDrmParams;
+import com.kaltura.playkit.PKError;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
+import com.kaltura.playkit.PKPlaylist;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
-//import com.kaltura.playkit.PKVideoCodec;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
+import com.kaltura.playkit.player.ABRSettings;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
+import com.kaltura.playkit.player.ExoPlayerWrapper;
 import com.kaltura.playkit.player.LoadControlBuffers;
 import com.kaltura.playkit.player.MediaSupport;
 import com.kaltura.playkit.player.PKHttpClientManager;
@@ -75,9 +86,11 @@ import com.kaltura.playkit.providers.MediaEntryProvider;
 import com.kaltura.playkit.providers.api.SimpleSessionProvider;
 import com.kaltura.playkit.providers.api.phoenix.APIDefines;
 import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
+import com.kaltura.playkit.providers.base.OnPlaylistLoadCompletion;
 import com.kaltura.playkit.providers.mock.MockMediaProvider;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
 import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
+
 import com.kaltura.playkit.utils.Consts;
 import com.kaltura.playkitvr.VRUtil;
 
@@ -88,12 +101,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
-import static com.kaltura.playkitdemo.MockParams.Format2;
 import static com.kaltura.playkitdemo.MockParams.FormatTest;
 import static com.kaltura.playkitdemo.MockParams.MediaIdTest;
 import static com.kaltura.playkitdemo.MockParams.OvpUserKS;
-import static com.kaltura.playkitdemo.MockParams.PnxKS;
-import static com.kaltura.playkitdemo.MockParams.SingMediaId4;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
@@ -107,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String DAI_PLUGIN = "DAI";
     public static int READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 123;
     public static int changeMediaIndex = -1;
-    public static Long START_POSITION = 0L;//65L;
+    public static Long START_POSITION = 0L;
 
     String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
     String preSkipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
@@ -131,8 +141,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isAdsEnabled = true;
+    private boolean isAdsEnabled = false;
     private boolean isDAIMode = false;
+
+    private ExoPlayerWrapper.LoadControlStrategy loadControlStrategy;
 
     static {
         PKHttpClientManager.setHttpProvider("okhttp");
@@ -186,19 +198,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         progressBar.setVisibility(View.INVISIBLE);
         companionAdSlot = findViewById(R.id.companionAdSlot);
 
+        loadControlStrategy = new ExoPlayerWrapper.LoadControlStrategy() {
+            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(MainActivity.this).build();
+
+            @Override
+            public LoadControl getCustomLoadControl() {
+                return null;
+            }
+
+            @Override
+            public BandwidthMeter getCustomBandwidthMeter() {
+                return bandwidthMeter;
+            }
+        };
+
         registerPlugins();
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
-
-        startOttMediaLoading(playLoadedEntry);
-//      startSimpleOvpMediaLoadingVR(playLoadedEntry);
-//      startSimpleOvpMediaLoadingHls(playLoadedEntry);
-//      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
-//      startMockMediaLoading(playLoadedEntry);
-//      startOvpMediaLoading(playLoadedEntry);
-//      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
-//        startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
+        //startPreprodOttMediaLoading(playLoadedEntry);
+        //startOttMediaLoading(playLoadedEntry);
+        //startSimpleOvpMediaLoadingVR(playLoadedEntry);
+        //startSimpleOvpMediaLoadingHls(playLoadedEntry);
+        //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
+        //startMockMediaLoading(playLoadedEntry);
+        //startOvpMediaLoading(playLoadedEntry);
+        startSimpleOvpMediaLoadingDRM(playLoadedEntry);
+        //startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
@@ -272,7 +298,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void run() {
                 if (response.isSuccess()) {
-                    onMediaLoaded(response.getResponse());
+                    if (response.getResponse() instanceof PKMediaEntry) {
+                        onMediaLoaded(response.getResponse());
+                    } else if (response.getResponse() instanceof List) {
+                        //PKPlaylist listofmedia = (PKPlaylist) response.getResponse();
+                        //onMediaLoaded(listodmedia.get(1));
+                    }
                 } else {
                     Toast.makeText(MainActivity.this, "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""), Toast.LENGTH_LONG).show();
                     log.e("failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""));
@@ -322,6 +353,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .load(completion);
     }
 
+    private void startPreprodOttMediaLoading(final OnMediaLoadCompletion completion) {
+
+        APIOkRequestsExecutor.getSingleton().setRequestConfiguration(new RequestConfiguration().setMaxRetries(5).setReadTimeoutMs(15000));
+// APIOkRequestsExecutor.getSingleton().setNetworkErrorEventListener(errorElement -> {
+// log.d("XXX NetworkError code = " + errorElement.getCode() + " " + errorElement.getMessage());
+//});
+
+        SessionProvider ksSessionProvider = new SimpleSessionProvider( "https://api-preprod.ott.kaltura.com/v5_2_8/api_v3/", //"http://httpbin.org/status/401"?
+                198,
+                null);
+//djJ8MjI1fPzX0HoAMEhNI2RyiLfXurOxE9cPipMNd_HugBn4mZj9Hq9QnBEelnQjzdKsogeO3PRucy0VcU5gzW_nZCsbLLQaUgYaLh5AE4ug2riuTd8XR4WEPt1pWgh854B54vmh7XVCM1WgLUFEyMMx20g3CmvX6VmmrKHv3TRuCQzQy6oXJ8k7W40pP2f9BFBn1Z2ABG7vb0qvpnZxTdTtsOmrrCkIznxULsuYmyi8xowX7C2cE2kCeIaAN7I48SMIzoA1ow==
+        String mediaId = "480989";//"631387";//"550987";//"631387";// "audio 743297";// "749632";//"616436";// "626769";//"610715";//"684891"
+        String formatHls = "Tablet Main"; //"Web New";//
+        String formatDash = "dash Mobile";
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaId)
+//.setReferrer()
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media).
+        setAssetReferenceType(APIDefines.AssetReferenceType.Media);
+                //.setFormats(formatDash,formatHls/*"Web New"*/);
+
+        mediaProvider.load(completion);
+    }
+
     private void startSimpleOvpMediaLoadingHEVC(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
                 .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2215841, null))
@@ -349,6 +408,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setEntryId("0_wu32qrt3")
                 .load(completion);
     }
+
+
 
     private void startSimpleOvpMediaLoadingLive(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
@@ -421,7 +482,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             configurePlugins(pluginConfig);
 
             player = PlayKitManager.loadPlayer(this, pluginConfig);
-            KalturaPlaybackRequestAdapter.install(player, "app://PlaykitTestApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
+            KalturaPlaybackRequestAdapter.install(player, null); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
             KalturaUDRMLicenseRequestAdapter.install(player, "app://PlaykitTestApp");
 
 
@@ -444,6 +505,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 player.getSettings().setVRSettings(vrSettings);
             }
 
+            player.getSettings().setCustomLoadControlStrategy(loadControlStrategy);
+            player.getSettings().setAdAutoPlayOnResume(true);
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
             //player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(PKVideoCodec.AVC, true));
@@ -451,12 +514,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
             player.getSettings().enableDecoderFallback(true);
             //player.setPlaybackRate(1.5f);
+            player.getSettings().setABRSettings(new ABRSettings().setInitialBitrateEstimate(100000).setMaxVideoBitrate(80000));
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
 
             FrameLayout layout = (FrameLayout) findViewById(R.id.player_view);
             layout.addView(player.getView());
 
+
+            //SurfaceView surface = findViewById(R.id.player_view);
+           // player.setVideoSurfaceView(surface);
+            //surface.setVisibility(View.VISIBLE);
+            player.pause();
             controlsView = (PlaybackControlsView) this.findViewById(R.id.playerControls);
             controlsView.setPlayer(player);
             initSpinners();
@@ -578,10 +647,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         JsonObject pluginEntry = new JsonObject();
 
         pluginEntry.addProperty("accountCode", "kalturatest");
-        pluginEntry.addProperty("username", "a@a.com");
+        pluginEntry.addProperty("username", "gilad@a.com");
         pluginEntry.addProperty("haltOnError", true);
         pluginEntry.addProperty("enableAnalytics", true);
         pluginEntry.addProperty("enableSmartAds", true);
+        pluginEntry.addProperty("userObfuscateIp", true);
 
 
         //Optional - Device json o/w youbora will decide by its own.
@@ -597,7 +667,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Media entry json.
         JsonObject mediaEntryJson = new JsonObject();
         mediaEntryJson.addProperty("isLive", isLive);
-        mediaEntryJson.addProperty("title", title);
+        mediaEntryJson.addProperty("GILAD TITLE", title);
 
         //Youbora ads configuration json.
         JsonObject adsJson = new JsonObject();
@@ -925,7 +995,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, AdEvent.error, event -> {
             if (event != null && event.error != null) {
                 controlsView.setSeekBarStateForAd(false);
-                log.e("ERROR: " + event.error.errorType + ", " + event.error.message);
+                log.d("PlayerEvent.Error event  position = " + event.error.errorType + " errorMessage = " + event.error.message + " " + event.error.exception.getCause());
+                if (event.error.severity == PKError.Severity.Fatal) {
+                    appProgressBar.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
@@ -957,6 +1030,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             nowPlaying = false;
         });
 
+        player.addListener(this, PlayerEvent.volumeChanged, event -> {
+            log.d("volumeChanged " + event.volume);
+        });
+
+
         player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
             log.d("playbackRateChanged event  rate = " + event.rate);
         });
@@ -964,8 +1042,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, PlayerEvent.tracksAvailable, event -> {
             //When the track data available, this event occurs. It brings the info object with it.
             tracksInfo = event.tracksInfo;
+            if (player != null) {
+                if (!tracksInfo.getVideoTracks().isEmpty()) {
+                    player.changeTrack(tracksInfo.getVideoTracks().get(0).getUniqueId());
+                }
+            }
             populateSpinnersWithTrackInfo(event.tracksInfo);
         });
+
+        player.addListener(this, PlayerEvent.videoTrackChanged, event -> {
+            //When the track data available, this event occurs. It brings the info object with it.
+            VideoTrack track = event.newTrack;
+            log.d("videoTrackChanged getBitrate= " + track.getBitrate());
+        });
+
+        player.addListener(this, PlayerEvent.textTrackChanged, event -> {
+            //When the track data available, this event occurs. It brings the info object with it.
+            TextTrack track = event.newTrack;
+            log.d("textTrackChanged " + track.getLanguage() +  "-"  + track.getLabel());
+        });
+
+        player.addListener(this, PlayerEvent.audioTrackChanged, event -> {
+            //When the track data available, this event occurs. It brings the info object with it.
+            AudioTrack track = event.newTrack;
+            log.d("audioTrackChanged " + track.getLanguage() +  "-"  + track.getLabel());
+        });
+
 
         player.addListener(this, PlayerEvent.sourceSelected, event -> {
             log.d("sourceSelected event source = " + event.source);
@@ -1365,4 +1467,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             return null;
         }
     }
+
+
 }

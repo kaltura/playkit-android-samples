@@ -10,7 +10,7 @@ import java.util.List;
 public class MockParams {
 
 /*Ott Mock params: */
-    public static String PhoenixBaseUrl = "http://api-preprod.ott.kaltura.com/v4_4/api_v3/";
+    public static String PhoenixBaseUrl = "http://api-preprod.ott.kaltura.com/v5_2_8/api_v3/";
     public static int OttPartnerId = 198;
 
     public static String PhoenixBaseUrlUS = "https://rest-us.ott.kaltura.com/v4_5/api_v3/";

@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.util.SparseArray;
 
 import android.view.View;
@@ -32,9 +33,15 @@ import android.widget.Toast;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
+import com.kaltura.android.exoplayer2.ExoPlaybackException;
 import com.kaltura.android.exoplayer2.LoadControl;
+import com.kaltura.android.exoplayer2.mediacodec.MediaCodecRenderer;
+import com.kaltura.android.exoplayer2.mediacodec.MediaCodecUtil;
+import com.kaltura.android.exoplayer2.ui.PlayerControlView;
+import com.kaltura.android.exoplayer2.ui.PlayerView;
 import com.kaltura.android.exoplayer2.upstream.BandwidthMeter;
 import com.kaltura.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.kaltura.android.exoplayer2.util.ErrorMessageProvider;
 import com.kaltura.netkit.connect.executor.APIOkRequestsExecutor;
 import com.kaltura.netkit.connect.request.RequestConfiguration;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
@@ -108,7 +115,7 @@ import static com.kaltura.playkitdemo.MockParams.OvpUserKS;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
-        OrientationManager.OrientationListener {
+        OrientationManager.OrientationListener, PlayerControlView.VisibilityListener {
 
 
     public static final boolean AUTO_PLAY_ON_RESUME = true;
@@ -127,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
 
     private Player player;
+    private PlayerView playerFrameLayout;
     private MediaEntryProvider mediaProvider;
     private PlaybackControlsView controlsView;
     private boolean nowPlaying;
@@ -512,8 +520,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
 
-            FrameLayout layout = (FrameLayout) findViewById(R.id.player_view);
-            layout.addView(player.getView());
+            playerFrameLayout = findViewById(R.id.player_view);
+            playerFrameLayout.addView(player.getView());
+
+            playerFrameLayout = findViewById(R.id.player_view);
+            playerFrameLayout.setKeepContentOnPlayerReset(true);
+            playerFrameLayout.setControllerVisibilityListener(this);
+            playerFrameLayout.setErrorMessageProvider(new PlayerErrorMessageProvider());
+            playerFrameLayout.requestFocus();
+            playerFrameLayout.addView(player.getView());
+
 
 
             //SurfaceView surface = findViewById(R.id.player_view);
@@ -1441,6 +1457,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    @Override
+    public void onVisibilityChange(int visibility) {
+        log.d("PlayerControlView onVisibilityChange ");
+    }
+
     //Example for Custom Licens Adapter
     static class DRMAdapter implements PKRequestParams.Adapter {
 
@@ -1462,5 +1483,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    private class PlayerErrorMessageProvider implements ErrorMessageProvider<ExoPlaybackException> {
+
+        @Override
+        public Pair<Integer, String> getErrorMessage(ExoPlaybackException e) {
+            String errorString = "Playback failed";
+            if (e.type == ExoPlaybackException.TYPE_RENDERER) {
+                Exception cause = e.getRendererException();
+                if (cause instanceof MediaCodecRenderer.DecoderInitializationException) {
+                    // Special case for decoder initialization failures.
+                    MediaCodecRenderer.DecoderInitializationException decoderInitializationException =
+                            (MediaCodecRenderer.DecoderInitializationException) cause;
+                    if (decoderInitializationException.codecInfo == null) {
+                        if (decoderInitializationException.getCause() instanceof MediaCodecUtil.DecoderQueryException) {
+                            errorString = "Unable to query device decoders";
+                        } else if (decoderInitializationException.secureDecoderRequired) {
+                            errorString = "This device does not provide a secure decoder for " +  decoderInitializationException.mimeType;
+                        } else {
+                            errorString ="This device does not provide a decoder for " + decoderInitializationException.mimeType;
+                        }
+                    } else {
+                        errorString = "Unable to instantiate decoder" + decoderInitializationException.codecInfo.name;
+                    }
+                }
+            }
+            return Pair.create(0, errorString);
+        }
+    }
 
 }

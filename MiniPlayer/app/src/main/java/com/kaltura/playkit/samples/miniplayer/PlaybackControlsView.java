@@ -13,7 +13,6 @@ import com.kaltura.android.exoplayer2.C;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerState;
-import com.kaltura.playkitdemo.R;
 
 import java.util.Formatter;
 import java.util.Locale;

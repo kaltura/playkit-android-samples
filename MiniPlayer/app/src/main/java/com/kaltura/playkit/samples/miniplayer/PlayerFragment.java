@@ -24,10 +24,8 @@ import com.kaltura.playkit.plugins.ads.AdEvent;
 //import com.kaltura.playkit.plugins.ima.IMAConfig;
 //import com.kaltura.playkit.plugins.ima.IMAPlugin;
 import com.kaltura.playkit.providers.MediaEntryProvider;
-import com.kaltura.playkitdemo.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by glebgleb on 7/13/17.

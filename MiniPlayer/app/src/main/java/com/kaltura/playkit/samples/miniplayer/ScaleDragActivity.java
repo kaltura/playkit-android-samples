@@ -27,7 +27,6 @@ import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.providers.MediaEntryProvider;
 import com.kaltura.playkit.samples.miniplayer.dragging.DragView;
 import com.kaltura.playkit.samples.miniplayer.dragging.DragViewController;
-import com.kaltura.playkitdemo.R;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -31,7 +31,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.github.pedrovgs.transformer.Transformer;
 import com.github.pedrovgs.transformer.TransformerFactory;
-import com.kaltura.playkitdemo.R;
+import com.kaltura.playkit.samples.miniplayer.R;
 import com.nineoldandroids.view.ViewHelper;
 
 /**

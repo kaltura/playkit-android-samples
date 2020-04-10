@@ -23,7 +23,8 @@ import android.widget.FrameLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.kaltura.playkitdemo.R;
+import com.kaltura.playkit.samples.miniplayer.R;
+
 
 /**
  * Custom view created to handle DraggableView using fragments. With this custom view the client

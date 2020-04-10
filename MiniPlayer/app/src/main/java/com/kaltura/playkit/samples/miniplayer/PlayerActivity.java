@@ -22,7 +22,6 @@ import android.view.View;
 import androidx.fragment.app.FragmentActivity;
 import com.github.pedrovgs.DraggableListener;
 import com.github.pedrovgs.DraggablePanel;
-import com.kaltura.playkitdemo.R;
 
 
 /**

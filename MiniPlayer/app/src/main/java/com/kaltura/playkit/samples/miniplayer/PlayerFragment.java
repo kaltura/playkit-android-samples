@@ -24,10 +24,8 @@ import com.kaltura.playkit.plugins.ads.AdEvent;
 //import com.kaltura.playkit.plugins.ima.IMAConfig;
 //import com.kaltura.playkit.plugins.ima.IMAPlugin;
 import com.kaltura.playkit.providers.MediaEntryProvider;
-import com.kaltura.playkitdemo.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by glebgleb on 7/13/17.
@@ -70,7 +68,7 @@ public class PlayerFragment extends Fragment {
         PKMediaEntry entry = new PKMediaEntry();
         PKMediaSource source = new PKMediaSource();
         source.setId("0_uka1msg4");
-        source.setUrl("http://api-preprod.ott.kaltura.com/v4_2/api_v3/service/assetFile/action/playManifest/partnerId/198/assetId/259295/assetType/media/assetFileId/516109/contextType/PLAYBACK/a.m3u8");
+        source.setUrl("https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8");
         source.setMediaFormat(PKMediaFormat.hls);
         entry.setId("0_uka1msg4");
         entry.setDuration(102000);

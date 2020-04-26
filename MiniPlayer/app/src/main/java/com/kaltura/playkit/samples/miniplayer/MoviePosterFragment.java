@@ -23,7 +23,6 @@ import android.widget.ImageView;
 
 import androidx.fragment.app.Fragment;
 
-import com.kaltura.playkitdemo.R;
 
 /**
  * Fragment implementation created to show a poster inside an ImageView widget.

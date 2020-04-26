@@ -47,9 +47,9 @@ import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
-import com.kaltura.playkit.PKPlaylist;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
+import com.kaltura.playkit.PKVideoCodec;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -96,6 +96,7 @@ import com.kaltura.playkit.utils.Consts;
 import com.kaltura.playkitvr.VRUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -142,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isAdsEnabled = false;
+    private boolean isAdsEnabled = true;
     private boolean isDAIMode = false;
 
     private ExoPlayerWrapper.LoadControlStrategy loadControlStrategy;
@@ -503,12 +504,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player.getSettings().setAdAutoPlayOnResume(true);
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
-            //player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(PKVideoCodec.AVC, true));
+            //player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(Collections.singletonList(PKVideoCodec.VP9), true, false));
             player.getSettings().setAllowCrossProtocolRedirect(true);
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
             player.getSettings().enableDecoderFallback(true);
             //player.setPlaybackRate(1.5f);
-            player.getSettings().setABRSettings(new ABRSettings().setInitialBitrateEstimate(100000).setMaxVideoBitrate(80000));
+            //player.getSettings().setABRSettings(new ABRSettings().setInitialBitrateEstimate(100000).setMaxVideoBitrate(80000));
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
 
@@ -989,7 +990,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, AdEvent.error, event -> {
             if (event != null && event.error != null) {
                 controlsView.setSeekBarStateForAd(false);
-                log.d("PlayerEvent.Error event  position = " + event.error.errorType + " errorMessage = " + event.error.message + " " + event.error.exception.getCause());
+                String cause = (event.error.exception != null && event.error.exception.getCause() != null) ? event.error.exception.getCause().getMessage() : "";
+                log.d("PlayerEvent.Error event  position = " + event.error.errorType + " errorMessage = " + event.error.message + " " + cause);
                 if (event.error.severity == PKError.Severity.Fatal) {
                     appProgressBar.setVisibility(View.INVISIBLE);
                 }

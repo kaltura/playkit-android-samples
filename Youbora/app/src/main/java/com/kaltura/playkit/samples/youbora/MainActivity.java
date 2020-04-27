@@ -51,6 +51,8 @@ import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_TYPE;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_ENABLED;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_USERNAME;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_USER_EMAIL;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_APP_NAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_APP_RELEASE_VERSION;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -145,6 +147,8 @@ public class MainActivity extends AppCompatActivity {
         optBundle.putString(KEY_ACCOUNT_CODE, ACCOUNT_CODE);
         optBundle.putString(KEY_USERNAME, UNIQUE_USER_NAME);
         optBundle.putString(KEY_USER_EMAIL, UNIQUE_USER_NAME);
+        optBundle.putString(KEY_APP_NAME, "TestApp");
+        optBundle.putString(KEY_APP_RELEASE_VERSION, "v1.0");
         optBundle.putBoolean(KEY_ENABLED, true);
 
         //Media entry bundle.
@@ -220,6 +224,8 @@ public class MainActivity extends AppCompatActivity {
         pluginEntry.addProperty("haltOnError", true);
         pluginEntry.addProperty("enableAnalytics", true);
         pluginEntry.addProperty("enableSmartAds", true);
+        pluginEntry.addProperty("appName", "TestApp");
+        pluginEntry.addProperty("appReleaseVersion", "v1.0");
 
 
         //Optional - Device json o/w youbora will decide by its own.

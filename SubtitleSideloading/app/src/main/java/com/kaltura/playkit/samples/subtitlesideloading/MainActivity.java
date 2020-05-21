@@ -226,8 +226,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private SubtitleStyleSettings getDefaultPositionDefault() {
         return new SubtitleStyleSettings("DefaultStyle")
-                // Set the subitlte position to default
-                .setSubtitlePosition(new PKSubtitlePosition(true).setToDefaultPosition(true));
+                // Set the subtitle position to default. Need to set the other apis to change the values
+                .setSubtitlePosition(new PKSubtitlePosition(true));
     }
 
     private SubtitleStyleSettings getStyleForPositionOne() {

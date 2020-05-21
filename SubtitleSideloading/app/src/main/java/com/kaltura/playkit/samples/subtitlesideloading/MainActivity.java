@@ -3,6 +3,8 @@ package com.kaltura.playkit.samples.subtitlesideloading;
 import android.graphics.Color;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +25,7 @@ import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.PKExternalSubtitle;
+import com.kaltura.playkit.player.PKSubtitlePosition;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.SubtitleStyleSettings;
 import com.kaltura.playkit.player.TextTrack;
@@ -222,7 +225,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private SubtitleStyleSettings getDefaultPositionDefault() {
-        return new SubtitleStyleSettings("DefaultStyle");
+        return new SubtitleStyleSettings("DefaultStyle")
+                // Set the subitlte position to default
+                .setSubtitlePosition(new PKSubtitlePosition(true).setToDefaultPosition(true));
     }
 
     private SubtitleStyleSettings getStyleForPositionOne() {
@@ -233,7 +238,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setWindowColor(Color.YELLOW)
                 .setEdgeColor(Color.BLUE)
                 .setTypeface(SubtitleStyleSettings.SubtitleStyleTypeface.MONOSPACE)
-                .setEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW);
+                .setEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW)
+                // Move subtitle horizontal and vertical together (anywhere on the screen)
+                .setSubtitlePosition(new PKSubtitlePosition(true).setPosition( 50, 50, Layout.Alignment. ALIGN_NORMAL));
     }
 
     private SubtitleStyleSettings getStyleForPositionTwo() {
@@ -244,7 +251,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setWindowColor(Color.BLUE)
                 .setEdgeColor(Color.BLUE)
                 .setTypeface(SubtitleStyleSettings.SubtitleStyleTypeface.SANS_SERIF)
-                .setEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW);
+                .setEdgeType(SubtitleStyleSettings.SubtitleStyleEdgeType.EDGE_TYPE_DROP_SHADOW)
+                // Move subtitle vertical up-down
+                .setSubtitlePosition(new PKSubtitlePosition(true).setVerticalPosition(30));
     }
 
     /**

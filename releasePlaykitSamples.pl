@@ -14,6 +14,10 @@ my ($pathToSamplesFolder, $oldVer, $newVer) = @ARGV;
 print "Release Android Samples\n";
 
 my @files = `find $pathToSamplesFolder/*/app | grep build.gradle`;
+my @filesplaykitdemo = `find $pathToSamplesFolder/*/playkitdemo | grep build.gradle`;
+my @filestv = `find $pathToSamplesFolder/AndroidTV/tv | grep build.gradle`;
+push @files, @filesplaykitdemo;
+push @files, @filestv;
 
 #my @files = `find $ENV{'HOME'}/Dev/android/kaltura/playkit-android-samples/*/app | grep build.gradle`;
 

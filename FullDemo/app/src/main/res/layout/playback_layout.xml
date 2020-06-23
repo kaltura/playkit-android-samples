@@ -25,10 +25,12 @@
             android:visibility="gone"/>
 
         <ImageButton android:id="@+id/play"
+            android:contentDescription="play"
             style="@style/ExoMediaButton"
             android:src="@drawable/exo_controls_play"/>
 
         <ImageButton android:id="@+id/pause"
+            android:contentDescription="pause"
             style="@style/ExoMediaButton"
             android:src="@drawable/exo_controls_pause"/>
 
@@ -49,6 +51,7 @@
         android:orientation="horizontal">
 
         <TextView android:id="@+id/time_current"
+            android:contentDescription="time_current"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
@@ -60,12 +63,14 @@
             android:textColor="#FFBEBEBE"/>
 
         <SeekBar android:id="@+id/mediacontroller_progress"
+            android:contentDescription="mediacontroller_progress"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="32dp"
             style="?android:attr/progressBarStyleHorizontal"/>
 
         <TextView android:id="@+id/time"
+            android:contentDescription="time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

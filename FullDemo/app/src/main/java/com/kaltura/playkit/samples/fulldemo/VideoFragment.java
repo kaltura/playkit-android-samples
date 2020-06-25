@@ -40,6 +40,7 @@ import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.ads.AdController;
 import com.kaltura.playkit.ads.AdEnabledPlayerController;
 import com.kaltura.playkit.player.PlayerSettings;
+import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
@@ -134,6 +135,8 @@ public class VideoFragment extends Fragment {
     private int companionAdHeight;
     private int minAdDurationForSkipButton;
     private boolean firstLaunch = true;
+    private AdCuePoints adCuePoints;
+    private Button replayButton;
 
     /**
      * Listener called when the fragment's onCreateView is fired.
@@ -655,14 +658,19 @@ public class VideoFragment extends Fragment {
 
     private void initUi(View rootView) {
 
+        replayButton = rootView.findViewById(R.id.replay);
+        replayButton.setOnClickListener(v -> {
+            if (player != null) {
+                player.replay();
+            }
+            replayButton.setVisibility(View.GONE);
+        });
         Button changeMediaButton = rootView.findViewById(R.id.changeMedia);
         //Set click listener.
-        changeMediaButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Change media.
-                changeMedia();
-            }
+        changeMediaButton.setOnClickListener(v -> {
+            replayButton.setVisibility(View.GONE);
+            //Change media.
+            changeMedia();
         });
         mVideoTitle = rootView.findViewById(R.id.video_title);
         playerLayout = rootView.findViewById(R.id.player_root);
@@ -800,8 +808,10 @@ public class VideoFragment extends Fragment {
         });
 
         player.addListener(this, AdEvent.cuepointsChanged, event -> {
-            AdEvent.AdCuePointsUpdateEvent cuePointsList = event;
-            Log.d(TAG, "Has Postroll = " + cuePointsList.cuePoints.hasPostRoll());
+            adCuePoints = event.cuePoints;
+            if (adCuePoints != null) {
+                Log.d(TAG, "Has Postroll = " + adCuePoints.hasPostRoll());
+            }
             log("AD_CUEPOINTS_UPDATED");
             onCuePointChanged();
         });
@@ -844,6 +854,9 @@ public class VideoFragment extends Fragment {
         player.addListener(this, AdEvent.allAdsCompleted, event -> {
             log("AD_ALL_ADS_COMPLETED");
             appProgressBar.setVisibility(View.INVISIBLE);
+            if (adCuePoints != null && adCuePoints.hasPostRoll()) {
+                replayButton.setVisibility(View.VISIBLE);
+            }
         });
 
         player.addListener(this, AdEvent.completed, event -> {
@@ -957,6 +970,9 @@ public class VideoFragment extends Fragment {
 
         player.addListener(this, PlayerEvent.ended, event -> {
             log("PLAYER ENDED");
+            if (adCuePoints == null || !adCuePoints.hasPostRoll()) {
+                replayButton.setVisibility(View.VISIBLE);
+            }
             appProgressBar.setVisibility(View.INVISIBLE);
             nowPlaying = false;
         });

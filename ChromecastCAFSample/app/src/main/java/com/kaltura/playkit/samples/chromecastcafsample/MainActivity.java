@@ -29,10 +29,14 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.plugins.googlecast.caf.CAFCastBuilder;
+import com.kaltura.playkit.plugins.googlecast.caf.KalturaBasicCAFCastBuilder;
 import com.kaltura.playkit.plugins.googlecast.caf.KalturaCastBuilder;
 import com.kaltura.playkit.plugins.googlecast.caf.KalturaPhoenixCastBuilder;
 import com.kaltura.playkit.plugins.googlecast.caf.MediaInfoUtils;
 import com.kaltura.playkit.plugins.googlecast.caf.adsconfig.AdsConfig;
+import com.kaltura.playkit.plugins.googlecast.caf.basic.Caption;
+import com.kaltura.playkit.plugins.googlecast.caf.basic.Metadata;
+import com.kaltura.playkit.plugins.googlecast.caf.basic.PlaybackParams;
 
 import org.json.JSONObject;
 
@@ -61,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private PKMediaConfig mediaConfig;
     private Button changeMediaButton;
     private Button playPauseButton;
+    private Button basicPlayPauseButton;
     private CastStateListener mCastStateListener;
     private SessionManagerListener<CastSession> mSessionManagerListener;
     private CastContext mCastContext;
@@ -97,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         addCastOvpButton();
+        addCastBasicButton();
         addCastOttButton();
         addChangeMediaButton();
 
@@ -127,6 +133,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void addCastBasicButton() {
+        //Get reference to the play/pause button.
+        basicPlayPauseButton = this.findViewById(R.id.cast_basic_button);
+        if ("ott".equals(BuildConfig.FLAVOR)) {
+            basicPlayPauseButton.setVisibility(View.INVISIBLE);
+        }
+
+        //Add clickListener.
+        basicPlayPauseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadRemoteMediaBasic(0,true);
+                return;
+            }
+        });
+    }
+
     private void addCastOttButton() {
         //Get reference to the play/pause button.
         playPauseButton = this.findViewById(R.id.cast_ott_button);
@@ -146,45 +169,47 @@ public class MainActivity extends AppCompatActivity {
     private void addChangeMediaButton() {
         //Get reference to the play/pause button.
         changeMediaButton =  this.findViewById(R.id.change_media_button);
-        changeMediaButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = null;
-                MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(0).build();
-                String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=" + 43543;
-                if ("ovp".equals(BuildConfig.FLAVOR)) {
-                    pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_b7s02kjl", vastAdTag, CAFCastBuilder.AdTagType.VAST), loadOptions);
-                    pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+        if (changeMediaButton != null) {
+            changeMediaButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = null;
+                    MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(0).build();
+                    String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=" + 43543;
+                    if ("ovp".equals(BuildConfig.FLAVOR)) {
+                        pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_b7s02kjl", vastAdTag, CAFCastBuilder.AdTagType.VAST, null), loadOptions);
+                        pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
-                        @Override
-                        public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
+                            @Override
+                            public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
 
-                            JSONObject customData = mediaChannelResult.getCustomData();
-                            if (customData != null) {
-                                //log.v("loadMediaInfo. customData = " + customData.toString());
-                            } else {
-                                //log.v("loadMediaInfo. customData == null");
+                                JSONObject customData = mediaChannelResult.getCustomData();
+                                if (customData != null) {
+                                    //log.v("loadMediaInfo. customData = " + customData.toString());
+                                } else {
+                                    //log.v("loadMediaInfo. customData == null");
+                                }
                             }
-                        }
-                    });
-                } else {
-                    pendingResult = remoteMediaClient.load(getOttCastMediaInfo("548576","Mobile_Main", "", null, CAFCastBuilder.HttpProtocol.Http), loadOptions);
-                    pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+                        });
+                    } else {
+                        pendingResult = remoteMediaClient.load(getOttCastMediaInfo("548576", "Mobile_Main", "", null, CAFCastBuilder.HttpProtocol.Http, null), loadOptions);
+                        pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
-                        @Override
-                        public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
+                            @Override
+                            public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
 
-                            JSONObject customData = mediaChannelResult.getCustomData();
-                            if (customData != null) {
-                                //log.v("loadMediaInfo. customData = " + customData.toString());
-                            } else {
-                                //log.v("loadMediaInfo. customData == null");
+                                JSONObject customData = mediaChannelResult.getCustomData();
+                                if (customData != null) {
+                                    //log.v("loadMediaInfo. customData = " + customData.toString());
+                                } else {
+                                    //log.v("loadMediaInfo. customData == null");
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
 
@@ -326,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
         MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(position).build();
         String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=" +  11223;
         //using QA partner 1091
-        pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_ttfy4uu0", vastAdTag, CAFCastBuilder.AdTagType.VAST), loadOptions);
+        pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_ttfy4uu0", vastAdTag, CAFCastBuilder.AdTagType.VAST, getExternalVttCaptions()), loadOptions);
         pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
             @Override
@@ -394,6 +419,122 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void loadRemoteMediaBasic(int position, boolean autoPlay) {
+        if (mCastSession == null) {
+            return;
+        }
+        remoteMediaClient = mCastSession.getRemoteMediaClient();
+        if (remoteMediaClient == null) {
+            return;
+        }
+        remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
+            @Override
+            public void onStatusUpdated() {
+                Intent intent = new Intent(MainActivity.this, ExpandedControlsActivity.class);
+                startActivity(intent);
+                //remoteMediaClient.removeListener(this);
+            }
+
+            @Override
+            public void onMetadataUpdated() {
+            }
+
+            @Override
+            public void onQueueStatusUpdated() {
+            }
+
+            @Override
+            public void onPreloadStatusUpdated() {
+            }
+
+            @Override
+            public void onSendingRemoteMediaRequest() {
+            }
+
+            @Override
+            public void onAdBreakStatusUpdated() {
+            }
+        });
+
+        PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = null;
+        MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(position).build();
+        String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=" +  11223;
+        //using QA partner 1091
+
+
+
+        PlaybackParams playbackParams = new PlaybackParams();
+        playbackParams.poster = "https://cfvod.kaltura.com/p/2222401/sp/222240100/thumbnail/entry_id/1_f93tepsn/version/100011";
+        playbackParams.id = "0_2jiaa9tb";
+        playbackParams.duration = 741;
+        playbackParams.type = "Vod";
+        playbackParams.dvr = false;
+        playbackParams.vr = null;
+        playbackParams.dvr = false;
+        playbackParams.progressive = new ArrayList<>();
+        playbackParams.hls = new ArrayList<>();
+
+
+        //playbackParams.setDashSource("0_2jiaa9tb_973",
+        //             "https://cdnapisec.kaltura.com/p/2222401/sp/222240100/playManifest/entryId/1_f93tepsn/protocol/https/format/mpegdash/flavorIds/1_7cgwjy2a,1_xc3jlgr7,1_cn83nztu,1_pgoeohrs/a.mpd",
+        //       "https://udrm.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJPVlAiLCJ1c2VyX3Rva2VuIjoiZGpKOE1qSXlNalF3TVh6Q1B5ZDRyd0tiUlVRQTA2RktoNFNtMWJyWDE2LW01dnh5ODBLa0JEWTN0ME9yUklCajZ4WTc2SWZWRVJFcmItZkNLN01uN1VJV1VWaU92S0JaV0h6V09paGRkdGVlc211b0lLaGQ3d2VhbkE9PSIsImFjY291bnRfaWQiOjIyMjI0MDEsImNvbnRlbnRfaWQiOiIxX2Y5M3RlcHNuIiwiZmlsZXMiOiIxXzdjZ3dqeTJhLDFfeGMzamxncjcsMV9jbjgzbnp0dSwxX3Bnb2VvaHJzIn0%3D&signature=9tenGJdH1qEVhrI1f1fnKbvNBKA%3D")
+
+
+        playbackParams.setHlsSource("0_2jiaa9tb_971",
+                "https://cdnapisec.kaltura.com/p/1734751/sp/173475100/playManifest/entryId/1_3o1seqnv/protocol/https/format/applehttp/flavorIds/1_l7xu37er,1_9p9dlin6,1_h6cxfg0z,1_fdpeg81m/a.m3u8");
+
+
+        Metadata metadata = new Metadata();
+        metadata.description = "";
+        metadata.name = "Audio Tracks";
+        metadata.tags = "";
+        playbackParams.metadata = metadata;
+        playbackParams.captions = getExternalVttCaptions();
+
+        //pendingResult = remoteMediaClient!!.load(getBasicCastMediaInfo(playbackParams, vastAdTag, CAFCastBuilder.AdTagType.VAST), loadOptions)
+        pendingResult = remoteMediaClient.load(getBasicCastMediaInfo(playbackParams, "", null), loadOptions);
+
+        pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+            @Override
+            public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
+                JSONObject customData = mediaChannelResult.getCustomData();
+                if (customData != null) {
+                    //log.v("loadMediaInfo. customData = " + customData.toString());
+                } else {
+                    //log.v("loadMediaInfo. customData == null");
+                }
+            }
+        });
+    }
+
+    private List<Caption> getExternalVttCaptions() {
+        Caption caption1 = new Caption();
+        caption1.isDefault = false;
+        caption1.type = "srt";
+        caption1.label = "Ger";
+        caption1.language = "nl";
+        caption1.url = "https://qa-nginx-vod.dev.kaltura.com/api_v3/index.php/service/caption_captionasset/action/serveWebVTT/captionAssetId/0_kozg4x1x/version/2/segmentIndex/1.vtt";
+
+        Caption caption2 = new Caption();
+        caption2.isDefault = false;
+        caption2.type = "srt";
+        caption2.label = "Rus";
+        caption2.language = "ru";
+        caption2.url = "https://qa-nginx-vod.dev.kaltura.com/api_v3/index.php/service/caption_captionasset/action/serveWebVTT/captionAssetId/0_njhnv6na/version/2/segmentIndex/1.vtt";
+
+        Caption caption3 = new Caption();
+        caption3.isDefault = false;
+        caption3.type = "srt";
+        caption3.label = "Eng";
+        caption3.language = "en";
+        caption3.url = "https://qa-nginx-vod.dev.kaltura.com/api_v3/index.php/service/caption_captionasset/action/serveWebVTT/captionAssetId/0_kozg4x1x/version/2/segmentIndex/1.vtt";
+        List<Caption> captions = new ArrayList<>();
+        captions.add(caption1);
+        captions.add(caption2);
+        captions.add(caption3);
+        return captions;
+    }
+
     private void loadRemoteMediaOtt(int position, boolean autoPlay) {
         if (mCastSession == null) {
             return;
@@ -432,7 +573,7 @@ public class MainActivity extends AppCompatActivity {
         });
         PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = null;
         MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(position).build();
-        pendingResult = remoteMediaClient.load(getOttCastMediaInfo("548575","Mobile_Main", "", null, CAFCastBuilder.HttpProtocol.Http), loadOptions);
+        pendingResult = remoteMediaClient.load(getOttCastMediaInfo("548575","Mobile_Main", "", null, CAFCastBuilder.HttpProtocol.Http, getExternalVttCaptions()), loadOptions);
         pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
             @Override
@@ -461,7 +602,22 @@ public class MainActivity extends AppCompatActivity {
         return MediaInfoUtils.createAdsConfigVmap(adTagUrl);
     }
 
-    private MediaInfo getOttCastMediaInfo(String mediaId, String mediaFormat, String adTagUrl, CAFCastBuilder.AdTagType adTagType, CAFCastBuilder.HttpProtocol protocol) {
+    private MediaInfo getBasicCastMediaInfo(PlaybackParams playbackParams, String adTagUrl, CAFCastBuilder.AdTagType adTagType) {
+
+        KalturaBasicCAFCastBuilder basicCastBuilder = new KalturaBasicCAFCastBuilder(playbackParams)
+                .setStreamType(CAFCastBuilder.StreamType.VOD);
+        if (!TextUtils.isEmpty(adTagUrl)) {
+            if (adTagType == CAFCastBuilder.AdTagType.VAST) {
+                basicCastBuilder.setAdsConfig(createAdsConfigVast(adTagUrl));
+            } else {
+                basicCastBuilder.setAdsConfig(createAdsConfigVmap(adTagUrl));
+            }
+            basicCastBuilder.setDefaultTextLangaugeCode("en");
+        }
+        return basicCastBuilder.build();
+    }
+
+    private MediaInfo getOttCastMediaInfo(String mediaId, String mediaFormat, String adTagUrl, CAFCastBuilder.AdTagType adTagType, CAFCastBuilder.HttpProtocol protocol, List<Caption> externalVttCaptions) {
 
         List<String> formats = null;
         if (mediaFormat != null) {
@@ -479,6 +635,10 @@ public class MainActivity extends AppCompatActivity {
                 .setMediaType(CAFCastBuilder.KalturaAssetType.Media)
                 .setProtocol(protocol);
 
+        if (externalVttCaptions != null) {
+            phoenixCastBuilder.setExternalVttCaptions(externalVttCaptions);
+        }
+
         if (!TextUtils.isEmpty(adTagUrl)) {
             if (adTagType == CAFCastBuilder.AdTagType.VAST) {
                 phoenixCastBuilder.setAdsConfig(createAdsConfigVast(adTagUrl));
@@ -491,12 +651,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private MediaInfo getOvpCastMediaInfo(String entryId, String adTagUrl, CAFCastBuilder.AdTagType adTagType) {
+    private MediaInfo getOvpCastMediaInfo(String entryId, String adTagUrl, CAFCastBuilder.AdTagType adTagType, List<Caption> externalVttCaptions) {
 
         CAFCastBuilder ovpV3CastBuilder =  new KalturaCastBuilder()
                 .setMediaEntryId(entryId)
                 .setKs("")
                 .setStreamType(CAFCastBuilder.StreamType.VOD);
+
+        if (externalVttCaptions != null) {
+            ovpV3CastBuilder.setExternalVttCaptions(externalVttCaptions);
+        }
+
         if (!TextUtils.isEmpty(adTagUrl)) {
             if (adTagType == CAFCastBuilder.AdTagType.VAST) {
                 ovpV3CastBuilder.setAdsConfig(createAdsConfigVast(adTagUrl));

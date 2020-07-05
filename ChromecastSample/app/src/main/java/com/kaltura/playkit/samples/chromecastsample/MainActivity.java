@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
             public void onStatusUpdated() {
                 Intent intent = new Intent(MainActivity.this, ExpandedControlsActivity.class);
                 startActivity(intent);
-                //remoteMediaClient.removeListener(this);
+                //remoteMediaClient.unregisterCallback(this);
             }
 
             @Override
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
             public void onStatusUpdated() {
                 Intent intent = new Intent(MainActivity.this, ExpandedControlsActivity.class);
                 startActivity(intent);
-                //remoteMediaClient.removeListener(this);
+                //remoteMediaClient.unregisterCallback(this);
             }
 
             @Override

@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadRemoteMediaOvp(0,true);
+                loadRemoteMediaOvp(0, true);
                 return;
             }
         });
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         basicPlayPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadRemoteMediaBasic(0,true);
+                loadRemoteMediaBasic(0, true);
                 return;
             }
         });
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadRemoteMediaOtt(0,true);
+                loadRemoteMediaOtt(0, true);
                 return;
             }
         });
@@ -471,7 +471,7 @@ public class MainActivity extends AppCompatActivity {
         PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = null;
         MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(position).build();
         String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=" +  11223;
-        
+
         PlaybackParams playbackParams = new PlaybackParams();
         playbackParams.poster = "https://cfvod.kaltura.com/p/2222401/sp/222240100/thumbnail/entry_id/1_f93tepsn/version/100011";
         playbackParams.id = "0_2jiaa9tb";

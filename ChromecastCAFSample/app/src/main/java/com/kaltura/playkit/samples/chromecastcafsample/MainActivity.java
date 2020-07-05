@@ -318,7 +318,8 @@ public class MainActivity extends AppCompatActivity {
         if (remoteMediaClient == null) {
             return;
         }
-        remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
+
+        remoteMediaClient.registerCallback(new RemoteMediaClient.Callback() {
             @Override
             public void onStatusUpdated() {
                 Intent intent = new Intent(MainActivity.this, ExpandedControlsActivity.class);
@@ -328,22 +329,27 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onMetadataUpdated() {
+                super.onMetadataUpdated();
             }
 
             @Override
             public void onQueueStatusUpdated() {
+                super.onQueueStatusUpdated();
             }
 
             @Override
             public void onPreloadStatusUpdated() {
+                super.onPreloadStatusUpdated();
             }
 
             @Override
             public void onSendingRemoteMediaRequest() {
+                super.onSendingRemoteMediaRequest();
             }
 
             @Override
             public void onAdBreakStatusUpdated() {
+                super.onAdBreakStatusUpdated();
             }
         });
 
@@ -427,7 +433,8 @@ public class MainActivity extends AppCompatActivity {
         if (remoteMediaClient == null) {
             return;
         }
-        remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
+
+        remoteMediaClient.registerCallback(new RemoteMediaClient.Callback() {
             @Override
             public void onStatusUpdated() {
                 Intent intent = new Intent(MainActivity.this, ExpandedControlsActivity.class);
@@ -437,22 +444,27 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onMetadataUpdated() {
+                super.onMetadataUpdated();
             }
 
             @Override
             public void onQueueStatusUpdated() {
+                super.onQueueStatusUpdated();
             }
 
             @Override
             public void onPreloadStatusUpdated() {
+                super.onPreloadStatusUpdated();
             }
 
             @Override
             public void onSendingRemoteMediaRequest() {
+                super.onSendingRemoteMediaRequest();
             }
 
             @Override
             public void onAdBreakStatusUpdated() {
+                super.onAdBreakStatusUpdated();
             }
         });
 
@@ -543,7 +555,8 @@ public class MainActivity extends AppCompatActivity {
         if (remoteMediaClient == null) {
             return;
         }
-        remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
+
+        remoteMediaClient.registerCallback(new RemoteMediaClient.Callback() {
             @Override
             public void onStatusUpdated() {
                 Intent intent = new Intent(MainActivity.this, ExpandedControlsActivity.class);
@@ -553,24 +566,30 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onMetadataUpdated() {
+                super.onMetadataUpdated();
             }
 
             @Override
             public void onQueueStatusUpdated() {
+                super.onQueueStatusUpdated();
             }
 
             @Override
             public void onPreloadStatusUpdated() {
+                super.onPreloadStatusUpdated();
             }
 
             @Override
             public void onSendingRemoteMediaRequest() {
+                super.onSendingRemoteMediaRequest();
             }
 
             @Override
             public void onAdBreakStatusUpdated() {
+                super.onAdBreakStatusUpdated();
             }
         });
+
         PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = null;
         MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(position).build();
         pendingResult = remoteMediaClient.load(getOttCastMediaInfo("548575","Mobile_Main", "", null, CAFCastBuilder.HttpProtocol.Http, getExternalVttCaptions()), loadOptions);

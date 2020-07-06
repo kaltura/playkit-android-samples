@@ -227,34 +227,41 @@ public class MainActivity extends AppCompatActivity {
         if (remoteMediaClient == null) {
             return;
         }
-        remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
+
+        remoteMediaClient.registerCallback(new RemoteMediaClient.Callback() {
             @Override
             public void onStatusUpdated() {
                 Intent intent = new Intent(MainActivity.this, ExpandedControlsActivity.class);
                 startActivity(intent);
-                //remoteMediaClient.removeListener(this);
+                //remoteMediaClient.unregisterCallback(this);
             }
 
             @Override
             public void onMetadataUpdated() {
+                super.onMetadataUpdated();
             }
 
             @Override
             public void onQueueStatusUpdated() {
+                super.onQueueStatusUpdated();
             }
 
             @Override
             public void onPreloadStatusUpdated() {
+                super.onPreloadStatusUpdated();
             }
 
             @Override
             public void onSendingRemoteMediaRequest() {
+                super.onSendingRemoteMediaRequest();
             }
 
             @Override
             public void onAdBreakStatusUpdated() {
+                super.onAdBreakStatusUpdated();
             }
         });
+
         remoteMediaClient.load(getOvpCastMediaInfo(getConverterCastForOvp(), false), autoPlay, position);
     }
 
@@ -267,34 +274,41 @@ public class MainActivity extends AppCompatActivity {
         if (remoteMediaClient == null) {
             return;
         }
-        remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
+
+        remoteMediaClient.registerCallback(new RemoteMediaClient.Callback() {
             @Override
             public void onStatusUpdated() {
                 Intent intent = new Intent(MainActivity.this, ExpandedControlsActivity.class);
                 startActivity(intent);
-                //remoteMediaClient.removeListener(this);
+                //remoteMediaClient.unregisterCallback(this);
             }
 
             @Override
             public void onMetadataUpdated() {
+                super.onMetadataUpdated();
             }
 
             @Override
             public void onQueueStatusUpdated() {
+                super.onQueueStatusUpdated();
             }
 
             @Override
             public void onPreloadStatusUpdated() {
+                super.onPreloadStatusUpdated();
             }
 
             @Override
             public void onSendingRemoteMediaRequest() {
+                super.onSendingRemoteMediaRequest();
             }
 
             @Override
             public void onAdBreakStatusUpdated() {
+                super.onAdBreakStatusUpdated();
             }
         });
+
         remoteMediaClient.load(getOttCastMediaInfo(getConverterCastForOtt(), false), autoPlay, position);
     }
 

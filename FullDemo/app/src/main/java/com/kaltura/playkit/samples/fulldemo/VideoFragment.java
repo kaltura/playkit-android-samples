@@ -853,16 +853,17 @@ public class VideoFragment extends Fragment {
             log("SKIPPABLE_STATE_CHANGED");
         });
 
-        player.addListener(this, AdEvent.adRequested, event -> {
-            AdEvent.AdRequestedEvent adRequestEvent = event;
-            log("AD_REQUESTED");// adtag = " + adRequestEvent.adTagUrl);
-        });
-
         player.addListener(this, AdEvent.playHeadChanged, event -> {
             appProgressBar.setVisibility(View.INVISIBLE);
             AdEvent.AdPlayHeadEvent adEventProress = event;
             //log.d("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
         });
+
+        player.addListener(this, AdEvent.adRequested, event -> {
+            AdEvent.AdRequestedEvent adRequestEvent = event;
+            log("AD_REQUESTED");// adtag = " + adRequestEvent.adTagUrl);
+        });
+
 
         player.addListener(this, AdEvent.error, event -> {
             AdEvent.Error adError = event;
@@ -1058,6 +1059,9 @@ public class VideoFragment extends Fragment {
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
             if(controlsView != null){
+                if (stateChanged.newState == PlayerState.IDLE && player.getCurrentPosition() >= player.getDuration() && adCuePoints.hasPostRoll()) {
+                    return;
+                }
                 controlsView.setPlayerState(stateChanged.newState);
             }
         });

@@ -1,5 +1,8 @@
 package com.kaltura.playkit.samples.fulldemo;
 
+import com.google.ads.interactivemedia.v3.api.StreamRequest;
+import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +25,14 @@ public class VideoMetadata {
     /** The ad tag for the video **/
     public String adTagUrl;
 
+    /** The LIVE IMADAI **/
+    public String assetKey;
+
+    /** The VOD IMADAI **/
+    public String contentSourceId;
+    public String videoId;
+
+
     public VideoMetadata(String title, String videoUrl, String videoLic, String adTagUrl, int thumbnail) {
         this.title = title;
         this.videoUrl = videoUrl;
@@ -29,7 +40,6 @@ public class VideoMetadata {
         this.adTagUrl = adTagUrl;
         this.thumbnail = thumbnail;
     }
-
 
     public static List<VideoItem> getDefaultVideoList() {
         List<VideoItem> defaultVideos = new ArrayList<>();
@@ -116,6 +126,18 @@ public class VideoMetadata {
                 VOOT_URL1,
                 LIC_URL1,
                 AD_VOOT1,
+                R.drawable.k_image));
+        defaultVideos.add(new VideoItem(
+                "Vod DAI",
+                VOOT_URL1,
+                LIC_URL1,
+                null, "19463", "tears-of-steel",
+                R.drawable.k_image));
+        defaultVideos.add(new VideoItem(
+                "Live DAI",
+                VOOT_URL1,
+                LIC_URL1,
+                "sN_IYUG8STe1ZzhIIE_ksA", null, null,
                 R.drawable.k_image));
 
         return defaultVideos;

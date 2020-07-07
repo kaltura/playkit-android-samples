@@ -223,7 +223,7 @@ public class VideoListFragment extends Fragment implements LoaderManager.LoaderC
                         VideoItem selectedVideo = (VideoItem) listView.getItemAtPosition(position);
 
                         // If applicable, prompt the user to input a custom ad tag.
-                        if (selectedVideo.getAdTagUrl().equals(getString(
+                        if (selectedVideo.getAdTagUrl() != null && selectedVideo.getAdTagUrl().equals(getString(
                                 R.string.custom_ad_tag_value))) {
                             getCustomAdTag(selectedVideo);
                         } else {
@@ -254,8 +254,16 @@ public class VideoListFragment extends Fragment implements LoaderManager.LoaderC
                         String streamName = sample.getString("name");
                         String streamUri = sample.getString("uri");
                         String streamLic = sample.has("lic") ? sample.getString("lic") : "";
-                        String adtagUri = sample.getString("ad_tag_uri");
-                        samples.add(new VideoItem(streamName, streamUri, streamLic, adtagUri,R.drawable.k_image));
+                        String adtagUri = sample.has("ad_tag_uri") ? sample.getString("ad_tag_uri") : null;
+                        String adAssetKey = sample.has("ad_asset_key") ? sample.getString("ad_asset_key") : null;
+                        String adContentSourceId = sample.has("ad_content_source_id") ? sample.getString("ad_content_source_id") : null;
+                        String adVideoId = sample.has("ad_video_id") ? sample.getString("ad_video_id") : null;
+
+                        if (adtagUri != null) {
+                            samples.add(new VideoItem(streamName, streamUri, streamLic, adtagUri, R.drawable.k_image));
+                        } else {
+                            samples.add(new VideoItem(streamName, streamUri, streamLic, adAssetKey, adContentSourceId, adVideoId, R.drawable.k_image));
+                        }
                         //String videoUrl, String videoLic, String title, String adTagUrl, int thumbnail
                     }
                     SampleGroup sampleGroup = new SampleGroup(title, samples);
@@ -271,7 +279,7 @@ public class VideoListFragment extends Fragment implements LoaderManager.LoaderC
                                 VideoItem selectedVideo = (VideoItem) listView.getItemAtPosition(position);
 
                                 // If applicable, prompt the user to input a custom ad tag.
-                                if (selectedVideo.getAdTagUrl().equals(getString(
+                                if (selectedVideo.getAdTagUrl() != null && selectedVideo.getAdTagUrl().equals(getString(
                                         R.string.custom_ad_tag_value))) {
                                     getCustomAdTag(selectedVideo);
                                 } else {

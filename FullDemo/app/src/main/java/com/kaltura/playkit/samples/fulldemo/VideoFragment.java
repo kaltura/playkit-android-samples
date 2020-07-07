@@ -22,6 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.kaltura.android.exoplayer2.util.MimeTypes;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -44,6 +45,8 @@ import com.kaltura.playkit.plugins.ads.AdCuePoints;
 import com.kaltura.playkit.plugins.ads.AdEvent;
 import com.kaltura.playkit.plugins.ima.IMAConfig;
 import com.kaltura.playkit.plugins.ima.IMAPlugin;
+import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
+import com.kaltura.playkit.plugins.imadai.IMADAIPlugin;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsConfig;
 import com.kaltura.playkit.plugins.kava.KavaAnalyticsPlugin;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
@@ -137,6 +140,7 @@ public class VideoFragment extends Fragment {
     private boolean firstLaunch = true;
     private AdCuePoints adCuePoints;
     private Button replayButton;
+    private boolean imaDAIEnabled;
 
     /**
      * Listener called when the fragment's onCreateView is fired.
@@ -222,7 +226,11 @@ public class VideoFragment extends Fragment {
 
             //player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
             player.updatePluginConfig(PhoenixAnalyticsPlugin.factory.getName(), getPhoenixAnalyticsConfig());
-            player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
+            if (imaDAIEnabled) {
+                player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAILiveConfig());
+            } else {
+                player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
+            }
             player.updatePluginConfig(YouboraPlugin.factory.getName(), getConverterYoubora(MEDIA_TITLE + "_changeMedia1", false).toJson());
             //If first one is active, prepare second one.
             prepareSecondEntry();
@@ -244,12 +252,29 @@ public class VideoFragment extends Fragment {
             player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
             player.updatePluginConfig(PhoenixAnalyticsPlugin.factory.getName(), getPhoenixAnalyticsConfig());
             //player.updatePluginConfig(AdsPlugin.factory.getName(), adsConfig);
-            player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
+            if (imaDAIEnabled) {
+                player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAILiveConfig());
+            } else {
+                player.updatePluginConfig(IMAPlugin.factory.getName(), adsConfig);
+            }
             player.updatePluginConfig(YouboraPlugin.factory.getName(), getConverterYoubora(MEDIA_TITLE + "_changeMedia2", false).toJson());
 
             //If the second one is active, prepare the first one.
             prepareFirstEntry();
         }
+    }
+
+    private IMADAIConfig getDAILiveConfig() {
+        String assetTitle = "Live Video - Big Buck Bunny";
+        String assetKey = "sN_IYUG8STe1ZzhIIE_ksA";
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getLiveIMADAIConfig(assetTitle,
+                assetKey,
+                apiKey,
+                streamFormat,
+                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
     }
 
     /**
@@ -396,7 +421,11 @@ public class VideoFragment extends Fragment {
         clearLog();
         //Initialize media config object.
         createMediaConfig();
-        PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
+        if (videoItem.getAdTagUrl() != null) {
+            PlayKitManager.registerPlugins(this.getActivity(), IMAPlugin.factory);
+        } else {
+            PlayKitManager.registerPlugins(this.getActivity(), IMADAIPlugin.factory);
+        }
         PlayKitManager.registerPlugins(this.getActivity(), PhoenixAnalyticsPlugin.factory);
         //PlayKitManager.registerPlugins(this.getActivity(), IMADAIPlugin.factory);
         PlayKitManager.registerPlugins(getActivity(), YouboraPlugin.factory);
@@ -405,7 +434,12 @@ public class VideoFragment extends Fragment {
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         //addAdPluginConfig(pluginConfig, playerLayout, adSkin);
         addPhoenixAnalyticsPluginConfig(pluginConfig);
-        addIMAPluginConfig(pluginConfig, mVideoItem.getAdTagUrl());
+        if (mVideoItem.getAdTagUrl() != null) {
+            addIMAPluginConfig(pluginConfig, mVideoItem.getAdTagUrl());
+        } else {
+            addIMADAIPluginConfig(pluginConfig, mVideoItem.getTitle(),
+                    mVideoItem.getAssetKey(), mVideoItem.getContentSourceId(), mVideoItem.getVideoId());
+        }
         addKavaPlugin(pluginConfig);
         addYouboraPlugin(pluginConfig);
 
@@ -486,8 +520,43 @@ public class VideoFragment extends Fragment {
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
+    private void addIMADAIPluginConfig(PKPluginConfigs config, String title, String assetKey, String contentSourceId, String videoId) {
 
+                if (assetKey == null) {
+                    IMADAIConfig adsConfig = getDAIVodConfig(title, contentSourceId, videoId);
+                    config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig);
+                    imaDAIEnabled = true;
+                } else {
+                    IMADAIConfig adsConfigLive = getDAILiveConfig(title, assetKey);
+                    config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigLive);
+                    imaDAIEnabled = false;
+                }
 
+    }
+
+    private IMADAIConfig getDAILiveConfig(String assetTitle, String assetKey) {
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getLiveIMADAIConfig(assetTitle,
+                assetKey,
+                apiKey,
+                streamFormat,
+                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIVodConfig(String assetTitle, String contentSourceId, String videoId) {
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+
+        return IMADAIConfig.getVodIMADAIConfig(assetTitle,
+                contentSourceId,
+                videoId,
+                apiKey,
+                streamFormat,
+                licenseUrl).enableDebugMode(true).setAlwaysStartWithPreroll(true);
+    }
     private void addKavaPlugin(PKPluginConfigs config) {
         String referrer = "app://NonDefaultReferrer/"  + getActivity().getPackageName();
         KavaAnalyticsConfig kavaAnalyticsConfig = getKavaAnalyticsConfig(38713161, referrer, DISTANCE_FROM_LIVE_THRESHOLD);
@@ -784,16 +853,17 @@ public class VideoFragment extends Fragment {
             log("SKIPPABLE_STATE_CHANGED");
         });
 
-        player.addListener(this, AdEvent.adRequested, event -> {
-            AdEvent.AdRequestedEvent adRequestEvent = event;
-            log("AD_REQUESTED");// adtag = " + adRequestEvent.adTagUrl);
-        });
-
         player.addListener(this, AdEvent.playHeadChanged, event -> {
             appProgressBar.setVisibility(View.INVISIBLE);
             AdEvent.AdPlayHeadEvent adEventProress = event;
             //log.d("received AD PLAY_HEAD_CHANGED " + adEventProress.adPlayHead);
         });
+
+        player.addListener(this, AdEvent.adRequested, event -> {
+            AdEvent.AdRequestedEvent adRequestEvent = event;
+            log("AD_REQUESTED");// adtag = " + adRequestEvent.adTagUrl);
+        });
+
 
         player.addListener(this, AdEvent.error, event -> {
             AdEvent.Error adError = event;
@@ -963,9 +1033,11 @@ public class VideoFragment extends Fragment {
         });
 
         player.addListener(this, PlayerEvent.error, event -> {
-            log("PLAYER ERROR " + event.error.message);
-            appProgressBar.setVisibility(View.INVISIBLE);
-            nowPlaying = false;
+            if (event.error.isFatal()) {
+                log("PLAYER ERROR " + event.error.message);
+                appProgressBar.setVisibility(View.INVISIBLE);
+                nowPlaying = false;
+            }
         });
 
         player.addListener(this, PlayerEvent.ended, event -> {
@@ -987,6 +1059,9 @@ public class VideoFragment extends Fragment {
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
             if(controlsView != null){
+                if (stateChanged.newState == PlayerState.IDLE && player.getCurrentPosition() >= player.getDuration() && adCuePoints.hasPostRoll()) {
+                    return;
+                }
                 controlsView.setPlayerState(stateChanged.newState);
             }
         });

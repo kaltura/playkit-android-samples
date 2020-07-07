@@ -68,19 +68,19 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
 
     private void initPlaybackControls() {
 
-        btnPlay = this.findViewById(R.id.exo_play);
-        btnPause = this.findViewById(R.id.exo_pause);
-        btnFastForward = this.findViewById(R.id.exo_ffwd);
+        btnPlay = this.findViewById(R.id.kexo_play);
+        btnPause = this.findViewById(R.id.kexo_pause);
+        btnFastForward = this.findViewById(R.id.kexo_ffwd);
         btnFastForward.setVisibility(GONE);
-        btnRewind = this.findViewById(R.id.exo_rew);
+        btnRewind = this.findViewById(R.id.kexo_rew);
         btnRewind.setVisibility(GONE);
-        btnNext = this.findViewById(R.id.exo_next);
-        btnPrevious = this.findViewById(R.id.exo_prev);
-        btnRepeatToggle = this.findViewById(R.id.exo_repeat_toggle);
+        btnNext = this.findViewById(R.id.kexo_next);
+        btnPrevious = this.findViewById(R.id.kexo_prev);
+        btnRepeatToggle = this.findViewById(R.id.kexo_repeat_toggle);
         btnRepeatToggle.setVisibility(GONE);
-        btnShuffle = this.findViewById(R.id.exo_shuffle);
+        btnShuffle = this.findViewById(R.id.kexo_shuffle);
         btnShuffle.setVisibility(GONE);
-        btnVr = this.findViewById(R.id.exo_vr);
+        btnVr = this.findViewById(R.id.kexo_vr);
         btnVr.setVisibility(GONE);
 
         btnPlay.setOnClickListener(this);
@@ -90,7 +90,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         btnNext.setOnClickListener(this);
         btnPrevious.setOnClickListener(this);
 
-        seekBar = this.findViewById(R.id.exo_progress);
+        seekBar = this.findViewById(R.id.kexo_progress);
         seekBar.setPlayedColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
         seekBar.setBufferedColor(ContextCompat.getColor(getContext(), R.color.grey));
         seekBar.setUnplayedColor(ContextCompat.getColor(getContext(), R.color.black));
@@ -98,7 +98,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         seekBar.addListener(componentListener);
 
         tvCurTime = this.findViewById(R.id.exo_position);
-        tvTime = this.findViewById(R.id.exo_duration);
+        tvTime = this.findViewById(R.id.kexo_duration);
     }
 
 
@@ -254,26 +254,26 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.exo_play:
+            case R.id.kexo_play:
                 if (player != null) {
                     player.play();
                 }
                 break;
-            case R.id.exo_pause:
+            case R.id.kexo_pause:
                 if (player != null) {
                     player.pause();
                 }
                 break;
-            case R.id.exo_ffwd:
+            case R.id.kexo_ffwd:
                 //Do nothing for now
                 break;
-            case R.id.exo_rew:
+            case R.id.kexo_rew:
                 ///Do nothing for now
                 break;
-            case R.id.exo_next:
+            case R.id.kexo_next:
                 //Do nothing for now
                 break;
-            case R.id.exo_prev:
+            case R.id.kexo_prev:
                 //Do nothing for now
                 break;
         }

@@ -1,23 +1,20 @@
 package com.kaltura.playkitdemo;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-
+import android.graphics.Color;
 import android.hardware.SensorManager;
-
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
+import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
-
+import android.view.ContextMenu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -30,26 +27,28 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
-import com.kaltura.android.exoplayer2.LoadControl;
-import com.kaltura.android.exoplayer2.upstream.BandwidthMeter;
-import com.kaltura.android.exoplayer2.upstream.DefaultBandwidthMeter;
-import com.kaltura.netkit.connect.executor.APIOkRequestsExecutor;
-import com.kaltura.netkit.connect.request.RequestConfiguration;
+import com.kaltura.netkit.BuildConfig;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.utils.OnCompletion;
 import com.kaltura.netkit.utils.SessionProvider;
 import com.kaltura.playkit.PKDrmParams;
-import com.kaltura.playkit.PKError;
 import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
+import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
-//import com.kaltura.playkit.PKVideoCodec;
+import com.kaltura.playkit.PKSubtitleFormat;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -57,13 +56,14 @@ import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.player.ABRSettings;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
-import com.kaltura.playkit.player.ExoPlayerWrapper;
 import com.kaltura.playkit.player.LoadControlBuffers;
 import com.kaltura.playkit.player.MediaSupport;
+import com.kaltura.playkit.player.PKExternalSubtitle;
 import com.kaltura.playkit.player.PKHttpClientManager;
+import com.kaltura.playkit.player.PKSubtitlePosition;
 import com.kaltura.playkit.player.PKTracks;
+import com.kaltura.playkit.player.SubtitleStyleSettings;
 import com.kaltura.playkit.player.TextTrack;
-//import com.kaltura.playkit.player.VideoCodecSettings;
 import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
 import com.kaltura.playkit.player.vr.VRSettings;
@@ -86,12 +86,9 @@ import com.kaltura.playkit.providers.MediaEntryProvider;
 import com.kaltura.playkit.providers.api.SimpleSessionProvider;
 import com.kaltura.playkit.providers.api.phoenix.APIDefines;
 import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
-import com.kaltura.playkit.providers.base.OnPlaylistLoadCompletion;
 import com.kaltura.playkit.providers.mock.MockMediaProvider;
-import com.kaltura.playkit.providers.ott.OTTMediaAsset;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
 import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
-
 import com.kaltura.playkit.utils.Consts;
 import com.kaltura.playkitvr.VRUtil;
 
@@ -100,6 +97,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
@@ -107,10 +106,25 @@ import static com.kaltura.playkitdemo.MockParams.FormatTest;
 import static com.kaltura.playkitdemo.MockParams.MediaIdTest;
 import static com.kaltura.playkitdemo.MockParams.OvpUserKS;
 
+//import com.kaltura.playkit.PKVideoCodec;
+//import com.kaltura.playkit.player.VideoCodecSettings;
+
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
-        OrientationManager.OrientationListener {
+        OrientationManager.OrientationListener, PlaybackControlsView.UIListener {
 
+    List<String> mediaArray = new ArrayList<>(Arrays.asList("922976","918331","918330","918329","918327",
+            "918326","918324","918321","918319","918318",
+            "594979","570738","571796","572824","597345",
+            "568308","620160","521735","522773","523739",
+            "524710","526594","537514","538376","540085"));
+
+
+    private String V18_PROD_KS = "djJ8MjI1fMWdwUAlBSyjKKzJnmLvQfNa3Fv2Dz-pU2rZ1XSqi9F4Jqe28WPw_IpDlXJDFoF6X8UuMj7Rz58x1OnxAoA2xIYop5pgQPM-TojGs3gAfdatONwKlizMpou66mN-_h1dkMXdsNc0ZRR6_UsDlVipgZEIzY0GWXegVSEePQtYR2U2nIfX0oH5bwNpCAdqiTfGsDGOcN3h5blFLwOcKrlBCE__X7k-D-UyvU1r8qkg51OBOhRo1qy42hbZYanH0WYoxq2Bx1X63HxwTkAVroAmKy5jZeDR7YZXSysQpajK7ltxVMs4rtrfbU6XRCHq92Bs1zPw7iscgRYSm_uZtIh9HGmHmejiu3LktP6Q2K2ZyLzQmdvoyZlIP6EPTRPNrDRISw==";
+    private String V18_STAGING_KS = "djJ8MjI1fDdmR5NI3xsHhVW4o8ipExsyi4FmGPOJ623MbCvVB4C48AZnnfvqnXBQsKWZaF9yBmV5qkpf_BDsF9N01sWRNr9wBCMcMdDudmF7yfM8U5X9MvzcAH-ArMS2vhnRXke6tB-9iRHDCzUzGdtwOppEBXxZpvQGRS7nmq0-ypLAX4AGjzJGgRUvIEcz7Y7EZT-foy_15jc-ZFWLMuGuRWAbqhaVmPzkMV9sn5D5f3l2BH5FG0DfhZR3_8SqhdEpCdG_xgMkDH0Uk8HEsIWvlg07O7irYp_Va-UU-wEnuZgK7oLsz7EfQ42wBJhmic7AqpVQgBuKaYHPpk30pLBJNXd3cMTjQRvLVOKEwulSMBwEliobKvLiz07Tpq8c2ZppruP86w==";
+
+
+    //   List<String> mediaArray = new ArrayList<>(Arrays.asList("353690","353691","353692","379073","353699"));
 
     public static final boolean AUTO_PLAY_ON_RESUME = true;
 
@@ -119,13 +133,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String DAI_PLUGIN = "DAI";
     public static int READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 123;
     public static int changeMediaIndex = -1;
-    public static Long START_POSITION = 0L;
+    public static Long START_POSITION = 0L;//65L;
 
     String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
     String preSkipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
     String inLinePreAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
     String preMidPostSingleAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
+    String ads5AdsEvery10Secs = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostlongpod&cmsid=496&vid=short_tencue&correlator=";
     String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
+    String v18_ad_tag = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOI&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D33%26KidsPinEnabled%3DN%26distinct_id%3D42c92f17603e4ee2b4232666b9591134%26AppVersion%3D0.1.80%26DeviceModel%3Dmoto%20g(6)%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2467608&ppid=42c92f17603e4ee2b4232666b9591134&vid=0_im5ianso&ad_rule=1&correlator=10771&InterstitialRendered=False";
+    String Kaltura_Skippable = "https://kaltura.github.io/playkit-admanager-samples/vast/pod-inline-someskip.xml";
+    String V18_empty_reponse = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360%7C640x480&iu=%2F21633895671%2FSVOD%2FVideo%2FAndroid_Native_App%2FVOOT%20Select%20Originals&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D32%26KidsPinEnabled%3DN%26distinct_id%3D5a096e8094e542c99b00c84caa070e40%26AppVersion%3D0.3.3%26DeviceModel%3DONEPLUS%20A6010%26OptOut%3DTrue%26OSVersion%3D10%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DFacebook&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2511390&ppid=5a096e8094e542c99b00c84caa070e40&vid=1_wiibrart&ad_rule=1&correlator=9489&InterstitialRendered=False";
+    public String AD_GOOGLE_SEARCH = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
+    public String AD_1 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
+    public String SKIP_WRONG_AD = "https://pubads.g.doubleclick.net/gampad/ads?sz=850x478%7C640x480&iu=%2F21633895671%2Fvideo%2FDesktop%2FMTV&description_url=https%3A%2F%2Fwww.voot.com&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&ad_rule=1&cmsid=2467608&vid=0_hmq5k9d6&url=https%3A%2F%2Fvoot.com%2Fshows%2Fmtv-hustle-from-home%2F2%2F100824%2Frcr-rolls-back-the-time%2F940097&correlator=4202960119303889&cust_params=sample_ar%3Dskippablelinear%26age%3D31%26gender%3DF%26distinct_id%3D1719d89c24e14-08778a2ac6a557-396c7f07-1aeaa0-1719d89c24fa8b&ppid=1719d89c24e14-08778a2ac6a557-396c7f07-1aeaa0-1719d89c24fa8b&vpa=auto&vpmute=0&sdkv=h.3.384.1&osd=2&frm=0&vis=1&sdr=1&hl=en&is_amp=0&u_so=l&mpt=kaltura-player-js&mpv=0.53.3&adsid=ChAI8OPO9QUQxv_6ifWZmZ4LEkwA2UDr0bZ79j77YjFi4cz3CHrvnQR0mlxe2PFW4aDaNZcN_F2wc5n7BVCtHT6igb-X1L5mEOW4LIkPAhIlvOApwmeJ6-cam5ghVqEY&sdki=44d&adk=300787811&eid=420706105&dlt=1588915545856&idt=32358&dt=1588915601841&cookie=ID%3D48ac7d6646a33603%3AT%3D1587485985%3AS%3DALNI_MaoMJD4gbSk3JGY_xpeqkzfvM-81w&scor=1338166435667239&ged=ve4_td56_tt24_pd56_la0_er0.0.0.0_vi0.0.898.878_vp0_eb16491%22";
+    public String singlePostRoll = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpostonly&cmsid=496&vid=short_onecue&correlator=";
+    public String vootPremiumEmptyAdTag = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360%7C640x480&iu=%2F21633895671%2FQASVOD%2FVideo%2FAndroid_Native_App%2FVSO&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D13%26KidsPinEnabled%3DN%26distinct_id%3DXmWLVbUThyY3NzJGgw7NGPsFYAp2%26AppVersion%3D0.3.4_PPE_DBG%26DeviceModel%3DAndroid%20SDK%20built%20for%20x86%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2510338&ppid=XmWLVbUThyY3NzJGgw7NGPsFYAp2&vid=0_1sz284bq&ad_rule=1&correlator=1440&InterstitialRendered=False";
 
     private Player player;
     private MediaEntryProvider mediaProvider;
@@ -145,8 +168,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private PKTracks tracksInfo;
     private boolean isAdsEnabled = true;
     private boolean isDAIMode = false;
-
-    private ExoPlayerWrapper.LoadControlStrategy loadControlStrategy;
+    SubtitleStyleSettings subtitleStyleSettings = new SubtitleStyleSettings("MyCustomSubtitleStyle");
+    PKSubtitlePosition pkSubtitlePosition = new PKSubtitlePosition(true);
+    private TextView tvSourceUrl;
 
     static {
         PKHttpClientManager.setHttpProvider("okhttp");
@@ -162,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         //getPermissionToReadExternalStorage();
         initDrm();
+        PKLog.setGlobalLevel(PKLog.Level.verbose);
         /*try {
             ProviderInstaller.installIfNeeded(this);
         } catch (GooglePlayServicesRepairableException e) {
@@ -173,26 +198,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mOrientationManager.enable();
         setContentView(R.layout.activity_main);
 
+        tvSourceUrl = findViewById(R.id.sourceUrlText);
+        registerForContextMenu(tvSourceUrl);
+
         log.i("PlayKitManager: " + PlayKitManager.CLIENT_TAG);
 
         Button button = findViewById(R.id.changeMedia);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (player != null) {
-                    changeMediaIndex++;
-                    OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
-                    if (changeMediaIndex % 4 == 0) {
-                        startSimpleOvpMediaLoadingDRM(playLoadedEntry);
-                        //startSimpleOvpMediaLoadingVR(playLoadedEntry);
-                        //startMockMediaLoading(playLoadedEntry);
-                    } else if (changeMediaIndex % 4 == 1) {
-                        startSimpleOvpMediaLoadingHls(playLoadedEntry);
-                    } if (changeMediaIndex % 4 == 2) {
-                        startSimpleOvpMediaLoadingClear(playLoadedEntry);
-                    } if (changeMediaIndex % 4 == 3) {
-                        startSimpleOvpMediaLoadingHls(playLoadedEntry);
-                    }
-                }
+        AtomicBoolean click = new AtomicBoolean(false);
+        button.setOnClickListener(v -> {
+            /*if (player != null) {
+                player.replay();
+            }*/
+            if (!click.get()) {
+                click.set(true);
+                pkSubtitlePosition.setPosition(70, 30, Layout.Alignment.ALIGN_CENTER);
+                subtitleStyleSettings.setSubtitlePosition(pkSubtitlePosition);
+                useSubtitleStyle(false, subtitleStyleSettings);
+            } else {
+                click.set(false);
+                pkSubtitlePosition.setPosition(0, 70, Layout.Alignment.ALIGN_NORMAL);
+                subtitleStyleSettings.setSubtitlePosition(pkSubtitlePosition);
+                useSubtitleStyle(false, subtitleStyleSettings);
             }
         });
 
@@ -200,33 +226,40 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         progressBar.setVisibility(View.INVISIBLE);
         companionAdSlot = findViewById(R.id.companionAdSlot);
 
-        loadControlStrategy = new ExoPlayerWrapper.LoadControlStrategy() {
-            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter.Builder(MainActivity.this).build();
-
-            @Override
-            public LoadControl getCustomLoadControl() {
-                return null;
-            }
-
-            @Override
-            public BandwidthMeter getCustomBandwidthMeter() {
-                return bandwidthMeter;
-            }
-        };
-
         registerPlugins();
 
         OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
-        //startPreprodOttMediaLoading(playLoadedEntry);
-        //startOttMediaLoading(playLoadedEntry);
-        //startSimpleOvpMediaLoadingVR(playLoadedEntry);
-        //startSimpleOvpMediaLoadingHls(playLoadedEntry);
-        //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
-        //startMockMediaLoading(playLoadedEntry);
-        //startOvpMediaLoading(playLoadedEntry);
-        startSimpleOvpMediaLoadingDRM(playLoadedEntry);
-        //startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
+        // To check hebrew subtitle
+        // startSimpleOvpMediaLoadingHlsSubtitle(playLoadedEntry);
+
+        // "764459" : Vootkids firestick issue asset
+        //   startVootOttMediaLoadingProd(playLoadedEntry, "594159"); // Dolby Content
+        //  startVootOttMediaLoadingProd(playLoadedEntry, "805986"); // iOS linear
+        startVootOttMediaLoadingProd(playLoadedEntry, "963762");
+        //    startVootOttMediaLoadingProd(playLoadedEntry, "805985"); // Voot Live Channel DASH_LINEAR_TV
+        //  startVootOttMediaLoadingStaging(playLoadedEntry, "326666"); // 403 Soruce Error asset for Tablet Main
+        //  startVootOttMediaLoadingStaging(playLoadedEntry, "326683"); // 404 Soruce Error asset for dashclear
+        //startVootOttMediaLoadingStaging(playLoadedEntry, "317519"); // Staging asset to test L1 and L3 with DASHENC_TV_PremiumHD
+        // startVootOttMediaLoadingStaging(playLoadedEntry, "326510"); // Jio tokenization on clear content
+
+        //    startHorizonOttMediaLoadingLive(playLoadedEntry);
+
+        //  createPlayerWithoutPhoenixProvider();
+        // createPlayerWithoutPhoenixProvider();
+
+//        startSimpleOvpMediaLoadingHls(playLoadedEntry);
+
+//        startSimpleOvpMediaLoadingMulti(playLoadedEntry);
+
+//        startOttMediaLoading(playLoadedEntry);
+//      startSimpleOvpMediaLoadingVR(playLoadedEntry);
+//      startSimpleOvpMediaLoadingHls(playLoadedEntry);
+//      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
+//      startMockMediaLoading(playLoadedEntry);
+//      startOvpMediaLoading(playLoadedEntry);
+//      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
+//        startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
@@ -244,6 +277,52 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 setRequestedOrientation(orient);
             }
         });
+
+        //   WriteAdbLogs.INSTANCE.sendYouboraLogToFile("Gourav");
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo) {
+
+        menu.add(0, v.getId(),0, "Copy");
+        menu.setHeaderTitle("Copy text"); //setting header title for menu
+        TextView textView = (TextView) v;
+        ClipboardManager manager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText("text", textView.getText());
+        manager.setPrimaryClip(clipData);
+    }
+
+
+    @Override
+    public void onChangeMedia() {
+        if (player != null) {
+            if (controlsView != null) {
+                controlsView.setSeekBarStateForAd(false);
+            }
+            changeMediaIndex++;
+            OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
+            startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()));
+
+                   /* if (changeMediaIndex % 4 == 0) {
+                        startSimpleOvpMediaLoadingDRM(playLoadedEntry);
+                        //startSimpleOvpMediaLoadingVR(playLoadedEntry);
+                        //startMockMediaLoading(playLoadedEntry);
+                    } else if (changeMediaIndex % 4 == 1) {
+                        startSimpleOvpMediaLoadingHls(playLoadedEntry);
+                    } if (changeMediaIndex % 4 == 2) {
+                        startSimpleOvpMediaLoadingClear(playLoadedEntry);
+                    } if (changeMediaIndex % 4 == 3) {
+                        startSimpleOvpMediaLoadingHls(playLoadedEntry);
+                    }*/
+        }
+    }
+
+    private int getRandomNo() {
+        Random r = new Random();
+        int low = 1;
+        int high = 5;
+        return r.nextInt(high-low) + low;
     }
 
     private void getPermissionToReadExternalStorage() {
@@ -281,15 +360,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-
     private void registerPlugins() {
 
         //PlayKitManager.registerPlugins(this, SamplePlugin.factory);
         PlayKitManager.registerPlugins(this, IMAPlugin.factory);
-        PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
+        //PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
         //PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
-        PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
+        // PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
         //PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
         //PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
     }
@@ -300,15 +378,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void run() {
                 if (response.isSuccess()) {
-                    if (response.getResponse() instanceof PKMediaEntry) {
-                        onMediaLoaded(response.getResponse());
-                    } else if (response.getResponse() instanceof List) {
-                        //PKPlaylist listofmedia = (PKPlaylist) response.getResponse();
-                        //onMediaLoaded(listodmedia.get(1));
-                    }
+                    PKMediaEntry pkMediaEntry = response.getResponse();
+                    //   pkMediaEntry.getSources().get(0).getDrmData().get(0).setScheme(PKDrmParams.Scheme.WidevineClassic);
+                    //   pkMediaEntry.getSources().get(0).getDrmData().get(1).setScheme(PKDrmParams.Scheme.WidevineClassic);
+                    onMediaLoaded(pkMediaEntry);
                 } else {
                     Toast.makeText(MainActivity.this, "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""), Toast.LENGTH_LONG).show();
-                    log.e("failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""));
+                    log.e("failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : " - ")
+                            + (response.getError().getCode() != null ? response.getError().getCode() : " - ")
+                            + (response.getError().getName() != null ? response.getError().getName() : ""));
                 }
             }
         });
@@ -316,6 +394,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void initDrm() {
         MediaSupport.initializeDrm(this, (supportedDrmSchemes, isHardwareDrmSupported, provisionPerformed, provisionError) -> {
+            log.e("DRM ", " isHardwareDrmSupported = "+isHardwareDrmSupported);
             if (provisionPerformed) {
                 if (provisionError != null) {
                     log.e("DRM Provisioning failed", provisionError);
@@ -323,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     log.d("DRM Provisioning succeeded");
                 }
             }
-            log.d("DRM initialized; supported: " + supportedDrmSchemes + " isHardwareDrmSupported = " + isHardwareDrmSupported);
+            log.d("DRM initialized; supported: " + supportedDrmSchemes);
 
             // Now it's safe to look at `supportedDrmSchemes`
         });
@@ -349,44 +428,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void startSimpleOvpMediaLoadingHls(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider("https://cdnapisec.kaltura.com", 1734751, null)
-                .setEntryId("1_3o1seqnv")
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 1982541, ""))
+                .setEntryId("0_2xra7jko")
                 .load(completion);
     }
 
-    private void startPreprodOttMediaLoading(final OnMediaLoadCompletion completion) {
-
-        APIOkRequestsExecutor.getSingleton().setRequestConfiguration(new RequestConfiguration().setMaxRetries(5).setReadTimeoutMs(15000));
-// APIOkRequestsExecutor.getSingleton().setNetworkErrorEventListener(errorElement -> {
-// log.d("XXX NetworkError code = " + errorElement.getCode() + " " + errorElement.getMessage());
-//});
-
-        String mediaId = "259153";
-        String mediaFormat = "Mobile_Devices_Main_SD";
-
-        OTTMediaAsset ottMediaAsset = new OTTMediaAsset()
-                .setAssetId(mediaId)
-                .setKs(null)
-                 //.setReferrer()
-                .setFormats(Collections.singletonList(mediaFormat))
-                .setProtocol(PhoenixMediaProvider.HttpProtocol.Http)
-                .setContextType(APIDefines.PlaybackContextType.Playback)
-                .setAssetType(APIDefines.KalturaAssetType.Media)
-                .setAssetReferenceType(APIDefines.AssetReferenceType.Media);
-
-        mediaProvider = new PhoenixMediaProvider(MockParams.PhoenixBaseUrl, MockParams.OttPartnerId, ottMediaAsset);
-
-        mediaProvider.load(completion);
+    private void startSimpleOvpMediaLoadingHlsSubtitle(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("http://cdntesting.qa.mkaltura.com", 1091, ""))
+                .setEntryId("0_hut6q26s")
+                .load(completion);
     }
 
     private void startSimpleOvpMediaLoadingHEVC(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider("https://cdnapisec.kaltura.com", 2215841, null)
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2215841, null))
                 .setEntryId("1_zhpdyrr2")
                 .load(completion);
     }
 
     private void startSimpleOvpMediaLoadingDRM(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider("https://cdnapisec.kaltura.com", 2222401, null)
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 2222401, null))
                 .setEntryId("1_f93tepsn")//("1_asoyc5ef") //("1_uzea2uje")
                 .load(completion);
     }
@@ -399,44 +463,43 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void startSimpleOvpMediaLoadingClear(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null)
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null))
                 .setEntryId("0_wu32qrt3")
                 .load(completion);
     }
 
-
-
     private void startSimpleOvpMediaLoadingLive(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null)
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null))
                 .setEntryId("0_nwkp7jtx")
                 .load(completion);
     }
 
     private void startSimpleOvpMediaLoadingLive1(OnMediaLoadCompletion completion) {
-        new KalturaOvpMediaProvider("https://cdnapisec.kaltura.com/", 1740481, null)
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com/", 1740481, null))
                 .setEntryId("1_fdv46dba")
                 .load(completion);
     }
 
     private void startMockMediaLoading(OnMediaLoadCompletion completion) {
 
-        mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "mp4");
+        mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "harold");
 
         mediaProvider.load(completion);
     }
 
     private void startOttMediaLoading(final OnMediaLoadCompletion completion) {
-
-        OTTMediaAsset ottMediaAsset = new OTTMediaAsset()
+        SessionProvider ksSessionProvider = new SimpleSessionProvider(MockParams.PhoenixBaseUrlUS, MockParams.OttPartnerIdTest, null);
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
                 .setAssetId(MediaIdTest)
-                .setKs(null)
                 .setAssetType(APIDefines.KalturaAssetType.Media)
                 .setAssetReferenceType(APIDefines.AssetReferenceType.Media)
                 .setContextType(APIDefines.PlaybackContextType.Playback)
                 .setProtocol(PhoenixMediaProvider.HttpProtocol.All)
-                .setFormats(Collections.singletonList(FormatTest));
-
-        mediaProvider = new PhoenixMediaProvider(MockParams.PhoenixBaseUrlUS, MockParams.OttPartnerIdTest, ottMediaAsset);
+                .setFormats(FormatTest);
         mediaProvider.load(completion);
     }
 
@@ -464,20 +527,30 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mediaProvider.load(completion);
     }
 
+    private void startSimpleOvpMediaLoadingMulti(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null)
+                .setEntryId("0_wu32qrt3")
+                .load(completion);
+    }
+
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
 
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
             START_POSITION = null; // force live streams to play from live edge
         }
 
-        PKMediaConfig mediaConfig = new PKMediaConfig().setMediaEntry(mediaEntry).setStartPosition(START_POSITION);
+        PKMediaConfig mediaConfig = new PKMediaConfig();
+        //  setExternalSubtitles(mediaEntry);
+
+        mediaConfig.setMediaEntry(mediaEntry).setStartPosition(null);
+
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         if (player == null) {
 
             configurePlugins(pluginConfig);
 
             player = PlayKitManager.loadPlayer(this, pluginConfig);
-            KalturaPlaybackRequestAdapter.install(player, null); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
+            KalturaPlaybackRequestAdapter.install(player, "app://PlaykitTestApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
             KalturaUDRMLicenseRequestAdapter.install(player, "app://PlaykitTestApp");
 
 
@@ -485,6 +558,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //            DRMAdapter.customData = customAdapterData;
 //            final DRMAdapter licenseRequestAdapter = new DRMAdapter();
 //            player.getSettings().setLicenseRequestAdapter(licenseRequestAdapter);
+            player.getSettings().setPreferredMediaFormat(PKMediaFormat.dash);
 
             if (mediaEntry.isVRMediaType()) {
                 VRSettings vrSettings = new VRSettings();
@@ -500,28 +574,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 player.getSettings().setVRSettings(vrSettings);
             }
 
-            player.getSettings().setCustomLoadControlStrategy(loadControlStrategy);
-            player.getSettings().setAdAutoPlayOnResume(true);
+            pkSubtitlePosition.setPosition( 80, 20, Layout.Alignment.ALIGN_OPPOSITE);
+            subtitleStyleSettings.setSubtitlePosition(pkSubtitlePosition);
+            subtitleStyleSettings.setBackgroundColor(Color.BLUE);
+            useSubtitleStyle(true, subtitleStyleSettings);
+
             player.getSettings().setSecureSurface(false);
-            player.getSettings().setAdAutoPlayOnResume(true);
-            //player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(Collections.singletonList(PKVideoCodec.VP9), true, false));
-            player.getSettings().setAllowCrossProtocolRedirect(true);
+            //  player.getSettings().forceSinglePlayerEngine(true);
+            //  player.getSettings().setPreferredMediaFormat(PKMediaFormat.dash);
+            // player.getSettings().setAdAutoPlayOnResume(true);
+            //     player.getSettings().setABRSettings(new ABRSettings().setMaxVideoBitrate(550000));
+            //player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(PKVideoCodec.AVC, true));
+            // player.getSettings().setAllowCrossProtocolRedirect(true);
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
-            player.getSettings().enableDecoderFallback(true);
+            // player.getSettings().enableDecoderFallback(true);
             //player.setPlaybackRate(1.5f);
-            //player.getSettings().setABRSettings(new ABRSettings().setInitialBitrateEstimate(100000).setMaxVideoBitrate(80000));
+            //    player.getSettings().setAdAutoPlayOnResume(true);
+            //   player.getSettings().setMaxVideoBitrate(878786);
+            //   player.getSettings().setMaxVideoSize(new PKMaxVideoSize(640,360));
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
 
             FrameLayout layout = (FrameLayout) findViewById(R.id.player_view);
             layout.addView(player.getView());
 
-
-            //SurfaceView surface = findViewById(R.id.player_view);
-           // player.setVideoSurfaceView(surface);
-            //surface.setVisibility(View.VISIBLE);
-            player.pause();
             controlsView = (PlaybackControlsView) this.findViewById(R.id.playerControls);
+            controlsView.setUiListener(this);
             controlsView.setPlayer(player);
             initSpinners();
         } else {
@@ -542,12 +620,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             } else if (changeMediaIndex % 4 == 1) {
                 if (isAdsEnabled) {
                     if (isDAIMode) {
-                        promptMessage(DAI_PLUGIN, getDAIConfig3().getAssetTitle());
+                        promptMessage(DAI_PLUGIN, getDAIConfig10().getAssetTitle());
                         player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig3());
                     } else {
                         log.d("Play Ad inLinePreAdTagUrl");
                         promptMessage(IMA_PLUGIN, "inLinePreAdTagUrl");
-                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(inLinePreAdTagUrl));
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(v18_ad_tag));
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(true, "inLinePreAdTagUrl media3"));
@@ -555,12 +633,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             } if (changeMediaIndex % 4 == 2) {
                 if (isAdsEnabled) {
                     if (isDAIMode) {
-                        promptMessage(DAI_PLUGIN, getDAIConfig4().getAssetTitle());
+                        promptMessage(DAI_PLUGIN, getDAIConfig8().getAssetTitle());
                         player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig4());
                     } else {
                         log.d("Play NO Ad");
                         promptMessage(IMA_PLUGIN, "Enpty AdTag");
-                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(""));
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(SKIP_WRONG_AD));
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "NO AD media4"));
@@ -576,7 +654,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSkipAdTagUrl));
                     }
                 }
-                
+
                 player.getSettings().setPlayerBuffers(new LoadControlBuffers().
                         setMinPlayerBufferMs(2500).
                         setMaxPlayerBufferMs(50000).setAllowedVideoJoiningTimeMs(4000));
@@ -588,6 +666,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         player.prepare(mediaConfig);
         player.play();
+    }
+
+    private void useSubtitleStyle(boolean setOrUpdate, SubtitleStyleSettings subtitleStyleSettings) {
+        if (setOrUpdate) {
+            player.getSettings().setSubtitleStyle(subtitleStyleSettings);
+        } else {
+            player.updateSubtitleStyle(subtitleStyleSettings);
+        }
     }
 
     private void initSpinners() {
@@ -625,7 +711,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return new KavaAnalyticsConfig()
                 .setApplicationVersion(BuildConfig.VERSION_NAME)
                 .setPartnerId(partnerId)
-                .setUserId("aaa@gmail.com")
+                .setUserId("gourav@gmail.com")
                 .setEntryId(ovpEntryId)
                 .setDvrThreshold(DISTANCE_FROM_LIVE_THRESHOLD);
     }
@@ -642,11 +728,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         JsonObject pluginEntry = new JsonObject();
 
         pluginEntry.addProperty("accountCode", "kalturatest");
-        pluginEntry.addProperty("username", "gilad@a.com");
+        pluginEntry.addProperty("username", "gourav@gmail.com");
         pluginEntry.addProperty("haltOnError", true);
         pluginEntry.addProperty("enableAnalytics", true);
         pluginEntry.addProperty("enableSmartAds", true);
-        pluginEntry.addProperty("userObfuscateIp", true);
 
 
         //Optional - Device json o/w youbora will decide by its own.
@@ -662,7 +747,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Media entry json.
         JsonObject mediaEntryJson = new JsonObject();
         mediaEntryJson.addProperty("isLive", isLive);
-        mediaEntryJson.addProperty("GILAD TITLE", title);
+        mediaEntryJson.addProperty("title", title);
 
         //Youbora ads configuration json.
         JsonObject adsJson = new JsonObject();
@@ -673,7 +758,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         JsonObject propertiesJson = new JsonObject();
         propertiesJson.addProperty("genre", "");
         propertiesJson.addProperty("type", "");
-        propertiesJson.addProperty("transactionType", "TransactionType-1");
+        propertiesJson.addProperty("transaction_type", "");
         propertiesJson.addProperty("year", "");
         propertiesJson.addProperty("cast", "");
         propertiesJson.addProperty("director", "");
@@ -688,8 +773,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //You can add some extra params here:
         JsonObject extraParamJson = new JsonObject();
-        extraParamJson.addProperty("param1", "param1");
-        extraParamJson.addProperty("param2", "param2");
+        extraParamJson.addProperty("param1", "Gourav-Custom-Param-1");
+        extraParamJson.addProperty("param2", "Gourav-Custom-Param-2");
+        extraParamJson.addProperty("param3", "Gourav-Custom-Param-3");
 
         //Add all the json objects created before to the pluginEntry json.
         pluginEntry.add("device", deviceJson);
@@ -713,33 +799,529 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         log.d("Play Ad preSkipAdTagUrl");
         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
-        IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl).setCompanionAdConfig(companionAdSlot, 300, 250);
+        IMAConfig adsConfig = getAdsConfig(vootPremiumEmptyAdTag);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
     private IMAConfig getAdsConfig(String adTagUrl) {
         List<String> videoMimeTypes = new ArrayList<>();
-        videoMimeTypes.add("video/mp4");
-        videoMimeTypes.add("application/x-mpegURL");
-        videoMimeTypes.add("application/dash+xml");
-        return new IMAConfig().setAdTagUrl(adTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
+        // videoMimeTypes.add("video/mp4");
+        // videoMimeTypes.add("application/x-mpegURL");
+        // videoMimeTypes.add("application/dash+xml");
+        //return getAdsConfigResponse("");
+        // return new IMAConfig().setAdTagUrl("https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOI&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D33%26KidsPinEnabled%3DN%26distinct_id%3D42c92f17603e4ee2b4232666b9591134%26AppVersion%3D0.1.80%26DeviceModel%3Dmoto%20g(6)%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2467608&ppid=42c92f17603e4ee2b4232666b9591134&vid=0_im5ianso&ad_rule=1&correlator=10771&InterstitialRendered=False").enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
+        return new IMAConfig().setAdTagUrl(vootPremiumEmptyAdTag).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
     }
-
 
     private IMAConfig getAdsConfigResponse(String adResponse) {
         List<String> videoMimeTypes = new ArrayList<>();
         videoMimeTypes.add("video/mp4");
         videoMimeTypes.add("application/x-mpegURL");
         // videoMimeTypes.add("application/dash+xml");
-        return new IMAConfig().setAdTagResponse(adResponse).setVideoMimeTypes(videoMimeTypes).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
+        return new IMAConfig().setAdTagResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<VAST xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"vast.xsd\" version=\"3.0\">\n" +
+                "    <Ad id=\"697200496\" sequence=\"1\">\n" +
+                "        <InLine>\n" +
+                "            <AdSystem>GDFP</AdSystem>\n" +
+                "            <AdTitle>External NCA1C1L1 LinearInlineSkippable1</AdTitle>\n" +
+                "            <Description>\n" +
+                "                <![CDATA[External NCA1C1L1 LinearInlineSkippable ad]]>\n" +
+                "            </Description>\n" +
+                "            <Error>\n" +
+                "                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoplayfailed[ERRORCODE]]]>\n" +
+                "            </Error>\n" +
+                "            <Impression>\n" +
+                "                <![CDATA[https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjssbJ-NIPc1thQ4jiqlJtwMcdR0cMzj-DPmwv0ZLNCGVewPk-_-qRRXzhiyRpSGQyfjxUPYMsbx1TfNP73PHwzH5Sa8xTHrSVMK14ibBcEKXIZckAU36SzpqkOsY6HFybbiv8TJ2vqCfWqbkwzVoP3_uC5Co8ODxwzjrFHyrUT99w638gemssuGGLhiE1D1oSENH-b3L_Z4X17n0EQ1Mmma6Y8OywPy5UmRUWZOFHMD-9KJ4z4IaaFCuO7toI-HjzMjKAQ&sig=Cg0ArKJSzO_u2FZZ48G4EAE&adurl=]]>\n" +
+                "            </Impression>\n" +
+                "            <Creatives>\n" +
+                "                <Creative id=\"57860459056\" sequence=\"1\">\n" +
+                "                    <Linear skipoffset=\"00:00:05\">\n" +
+                "                        <Duration>00:00:10</Duration>\n" +
+                "                        <TrackingEvents>\n" +
+                "                            <Tracking event=\"start\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=part2viewed&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"firstQuartile\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoplaytime25&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"midpoint\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoplaytime50&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"thirdQuartile\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoplaytime75&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"complete\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoplaytime100&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"mute\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=admute&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"unmute\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adunmute&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"rewind\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adrewind&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"pause\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adpause&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"resume\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adresume&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"fullscreen\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adfullscreen&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"creativeView\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=vast_creativeview&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"exitFullscreen\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=vast_exit_fullscreen&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"acceptInvitationLinear\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=acceptinvitation&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"closeLinear\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adclose&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"skip\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoskipped&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"progress\" offset=\"00:00:05\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=video_skip_shown&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"progress\" offset=\"00:00:30\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=video_engaged_view&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                        </TrackingEvents>\n" +
+                "                        <AdParameters>\n" +
+                "                            <![CDATA[custom_param=some_value]]>\n" +
+                "                        </AdParameters>\n" +
+                "                        <VideoClicks>\n" +
+                "                            <ClickThrough id=\"GDFP\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pcs/click?xai=AKAOjssRtEFo991pR7zwabKsfXwr_aghNnLMOIPnWfUd5qDOvHBP6JBLSaLelz1zulNEXWWR7eAs0jETJWFfaGAymWttftWZcEddHM17nyxbug9-mXgcDMU30TfS5cwe9qbYt8UbkvIVTpA3IcQ6dchlTaIojYu_5lacYvZ3OxpFUtGs0jsFDAHs8zKjUIrQpk66f9kGao8FgTUb3uD5qrBn11QFBaCWZfgmkQK_KUVpYZ-K3xD0qsAEhbaJ-E17Rr4&sig=Cg0ArKJSzPD0XJy5Qe_z&adurl=https://developers.google.com/interactive-media-ads/docs/vastinspector_dual]]>\n" +
+                "                            </ClickThrough>\n" +
+                "                        </VideoClicks>\n" +
+                "                        <MediaFiles>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"1280\" height=\"720\" type=\"video/mp4\" bitrate=\"533\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/15/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fmp4/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/A7A30B1D1A7F7BE73A9538FD1B807350967D2AEB.9A38C814EDA47CAC281AED15E39F280599559A30/key/ck2/file/file.mp4]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"176\" height=\"144\" type=\"video/3gpp\" bitrate=\"36\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/17/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2F3gpp/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/704416F60F7B435E72AB4930D2797E711D21D267.AA2B92F31E6FB8B7B68757975771630A1A77AD67/key/ck2/file/file.3gp]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"640\" height=\"360\" type=\"video/mp4\" bitrate=\"122\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/18/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fmp4/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/10542A19241D1CC9E11D8AE9FA0E1A6B003C079B.8D328E7408844794F1985FBC9DC53B850E60E8AB/key/ck2/file/file.mp4]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"320\" height=\"180\" type=\"video/3gpp\" bitrate=\"74\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/36/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2F3gpp/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/682F9CB111CA36AB2B72D9CF06B97814C08AEAE9.8867580B16BC64EB7E62725EE281CE93330FD9A1/key/ck2/file/file.3gp]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"640\" height=\"360\" type=\"video/webm\" bitrate=\"125\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/43/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fwebm/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/6D73F2F257A32FE7EE3833AC95A2E0F83B26D30E.8AC48D55F95E5E06CE97F79999D43FCFBE58598A/key/ck2/file/file.webm]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"1280\" height=\"720\" type=\"video/mp4\" bitrate=\"252\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/22/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fmp4/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/2FD975ED3F1DC539431C7B1599343CA6D42BE26F.3192B70BACB2374FF6F79F2C1B910CAD061F6681/key/ck2/file/file.mp4]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"1280\" height=\"720\" type=\"video/webm\" bitrate=\"245\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/45/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fwebm/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/A69051380724BB05C63CBADEABE87930D903A060.5268C540E0881255FB9B1E8B06D6334D9C8FFA15/key/ck2/file/file.webm]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"854\" height=\"480\" type=\"video/webm\" bitrate=\"139\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/44/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fwebm/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/44ABC7593CA293C15FC6B1B609F95BAC49C1293D.9735E1E8043D00DD236FB2AEBF0686FC6E591885/key/ck2/file/file.webm]]>\n" +
+                "                            </MediaFile>\n" +
+                "                        </MediaFiles>\n" +
+                "                    </Linear>\n" +
+                "                </Creative>\n" +
+                "                <Creative id=\"57857370976\" sequence=\"1\">\n" +
+                "                    <CompanionAds>\n" +
+                "                        <Companion id=\"57857370976\" width=\"300\" height=\"250\">\n" +
+                "                            <StaticResource creativeType=\"image/png\">\n" +
+                "                                <![CDATA[https://pagead2.googlesyndication.com/pagead/imgad?id=CICAgKDTwILFiwEQrAIY-gEyCAAnmA4d6uc2]]>\n" +
+                "                            </StaticResource>\n" +
+                "                            <TrackingEvents>\n" +
+                "                                <Tracking event=\"creativeView\">\n" +
+                "                                    <![CDATA[https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjsu4t45zNGfTQ06CDdiMzq_mcWro7Zdd7ypWcTFkFQDuuOQEj-HujgeZUXPEIJ7MplCd0M1fON1_sVKUBdmIQbAFCFIYbFbOjhxoBArrI3bUPnmOWqAXN8FeyABK_cK7OUS9UDtH0dH15Uo-bazAynoCqFYLWIlX2Zogydj70J9Ct7e37UFIYEMCvLoKKJX9vFr3xOOjVagqQuF4gazu364ygyPlwi4u4BQz8yvhjnbagVo65qjZRTWiuIJkq2FNiHrw7g&sig=Cg0ArKJSzM1nydF7FthbEAE&adurl=]]>\n" +
+                "                                </Tracking>\n" +
+                "                            </TrackingEvents>\n" +
+                "                            <CompanionClickThrough>\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pcs/click?xai=AKAOjsvWFRuVRofvhzu2K9mtloqdcO2Z76J4Lz72yy_u-_ubft33SejmI7szO1diOL-WSyDsF7QSavCWgJKt2-2QnaL7RqZHWxnRkysUAacI0iNTQRt5rVatQYadnJ9rm75ADKmjI7RPhhkTANwajN6Ca_UnrUydp_QLhMNAwj2c9kie1CMkcTaD4nnccEQuoGHOax_r_CPU8Sgx166SLRn_2TXDk2B1odmHAcsxFzsp4FJ5nog03uxg0O5ESAU_CnY&sig=Cg0ArKJSzDaG_Mg6T5ca&adurl=https://developers.google.com/interactive-media-ads/docs/vastinspector_dual]]>\n" +
+                "                            </CompanionClickThrough>\n" +
+                "                        </Companion>\n" +
+                "                    </CompanionAds>\n" +
+                "                </Creative>\n" +
+                "            </Creatives>\n" +
+                "            <Extensions>\n" +
+                "                <Extension type=\"waterfall\" fallback_index=\"0\"/>\n" +
+                "                <Extension type=\"geo\">\n" +
+                "                    <Country>IL</Country>\n" +
+                "                    <Bandwidth>4</Bandwidth>\n" +
+                "                    <BandwidthKbps>20000</BandwidthKbps>\n" +
+                "                </Extension>\n" +
+                "                <Extension type=\"activeview\">\n" +
+                "                    <CustomTracking>\n" +
+                "                        <Tracking event=\"viewable_impression\">\n" +
+                "                            <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=viewable_impression&acvw=[VIEWABILITY]&gv=[GOOGLE_VIEWABILITY]&ad_mt=[AD_MT]]]>\n" +
+                "                        </Tracking>\n" +
+                "                        <Tracking event=\"abandon\">\n" +
+                "                            <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=video_abandon&acvw=[VIEWABILITY]&gv=[GOOGLE_VIEWABILITY]]]>\n" +
+                "                        </Tracking>\n" +
+                "                    </CustomTracking>\n" +
+                "                    <ActiveViewMetadata>\n" +
+                "                        <![CDATA[la=1&alp=xai&alh=2089752336&]]>\n" +
+                "                    </ActiveViewMetadata>\n" +
+                "                </Extension>\n" +
+                "                <Extension type=\"DFP\">\n" +
+                "                    <SkippableAdType>Generic</SkippableAdType>\n" +
+                "                </Extension>\n" +
+                "                <Extension type=\"metrics\">\n" +
+                "                    <FeEventId>dpL4XfqHA4nV3gOyt5moDw</FeEventId>\n" +
+                "                    <AdEventId>CJvLx8aivOYCFVGWdwodM4wJig</AdEventId>\n" +
+                "                </Extension>\n" +
+                "                <Extension type=\"ShowAdTracking\">\n" +
+                "                    <CustomTracking>\n" +
+                "                        <Tracking event=\"show_ad\">\n" +
+                "                            <![CDATA[https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjsuMDugqzaXeMHc5duHjTQTFZd_2h7D5m4MC5GvwNKYMmJjOkfp3zT6eTAAJ9TU383ZdaRKIluMaptIot2SeFL2moXcRpRCmh1PRrd6VPWswW2G70cRCPWblTBOeKELi7-NT3RJOHGge6yRow5LCbM3iYK8lFXgzRYAO4xN_Q2nUjZzwSFOn7lwjzQEKMbR8OobgBq1SwXVZFK60oi4F4G-94Y1muVUkgnpBLn49Zz3-eYUIxKiE7IgMDS5RuRuVCOgJui2n&sig=Cg0ArKJSzCI1ib-MTkMyEAE&adurl=]]>\n" +
+                "                        </Tracking>\n" +
+                "                    </CustomTracking>\n" +
+                "                </Extension>\n" +
+                "                <Extension type=\"video_ad_loaded\">\n" +
+                "                    <CustomTracking>\n" +
+                "                        <Tracking event=\"loaded\">\n" +
+                "                            <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=video_ad_loaded]]>\n" +
+                "                        </Tracking>\n" +
+                "                    </CustomTracking>\n" +
+                "                </Extension>\n" +
+                "            </Extensions>\n" +
+                "        </InLine>\n" +
+                "    </Ad>\n" +
+                "    <Ad id=\"697200496\" sequence=\"2\">\n" +
+                "        <InLine>\n" +
+                "            <AdSystem>GDFP</AdSystem>\n" +
+                "            <AdTitle>External NCA1C1L1 LinearInlineSkippable2</AdTitle>\n" +
+                "            <Description>\n" +
+                "                <![CDATA[External NCA1C1L1 LinearInlineSkippable ad]]>\n" +
+                "            </Description>\n" +
+                "            <Error>\n" +
+                "                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoplayfailed[ERRORCODE]]]>\n" +
+                "            </Error>\n" +
+                "            <Impression>\n" +
+                "                <![CDATA[https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjssbJ-NIPc1thQ4jiqlJtwMcdR0cMzj-DPmwv0ZLNCGVewPk-_-qRRXzhiyRpSGQyfjxUPYMsbx1TfNP73PHwzH5Sa8xTHrSVMK14ibBcEKXIZckAU36SzpqkOsY6HFybbiv8TJ2vqCfWqbkwzVoP3_uC5Co8ODxwzjrFHyrUT99w638gemssuGGLhiE1D1oSENH-b3L_Z4X17n0EQ1Mmma6Y8OywPy5UmRUWZOFHMD-9KJ4z4IaaFCuO7toI-HjzMjKAQ&sig=Cg0ArKJSzO_u2FZZ48G4EAE&adurl=]]>\n" +
+                "            </Impression>\n" +
+                "            <Creatives>\n" +
+                "                <Creative id=\"57860459056\" sequence=\"1\">\n" +
+                "                    <Linear skipoffset=\"00:00:07\">\n" +
+                "                        <Duration>00:00:10</Duration>\n" +
+                "                        <TrackingEvents>\n" +
+                "                            <Tracking event=\"start\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=part2viewed&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"firstQuartile\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoplaytime25&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"midpoint\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoplaytime50&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"thirdQuartile\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoplaytime75&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"complete\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoplaytime100&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"mute\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=admute&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"unmute\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adunmute&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"rewind\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adrewind&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"pause\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adpause&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"resume\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adresume&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"fullscreen\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adfullscreen&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"creativeView\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=vast_creativeview&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"exitFullscreen\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=vast_exit_fullscreen&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"acceptInvitationLinear\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=acceptinvitation&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"closeLinear\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=adclose&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"skip\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=videoskipped&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"progress\" offset=\"00:00:05\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=video_skip_shown&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                            <Tracking event=\"progress\" offset=\"00:00:30\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=video_engaged_view&ad_mt=[AD_MT]]]>\n" +
+                "                            </Tracking>\n" +
+                "                        </TrackingEvents>\n" +
+                "                        <AdParameters>\n" +
+                "                            <![CDATA[custom_param=some_value]]>\n" +
+                "                        </AdParameters>\n" +
+                "                        <VideoClicks>\n" +
+                "                            <ClickThrough id=\"GDFP\">\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pcs/click?xai=AKAOjssRtEFo991pR7zwabKsfXwr_aghNnLMOIPnWfUd5qDOvHBP6JBLSaLelz1zulNEXWWR7eAs0jETJWFfaGAymWttftWZcEddHM17nyxbug9-mXgcDMU30TfS5cwe9qbYt8UbkvIVTpA3IcQ6dchlTaIojYu_5lacYvZ3OxpFUtGs0jsFDAHs8zKjUIrQpk66f9kGao8FgTUb3uD5qrBn11QFBaCWZfgmkQK_KUVpYZ-K3xD0qsAEhbaJ-E17Rr4&sig=Cg0ArKJSzPD0XJy5Qe_z&adurl=https://developers.google.com/interactive-media-ads/docs/vastinspector_dual]]>\n" +
+                "                            </ClickThrough>\n" +
+                "                        </VideoClicks>\n" +
+                "                        <MediaFiles>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"1280\" height=\"720\" type=\"video/mp4\" bitrate=\"533\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/15/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fmp4/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/A7A30B1D1A7F7BE73A9538FD1B807350967D2AEB.9A38C814EDA47CAC281AED15E39F280599559A30/key/ck2/file/file.mp4]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"176\" height=\"144\" type=\"video/3gpp\" bitrate=\"36\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/17/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2F3gpp/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/704416F60F7B435E72AB4930D2797E711D21D267.AA2B92F31E6FB8B7B68757975771630A1A77AD67/key/ck2/file/file.3gp]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"640\" height=\"360\" type=\"video/mp4\" bitrate=\"122\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/18/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fmp4/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/10542A19241D1CC9E11D8AE9FA0E1A6B003C079B.8D328E7408844794F1985FBC9DC53B850E60E8AB/key/ck2/file/file.mp4]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"320\" height=\"180\" type=\"video/3gpp\" bitrate=\"74\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/36/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2F3gpp/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/682F9CB111CA36AB2B72D9CF06B97814C08AEAE9.8867580B16BC64EB7E62725EE281CE93330FD9A1/key/ck2/file/file.3gp]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"640\" height=\"360\" type=\"video/webm\" bitrate=\"125\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/43/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fwebm/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/6D73F2F257A32FE7EE3833AC95A2E0F83B26D30E.8AC48D55F95E5E06CE97F79999D43FCFBE58598A/key/ck2/file/file.webm]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"1280\" height=\"720\" type=\"video/mp4\" bitrate=\"252\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/22/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fmp4/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/2FD975ED3F1DC539431C7B1599343CA6D42BE26F.3192B70BACB2374FF6F79F2C1B910CAD061F6681/key/ck2/file/file.mp4]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"1280\" height=\"720\" type=\"video/webm\" bitrate=\"245\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/45/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fwebm/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/A69051380724BB05C63CBADEABE87930D903A060.5268C540E0881255FB9B1E8B06D6334D9C8FFA15/key/ck2/file/file.webm]]>\n" +
+                "                            </MediaFile>\n" +
+                "                            <MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"854\" height=\"480\" type=\"video/webm\" bitrate=\"139\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "                                <![CDATA[https://redirector.gvt1.com/videoplayback/id/b96674ee53e47835/itag/44/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fwebm/ctier/L/ip/0.0.0.0/ipbits/0/expire/1576593110/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/44ABC7593CA293C15FC6B1B609F95BAC49C1293D.9735E1E8043D00DD236FB2AEBF0686FC6E591885/key/ck2/file/file.webm]]>\n" +
+                "                            </MediaFile>\n" +
+                "                        </MediaFiles>\n" +
+                "                    </Linear>\n" +
+                "                </Creative>\n" +
+                "                <Creative id=\"57857370976\" sequence=\"1\">\n" +
+                "                    <CompanionAds>\n" +
+                "                        <Companion id=\"57857370976\" width=\"300\" height=\"250\">\n" +
+                "                            <StaticResource creativeType=\"image/png\">\n" +
+                "                                <![CDATA[https://pagead2.googlesyndication.com/pagead/imgad?id=CICAgKDTwILFiwEQrAIY-gEyCAAnmA4d6uc2]]>\n" +
+                "                            </StaticResource>\n" +
+                "                            <TrackingEvents>\n" +
+                "                                <Tracking event=\"creativeView\">\n" +
+                "                                    <![CDATA[https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjsu4t45zNGfTQ06CDdiMzq_mcWro7Zdd7ypWcTFkFQDuuOQEj-HujgeZUXPEIJ7MplCd0M1fON1_sVKUBdmIQbAFCFIYbFbOjhxoBArrI3bUPnmOWqAXN8FeyABK_cK7OUS9UDtH0dH15Uo-bazAynoCqFYLWIlX2Zogydj70J9Ct7e37UFIYEMCvLoKKJX9vFr3xOOjVagqQuF4gazu364ygyPlwi4u4BQz8yvhjnbagVo65qjZRTWiuIJkq2FNiHrw7g&sig=Cg0ArKJSzM1nydF7FthbEAE&adurl=]]>\n" +
+                "                                </Tracking>\n" +
+                "                            </TrackingEvents>\n" +
+                "                            <CompanionClickThrough>\n" +
+                "                                <![CDATA[https://pubads.g.doubleclick.net/pcs/click?xai=AKAOjsvWFRuVRofvhzu2K9mtloqdcO2Z76J4Lz72yy_u-_ubft33SejmI7szO1diOL-WSyDsF7QSavCWgJKt2-2QnaL7RqZHWxnRkysUAacI0iNTQRt5rVatQYadnJ9rm75ADKmjI7RPhhkTANwajN6Ca_UnrUydp_QLhMNAwj2c9kie1CMkcTaD4nnccEQuoGHOax_r_CPU8Sgx166SLRn_2TXDk2B1odmHAcsxFzsp4FJ5nog03uxg0O5ESAU_CnY&sig=Cg0ArKJSzDaG_Mg6T5ca&adurl=https://developers.google.com/interactive-media-ads/docs/vastinspector_dual]]>\n" +
+                "                            </CompanionClickThrough>\n" +
+                "                        </Companion>\n" +
+                "                    </CompanionAds>\n" +
+                "                </Creative>\n" +
+                "            </Creatives>\n" +
+                "            <Extensions>\n" +
+                "                <Extension type=\"waterfall\" fallback_index=\"0\"/>\n" +
+                "                <Extension type=\"geo\">\n" +
+                "                    <Country>IL</Country>\n" +
+                "                    <Bandwidth>4</Bandwidth>\n" +
+                "                    <BandwidthKbps>20000</BandwidthKbps>\n" +
+                "                </Extension>\n" +
+                "                <Extension type=\"activeview\">\n" +
+                "                    <CustomTracking>\n" +
+                "                        <Tracking event=\"viewable_impression\">\n" +
+                "                            <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=viewable_impression&acvw=[VIEWABILITY]&gv=[GOOGLE_VIEWABILITY]&ad_mt=[AD_MT]]]>\n" +
+                "                        </Tracking>\n" +
+                "                        <Tracking event=\"abandon\">\n" +
+                "                            <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=video_abandon&acvw=[VIEWABILITY]&gv=[GOOGLE_VIEWABILITY]]]>\n" +
+                "                        </Tracking>\n" +
+                "                    </CustomTracking>\n" +
+                "                    <ActiveViewMetadata>\n" +
+                "                        <![CDATA[la=1&alp=xai&alh=2089752336&]]>\n" +
+                "                    </ActiveViewMetadata>\n" +
+                "                </Extension>\n" +
+                "                <Extension type=\"DFP\">\n" +
+                "                    <SkippableAdType>Generic</SkippableAdType>\n" +
+                "                </Extension>\n" +
+                "                <Extension type=\"metrics\">\n" +
+                "                    <FeEventId>dpL4XfqHA4nV3gOyt5moDw</FeEventId>\n" +
+                "                    <AdEventId>CJvLx8aivOYCFVGWdwodM4wJig</AdEventId>\n" +
+                "                </Extension>\n" +
+                "                <Extension type=\"ShowAdTracking\">\n" +
+                "                    <CustomTracking>\n" +
+                "                        <Tracking event=\"show_ad\">\n" +
+                "                            <![CDATA[https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjsuMDugqzaXeMHc5duHjTQTFZd_2h7D5m4MC5GvwNKYMmJjOkfp3zT6eTAAJ9TU383ZdaRKIluMaptIot2SeFL2moXcRpRCmh1PRrd6VPWswW2G70cRCPWblTBOeKELi7-NT3RJOHGge6yRow5LCbM3iYK8lFXgzRYAO4xN_Q2nUjZzwSFOn7lwjzQEKMbR8OobgBq1SwXVZFK60oi4F4G-94Y1muVUkgnpBLn49Zz3-eYUIxKiE7IgMDS5RuRuVCOgJui2n&sig=Cg0ArKJSzCI1ib-MTkMyEAE&adurl=]]>\n" +
+                "                        </Tracking>\n" +
+                "                    </CustomTracking>\n" +
+                "                </Extension>\n" +
+                "                <Extension type=\"video_ad_loaded\">\n" +
+                "                    <CustomTracking>\n" +
+                "                        <Tracking event=\"loaded\">\n" +
+                "                            <![CDATA[https://pubads.g.doubleclick.net/pagead/conversion/?ai=BiAmtdpL4XZu4A9Gs3gOzmKbQCJDVj-sGAAAAEAEgqN27JjgAWLCUgsbXAWD5qvSDnBC6AQo3Mjh4OTBfeG1syAEFwAIC4AIA6gIlLzEyNDMxOTA5Ni9leHRlcm5hbC9zaW5nbGVfYWRfc2FtcGxlc_gChNIegAMBkAPIBpgD8AGoAwHgBAHSBQYQ8N65zAKQBgGgBiOoB-zVG6gH89Eb2AcB4AcL0ggHCIBhEAEYHQ&sigh=0Yw_KrP8i6U&label=video_ad_loaded]]>\n" +
+                "                        </Tracking>\n" +
+                "                    </CustomTracking>\n" +
+                "                </Extension>\n" +
+                "            </Extensions>\n" +
+                "        </InLine>\n" +
+                "    </Ad>\n" +
+                "</VAST>\n").setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
+    }
+
+    private IMAConfig getAdsConfigResponsePostroll(String adResponse) {
+        List<String> videoMimeTypes = new ArrayList<>();
+        videoMimeTypes.add("video/mp4");
+        videoMimeTypes.add("application/x-mpegURL");
+        // videoMimeTypes.add("application/dash+xml");
+        return new IMAConfig().setAdTagResponse("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<VAST xsi:noNamespaceSchemaLocation=\"vast.xsd\" version=\"3.0\">\n" +
+                "<Ad id=\"709684216\">\n" +
+                "<InLine>\n" +
+                "<AdSystem>GDFP</AdSystem>\n" +
+                "<AdTitle>External NCA1C1L1 Postroll</AdTitle>\n" +
+                "<Description>External NCA1C1L1 Postroll ad</Description>\n" +
+                "<Error>\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=videoplayfailed[ERRORCODE]\n" +
+                "</Error>\n" +
+                "<Impression>\n" +
+                "https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjsslNcw-Y9YMikSWb18WnWQvH0ElPPzwVh8KuWcZsazWq9BNs7ad8ybbo3Yy_Oa3HWc6Y0xeeX5a5hqj0q9yXC9EAC7lggvao68skB2Je1knMzve5h5yd0uQbF1GHEmQX2K4xLl4NBwYjmAlkr7iD0OZ6IBWXwXVWr-CZrO9CbuLT8nAd1pIwToGZ7Z91KYanGlo8pKN13qHWnZ6MGezybENHd7MC4kS5l-vzLt8NCe0nilmyT4U75ZUVq5y5yLuH1kDgGBtn99RS3BJnMo5EIfVeSsqWF8PHA&sig=Cg0ArKJSzF6M_qkMH93mEAE&adurl=\n" +
+                "</Impression>\n" +
+                "<Creatives>\n" +
+                "<Creative id=\"57861174496\" sequence=\"1\">\n" +
+                "<Linear>\n" +
+                "<Duration>00:00:10</Duration>\n" +
+                "<TrackingEvents>\n" +
+                "<Tracking event=\"start\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=part2viewed&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"firstQuartile\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=videoplaytime25&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"midpoint\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=videoplaytime50&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"thirdQuartile\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=videoplaytime75&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"complete\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=videoplaytime100&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"mute\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=admute&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"unmute\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=adunmute&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"rewind\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=adrewind&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"pause\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=adpause&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"resume\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=adresume&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"creativeView\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=vast_creativeview&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"fullscreen\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=adfullscreen&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"acceptInvitationLinear\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=acceptinvitation&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"closeLinear\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=adclose&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "<Tracking event=\"exitFullscreen\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=vast_exit_fullscreen&ad_mt=[AD_MT]\n" +
+                "</Tracking>\n" +
+                "</TrackingEvents>\n" +
+                "<VideoClicks>\n" +
+                "<ClickThrough id=\"GDFP\">\n" +
+                "https://pubads.g.doubleclick.net/pcs/click?xai=AKAOjsvDku9AJUH7OGQljwqIRjCBkobvEMsrensd_qs8KgvGNmlffZxWKyxYE9XSMeDiXFVHV4sox977zoYMkhknrYt3CqAKUM9sayMjdQMMcTseobpbbhvgKPql1OZyjbrNFZhK6Y2P31B1rAEFrYLlpSj5o3hVt8ZK30HxlSPeWfh1_GtZed-IvimaI5gyQY97MWi3XrukHnIc69_-6d9OiFmWUFWberQmsr-zC6kCQcnpOkwNYjZRkeHS9Hp2wRg5QuFXWjdzICgUZdQPXtuCVJBlO4El5g&sig=Cg0ArKJSzB4SJveznxbH&adurl=https://developers.google.com/interactive-media-ads/docs/vastinspector_dual\n" +
+                "</ClickThrough>\n" +
+                "</VideoClicks>\n" +
+                "<MediaFiles>\n" +
+                "<MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"1280\" height=\"720\" type=\"video/mp4\" bitrate=\"423\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "https://redirector.gvt1.com/videoplayback/id/f4890b9f60d85691/itag/15/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fmp4/ctier/L/ip/0.0.0.0/ipbits/0/expire/1593517782/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/243EA6146036AD334C769D972802967BFEE6B497.70B0739DE7316E24F23D307E87BC55332DF38DB5/key/ck2/file/file.mp4\n" +
+                "</MediaFile>\n" +
+                "<MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"1280\" height=\"720\" type=\"video/mp4\" bitrate=\"236\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "https://redirector.gvt1.com/videoplayback/id/f4890b9f60d85691/itag/22/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fmp4/ctier/L/ip/0.0.0.0/ipbits/0/expire/1593517782/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/18B40810C8DE5920F18F4285E28B08B73C77F27B.B31791D926500ADD9665D2CDA3A608C0E229C772/key/ck2/file/file.mp4\n" +
+                "</MediaFile>\n" +
+                "<MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"854\" height=\"480\" type=\"video/webm\" bitrate=\"128\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "https://redirector.gvt1.com/videoplayback/id/f4890b9f60d85691/itag/44/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fwebm/ctier/L/ip/0.0.0.0/ipbits/0/expire/1593517782/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/AE10F7D5983E57A55BA10D218D1DABEF8CE34724.9D06C6675ADFABEF1ED23E4E6C70974E76DC09AE/key/ck2/file/file.webm\n" +
+                "</MediaFile>\n" +
+                "<MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"1280\" height=\"720\" type=\"video/webm\" bitrate=\"221\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "https://redirector.gvt1.com/videoplayback/id/f4890b9f60d85691/itag/45/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fwebm/ctier/L/ip/0.0.0.0/ipbits/0/expire/1593517782/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/6B576F1F13257D4BF1E798540C18020B55529B87.7C13814CD22E7CF20B24B31DD0E0E1320F392D03/key/ck2/file/file.webm\n" +
+                "</MediaFile>\n" +
+                "<MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"176\" height=\"144\" type=\"video/3gpp\" bitrate=\"34\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "https://redirector.gvt1.com/videoplayback/id/f4890b9f60d85691/itag/17/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2F3gpp/ctier/L/ip/0.0.0.0/ipbits/0/expire/1593517782/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/40A7A186F1D47598025154C197DA7551FA4A54F0.66E2DEE429DC0FA5F77BBFA1D8D41644EB03F9E9/key/ck2/file/file.3gp\n" +
+                "</MediaFile>\n" +
+                "<MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"320\" height=\"180\" type=\"video/3gpp\" bitrate=\"65\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "https://redirector.gvt1.com/videoplayback/id/f4890b9f60d85691/itag/36/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2F3gpp/ctier/L/ip/0.0.0.0/ipbits/0/expire/1593517782/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/BAC411C8C9FE72B93983D9E93379BCB602743E12.9DB7AE35723EEBA093697B3B1C44ED492263854D/key/ck2/file/file.3gp\n" +
+                "</MediaFile>\n" +
+                "<MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"640\" height=\"360\" type=\"video/webm\" bitrate=\"117\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "https://redirector.gvt1.com/videoplayback/id/f4890b9f60d85691/itag/43/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fwebm/ctier/L/ip/0.0.0.0/ipbits/0/expire/1593517782/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/4314C8054E0A9CCC12C65F24D2BEC4768020899A.AC8D24C74C74CEAB27D77CEB053EE101F0AB4864/key/ck2/file/file.webm\n" +
+                "</MediaFile>\n" +
+                "<MediaFile id=\"GDFP\" delivery=\"progressive\" width=\"640\" height=\"360\" type=\"video/mp4\" bitrate=\"116\" scalable=\"true\" maintainAspectRatio=\"true\">\n" +
+                "https://redirector.gvt1.com/videoplayback/id/f4890b9f60d85691/itag/18/source/gfp_video_ads/requiressl/yes/acao/yes/mime/video%2Fmp4/ctier/L/ip/0.0.0.0/ipbits/0/expire/1593517782/sparams/ip,ipbits,expire,id,itag,source,requiressl,acao,mime,ctier/signature/601A0B3A24601B2601A5F0DD6A9AEA7A5838108E.62A8FBC619896BCF61C07A3B36A554E8EC410616/key/ck2/file/file.mp4\n" +
+                "</MediaFile>\n" +
+                "</MediaFiles>\n" +
+                "</Linear>\n" +
+                "</Creative>\n" +
+                "<Creative id=\"57857370976\" sequence=\"1\">\n" +
+                "<CompanionAds>\n" +
+                "<Companion id=\"57857370976\" width=\"300\" height=\"250\">\n" +
+                "<StaticResource creativeType=\"image/png\">\n" +
+                "https://pagead2.googlesyndication.com/simgad/14568666361913360151\n" +
+                "</StaticResource>\n" +
+                "<TrackingEvents>\n" +
+                "<Tracking event=\"creativeView\">\n" +
+                "https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjsvR4meVkrv2h42e1idfgGoLplpNhePB6jU0dM6I9QaF-xatnhPLWJjhh1zETgIntDWvtSI4KSZg_mFZjjv-6AR9aiVl9FavXJj-RUinh465g4qXzI5vILoED-cUxFQKZ6iCjUyXcrrYFIM7pZjdmZhVU0fs2DcxKhi_bbr_jEZP3_MaPYfcFgsdhcpjEnCetq5QbDRk4M6TjjCk5wF1vTGvT1-m-F_wRes2ndlrqrsggYkBhQQlWr9yR2dKrpTs9IOy7GRZmLo2j_g9-UJeRYSyGiRxg1y0Ig&sig=Cg0ArKJSzDmvqIYMm3xqEAE&adurl=\n" +
+                "</Tracking>\n" +
+                "</TrackingEvents>\n" +
+                "<CompanionClickThrough>\n" +
+                "https://pubads.g.doubleclick.net/pcs/click?xai=AKAOjsuO3RUAKpq6wKfGV_TR4H2B-lrj0xfxzt8fZCiseUjLwmgv_gRutwaccnXsbmDM9cS6QQdFj-GbLBh2mebHSccfwlA7623zCJLwmG4U-IedGB1TfmjiKOZtBgd3fOFO1DBBX19Y8KHwNFYyoyxoGJWB7E6gcZy8gnVBFE3Gjn6YRHjjllTsjExPCTpEM_PEePAsCoDB6Vplf-QaO0Vml2aMDAoIwNYTW63dOTOhu3ANtLet7axOavRnfv2luZmaYxcKZlfsLuBGTvyja5xLs6cl4mZB0Q&sig=Cg0ArKJSzJl4jNMFgxGz&adurl=https://developers.google.com/interactive-media-ads/docs/vastinspector_dual\n" +
+                "</CompanionClickThrough>\n" +
+                "</Companion>\n" +
+                "</CompanionAds>\n" +
+                "</Creative>\n" +
+                "</Creatives>\n" +
+                "<Extensions>\n" +
+                "<Extension type=\"waterfall\" fallback_index=\"0\"/>\n" +
+                "<Extension type=\"geo\">\n" +
+                "<Country>IN</Country>\n" +
+                "<Bandwidth>3</Bandwidth>\n" +
+                "<BandwidthKbps>2660</BandwidthKbps>\n" +
+                "</Extension>\n" +
+                "<Extension type=\"metrics\">\n" +
+                "<FeEventId>dtL6XoTZEsukwgO814PYAQ</FeEventId>\n" +
+                "<AdEventId>CJzJl-_rqOoCFRLQjwod55ABkg</AdEventId>\n" +
+                "</Extension>\n" +
+                "<Extension type=\"ShowAdTracking\">\n" +
+                "<CustomTracking>\n" +
+                "<Tracking event=\"show_ad\">\n" +
+                "https://securepubads.g.doubleclick.net/pcs/view?xai=AKAOjst5fFJdPCT18pWAjs1yY0WSZN3x1-WAyAV3o0AGHTc7o3Fx2zS6OLDqwmvLgsP_FM4N5acRkLHNG9JrwOToAYWXsydud9C9Ga1r7yVy8YxyefGePsO9HrmWY3WpZDhwnIqNz5w4EEQdc94lIC7OAGhagI-QWnwYBP3WOZ9fnQpB09lcjA_vofKgn77v6Ahaf5HJk8tx4dByCgkEMgRP7jhxap-LENOMk4GuKT8XIPOIbDjOXgld7QeRo5evnO0pNO6pH0ylJA3mGEWmI4dReKzfGTccGSYyucqR&sig=Cg0ArKJSzOH3HNxuBUDMEAE&adurl=\n" +
+                "</Tracking>\n" +
+                "</CustomTracking>\n" +
+                "</Extension>\n" +
+                "<Extension type=\"video_ad_loaded\">\n" +
+                "<CustomTracking>\n" +
+                "<Tracking event=\"loaded\">\n" +
+                "https://pubads.g.doubleclick.net/pagead/conversion/?ai=BtyJFdtL6Xpy2E5KgvwTnoYaQCcCxj-sGAAAAEAEgqN27JjgAWODprcbXAWDlyuWDtA6yARVkZXZlbG9wZXJzLmdvb2dsZS5jb226AQo3Mjh4OTBfeG1syAEF2gFUaHR0cHM6Ly9kZXZlbG9wZXJzLmdvb2dsZS5jb20vaW50ZXJhY3RpdmUtbWVkaWEtYWRzL2RvY3Mvc2Rrcy9odG1sNS9jbGllbnQtc2lkZS90YWdzwAIC4AIA6gIjLzEyNDMxOTA5Ni9leHRlcm5hbC9hZF9ydWxlX3NhbXBsZXP4AvLRHoADAZADmgiYA6wCqAMB4AQB0gUGEPjXs9ICkAYBoAYjqAfs1RuoB_PRG6gHltgbqAfC2hvYBwHgBwvSCAcIgGEQARgdmAsB&sigh=doJoJqTltPI&label=video_ad_loaded\n" +
+                "</Tracking>\n" +
+                "</CustomTracking>\n" +
+                "</Extension>\n" +
+                "</Extensions>\n" +
+                "</InLine>\n" +
+                "</Ad>\n" +
+                "</VAST>").setVideoMimeTypes(videoMimeTypes).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
     }
 
     //IMA DAI CONFIG
     private void addIMADAIPluginConfig(PKPluginConfigs config, int daiType) {
         switch (daiType) {
             case 1: {
-                promptMessage(DAI_PLUGIN, getDAIConfig1().getAssetTitle());
-                IMADAIConfig adsConfig = getDAIConfig1();
+                promptMessage(DAI_PLUGIN, getDAIConfig5_1().getAssetTitle());
+                IMADAIConfig adsConfig = getDAIConfig5_1();
                 config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig);
             }
             break;
@@ -772,6 +1354,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 IMADAIConfig adsConfigError = getDAIConfig6();
                 config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
             }
+            case 7: {
+                promptMessage(DAI_PLUGIN, getDAIConfig6().getAssetTitle());
+                IMADAIConfig adsConfigError = getDAIConfig7();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
+            }
+            case 8: {
+                promptMessage(DAI_PLUGIN, getDAIConfig6().getAssetTitle());
+                IMADAIConfig adsConfigError = getDAIConfig8();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
+            }
+            case 9: {
+                promptMessage(DAI_PLUGIN, getDAIConfig6().getAssetTitle());
+                IMADAIConfig adsConfigError = getDAIConfig9();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
+            }
+            case 10: {
+                promptMessage(DAI_PLUGIN, getDAIConfig6().getAssetTitle());
+                IMADAIConfig adsConfigError = getDAIConfig10();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
+            }
             break;
             default:
                 break;
@@ -780,6 +1382,58 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void promptMessage(String type, String title) {
         Toast.makeText(this, type + " " + title, Toast.LENGTH_SHORT).show();
+    }
+
+    private IMADAIConfig getDAIConfig7() {
+        String assetTitle = "DD Rajasthan";
+        String assetKey = "Hs8aTJFeSCq7kWEvQiSGVg";
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getLiveIMADAIConfig(assetTitle,
+                assetKey,
+                apiKey,
+                streamFormat,
+                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfig8() {
+        String assetTitle = "DD MP";
+        String assetKey = "zbV5Tfp0TJaHDssgBrFWOA";
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getLiveIMADAIConfig(assetTitle,
+                assetKey,
+                apiKey,
+                streamFormat,
+                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfig9() {
+        String assetTitle = "DD National";
+        String assetKey = "rJNQu3LRR2q6_izClfioA";
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getLiveIMADAIConfig(assetTitle,
+                assetKey,
+                apiKey,
+                streamFormat,
+                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfig10() {
+        String assetTitle = "Zee News";
+        String assetKey = "W1x4XiDkR5yE7K9amJwTDg";
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getLiveIMADAIConfig(assetTitle,
+                assetKey,
+                apiKey,
+                streamFormat,
+                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
     }
 
     private IMADAIConfig getDAIConfig6() {
@@ -940,6 +1594,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             log.d("playbackInfoUpdated  = " + event.width + "/" + event.height + "/" + event.bitrate);
         });
 
+        player.addListener(this, AdEvent.adProgress, event -> {
+            // log.d("AD_PROGRESS " + event.currentAdPosition);
+        });
+
         player.addListener(this, AdEvent.cuepointsChanged, event -> {
             adCuePoints = event.cuePoints;
 
@@ -950,6 +1608,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         player.addListener(this, AdEvent.adBufferStart, event -> {
             log.d("AD_BUFFER_START pos = " + event.adPosition);
+            appProgressBar.setVisibility(View.VISIBLE);
+        });
+
+        player.addListener(this, AdEvent.error, event -> {
+            log.d("AdEvent.error = " + event.error.errorType.name());
+//            log.d("AdEvent.category = " + event.error.errorCategory.name());
             appProgressBar.setVisibility(View.VISIBLE);
         });
 
@@ -990,11 +1654,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, AdEvent.error, event -> {
             if (event != null && event.error != null) {
                 controlsView.setSeekBarStateForAd(false);
-                String cause = (event.error.exception != null && event.error.exception.getCause() != null) ? event.error.exception.getCause().getMessage() : "";
-                log.d("PlayerEvent.Error event  position = " + event.error.errorType + " errorMessage = " + event.error.message + " " + cause);
-                if (event.error.severity == PKError.Severity.Fatal) {
-                    appProgressBar.setVisibility(View.INVISIBLE);
-                }
+                log.e("ERROR: " + event.error.errorType + ", " + event.error.message);
             }
         });
 
@@ -1007,6 +1667,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             log.d("resizeMode updated" + event.resizeMode);
         });
 
+        player.addListener(this, PlayerEvent.volumeChanged, event -> {
+            log.d("volume == " + event.volume);
+        });
+
+        player.addListener(this, PlayerEvent.durationChanged, event -> {
+            log.d("durationChanged == " + event.duration);
+        });
 
         /////// PLAYER EVENTS
 
@@ -1026,10 +1693,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             nowPlaying = false;
         });
 
-        player.addListener(this, PlayerEvent.volumeChanged, event -> {
-            log.d("volumeChanged " + event.volume);
+        player.addListener(this, PlayerEvent.Type.PLAYHEAD_UPDATED, event -> {
+            //   log.d("playheadUpdated play position " + event.eventType().toString());
         });
 
+        player.addListener(this, PlayerEvent.videoTrackChanged, event -> {
+            log.d("videoTrackChanged " + event.newTrack.getBitrate());
+        });
 
         player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
             log.d("playbackRateChanged event  rate = " + event.rate);
@@ -1038,35 +1708,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, PlayerEvent.tracksAvailable, event -> {
             //When the track data available, this event occurs. It brings the info object with it.
             tracksInfo = event.tracksInfo;
-            if (player != null) {
-                if (!tracksInfo.getVideoTracks().isEmpty()) {
-                    player.changeTrack(tracksInfo.getVideoTracks().get(0).getUniqueId());
-                }
-            }
             populateSpinnersWithTrackInfo(event.tracksInfo);
         });
 
-        player.addListener(this, PlayerEvent.videoTrackChanged, event -> {
-            //When the track data available, this event occurs. It brings the info object with it.
-            VideoTrack track = event.newTrack;
-            log.d("videoTrackChanged getBitrate= " + track.getBitrate());
-        });
-
-        player.addListener(this, PlayerEvent.textTrackChanged, event -> {
-            //When the track data available, this event occurs. It brings the info object with it.
-            TextTrack track = event.newTrack;
-            log.d("textTrackChanged " + track.getLanguage() +  "-"  + track.getLabel());
-        });
-
-        player.addListener(this, PlayerEvent.audioTrackChanged, event -> {
-            //When the track data available, this event occurs. It brings the info object with it.
-            AudioTrack track = event.newTrack;
-            log.d("audioTrackChanged " + track.getLanguage() +  "-"  + track.getLabel());
-        });
-
-
         player.addListener(this, PlayerEvent.sourceSelected, event -> {
-            log.d("sourceSelected event source = " + event.source);
+            log.d("sourceSelected event source = " + event.source.getUrl());
+            tvSourceUrl.setText(event.source.getUrl());
         });
 
         player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
@@ -1147,6 +1794,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (controlsView != null) {
             controlsView.resume();
         }
+    }
+
+    private void setExternalSubtitles(PKMediaEntry mediaEntry) {
+
+        List<PKExternalSubtitle> subsList = new ArrayList<>();
+
+        PKExternalSubtitle pkExternalSubtitle = new PKExternalSubtitle()
+                .setUrl("https://zee5vod.akamaized.net/drm1/1080p/movies/MOVIE_PROJECT/KANNADA/19122018/TIGER_MOVIE_kn.mp4/thumbnails/index.vtt")
+                .setMimeType(PKSubtitleFormat.vtt)
+                .setLabel("Zee-1")
+                .setLanguage("deu");
+        subsList.add(pkExternalSubtitle);
+
+        PKExternalSubtitle pkExternalSubtitleDe = new PKExternalSubtitle()
+                .setUrl("https://zee5vod.akamaized.net/drm1/elemental/dash/Movies/TIGER_Revised_20112018_Hindi_Movie_REX_hi_292ea10f271d2643bfe36430772992a4/thumbnails/index.vtt")
+                .setMimeType(PKSubtitleFormat.vtt)
+                .setLabel("Zee-2")
+                .setLanguage("eng")
+                .setDefault();
+        subsList.add(pkExternalSubtitleDe);
+
+        mediaEntry.setExternalSubtitleList(subsList);
     }
 
     @Override
@@ -1319,6 +1988,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     public void onOrientationChange(OrientationManager.ScreenOrientation screenOrientation) {
         switch(screenOrientation){
@@ -1463,6 +2133,362 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             return null;
         }
     }
+
+
+    /*private void startVootOttMediaLoadingProd(final OnMediaLoadCompletion completion, String mediaId) {
+
+        log.i("mediaID:= " + mediaId);
+
+        SessionProvider ksSessionProvider = new SessionProvider() {
+            @Override
+            public String baseUrl() {
+                String PhoenixBaseUrl = "https://rest-sgs1.ott.kaltura.com/restful_V5_0/api_v3/";//"https://rest-sgs1.ott.kaltura.com/v4_4/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
+                return PhoenixBaseUrl;
+            }
+
+            @Override
+            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                // Anonymous KS
+                // String PnxKS = "djJ8MjI1fHn4Cw4QmXr7PQthpXSlbprIrYuEpQvGjLJalUJ92dtMr__2yaBWlue36tfYuIIlcPSQdxbAQWM6i4tjwCrVx-hL8DkcpiS7dJj7jp0SYpyXrgHtpMCQyiJaOgSUGhlT2pwgOJfseFbuxOfzdbXzAIU=";
+                // Login without UDID
+                // String PnxKS = "djJ8MjI1fN-nTOp-3LkYCTaQgL11VAhRxe3N2wGXeevoyCOEVfY6CapnQFyI4M623ouxbYfaNGynur-MqJF5K9s4R84hQaMRcLbPOdsA629HMJJP-pjfEWPkzJ7M5vv4QyV14SD_vlaK6KB2lmYIi1iMS4Iu65A=";
+                // Login with UDID but household is not added
+                //  String PnxKS = "djJ8MjI1fLKcf44eXSWVdrzzV4Q4EZ8b_A107ZNSRfu7zTrL5d6YJI_58kQv7yIvRxkXhqTeiRCIJFRLAqb3nZ6xLo0Xr-evpADcWbMLdXkplx7LADiZ7ZsR8_EcSKZ8QbRF-A8DcIF3GKxMtVMosW29nHMn9zGvF0j30nwLNNL9PUwMykcWle-68FOMDaPU9sVEEvLTmA==";
+                // Now household added but subscription not purchased yet
+                //  String PnxKS = "djJ8MjI1fMiDyURBbrmn1-0miHqpxZBU0Juvjy-jtSvmMQqVe2WqZK8mNPi98x8ma5zPORbPV1mL5v25mA6NNjejDERAsChUNLzqejRgvZarK-elL8VfYUy1EHx0E-cdJ36WMNFfYJS1dcmi2kxjGwY4jiYJDmlgUPx0EiKn6_PiLsyHZdg4vW7Ne4w0T_78_iiBDtm40g==";
+                // Subsription purchased
+
+
+
+              //   String PnxKS = "djJ8MjI1fNRrd0CRif0eHdiJqKSmkadrMYj70ry0-9J_1oixwxK2fxm2mvjFpV2pV4rNFf8dRMKijfILmld5q8mpVcGjfhbJx-03greh4EVr0O2LujTT_Ysce9WbSi2i7vl_1X6bztD938a6BZ9hF92WwI-VUIpVDoVEPP4n0VXc3M61i2fc";
+
+                String ks = "djJ8MjI1fJqYQoKdrm0lWI2qygW7jk4EYCjgnBhqzHQ4PVBsRTNQ0D1s7FcYMH4xikLtWCX95Vcc4Uw0MUgMlabou_0cMpXF3DbCGce-5CU635jnqhD8zZqQ5kGeuCj3ylu1m45VYTVrIfB3p3IGX47OMshGbBnY0gLVuSM7F2IPAMeW6pxoTXdRMdp4Ois-SGtfkca2XQ==";
+                if (completion != null) {
+                    completion.onComplete(new PrimitiveResult(ks));
+                }
+            }
+
+            @Override
+            public int partnerId() {
+                int OttPartnerId = 225;
+                return OttPartnerId;
+            }
+        };
+
+        //  SimpleSessionProvider ksSessionProvider = new SimpleSessionProvider("https://rest-as.ott.kaltura.com/v4_4/api_v3", 255, null);
+
+        String mediaIdPhoenix = "331593";
+        //String formatHls = fileType % 2 == 0 ? "Tablet Main" : "dash Main";
+        String formatHls = "dash Mobile";
+        //audio
+        // String mediaId = "743297";
+        // String formatHls  = "audio_only";
+        //  String formatDash  = "dash Main";
+        //                "Format": "dash Mobile",
+//                "Format": "ism Main",
+//                "Format": "Tablet Main",
+//                "Format": "dash Main",
+//                "Format": "widevine_sbr Download High",
+//                "Format": "widevine_mbr Main",
+//                "Format": "TV Main",
+//                "Format": "Web New",
+//                "Format": "360_Main",
+//                "Format": "HLS_Mobile_SD",
+//                "Format": "HLS_Mobile_HD",
+//                "Format": "HLSFPS_Mobile_SD",
+//                "Format": "HLSFPS_Mobile_HD",
+//                "Format": "HLS_Web_SD",
+//                "Format": "HLS_Web_HD",
+//                "Format": "HLS_360_SD",
+//                "Format": "HLS_360_HD",
+//                "Format": "HLS_TV_SD",
+//                "Format": "HLS_TV_HD",
+//                "Format": "HLSFPS_Main",
+//                "Format": "HLSFPS_Main",
+//                "Format": "WVC_Low",
+//                "Format": "WVC_Auto",
+//                "Format": "DASH_Mobile_SD",
+//                "Format": "DASH_Mobile_HD",
+//                "Format": "WVC_High",
+//                "Format": "JIO_MAIN",
+//                "Format": "SBR256",
+//                "Format": "HLS_Linear_P",
+//                "Format": "HLS_Linear_B",
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaIdPhoenix)
+                //.setReferrer()
+                .setFileIds()
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                //  .setPKUrlType(APIDefines.PKUrlType.PlayManifest)
+                .setFormats(formatHls);
+        //.setFormats(formatDash);
+
+        mediaProvider.load(completion);
+        fileType++;
+        if (fileType > 10) {
+            fileType = 0;
+        }
+    }*/
+
+    private void startVootOttMediaLoadingStaging(final OnMediaLoadCompletion completion, String mediaId) {
+
+        log.i("mediaID:= " + mediaId);
+
+        SessionProvider ksSessionProvider = new SessionProvider() {
+            @Override
+            public String baseUrl() {
+                String PhoenixBaseUrl = "https://rest-sgs1.ott.kaltura.com/restful_v5_3_5/api_v3/"; //"https://rest-sgs1.ott.kaltura.com/restful_v5_3_5/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
+                return PhoenixBaseUrl;
+            }
+
+            @Override
+            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                // Anonymous KS
+                // String PnxKS = "djJ8MjI1fHn4Cw4QmXr7PQthpXSlbprIrYuEpQvGjLJalUJ92dtMr__2yaBWlue36tfYuIIlcPSQdxbAQWM6i4tjwCrVx-hL8DkcpiS7dJj7jp0SYpyXrgHtpMCQyiJaOgSUGhlT2pwgOJfseFbuxOfzdbXzAIU=";
+                // Login without UDID
+                // String PnxKS = "djJ8MjI1fN-nTOp-3LkYCTaQgL11VAhRxe3N2wGXeevoyCOEVfY6CapnQFyI4M623ouxbYfaNGynur-MqJF5K9s4R84hQaMRcLbPOdsA629HMJJP-pjfEWPkzJ7M5vv4QyV14SD_vlaK6KB2lmYIi1iMS4Iu65A=";
+                // Login with UDID but household is not added
+                //  String PnxKS = "djJ8MjI1fLKcf44eXSWVdrzzV4Q4EZ8b_A107ZNSRfu7zTrL5d6YJI_58kQv7yIvRxkXhqTeiRCIJFRLAqb3nZ6xLo0Xr-evpADcWbMLdXkplx7LADiZ7ZsR8_EcSKZ8QbRF-A8DcIF3GKxMtVMosW29nHMn9zGvF0j30nwLNNL9PUwMykcWle-68FOMDaPU9sVEEvLTmA==";
+                // Now household added but subscription not purchased yet
+                //  String PnxKS = "djJ8MjI1fMiDyURBbrmn1-0miHqpxZBU0Juvjy-jtSvmMQqVe2WqZK8mNPi98x8ma5zPORbPV1mL5v25mA6NNjejDERAsChUNLzqejRgvZarK-elL8VfYUy1EHx0E-cdJ36WMNFfYJS1dcmi2kxjGwY4jiYJDmlgUPx0EiKn6_PiLsyHZdg4vW7Ne4w0T_78_iiBDtm40g==";
+                // Subsription purchased
+
+
+
+                //   String PnxKS = "djJ8MjI1fNRrd0CRif0eHdiJqKSmkadrMYj70ry0-9J_1oixwxK2fxm2mvjFpV2pV4rNFf8dRMKijfILmld5q8mpVcGjfhbJx-03greh4EVr0O2LujTT_Ysce9WbSi2i7vl_1X6bztD938a6BZ9hF92WwI-VUIpVDoVEPP4n0VXc3M61i2fc";
+
+                //  String ks = "djJ8MjI1fJqYQoKdrm0lWI2qygW7jk4EYCjgnBhqzHQ4PVBsRTNQ0D1s7FcYMH4xikLtWCX95Vcc4Uw0MUgMlabou_0cMpXF3DbCGce-5CU635jnqhD8zZqQ5kGeuCj3ylu1m45VYTVrIfB3p3IGX47OMshGbBnY0gLVuSM7F2IPAMeW6pxoTXdRMdp4Ois-SGtfkca2XQ==";
+                if (completion != null) {
+                    completion.onComplete(new PrimitiveResult(V18_STAGING_KS));
+                }
+            }
+
+            @Override
+            public int partnerId() {
+                int OttPartnerId = 225;
+                return OttPartnerId;
+            }
+        };
+
+        //  SimpleSessionProvider ksSessionProvider = new SimpleSessionProvider("https://rest-as.ott.kaltura.com/v4_4/api_v3", 255, null);
+
+        String mediaIdPhoenix = mediaId;
+        //String formatHls = fileType % 2 == 0 ? "Tablet Main" : "dash Main";
+        //  String formatHls = "dashclear";
+        //String formatHls = "DASHENC_TV_PremiumHD";
+        String formatHls = "DASHENC_TV_PremiumHD";
+        //String formatHls = "dash Main";
+        //audio
+        // String mediaId = "743297";
+        // String formatHls  = "audio_only";
+        //  String formatDash  = "dash Main";
+        //                "Format": "dash Mobile",
+//                "Format": "ism Main",
+//                "Format": "Tablet Main",
+//                "Format": "dash Main",
+//                "Format": "widevine_sbr Download High",
+//                "Format": "widevine_mbr Main",
+//                "Format": "TV Main",
+//                "Format": "Web New",
+//                "Format": "360_Main",
+//                "Format": "HLS_Mobile_SD",
+//                "Format": "HLS_Mobile_HD",
+//                "Format": "HLSFPS_Mobile_SD",
+//                "Format": "HLSFPS_Mobile_HD",
+//                "Format": "HLS_Web_SD",
+//                "Format": "HLS_Web_HD",
+//                "Format": "HLS_360_SD",
+//                "Format": "HLS_360_HD",
+//                "Format": "HLS_TV_SD",
+//                "Format": "HLS_TV_HD",
+//                "Format": "HLSFPS_Main",
+//                "Format": "HLSFPS_Main",
+//                "Format": "WVC_Low",
+//                "Format": "WVC_Auto",
+//                "Format": "DASH_Mobile_SD",
+//                "Format": "DASH_Mobile_HD",
+//                "Format": "WVC_High",
+//                "Format": "JIO_MAIN",
+//                "Format": "SBR256",
+//                "Format": "HLS_Linear_P",
+//                "Format": "HLS_Linear_B",
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaIdPhoenix)
+                //.setReferrer()
+                //    .setFileIds("10677547", "10677551")
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                //  .setPKUrlType(APIDefines.PKUrlType.PlayManifest)
+                .setFormats(formatHls);
+        //  .setFormats("dashclear", "DASHENC_PremiumHD");
+        //.setFormats(formatDash);
+
+        mediaProvider.load(completion);
+
+    }
+
+    private void startVootOttMediaLoadingProd(final OnMediaLoadCompletion completion, String mediaId) {
+
+        log.i("mediaID:= " + mediaId);
+
+        SessionProvider ksSessionProvider = new SessionProvider() {
+            @Override
+            public String baseUrl() {
+                String PhoenixBaseUrl = "https://rest-as.ott.kaltura.com/v4_4/api_v3/"; //"https://rest-sgs1.ott.kaltura.com/restful_v5_3_5/api_v3/";//"https://rest-as.ott.kaltura.com/v4_4/api_v3/";
+                return PhoenixBaseUrl;
+            }
+
+            @Override
+            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                // Anonymous KS
+                // String PnxKS = "djJ8MjI1fHn4Cw4QmXr7PQthpXSlbprIrYuEpQvGjLJalUJ92dtMr__2yaBWlue36tfYuIIlcPSQdxbAQWM6i4tjwCrVx-hL8DkcpiS7dJj7jp0SYpyXrgHtpMCQyiJaOgSUGhlT2pwgOJfseFbuxOfzdbXzAIU=";
+                // Login without UDID
+                // String PnxKS = "djJ8MjI1fN-nTOp-3LkYCTaQgL11VAhRxe3N2wGXeevoyCOEVfY6CapnQFyI4M623ouxbYfaNGynur-MqJF5K9s4R84hQaMRcLbPOdsA629HMJJP-pjfEWPkzJ7M5vv4QyV14SD_vlaK6KB2lmYIi1iMS4Iu65A=";
+                // Login with UDID but household is not added
+                //  String PnxKS = "djJ8MjI1fLKcf44eXSWVdrzzV4Q4EZ8b_A107ZNSRfu7zTrL5d6YJI_58kQv7yIvRxkXhqTeiRCIJFRLAqb3nZ6xLo0Xr-evpADcWbMLdXkplx7LADiZ7ZsR8_EcSKZ8QbRF-A8DcIF3GKxMtVMosW29nHMn9zGvF0j30nwLNNL9PUwMykcWle-68FOMDaPU9sVEEvLTmA==";
+                // Now household added but subscription not purchased yet
+                //  String PnxKS = "djJ8MjI1fMiDyURBbrmn1-0miHqpxZBU0Juvjy-jtSvmMQqVe2WqZK8mNPi98x8ma5zPORbPV1mL5v25mA6NNjejDERAsChUNLzqejRgvZarK-elL8VfYUy1EHx0E-cdJ36WMNFfYJS1dcmi2kxjGwY4jiYJDmlgUPx0EiKn6_PiLsyHZdg4vW7Ne4w0T_78_iiBDtm40g==";
+                // Subsription purchased
+
+
+
+                //   String PnxKS = "djJ8MjI1fNRrd0CRif0eHdiJqKSmkadrMYj70ry0-9J_1oixwxK2fxm2mvjFpV2pV4rNFf8dRMKijfILmld5q8mpVcGjfhbJx-03greh4EVr0O2LujTT_Ysce9WbSi2i7vl_1X6bztD938a6BZ9hF92WwI-VUIpVDoVEPP4n0VXc3M61i2fc";
+
+                //  String ks = "djJ8MjI1fJqYQoKdrm0lWI2qygW7jk4EYCjgnBhqzHQ4PVBsRTNQ0D1s7FcYMH4xikLtWCX95Vcc4Uw0MUgMlabou_0cMpXF3DbCGce-5CU635jnqhD8zZqQ5kGeuCj3ylu1m45VYTVrIfB3p3IGX47OMshGbBnY0gLVuSM7F2IPAMeW6pxoTXdRMdp4Ois-SGtfkca2XQ==";
+                if (completion != null) {
+                    completion.onComplete(new PrimitiveResult(V18_PROD_KS));
+                }
+            }
+
+            @Override
+            public int partnerId() {
+                int OttPartnerId = 225;
+                return OttPartnerId;
+            }
+        };
+
+        //  SimpleSessionProvider ksSessionProvider = new SimpleSessionProvider("https://rest-as.ott.kaltura.com/v4_4/api_v3", 255, null);
+
+        String mediaIdPhoenix = mediaId;
+        //String formatHls = fileType % 2 == 0 ? "Tablet Main" : "dash Main";
+        //  String formatHls = "Tablet Main";
+        String formatHls = "dash Main";
+        //audio
+        // String mediaId = "743297";
+        // String formatHls  = "audio_only";
+        //  String formatDash  = "dash Main";
+        //                "Format": "dash Mobile",
+//                "Format": "ism Main",
+//                "Format": "Tablet Main",
+//                "Format": "dash Main",
+//                "Format": "widevine_sbr Download High",
+//                "Format": "widevine_mbr Main",
+//                "Format": "TV Main",
+//                "Format": "Web New",
+//                "Format": "360_Main",
+//                "Format": "HLS_Mobile_SD",
+//                "Format": "HLS_Mobile_HD",
+//                "Format": "HLSFPS_Mobile_SD",
+//                "Format": "HLSFPS_Mobile_HD",
+//                "Format": "HLS_Web_SD",
+//                "Format": "HLS_Web_HD",
+//                "Format": "HLS_360_SD",
+//                "Format": "HLS_360_HD",
+//                "Format": "HLS_TV_SD",
+//                "Format": "HLS_TV_HD",
+//                "Format": "HLSFPS_Main",
+//                "Format": "HLSFPS_Main",
+//                "Format": "WVC_Low",
+//                "Format": "WVC_Auto",
+//                "Format": "DASH_Mobile_SD",
+//                "Format": "DASH_Mobile_HD",
+//                "Format": "WVC_High",
+//                "Format": "JIO_MAIN",
+//                "Format": "SBR256",
+//                "Format": "HLS_Linear_P",
+//                "Format": "HLS_Linear_B",
+
+        mediaProvider = new PhoenixMediaProvider()
+                .setSessionProvider(ksSessionProvider)
+                .setAssetId(mediaIdPhoenix)
+                //.setReferrer()
+                //    .setFileIds("10677547", "10677551")
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                //     .setPKUrlType(APIDefines.PKUrlType.PlayManifest)
+                .setFormats(formatHls);
+        //  .setFormats("dashclear", "DASHENC_PremiumHD");
+        //.setFormats(formatDash);
+
+        mediaProvider.load(completion);
+
+    }
+
+    private void createPlayerWithoutPhoenixProvider() {
+
+        List<PKDrmParams> pkDrmDataList = new ArrayList<>();
+        String licenseUri = "https://udrm-stg.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJodHRwczovL3Jlc3Qtc2dzMS5vdHQua2FsdHVyYS5jb20vcmVzdGZ1bF92NV8wL2FwaV92My9zZXJ2aWNlL2Fzc2V0RmlsZS9hY3Rpb24vZ2V0Q29udGV4dD9rcz1kako4TWpJMWZKNEVqbHc5LXFLUTBkRXZPbUwwS3JqandubFlJMG5fWGJLdC04dTZUUUhndUhuVDlOeEVGTmFYZHpKck81Vl9kLUtjLXJLNGgySU5ndHJFOWNZNWtvTzVQZWpybXNFMlQ2Y3o1anNwRUY2SmI1aHZwVENoS2tPU2t5bG9JRVJYQmwyRGs1TlVuUXk4Ty0wRVpCSmQyMUNtRDBNdUYxZVRRVnZfZTg3UDBSQS14X29nVV85Q3NUTlU4c2UwcUR1Y0FDS1labmREMWRHMklLLWpoNGFhRkdVM0NIOEx1QS16RkpXVk0xVGFtaHNlcGl6eGVNaDc3R0NXWUNkRFBReW9JNzZFWEtpMXE4OFNJWWhKV0xDY0c0WkJ4TTJWWGFfVDhIenMwd1l6VWhlTGZBdWNrdUFha1dMN285MzlIa2k3M2JDa2xFSVhCZlVOV3JHX3Y5aFVPX2s9JmNvbnRleHRUeXBlPW5vbmUmaWQ9NTg2NTQxIiwiYWNjb3VudF9pZCI6MTk4MjU0MSwiY29udGVudF9pZCI6IjBfYXgzdXIyeHZfMF9pZXY3bWJ0dCwwX2F4M3VyMnh2XzBfeXk5a3ZwZWwsMF9heDN1cjJ4dl8wX3hvYmFoa29qLDBfYXgzdXIyeHZfMF9vaWRoYThvaywwX2F4M3VyMnh2XzBfMnRwNWgxOWEiLCJmaWxlcyI6IiIsInVzZXJfdG9rZW4iOiJkako4TWpJMWZKNEVqbHc5LXFLUTBkRXZPbUwwS3JqandubFlJMG5fWGJLdC04dTZUUUhndUhuVDlOeEVGTmFYZHpKck81Vl9kLUtjLXJLNGgySU5ndHJFOWNZNWtvTzVQZWpybXNFMlQ2Y3o1anNwRUY2SmI1aHZwVENoS2tPU2t5bG9JRVJYQmwyRGs1TlVuUXk4Ty0wRVpCSmQyMUNtRDBNdUYxZVRRVnZfZTg3UDBSQS14X29nVV85Q3NUTlU4c2UwcUR1Y0FDS1labmREMWRHMklLLWpoNGFhRkdVM0NIOEx1QS16RkpXVk0xVGFtaHNlcGl6eGVNaDc3R0NXWUNkRFBReW9JNzZFWEtpMXE4OFNJWWhKV0xDY0c0WkJ4TTJWWGFfVDhIenMwd1l6VWhlTGZBdWNrdUFha1dMN285MzlIa2k3M2JDa2xFSVhCZlVOV3JHX3Y5aFVPX2s9IiwidWRpZCI6IiIsImFkZGl0aW9uYWxfY2FzX3N5c3RlbSI6MjI1fQ%3d%3d&signature=dEra120gz44b7fSp%2bjcuXFAZmtI%3d";
+        PKDrmParams pkDrmParams = new PKDrmParams(licenseUri, PKDrmParams.Scheme.WidevineCENC);
+        pkDrmDataList.add(pkDrmParams);
+
+        List<PKMediaSource> mediaSourceList = new ArrayList<>();
+        PKMediaSource pkMediaSource = new PKMediaSource();
+        pkMediaSource.setUrl("http://cdnapi.kaltura.com/p/2082311/sp/208231100/playManifest/protocol/http/entryId/0_17sldlfb/format/url/tags/wvc_h/f/a.wvm");
+        //  pkMediaSource.setId("929088");
+        pkMediaSource.setMediaFormat(PKMediaFormat.dash);
+
+        //  pkMediaSource.setDrmData(pkDrmDataList);
+
+        PKMediaEntry  pkMediaEntry = new PKMediaEntry();
+        //  pkMediaEntry.setId("929088");
+        pkMediaEntry.setDuration(0);
+
+        mediaSourceList.add(pkMediaSource);
+        pkMediaEntry.setSources(mediaSourceList);
+
+        PKMediaConfig config = new PKMediaConfig();
+        config.setMediaEntry(pkMediaEntry);
+
+
+        PKPluginConfigs pluginConfigs = new PKPluginConfigs();
+
+        player = PlayKitManager.loadPlayer(this, pluginConfigs);
+
+        player.getSettings().setAllowCrossProtocolRedirect(true);
+
+        FrameLayout layout = (FrameLayout) findViewById(R.id.player_view);
+        layout.addView(player.getView());
+
+        controlsView = (PlaybackControlsView) this.findViewById(R.id.playerControls);
+        controlsView.setPlayer(player);
+
+        player.prepare(config);
+        player.play();
+    }
+
+    private void startHorizonOttMediaLoadingLive(final OnMediaLoadCompletion completion) {
+
+        String mediaId = "323550";
+        String KS = "djJ8MzA2NXxddMRff_enEFE6C7sfMnlM5BWx4tYfrxus8MLMo0WRqRNJDwhArDecN0W9HmXhcXy-uk0_h-O97aSquq_srXRujNnMEA5xnnSbh0GNv6Mx5JKLs8D52F0HTU558O9LqbowkxRAA_epMR0iyZGcAZYfo4cUCe9MayYBkbmb7YM03Ua4IAkUkXPiEX3YtloDylUFCjTDZjKQ0CPUOTVly5yoRyEE6KJjDHeeA6-9Y5Wm8lqIjzVaxeTlYNSj70sY8XU4EfsDT7EI2GLM1MJ03K7bV2kMXkfaNgkc88kJVRwrMaMdDa8xsp3U4r1w0txaONXiRj37xMayD4JRUwHnbkIWDhJ3nHAg8c9V1dI2231nSQ==";
+
+        mediaProvider = new PhoenixMediaProvider("https://rest-sgs1.ott.kaltura.com/restful_v5_1/api_v3/", 3065, KS)
+                .setAssetId(mediaId)
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setFormats("Mobile_Dash_SD")
+                .setAssetType(APIDefines.KalturaAssetType.Media);
+
+        mediaProvider.load(completion);
+    }
+
 
 
 }

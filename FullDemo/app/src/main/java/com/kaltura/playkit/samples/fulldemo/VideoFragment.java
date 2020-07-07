@@ -1059,7 +1059,7 @@ public class VideoFragment extends Fragment {
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
             if(controlsView != null){
-                if (stateChanged.newState == PlayerState.IDLE && player.getCurrentPosition() >= player.getDuration() && adCuePoints.hasPostRoll()) {
+                if (stateChanged.newState == PlayerState.IDLE && player.getCurrentPosition() > 0 && player.getCurrentPosition() >= player.getDuration() && adCuePoints.hasPostRoll()) {
                     return;
                 }
                 controlsView.setPlayerState(stateChanged.newState);

@@ -1060,7 +1060,7 @@ public class VideoFragment extends Fragment {
             }
             if(controlsView != null){
                 if (stateChanged.newState == PlayerState.IDLE && player.getCurrentPosition() >= player.getDuration() && adCuePoints.hasPostRoll()) {
-                    return;
+                  //  return;
                 }
                 controlsView.setPlayerState(stateChanged.newState);
             }

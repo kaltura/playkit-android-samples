@@ -120,8 +120,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             "524710","526594","537514","538376","540085"));
 
 
-    private String V18_PROD_KS = "djJ8MjI1fMWdwUAlBSyjKKzJnmLvQfNa3Fv2Dz-pU2rZ1XSqi9F4Jqe28WPw_IpDlXJDFoF6X8UuMj7Rz58x1OnxAoA2xIYop5pgQPM-TojGs3gAfdatONwKlizMpou66mN-_h1dkMXdsNc0ZRR6_UsDlVipgZEIzY0GWXegVSEePQtYR2U2nIfX0oH5bwNpCAdqiTfGsDGOcN3h5blFLwOcKrlBCE__X7k-D-UyvU1r8qkg51OBOhRo1qy42hbZYanH0WYoxq2Bx1X63HxwTkAVroAmKy5jZeDR7YZXSysQpajK7ltxVMs4rtrfbU6XRCHq92Bs1zPw7iscgRYSm_uZtIh9HGmHmejiu3LktP6Q2K2ZyLzQmdvoyZlIP6EPTRPNrDRISw==";
-    private String V18_STAGING_KS = "djJ8MjI1fDdmR5NI3xsHhVW4o8ipExsyi4FmGPOJ623MbCvVB4C48AZnnfvqnXBQsKWZaF9yBmV5qkpf_BDsF9N01sWRNr9wBCMcMdDudmF7yfM8U5X9MvzcAH-ArMS2vhnRXke6tB-9iRHDCzUzGdtwOppEBXxZpvQGRS7nmq0-ypLAX4AGjzJGgRUvIEcz7Y7EZT-foy_15jc-ZFWLMuGuRWAbqhaVmPzkMV9sn5D5f3l2BH5FG0DfhZR3_8SqhdEpCdG_xgMkDH0Uk8HEsIWvlg07O7irYp_Va-UU-wEnuZgK7oLsz7EfQ42wBJhmic7AqpVQgBuKaYHPpk30pLBJNXd3cMTjQRvLVOKEwulSMBwEliobKvLiz07Tpq8c2ZppruP86w==";
+    private String V18_PROD_KS = "djJ8MjI1fKgjwWVWOaayyIYm6-CJCFTA9XdL25SMyhjDKXbNk_y-CJCGP402wZLrS5b04dtx0cXdITfEMAFLvDJBd-BU-_g48tiwf9d4nvaSlm_u2Afm_57UXjNaXCa7qZ60U8oESB3QPWsyDcDV-qEi4w6iVRWZA9KJS5XV1LPJpoZ5p-lGY1kCphYI1huAFOylwvBlW36H7lp9GT2Hent0G92YdqvCqoMJmWPmH6xv5NNHDBYMKZjkDK38XJFSQbGFB24_FMGKiLBDJOtZpE8dL1OpfHrBNgbx23d4aWApFBAwzP7lu3vAQruBK7KkfPey4dHTpTLkf444SFnuGXZBuAElC9eQfVzeeQn4ueL-d1cnx82eJSyz9Eb-7uspwXMim4keHQ==";
+    private String V18_STAGING_KS = "djJ8MjI1fLaTzkzHrlB8hbciRx2bVXOJS-mctJwkzw0NAzVPJ8G33Y-SlkUsToJh46sIhA5FL1H6K-jHghYmOC43gchsf6BZFk2g6NzNQtLdavhYEE6-xwn2FS873eRCCMK6Ril3734UTD0gm8dDxYADpXssXYvOVZUHV_Qk2Wv5HyLZyw2GuehXaChgJLbUC38d_ghZG0d_xwTe2jfLsOyKfs9Pk57YLJNtGiGDqpz4jS9RhzIDjy5ZXFoOCJXdwiSf8gPQBgne3gqlEyeNkedfiqlTa3dN_p3nuMl5FVHdoYXINfZhXw3gZ1056rECH9pK96EINHJxr4knKReX_zwA-pdcUno=";
 
 
     //   List<String> mediaArray = new ArrayList<>(Arrays.asList("353690","353691","353692","379073","353699"));
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
     private boolean isAdsEnabled = true;
-    private boolean isDAIMode = false;
+    private boolean isDAIMode = true;
     SubtitleStyleSettings subtitleStyleSettings = new SubtitleStyleSettings("MyCustomSubtitleStyle");
     PKSubtitlePosition pkSubtitlePosition = new PKSubtitlePosition(true);
     private TextView tvSourceUrl;
@@ -363,8 +363,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void registerPlugins() {
 
         //PlayKitManager.registerPlugins(this, SamplePlugin.factory);
-        PlayKitManager.registerPlugins(this, IMAPlugin.factory);
-        //PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
+        //PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+        PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
         //PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
         // PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
@@ -607,11 +607,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (isAdsEnabled) {
                     if (isDAIMode) {
                         promptMessage(DAI_PLUGIN, getDAIConfig2().getAssetTitle());
-                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig2());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigISSUE());
                     } else {
                         log.d("Play Ad preMidPostAdTagUrl");
                         promptMessage(IMA_PLUGIN, "preMidPostAdTagUrl");
-                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostAdTagUrl));
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(ads5AdsEvery10Secs));
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preMidPostAdTagUrl media2"));
@@ -621,11 +621,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (isAdsEnabled) {
                     if (isDAIMode) {
                         promptMessage(DAI_PLUGIN, getDAIConfig10().getAssetTitle());
-                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig3());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigISSUE());
                     } else {
                         log.d("Play Ad inLinePreAdTagUrl");
                         promptMessage(IMA_PLUGIN, "inLinePreAdTagUrl");
-                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(v18_ad_tag));
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(vootPremiumEmptyAdTag));
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(true, "inLinePreAdTagUrl media3"));
@@ -634,7 +634,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (isAdsEnabled) {
                     if (isDAIMode) {
                         promptMessage(DAI_PLUGIN, getDAIConfig8().getAssetTitle());
-                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig4());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigISSUE());
                     } else {
                         log.d("Play NO Ad");
                         promptMessage(IMA_PLUGIN, "Enpty AdTag");
@@ -647,11 +647,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (isAdsEnabled) {
                     if (isDAIMode) {
                         promptMessage(DAI_PLUGIN, getDAIConfig5().getAssetTitle());
-                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig5());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigISSUE());
                     } else {
                         log.d("Play Ad preSkipAdTagUrl");
                         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
-                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSkipAdTagUrl));
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(v18_ad_tag));
                     }
                 }
 
@@ -689,7 +689,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
         if (isAdsEnabled) {
             if (isDAIMode) {
-                addIMADAIPluginConfig(pluginConfigs, 1);
+                addIMADAIPluginConfig(pluginConfigs, 12);
             } else {
                 addIMAPluginConfig(pluginConfigs);
             }
@@ -799,7 +799,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         log.d("Play Ad preSkipAdTagUrl");
         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
-        IMAConfig adsConfig = getAdsConfig(vootPremiumEmptyAdTag);
+        IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
@@ -810,7 +810,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // videoMimeTypes.add("application/dash+xml");
         //return getAdsConfigResponse("");
         // return new IMAConfig().setAdTagUrl("https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOI&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D33%26KidsPinEnabled%3DN%26distinct_id%3D42c92f17603e4ee2b4232666b9591134%26AppVersion%3D0.1.80%26DeviceModel%3Dmoto%20g(6)%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2467608&ppid=42c92f17603e4ee2b4232666b9591134&vid=0_im5ianso&ad_rule=1&correlator=10771&InterstitialRendered=False").enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
-        return new IMAConfig().setAdTagUrl(vootPremiumEmptyAdTag).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
+        return new IMAConfig().setAdTagUrl(adTagUrl).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
     }
 
     private IMAConfig getAdsConfigResponse(String adResponse) {
@@ -1374,6 +1374,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 IMADAIConfig adsConfigError = getDAIConfig10();
                 config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
             }
+            case 11: {
+                promptMessage(DAI_PLUGIN, getDAIConfigISSUE().getAssetTitle());
+                IMADAIConfig adsConfigError = getDAIConfigISSUE();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
+            }
+            case 12: {
+                promptMessage(DAI_PLUGIN, getDAIConfigDASHFROMSAMPLE().getAssetTitle());
+                IMADAIConfig adsConfigError = getDAIConfigDASHFROMSAMPLE();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
+            }
             break;
             default:
                 break;
@@ -1543,6 +1553,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 apiKey,
                 streamFormat,
                 licenseUrl).enableDebugMode(true).setAlwaysStartWithPreroll(true);
+    }
+
+    private IMADAIConfig getDAIConfigISSUE() {
+        String assetTitle = "VOD - Tears of Steel";
+        String apiKey = null;
+        String contentSourceId = "2528370";
+        String videoId = "tears-of-steel";
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+
+        return IMADAIConfig.getVodIMADAIConfig(assetTitle,
+                contentSourceId,
+                videoId,
+                apiKey,
+                streamFormat,
+                licenseUrl).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfigDASHFROMSAMPLE() {
+        String assetTitle = "VOD - DASH";
+        String apiKey = null;
+        String contentSourceId = "2474148";
+        String videoId = "bbb-clear";
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.DASH;
+        String licenseUrl = null;
+
+        return IMADAIConfig.getVodIMADAIConfig(assetTitle,
+                contentSourceId,
+                videoId,
+                apiKey,
+                streamFormat,
+                licenseUrl).enableDebugMode(true);
     }
 
     @Override

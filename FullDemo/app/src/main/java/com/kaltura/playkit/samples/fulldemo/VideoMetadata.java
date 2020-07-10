@@ -140,6 +140,13 @@ public class VideoMetadata {
                 "sN_IYUG8STe1ZzhIIE_ksA", null, null,
                 R.drawable.k_image));
 
+        defaultVideos.add(new VideoItem(
+                "VMAP Pre Mid Post",
+                VOOT_URL1,
+                LIC_URL1,
+                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=",
+                R.drawable.k_image));
+
         return defaultVideos;
     }
 }

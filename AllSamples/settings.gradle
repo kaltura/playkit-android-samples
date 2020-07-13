@@ -16,8 +16,8 @@
 //project(':MD360').projectDir = new File('../../MD360Player4Android/vrlib')
 //include ':playkitvr'
 //project(':playkitvr').projectDir = new File('../../playkit-android-vr/playkitvr')
-////include ':netkit'
-////project(':netkit').projectDir = new File('../../netkit-android/netkit')
+//include ':netkit'
+//project(':netkit').projectDir = new File('../../netkit-android/netkit')
 //include ':fbads'
 //project(':fbads').projectDir = new File('../../playkit-android-fb-ads/fbadsplugin')
 
@@ -38,8 +38,8 @@ def samples = [
         'PhoenixAnalytics',
         'KavaAnalytics',
         'Providers',
-        'TVPapiStats',
-        'ChromecastSample',
+        //'TVPapiStats',
+        //'ChromecastSample',
         'ChromecastCAFSample',
         'FBAdsSample',
         'MiniPlayer',

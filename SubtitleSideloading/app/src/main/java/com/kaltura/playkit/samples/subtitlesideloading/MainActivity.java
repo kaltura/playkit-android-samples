@@ -30,7 +30,6 @@ import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.SubtitleStyleSettings;
 import com.kaltura.playkit.player.TextTrack;
 import com.kaltura.playkit.player.VideoTrack;
-import com.kaltura.playkit.plugins.youbora.YouboraEvent;
 import com.kaltura.playkit.samples.subtitlesideloading.tracks.TrackItem;
 import com.kaltura.playkit.samples.subtitlesideloading.tracks.TrackItemAdapter;
 

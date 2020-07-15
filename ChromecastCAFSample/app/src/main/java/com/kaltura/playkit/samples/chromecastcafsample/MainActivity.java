@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     private void addChangeMediaButton() {
         //Get reference to the play/pause button.
         changeMediaButton =  this.findViewById(R.id.change_media_button);
-        if (changeMediaButton != null) {
+        if (changeMediaButton != null && remoteMediaClient != null) {
             changeMediaButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -178,34 +178,38 @@ public class MainActivity extends AppCompatActivity {
                     String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=" + 43543;
                     if ("ovp".equals(BuildConfig.FLAVOR)) {
                         pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_b7s02kjl", vastAdTag, CAFCastBuilder.AdTagType.VAST, null), loadOptions);
-                        pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+                        if (pendingResult != null) {
+                            pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
-                            @Override
-                            public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
+                                @Override
+                                public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
 
-                                JSONObject customData = mediaChannelResult.getCustomData();
-                                if (customData != null) {
-                                    //log.v("loadMediaInfo. customData = " + customData.toString());
-                                } else {
-                                    //log.v("loadMediaInfo. customData == null");
+                                    JSONObject customData = mediaChannelResult.getCustomData();
+                                    if (customData != null) {
+                                        //log.v("loadMediaInfo. customData = " + customData.toString());
+                                    } else {
+                                        //log.v("loadMediaInfo. customData == null");
+                                    }
                                 }
-                            }
-                        });
+
+                            });
+                        }
                     } else {
                         pendingResult = remoteMediaClient.load(getOttCastMediaInfo("548576", "Mobile_Main", "", null, CAFCastBuilder.HttpProtocol.Http, null), loadOptions);
-                        pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+                        if (pendingResult != null) {
+                            pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+                                @Override
+                                public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
 
-                            @Override
-                            public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
-
-                                JSONObject customData = mediaChannelResult.getCustomData();
-                                if (customData != null) {
-                                    //log.v("loadMediaInfo. customData = " + customData.toString());
-                                } else {
-                                    //log.v("loadMediaInfo. customData == null");
+                                    JSONObject customData = mediaChannelResult.getCustomData();
+                                    if (customData != null) {
+                                        //log.v("loadMediaInfo. customData = " + customData.toString());
+                                    } else {
+                                        //log.v("loadMediaInfo. customData == null");
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 }
             });

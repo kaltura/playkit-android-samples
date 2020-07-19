@@ -262,47 +262,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * by the player.
      */
     private void subscribeToTracksAvailableEvent() {
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                if (event instanceof PlayerEvent.VideoTrackChanged) {
-                    Log.d(TAG, "Event VideoTrackChanged " + ((PlayerEvent.VideoTrackChanged) event).newTrack.getBitrate());
-                } else if (event instanceof PlayerEvent.AudioTrackChanged) {
-                    Log.d(TAG, "Event AudioTrackChanged " + ((PlayerEvent.AudioTrackChanged) event).newTrack.getLanguage());
-                } else if (event instanceof PlayerEvent.TextTrackChanged) {
-                    Log.d(TAG, "Event TextTrackChanged " + ((PlayerEvent.TextTrackChanged) event).newTrack.getLanguage());
-                } else if (event instanceof PlayerEvent.SubtitlesStyleChanged) {
-                    Log.d(TAG, "Event SubtitlesStyleChanged " + ((PlayerEvent.SubtitlesStyleChanged) event).styleName);
-                } else if (event instanceof PlayerEvent.TracksAvailable) {
-                    Log.d(TAG, "Event TRACKS_AVAILABLE");
+        player.addListener(this, PlayerEvent.videoTrackChanged, event -> {
+            Log.d(TAG, "Event VideoTrackChanged " + ((PlayerEvent.VideoTrackChanged) event).newTrack.getBitrate());
+        });
 
-                    //Cast event to the TracksAvailable object that is actually holding the necessary data.
-                    PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
+        player.addListener(this, PlayerEvent.textTrackChanged, event -> {
+            Log.d(TAG, "Event TextTrackChanged " + ((PlayerEvent.TextTrackChanged) event).newTrack.getLanguage());
+        });
 
-                    //Obtain the actual tracks info from it. Default track index values are coming from manifest
-                    PKTracks tracks = tracksAvailable.tracksInfo;
-                    int defaultAudioTrackIndex = tracks.getDefaultAudioTrackIndex();
-                    int defaultTextTrackIndex = tracks.getDefaultTextTrackIndex();
-                    if (tracks.getAudioTracks().size() > 0) {
-                        Log.d(TAG, "Default Audio langae = " + tracks.getAudioTracks().get(defaultAudioTrackIndex).getLabel());
-                    }
-                    if (tracks.getTextTracks().size() > 0) {
-                        Log.d(TAG, "Default Text langae = " + tracks.getTextTracks().get(defaultTextTrackIndex).getLabel());
-                        if(ccStyleLayout != null) {
-                            ccStyleLayout.setVisibility(View.VISIBLE);
-                        }
-                    }
-                    if (tracks.getVideoTracks().size() > 0) {
-                        Log.d(TAG, "Default video isAdaptive = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).isAdaptive() + " bitrate = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).getBitrate());
-                    }
-                    //player.changeTrack(tracksAvailable.tracksInfo.getVideoTracks().get(1).getUniqueId());
-                    //Populate Android spinner views with received data.
-                    populateSpinnersWithTrackInfo(tracks);
+        player.addListener(this, PlayerEvent.audioTrackChanged, event -> {
+            Log.d(TAG, "Event AudioTrackChanged " + ((PlayerEvent.AudioTrackChanged) event).newTrack.getLanguage());
+        });
 
+        player.addListener(this, PlayerEvent.tracksAvailable, event -> {
+            Log.d(TAG, "Event TRACKS_AVAILABLE");
+
+            //Cast event to the TracksAvailable object that is actually holding the necessary data.
+            PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
+
+            //Obtain the actual tracks info from it. Default track index values are coming from manifest
+            PKTracks tracks = tracksAvailable.tracksInfo;
+            int defaultAudioTrackIndex = tracks.getDefaultAudioTrackIndex();
+            int defaultTextTrackIndex = tracks.getDefaultTextTrackIndex();
+            if (tracks.getAudioTracks().size() > 0) {
+                Log.d(TAG, "Default Audio langae = " + tracks.getAudioTracks().get(defaultAudioTrackIndex).getLabel());
+            }
+            if (tracks.getTextTracks().size() > 0) {
+                Log.d(TAG, "Default Text langae = " + tracks.getTextTracks().get(defaultTextTrackIndex).getLabel());
+                if(ccStyleLayout != null) {
+                    ccStyleLayout.setVisibility(View.VISIBLE);
                 }
             }
-            //Event that will be sent when tracks data is available.
-        }, PlayerEvent.Type.TRACKS_AVAILABLE, PlayerEvent.Type.AUDIO_TRACK_CHANGED, PlayerEvent.Type.TEXT_TRACK_CHANGED, PlayerEvent.Type.VIDEO_TRACK_CHANGED, PlayerEvent.Type.SUBTITLE_STYLE_CHANGED);
+            if (tracks.getVideoTracks().size() > 0) {
+                Log.d(TAG, "Default video isAdaptive = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).isAdaptive() + " bitrate = " + tracks.getVideoTracks().get(tracks.getDefaultAudioTrackIndex()).getBitrate());
+            }
+            //player.changeTrack(tracksAvailable.tracksInfo.getVideoTracks().get(1).getUniqueId());
+            //Populate Android spinner views with received data.
+            populateSpinnersWithTrackInfo(tracks);
+        });
     }
 
     /**
@@ -575,4 +572,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player.play();
         }
     }
+
+    @Override
+    public void onDestroy() {
+        if (player != null) {
+            player.removeListeners(this);
+            player.destroy();
+            player = null;
+        }
+        super.onDestroy();
+    }
+
 }

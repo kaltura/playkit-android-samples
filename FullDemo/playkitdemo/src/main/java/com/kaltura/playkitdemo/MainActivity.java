@@ -991,7 +991,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (event != null && event.error != null) {
                 controlsView.setSeekBarStateForAd(false);
                 String cause = (event.error.exception != null && event.error.exception.getCause() != null) ? event.error.exception.getCause().getMessage() : "";
-                log.d("PlayerEvent.Error event  position = " + event.error.errorType + " errorMessage = " + event.error.message + " " + cause);
+                log.d("Ad Event ERROR errorType = " + event.error.errorType + " errorMessage = " + event.error.message + " cause = " + cause);
                 if (event.error.severity == PKError.Severity.Fatal) {
                     appProgressBar.setVisibility(View.INVISIBLE);
                 }

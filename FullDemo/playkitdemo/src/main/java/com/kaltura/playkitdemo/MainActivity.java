@@ -878,7 +878,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private IMADAIConfig getDAIConfig1() {
         String assetTitle = "VOD - Tears of Steel";
         String apiKey = null;
-        String contentSourceId = "2477953";
+        String contentSourceId = "19463";
         String videoId = "tears-of-steel";
         StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
         String licenseUrl = null;

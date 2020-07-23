@@ -19,6 +19,7 @@
 
         <Spinner
             android:id="@+id/videoSpinner"
+            android:contentDescription="video_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -38,6 +39,7 @@
 
         <Spinner
             android:id="@+id/audioSpinner"
+            android:contentDescription="audio_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -57,6 +59,7 @@
 
         <Spinner
             android:id="@+id/textSpinner"
+            android:contentDescription="text_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

@@ -120,8 +120,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             "524710","526594","537514","538376","540085"));
 
 
-    private String V18_PROD_KS = "djJ8MjI1fKgjwWVWOaayyIYm6-CJCFTA9XdL25SMyhjDKXbNk_y-CJCGP402wZLrS5b04dtx0cXdITfEMAFLvDJBd-BU-_g48tiwf9d4nvaSlm_u2Afm_57UXjNaXCa7qZ60U8oESB3QPWsyDcDV-qEi4w6iVRWZA9KJS5XV1LPJpoZ5p-lGY1kCphYI1huAFOylwvBlW36H7lp9GT2Hent0G92YdqvCqoMJmWPmH6xv5NNHDBYMKZjkDK38XJFSQbGFB24_FMGKiLBDJOtZpE8dL1OpfHrBNgbx23d4aWApFBAwzP7lu3vAQruBK7KkfPey4dHTpTLkf444SFnuGXZBuAElC9eQfVzeeQn4ueL-d1cnx82eJSyz9Eb-7uspwXMim4keHQ==";
-    private String V18_STAGING_KS = "djJ8MjI1fLaTzkzHrlB8hbciRx2bVXOJS-mctJwkzw0NAzVPJ8G33Y-SlkUsToJh46sIhA5FL1H6K-jHghYmOC43gchsf6BZFk2g6NzNQtLdavhYEE6-xwn2FS873eRCCMK6Ril3734UTD0gm8dDxYADpXssXYvOVZUHV_Qk2Wv5HyLZyw2GuehXaChgJLbUC38d_ghZG0d_xwTe2jfLsOyKfs9Pk57YLJNtGiGDqpz4jS9RhzIDjy5ZXFoOCJXdwiSf8gPQBgne3gqlEyeNkedfiqlTa3dN_p3nuMl5FVHdoYXINfZhXw3gZ1056rECH9pK96EINHJxr4knKReX_zwA-pdcUno=";
+    private String V18_PROD_KS = "djJ8MjI1fENLaYL8AGzWY8AGJ_5TGjU7LFWXW8sAqXEL6XyNHbVCQYJhXa692vYef1sLBtPXkgI_VEjcimB4LAbgRvDKILx2hZfqfOMzY24XDf8hmRQU_sXESWwgudVX4AWpTq5izPRRyayLqBnjaw7RlEj7hplyOkJ4iwh-l7zkUeGcIklC4Xwvw6ERVOVk3Mb_LOd_3NfqsKA3oqP8alO-j7Uy_mqP60kRLr0oY_jhd9r_lWTGbVy4-H7bgEg0W4lcvn1cNy0s3dNQs8eWM3_jxVttm1gFPLgIqetHHudU6S2gkNJ7tLeY1vvwEQv2RqCziQzCmgPj-n5i2FF7eYkqmnJBHr96EimItou_xMoMWuzzMX4tzsn7vAE40VoikDb0g26lH4VITDOPG3Cuw74aCLjUh1U=";
+    private String V18_STAGING_KS = "djJ8MjI1fMSmoskQ5EajvWJnkI4v1G-Z2DC4jr0rJ8vTdvXuK_tAtmrdKem6onKRKoyq1X_PC_5TzfAoZVd3eDsDr5zyYQyoUG3pt470qyk_kRUfqVtNVeDPv8a4Y1wyMfcD_Wd9XwLGr8K1mK8EK3U3-o6ektkPU2xtwDqJmnf5pNq3h39d4BnsB7N0LkXziOrKxs5jwQRY7vcwP0CIjXLO0E9BvGSVmRDGYWE-86KPUYNMwBy6m-rSsYoRtGWzcyHaKedvx8_xYyWBCDuMmmL2JT8Qufiu0DRAf24zXg6ehKq7VPaBmvDnQiJoKcsFEw-EZRPvP3v0AuR4G_VBgTI6Ll1VG314sl48rpUZSkN3AUNn1vcYUHRDinTjuaqRBLnFKnNysYTnuXrcOnNJUb0iWhKoj0U=";
 
 
     //   List<String> mediaArray = new ArrayList<>(Arrays.asList("353690","353691","353692","379073","353699"));
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // "764459" : Vootkids firestick issue asset
         //   startVootOttMediaLoadingProd(playLoadedEntry, "594159"); // Dolby Content
         //  startVootOttMediaLoadingProd(playLoadedEntry, "805986"); // iOS linear
-        startVootOttMediaLoadingProd(playLoadedEntry, "963762");
+        //startVootOttMediaLoadingProd(playLoadedEntry, "928900");
         //    startVootOttMediaLoadingProd(playLoadedEntry, "805985"); // Voot Live Channel DASH_LINEAR_TV
         //  startVootOttMediaLoadingStaging(playLoadedEntry, "326666"); // 403 Soruce Error asset for Tablet Main
         //  startVootOttMediaLoadingStaging(playLoadedEntry, "326683"); // 404 Soruce Error asset for dashclear
@@ -259,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //      startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
-//        startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
+        startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
@@ -689,7 +689,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
         if (isAdsEnabled) {
             if (isDAIMode) {
-                addIMADAIPluginConfig(pluginConfigs, 12);
+                addIMADAIPluginConfig(pluginConfigs, 11);
             } else {
                 addIMAPluginConfig(pluginConfigs);
             }
@@ -1558,7 +1558,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private IMADAIConfig getDAIConfigISSUE() {
         String assetTitle = "VOD - Tears of Steel";
         String apiKey = null;
-        String contentSourceId = "2528370";
+        String contentSourceId = "19463";
         String videoId = "tears-of-steel";
         StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
         String licenseUrl = null;
@@ -1765,7 +1765,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, PlayerEvent.error, event -> {
             //When the track data available, this event occurs. It brings the info object with it.
             if (event != null && event.error != null) {
-                log.d("PlayerEvent.Error event  position = " + event.error.errorType + " errorMessage = " + event.error.message);
+                log.d("PlayerEvent.Error event  position = " + event.error.errorType + " errorMessage = " + event.error.message +
+                        " event.error.errorCategory = " + event.error.errorCategory + " event.error.exception = " + event.error.exception
+                        + " event.error.severity = " + event.error.severity);
             }
         });
 
@@ -2322,8 +2324,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //String formatHls = fileType % 2 == 0 ? "Tablet Main" : "dash Main";
         //  String formatHls = "dashclear";
         //String formatHls = "DASHENC_TV_PremiumHD";
-        String formatHls = "DASHENC_TV_PremiumHD";
-        //String formatHls = "dash Main";
+        //String formatHls = "DASHENC_TV_PremiumHD";
+        String formatHls = "dash Main";
         //audio
         // String mediaId = "743297";
         // String formatHls  = "audio_only";

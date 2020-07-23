@@ -27,8 +27,11 @@ import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
 import com.kaltura.playkit.providers.api.phoenix.APIDefines;
 import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
+import com.kaltura.playkit.providers.ott.OTTMediaAsset;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
 import com.kaltura.playkitvr.VRUtil;
+
+import java.util.Collections;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -37,18 +40,18 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //Phoenix analytics constants
-    private static final String PHOENIX_ANALYTICS_BASE_URL = "https://api-preprod.ott.kaltura.com/v5_1_0/api_v3/"; // analytics base url
-    private static final int PHOENIX_ANALYTICS_PARTNER_ID = 198; // your OTT partner id
+    private static final String PHOENIX_ANALYTICS_BASE_URL = "https://rest-us.ott.kaltura.com/v4_5/api_v3/"; // analytics base url
+    private static final int PHOENIX_ANALYTICS_PARTNER_ID = 3009; // your OTT partner id
     private static final String PHOENIX_ANALYTICS_KS = "";
     private static final int ANALYTIC_TRIGGER_INTERVAL = 30; //Interval in which analytics report should be triggered (in seconds).
 
     //Phoenix provider constans.
-    private static final String PHOENIX_PROVIDER_BASE_URL = "https://api-preprod.ott.kaltura.com/v5_1_0/api_v3/"; //your provider base url
+    private static final String PHOENIX_PROVIDER_BASE_URL = "https://rest-us.ott.kaltura.com/v4_5/api_v3/"; //your provider base url
     private static final String PHOENIX_PROVIDER_KS = ""; // your user ks if required
-    private static final int PHOENIX_PROVIDER_PARTNER_ID = 198; // your OTT partner id
-    private static final String FORMAT = "Mobile_Devices_Main_SD";
-    private static final String MEDIA_ID = "259153";//"258459"; // asset id to request
-    public static final String VR_MEDIA_ID = "258459";
+    private static final int PHOENIX_PROVIDER_PARTNER_ID = 3009; // your OTT partner id
+    private static final String FORMAT = "Mobile_Main";
+    private static final String MEDIA_ID = "548573";//"258459"; // asset id to request
+    public static final String VR_MEDIA_ID = "548573";
 
 
     private Player player;
@@ -113,9 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Each OTT media with mediaPrep has OVP partnerId and OVP entryId (asset list will contain the entryId for here, partner you should ask..
         int MEDIA_PREP_PARTNER_ID = 1774581;
-        String MEDIA_ENTRY_ID = "1_mphei4ku";
-        kavaAnalyticsConfig.setPartnerId(MEDIA_PREP_PARTNER_ID);
-        kavaAnalyticsConfig.setEntryId(MEDIA_ENTRY_ID);
+        kavaAnalyticsConfig.setPartnerId(MEDIA_PREP_PARTNER_ID).setApplicationVersion("andrid/v1.1.0").setUserId("a@a.com");
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(KavaAnalyticsPlugin.factory.getName(), kavaAnalyticsConfig);
     }
@@ -184,24 +185,18 @@ public class MainActivity extends AppCompatActivity {
      */
     private void createPhoenixMediaProvider() {
 
-        //Initialize provider.
-        PhoenixMediaProvider mediaProvider = new PhoenixMediaProvider();
-        //Initialize session provider.
-        SessionProvider sessionProvider = createSessionProvider();
+        OTTMediaAsset ottMediaAsset = new OTTMediaAsset()
+                //.setKs("djJ8NDM2fApggWesBh7_L34SxJC5EbQYTHt6wZTpeyNXGCNvq_amkeAre2rJmy_4__ZD8Qs50MAAAreG_b3ri2HtYzDQGgV0zazujd2o0vbl9cH1bKER25-1wC3rIGjNP5gOif39PBBM56FVa3Z-uSZpu4ZQV_xV8_QqJmGNpBRDaIukLHF5NjlZg77Bpvvkq5J6l2v5GzzNt_1OHs1tTeLtfgF1dwZVPB_By_2-SmNO-u8xCUPBPFQN8henMkfHurWemV4YxDWpnfwa6MJ5iwb9OYP-KvrN2YOKmyGtBjtkfrVmO_HAlZy_icIDQhRrIAYTzXtC3-MkniXMdeVuXWjjbcQ5Na292WN9kLD1qEhuWLiKZfykue6OXGU373CyKlXHt03yww==")
+                .setAssetId(VR_MEDIA_ID)
+                .setFormats(Collections.singletonList(FORMAT))
+                .setAssetType(APIDefines.KalturaAssetType.Media)
+                .setAssetReferenceType(APIDefines.AssetReferenceType.Media)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Http);
 
-        //Set entry id for the session provider.
-        mediaProvider.setAssetId(VR_MEDIA_ID);
-        mediaProvider.setAssetType(APIDefines.KalturaAssetType.Media);
-        mediaProvider.setAssetReferenceType(APIDefines.AssetReferenceType.Media);
-        mediaProvider.setContextType(APIDefines.PlaybackContextType.Playback);
-        mediaProvider.setFormats(FORMAT);
-        mediaProvider.setProtocol(PhoenixMediaProvider.HttpProtocol.Http); // usually HTTPS
-
-        //Set session provider to media provider.
-        mediaProvider.setSessionProvider(sessionProvider);
-
-        //Load media from media provider.
-        mediaProvider.load(new OnMediaLoadCompletion() {
+        new PhoenixMediaProvider(PHOENIX_PROVIDER_BASE_URL,
+                PHOENIX_PROVIDER_PARTNER_ID,
+                ottMediaAsset).load(new OnCompletion<ResultElement<PKMediaEntry>>() {
             @Override
             public void onComplete(ResultElement<PKMediaEntry> response) {
                 //When response received, check if it was successful.
@@ -215,32 +210,31 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
-    /**
-     * Will create {@link SessionProvider}.
-     *
-     * @return - {@link SessionProvider}
-     */
-    private SessionProvider createSessionProvider() {
-        return new SessionProvider() {
-            @Override
-            public String baseUrl() {
-                return PHOENIX_PROVIDER_BASE_URL;
-            }
-
-            @Override
-            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
-                completion.onComplete(new PrimitiveResult(PHOENIX_PROVIDER_KS));
-            }
-
-            @Override
-            public int partnerId() {
-                return PHOENIX_PROVIDER_PARTNER_ID;
-            }
-        };
-    }
+//    /**
+//     * Will create {@link SessionProvider}.
+//     *
+//     * @return - {@link SessionProvider}
+//     */
+//    private SessionProvider createSessionProvider() {
+//        return new SessionProvider() {
+//            @Override
+//            public String baseUrl() {
+//                return PHOENIX_PROVIDER_BASE_URL;
+//            }
+//
+//            @Override
+//            public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+//                completion.onComplete(new PrimitiveResult(PHOENIX_PROVIDER_KS));
+//            }
+//
+//            @Override
+//            public int partnerId() {
+//                return PHOENIX_PROVIDER_PARTNER_ID;
+//            }
+//        };
+//    }
 
     /**
      * Prepare player and start playback.

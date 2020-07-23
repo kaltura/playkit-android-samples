@@ -176,36 +176,42 @@ public class MainActivity extends AppCompatActivity {
                     PendingResult<RemoteMediaClient.MediaChannelResult> pendingResult = null;
                     MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(0).build();
                     String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=" + 43543;
-                    if ("ovp".equals(BuildConfig.FLAVOR)) {
-                        pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_b7s02kjl", vastAdTag, CAFCastBuilder.AdTagType.VAST, null), loadOptions);
-                        pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+                    if (remoteMediaClient != null) {
+                        if ("ovp".equals(BuildConfig.FLAVOR)) {
+                            pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_b7s02kjl", vastAdTag, CAFCastBuilder.AdTagType.VAST, null), loadOptions);
+                            if (pendingResult != null) {
+                                pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
-                            @Override
-                            public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
+                                    @Override
+                                    public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
 
-                                JSONObject customData = mediaChannelResult.getCustomData();
-                                if (customData != null) {
-                                    //log.v("loadMediaInfo. customData = " + customData.toString());
-                                } else {
-                                    //log.v("loadMediaInfo. customData == null");
-                                }
+                                        JSONObject customData = mediaChannelResult.getCustomData();
+                                        if (customData != null) {
+                                            //log.v("loadMediaInfo. customData = " + customData.toString());
+                                        } else {
+                                            //log.v("loadMediaInfo. customData == null");
+                                        }
+                                    }
+
+                                });
                             }
-                        });
-                    } else {
-                        pendingResult = remoteMediaClient.load(getOttCastMediaInfo("548576", "Mobile_Main", "", null, CAFCastBuilder.HttpProtocol.Http, null), loadOptions);
-                        pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+                        } else {
+                            pendingResult = remoteMediaClient.load(getOttCastMediaInfo("548576", "Mobile_Main", "", null, CAFCastBuilder.HttpProtocol.Http, null), loadOptions);
+                            if (pendingResult != null) {
+                                pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
+                                    @Override
+                                    public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
 
-                            @Override
-                            public void onResult(@NonNull RemoteMediaClient.MediaChannelResult mediaChannelResult) {
-
-                                JSONObject customData = mediaChannelResult.getCustomData();
-                                if (customData != null) {
-                                    //log.v("loadMediaInfo. customData = " + customData.toString());
-                                } else {
-                                    //log.v("loadMediaInfo. customData == null");
-                                }
+                                        JSONObject customData = mediaChannelResult.getCustomData();
+                                        if (customData != null) {
+                                            //log.v("loadMediaInfo. customData = " + customData.toString());
+                                        } else {
+                                            //log.v("loadMediaInfo. customData == null");
+                                        }
+                                    }
+                                });
                             }
-                        });
+                        }
                     }
                 }
             });
@@ -519,24 +525,24 @@ public class MainActivity extends AppCompatActivity {
     private List<Caption> getExternalVttCaptions() {
         Caption caption1 = new Caption();
         caption1.isDefault = false;
-        caption1.type = "srt";
-        caption1.label = "Ger";
-        caption1.language = "nl";
-        caption1.url = "https://qa-nginx-vod.dev.kaltura.com/api_v3/index.php/service/caption_captionasset/action/serveWebVTT/captionAssetId/0_kozg4x1x/version/2/segmentIndex/1.vtt";
+        caption1.type = "vtt";
+        caption1.label = "Heb";
+        caption1.language = "he";
+        caption1.url = "https://externaltests.dev.kaltura.com/player/library_Player_V3/Captions/Caption_files_VTT/hebrew.vtt";
 
         Caption caption2 = new Caption();
         caption2.isDefault = false;
-        caption2.type = "srt";
-        caption2.label = "Rus";
-        caption2.language = "ru";
-        caption2.url = "https://qa-nginx-vod.dev.kaltura.com/api_v3/index.php/service/caption_captionasset/action/serveWebVTT/captionAssetId/0_njhnv6na/version/2/segmentIndex/1.vtt";
+        caption2.type = "vtt";
+        caption2.label = "Jap";
+        caption2.language = "ja";
+        caption2.url = "https://externaltests.dev.kaltura.com/player/library_Player_V3/Captions/Caption_files_VTT/japanese.vtt";
 
         Caption caption3 = new Caption();
         caption3.isDefault = false;
         caption3.type = "srt";
-        caption3.label = "Eng";
-        caption3.language = "en";
-        caption3.url = "https://qa-nginx-vod.dev.kaltura.com/api_v3/index.php/service/caption_captionasset/action/serveWebVTT/captionAssetId/0_kozg4x1x/version/2/segmentIndex/1.vtt";
+        caption3.label = "Rus";
+        caption3.language = "ru";
+        caption3.url = "https://externaltests.dev.kaltura.com/player/library_Player_V3/Captions/Caption_files_VTT/russian.vtt";
         List<Caption> captions = new ArrayList<>();
         captions.add(caption1);
         captions.add(caption2);

@@ -207,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (!userIsInteracting) {
                     return;
                 }
+                Log.d(TAG, "Event CcStyleChanged " + stylesStrings.get(position));
 
                 if (position == 0) {
                     player.updateSubtitleStyle(getDefaultPositionDefault());

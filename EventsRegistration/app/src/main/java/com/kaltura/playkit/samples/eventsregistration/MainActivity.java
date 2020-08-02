@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void addItemsOnSpeedSpinner() {
 
-        speedSpinner = findViewById(R.id.sppedSpinner);
+        speedSpinner = findViewById(R.id.speedSpinner);
         List<Float> list = new ArrayList();
         list.add(0.5f);
         list.add(1.0f);

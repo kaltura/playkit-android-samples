@@ -988,6 +988,7 @@ public class VideoFragment extends Fragment {
 
         player.addListener(this, AdEvent.adBufferStart, event -> {
             log("AD_STARTED_BUFFERING");
+            replayButton.setVisibility(View.GONE);
             appProgressBar.setVisibility(View.VISIBLE);
         });
 
@@ -1042,9 +1043,7 @@ public class VideoFragment extends Fragment {
 
         player.addListener(this, PlayerEvent.ended, event -> {
             log("PLAYER ENDED");
-            if (adCuePoints == null || !adCuePoints.hasPostRoll()) {
-                replayButton.setVisibility(View.VISIBLE);
-            }
+            replayButton.setVisibility(View.VISIBLE);
             appProgressBar.setVisibility(View.INVISIBLE);
             nowPlaying = false;
         });
@@ -1059,11 +1058,12 @@ public class VideoFragment extends Fragment {
                 appProgressBar.setVisibility(View.INVISIBLE);
             }
             if(controlsView != null){
-                if (stateChanged.newState == PlayerState.IDLE && player.getCurrentPosition() > 0 && player.getCurrentPosition() >= player.getDuration() && adCuePoints.hasPostRoll()) {
+                if (stateChanged.newState == PlayerState.IDLE && player.getCurrentPosition() > 0 && player.getCurrentPosition() >= player.getDuration() && adCuePoints != null && adCuePoints.hasPostRoll()) {
                     return;
                 }
                 controlsView.setPlayerState(stateChanged.newState);
             }
+            replayButton.setVisibility(View.GONE);
         });
 
         player.addListener(this, PlayerEvent.tracksAvailable, event -> {

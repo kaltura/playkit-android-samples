@@ -18,6 +18,7 @@
         android:orientation="horizontal">
         <Button
             android:id="@+id/play_pause_button"
+            android:contentDescription="play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -28,6 +29,7 @@
 
         <TextView
             android:id="@+id/editText"
+            android:contentDescription="edit_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -45,7 +47,8 @@
             android:orientation="horizontal">
 
         <Spinner
-            android:id="@+id/sppedSpinner"
+            android:id="@+id/speedSpinner"
+            android:contentDescription="speed_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:entries="@array/speed_arrays"

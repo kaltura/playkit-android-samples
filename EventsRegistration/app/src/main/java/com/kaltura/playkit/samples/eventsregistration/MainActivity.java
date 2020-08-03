@@ -311,6 +311,7 @@ public class MainActivity extends AppCompatActivity {
     class CustomOnItemSelectedListener implements AdapterView.OnItemSelectedListener {
 
         public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+            Log.d(TAG, "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString() + "X");
             if (userIsInteracting) {
                 Toast.makeText(parent.getContext(),
                         "OnItemSelectedListener : " + parent.getItemAtPosition(pos).toString() + "X",

@@ -642,20 +642,21 @@ public class MainActivity extends AppCompatActivity {
     private MediaInfo getOttCastMediaInfo(String mediaId, String mediaFormat, String adTagUrl, CAFCastBuilder.AdTagType adTagType, CAFCastBuilder.HttpProtocol protocol, List<Caption> externalVttCaptions) {
 
         List<String> formats = null;
+        mediaFormat = "DASH_LINEAR_APP";
         if (mediaFormat != null) {
             formats = new ArrayList<>();
             formats.add(mediaFormat);
         }
 
         CAFCastBuilder phoenixCastBuilder = new KalturaPhoenixCastBuilder()
-                .setMediaEntryId(mediaId)
-                .setKs("")
+                .setMediaEntryId("708552")
+                .setKs("djJ8MjI1fN9r3po0O11It8fUxxNwraLBq-QxULLUjcilKwTOV1bZhsDTVxp3Y_-56QiEo8PSm6MzHHthPQ_D565J4LBXsATm8LkZN1CaBUs1yxSKXVbmKZKB3UA-JxEvqJdJ2yVm08yan_oV7-UIOTd8VzgGz3fXaB9dEz39-3h5319JMaGzFnqTsjJgX3UFroiR-yqutBVSJ0CTC5mYhFb-02AiXjTy7ZJspjnyVqWQCvNoobTSAEHLKv0uG6EIuXR2eVTmSocZMesgpDtnen1K4icC7BGsBT2ZB_Mdpi_ARyQA4XP5v5OceRucYx2s-xsiGpvPQpKL3T1h3_grVrOpl9Wq2YKBeth9jsnBV1TmZrEAt4mXRPf4v7Nl_XkLLnjw86oBTXvLqh2CtHwB6lJTejkcbX8=")
                 .setFormats(formats)
                 .setStreamType(CAFCastBuilder.StreamType.VOD)
                 .setAssetReferenceType(CAFCastBuilder.AssetReferenceType.Media)
                 .setContextType(CAFCastBuilder.PlaybackContextType.Playback)
                 .setMediaType(CAFCastBuilder.KalturaAssetType.Media)
-                .setProtocol(protocol);
+                .setProtocol(CAFCastBuilder.HttpProtocol.Https);
 
         if (externalVttCaptions != null) {
             phoenixCastBuilder.setExternalVttCaptions(externalVttCaptions);

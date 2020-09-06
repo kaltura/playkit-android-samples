@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements VideoListFragment
     private int videoBitrate;
     private int companionAdWidth;
     private int companionAdHeight;
+    private static final String TAG = "MainActivity";
 
 
     @Override
@@ -265,6 +267,7 @@ public class MainActivity extends AppCompatActivity implements VideoListFragment
             startPosition = Long.valueOf(startFrom);
         } else if (key.equals(getString(R.string.pref_bitrate_key))) {
             videoBitrate = Integer.valueOf(sharedPreferences.getString(getString(R.string.pref_bitrate_key), getString(R.string.pref_bitrate_value)));
+            Log.d(TAG, "Event videoBitrateChanged " + videoBitrate);
         } else if (key.equals(getString(R.string.pref_companion_key))) {
             String companionAdDimentions = sharedPreferences.getString(getString(R.string.pref_companion_key), "0x0");
             String [] dimentions = companionAdDimentions.split("x");

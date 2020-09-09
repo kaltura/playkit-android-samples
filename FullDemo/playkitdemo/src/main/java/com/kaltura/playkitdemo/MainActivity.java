@@ -315,15 +315,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void initDrm() {
-        MediaSupport.initializeDrm(this, (supportedDrmSchemes, isHardwareDrmSupported, provisionPerformed, provisionError) -> {
-            if (provisionPerformed) {
+        MediaSupport.initializeDrm(this, (pkDeviceSupportInfo, provisionError) -> {
+            if (pkDeviceSupportInfo.isProvisionPerformed()) {
                 if (provisionError != null) {
                     log.e("DRM Provisioning failed", provisionError);
                 } else {
                     log.d("DRM Provisioning succeeded");
                 }
             }
-            log.d("DRM initialized; supported: " + supportedDrmSchemes + " isHardwareDrmSupported = " + isHardwareDrmSupported);
+            log.d("DRM initialized; supported: " + pkDeviceSupportInfo.getSupportedDrmSchemes() + " isHardwareDrmSupported = " + pkDeviceSupportInfo.isHardwareDrmSupported());
 
             // Now it's safe to look at `supportedDrmSchemes`
         });

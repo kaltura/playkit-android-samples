@@ -2,8 +2,16 @@ package com.kaltura.playkitdemo;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -31,6 +39,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
@@ -44,7 +53,6 @@ import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
-import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
@@ -53,7 +61,6 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
-import com.kaltura.playkit.player.ABRSettings;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
 import com.kaltura.playkit.player.LoadControlBuffers;
@@ -79,8 +86,6 @@ import com.kaltura.playkit.plugins.ott.OttEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
-import com.kaltura.playkit.plugins.playback.KalturaPlaybackRequestAdapter;
-import com.kaltura.playkit.plugins.playback.KalturaUDRMLicenseRequestAdapter;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 import com.kaltura.playkit.providers.MediaEntryProvider;
 import com.kaltura.playkit.providers.api.SimpleSessionProvider;
@@ -101,6 +106,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static android.app.Notification.EXTRA_NOTIFICATION_ID;
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
 import static com.kaltura.playkitdemo.MockParams.FormatTest;
 import static com.kaltura.playkitdemo.MockParams.MediaIdTest;
@@ -113,22 +119,26 @@ import static com.kaltura.playkitdemo.MockParams.OvpUserKS;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
         OrientationManager.OrientationListener, PlaybackControlsView.UIListener {
 
-    List<String> mediaArray = new ArrayList<>(Arrays.asList("922976","918331","918330","918329","918327",
+    public static final String ACTION_PLAY = "ACTION_PLAY";
+    public static final String ACTION_PAUSE = "ACTION_PAUSE";
+
+    //"918330" - BUggy
+    List<String> mediaArray = new ArrayList<>(Arrays.asList("922976","918331","918329","918327",
             "918326","918324","918321","918319","918318",
             "594979","570738","571796","572824","597345",
             "568308","620160","521735","522773","523739",
             "524710","526594","537514","538376","540085"));
 
 
-    private String V18_PROD_KS = "djJ8MjI1fK3ck941XNQatl7NgeECIlguhvu948ZwA4qol0LXt9lxa4zCL-zi9e2GLvc1UyQAPdjGKAql6246lhyKUHdTF_IfdrM_tzK7_lNgsjfF-aKohw7JYJk22WaHzBb7t7to3Axd06nIWbpnMzoxcGtJmWmQVeCdXamtpyQcT1hXck3io9t-roaZDTEfMavhmpdk_4_JQrYKsBFxy4VhjUX5X6QlHKITEiSR9J23cdXLOOgobNyotO3Zdq_gVw6Kj7s2dAqq31QRbcyUZ42ppgjd795Deg-txGjzPmbHy9Szz2KSt5Xs-3x-KQgfcjTwytOLQRZZQmVspNMFw_iMqPBtGDnpy2LkfQzOyIxsws4M-oko";
+    private String V18_PROD_KS = "djJ8MjI1fNqd-pAiBYYDIVWKd8pM09OKz9RGS0A8F_EvBQEjZZuCRMO5MlDDaBMpfteIgLFbHqJb0dTQr5BznLp8J00F8935UZl9kmmrSnVXcRVKpeecF7mPaxsfgYGR6ulCMBbRWUzy-3M1nCgjbugizegxOS9xzBZPmlEZTYPchtUPCCZ9mVb-n--hm4Gcp-eKH2m1XrDZDhNmHXyfulKm0nEVglxa-IWpb4EPlqZ1aFWFvHASmjDjxFTzmGrRwdNJE373Lszat8RuTWXEYXf1EUsugPt0RCImq8Pu9tr6Jl0j_paGxKJMarFvcv_3KQH0KoDaWJnCLouh98bU1nfpXEJt6v8AGMppBiETw3idkkbGHW_iwxyBywsPOnEEZ0bowu9F-w==";
 
     // Vootkids skype wala issue where they face device not in household issue
-    private String V18_STAGING_KS = "djJ8MjI1fFGtaQKGiNorkymwcFkmw67G2KE5-lESHZc58uGT05TIMeNqHvlZYKGZOUPiMTZlRyczGovHu9jyQv_BT3rDYPqOOFrmoxJIizjb4xAu9XdLn6AZlrDE1vfBH6BWTU6YtU4s_dW6_Pv_Yr-ke35ilQoC69bAFqq3z7x5Ppf_AspaPGQ2Lb0EE5CufQBcgd0IoabD_5w15py5t9V5r70SkSF-Cn4ZAhNMUiytTDoJx_hH1QdYyAl389YiHNed_65f5gEZDGYUJgpUQpTk8u43SW-uHz9MrOMekvMIeO6Z7Tg-ormQxM0O0yIREi4UX9jXcTOR4iOF6dfAb2eHM7qNXuE-mSBYj_onyRz9b6_8GBtA";
+  //  private String V18_STAGING_KS = "djJ8MjI1fFGtaQKGiNorkymwcFkmw67G2KE5-lESHZc58uGT05TIMeNqHvlZYKGZOUPiMTZlRyczGovHu9jyQv_BT3rDYPqOOFrmoxJIizjb4xAu9XdLn6AZlrDE1vfBH6BWTU6YtU4s_dW6_Pv_Yr-ke35ilQoC69bAFqq3z7x5Ppf_AspaPGQ2Lb0EE5CufQBcgd0IoabD_5w15py5t9V5r70SkSF-Cn4ZAhNMUiytTDoJx_hH1QdYyAl389YiHNed_65f5gEZDGYUJgpUQpTk8u43SW-uHz9MrOMekvMIeO6Z7Tg-ormQxM0O0yIREi4UX9jXcTOR4iOF6dfAb2eHM7qNXuE-mSBYj_onyRz9b6_8GBtA";
 
     // Device Not in household wala issue
 //    private String V18_PROD_KS = "djJ8MjI1fGcixuqp4KWEfBYF5snfFQ6toIzf10grFxTZeP3jVlXsYUp8WST_van4g418bq1ZuvOFqKtWBy7-j2UUBg_DZeobrJxwOrAqIhzgG7dsnaRLJHS_vkDRFgScrR19xvNRbgpVcdQa0JU7QKyXXDTN8PtcLaJobPoBxCV-Fv7wrC-3vifH-Hrj71N0JYybCSHuDnovUX6BbV_QK-AhuqpDyvTtfy5LUnhfnbFIiqEmpSPdzSPPLzKkmwW-AgYjGdzqroBeGHDXv7DuwjC5GLxFXXuoeQVIA0IAeN8DPc-fK8JlHbzMtENaieaJcaVvm198SvzjxdY-TYsfLZC9rajMcKXuHAhG13pihAEhogUryUatGXbQFIfSI8N4wfeR0JBFafZLYYNhfjB79uuHkqwX1Rq_oixiNr8Ak0to4cAh2Ix91ZXjD0EOcrj08Z3ahV0Xxf4Y9r2gzK6LrziuqRCUbhnH1k2o1b6ZDJ2fbxqX4HAG";
 
-//    private String V18_STAGING_KS = "djJ8MjI1fGZmavol7iNy3HEA5VenhjXK3FARi8VUCmAlKx5GWvwkXMk8754lQPNmR0HiiVg7B3ajEdiX5sgGCE45wO2jpXgo1Rsuo4YFelU69qio-46PgnDP-iTtreEm7VaYmsBbaCXXKqXZpHO2hO5f2H5gFBPD0bwbWVZc3RCZOFPe_vlqUjMrMApAvGnuCptHxLES9N4E92o80noiKOsJZWJp6ISoX2SmPU_PMQEnmmRhTTMfgoJcWvXcVSWFQScE5WPtBrRd2vyv0IMT8vw18s7_uAXqcOIbfowTyxUDRB8ii3iejW7K8fyUXWxjPU3ma8aNbiJVP8RuuERj9e_uxq3NEvXWRIFpdgi2IOlETXQAR3-rxWZsGP-SFYdbbCFR3rBE5A==";
+    private String V18_STAGING_KS = "djJ8MjI1fA4jcNWtb5K1QlygqYyGUbH6ZLEixZurpsVbCSfltFVqOAQ4A47V5oidczp-l9KfeoRaKFAJrp_9JbcYfpmv7FQk-xIscojf30UMovD9pR7kt57aBykRItDUfS__4wHU7Zjtm4IpWscnHMXPWwyYwJqmZ80E70XowvvAabaqo8Zvg2WzwgQZVvT52nu9yo7zicDRZelhwz7h9RdFk9DbAxC4A_7r2HiU6-05rg2TIaNMqHztT2yz5u3w0t5DVC9FJeb_7ojxnkD4ziMvGb27UWLTwmRZBim1WrgrLoqdOI4IKpvoyQU8eoM76ngg1WepZPNcJt0_2sszQ0A8XxSy3OW18dsY9Ne94tM76tpxMQIf";
 
 
     //   List<String> mediaArray = new ArrayList<>(Arrays.asList("353690","353691","353692","379073","353699"));
@@ -173,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isAdsEnabled = false;
+    private boolean isAdsEnabled = true;
     private boolean isDAIMode = false;
     SubtitleStyleSettings subtitleStyleSettings = new SubtitleStyleSettings("MyCustomSubtitleStyle");
     PKSubtitlePosition pkSubtitlePosition = new PKSubtitlePosition(true);
@@ -191,8 +201,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         //getPermissionToReadExternalStorage();
         initDrm();
         PKLog.setGlobalLevel(PKLog.Level.verbose);
@@ -209,6 +226,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         tvSourceUrl = findViewById(R.id.sourceUrlText);
         registerForContextMenu(tvSourceUrl);
+
+//        Map<String, Map<String, List<String>>> map = new HashMap<>();
+//        Map<String, List<String>> nMap = new HashMap<>();
+//        List<String> list = new ArrayList<String>();
+//
+//        list.add("ListValue");
+//        nMap.put("Key2", list);
+//        map.put("Key1", nMap);
 
         log.i("PlayKitManager: " + PlayKitManager.CLIENT_TAG);
 
@@ -253,13 +278,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // startVootOttMediaLoadingProd(playLoadedEntry, "926531"); // DTG
    //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
      //    startVootOttMediaLoadingProd(playLoadedEntry, "975732"); // SRT/webvtt failure source error
-         startVootOttMediaLoadingProd(playLoadedEntry, "630714");
-  //       startVootOttMediaLoadingProd(playLoadedEntry, "922978"); // Working asur
+     //    startVootOttMediaLoadingProd(playLoadedEntry, "633911"); //Gourav
+         startVootOttMediaLoadingProd(playLoadedEntry, "618620"); // Working Crackdown Ep:1
         // startVootOttMediaLoadingProd(playLoadedEntry, "929686"); // Working; but not on clear formats
        //  startVootOttMediaLoadingProd(playLoadedEntry, "357141"); // working with clear Not premium
        //  startVootOttMediaLoadingProd(playLoadedEntry, "357824");
 
   //        startVootOttMediaLoadingStaging(playLoadedEntry, "316699"); // Vootkids device not in household issue
+//          startVootOttMediaLoadingStaging(playLoadedEntry, "327807"); // BE 5.6.0 Testing
 
 
         //    startVootOttMediaLoadingProd(playLoadedEntry, "805985"); // Voot Live Channel DASH_LINEAR_TV
@@ -280,12 +306,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
        //   startVootOttMediaLoadingStaging(playLoadedEntry, "317071"); // vootkids jio cdn audio only "audio_only_dash"
 
+
         //startOVPVootKids(playLoadedEntry);
 
         //    startHorizonOttMediaLoadingLive(playLoadedEntry);
 
-        //  createPlayerWithoutPhoenixProvider();
-        // createPlayerWithoutPhoenixProvider();
+//          createPlayerWithoutPhoenixProvider();
 
 //        startSimpleOvpMediaLoadingHls(playLoadedEntry);
 
@@ -293,12 +319,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 //        startOttMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingVR(playLoadedEntry);
-//      startSimpleOvpMediaLoadingHls(playLoadedEntry);
+ //     startSimpleOvpMediaLoadingHls(playLoadedEntry);
+ //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
 //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
 //     startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
-        startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
+ //       startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
  //       startSimpleOvpMediaLoadingHEVCKarin(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
@@ -344,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
             startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()));
 
-                   /* if (changeMediaIndex % 4 == 0) {
+                    /*if (changeMediaIndex % 4 == 0) {
                         startSimpleOvpMediaLoadingDRM(playLoadedEntry);
                         //startSimpleOvpMediaLoadingVR(playLoadedEntry);
                         //startMockMediaLoading(playLoadedEntry);
@@ -404,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //PlayKitManager.registerPlugins(this, SamplePlugin.factory);
         PlayKitManager.registerPlugins(this, IMAPlugin.factory);
-        //PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
+      //  PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
         //PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
         // PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
@@ -489,6 +516,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         new KalturaOvpMediaProvider()
                 .setSessionProvider(new SimpleSessionProvider("https://cdnapisec.kaltura.com", 1982541, ""))
                 .setEntryId("0_2xra7jko")
+                .load(completion);
+    }
+
+    private void startSimpleOvpMediaLoadinExtSubtitle(OnMediaLoadCompletion completion) {
+        new KalturaOvpMediaProvider()
+                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, ""))
+                .setEntryId("0_dod3wrta")
                 .load(completion);
     }
 
@@ -612,14 +646,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         PKMediaConfig mediaConfig = new PKMediaConfig();
-   //     setExternalSubtitles(mediaEntry);
-
+     //   if (changeMediaIndex == 0) {
+     //       setExternalSubtitles(mediaEntry);
+     //   }
         mediaConfig.setMediaEntry(mediaEntry).setStartPosition(null);
 
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
         if (player == null) {
 
-       //     configurePlugins(pluginConfig);
+            configurePlugins(pluginConfig);
 
             player = PlayKitManager.loadPlayer(this, null);
       //      KalturaPlaybackRequestAdapter.install(player, "app://PlaykitTestApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
@@ -633,9 +668,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //    player.getSettings().setAllowCrossProtocolRedirect(true);
           //  player.getSettings().setPreferredMediaFormat(PKMediaFormat.dash);
             //Gourav
- //           player.getSettings().setSubtitlePreference(false);
+//            player.getSettings().setSubtitlePreference(true);
            // player.getSettings().enableDecoderFallback(true);
           //  player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings().setAllowSoftwareDecoder(true));
+
+            // Audio Player Configuration
+         //   player.getSettings().setAudioPlayerMode(true, createNotificationForAudioOnlyService());
 
             if (mediaEntry.isVRMediaType()) {
                 VRSettings vrSettings = new VRSettings();
@@ -763,10 +801,36 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         videoSpinner.setOnItemSelectedListener(this);
     }
 
+    public Notification createNotificationForAudioOnlyService() {
+        Notification notification = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            String NOTIFICATION_CHANNEL_ID = "com.playkit";
+            String channelName = "AudioOnlyService";
+
+            NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_HIGH);
+            chan.setLightColor(Color.BLUE);
+            chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            assert manager != null;
+            manager.createNotificationChannel(chan);
+
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+
+            notification = notificationBuilder.setOngoing(true)
+                    .setSmallIcon(android.R.drawable.ic_media_play)
+                    .setContentTitle("My Audio Service")
+                    .setPriority(NotificationManager.IMPORTANCE_HIGH)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .build();
+        }
+
+        return notification;
+    }
+
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
         if (isAdsEnabled) {
             if (isDAIMode) {
-                addIMADAIPluginConfig(pluginConfigs, 11);
+                addIMADAIPluginConfig(pluginConfigs, 2);
             } else {
                 addIMAPluginConfig(pluginConfigs);
             }
@@ -876,7 +940,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         log.d("Play Ad preSkipAdTagUrl");
         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
-        IMAConfig adsConfig = getAdsConfig(vootPremiumEmptyAdTag);
+        IMAConfig adsConfig = getAdsConfig(ads5AdsEvery10Secs);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
@@ -1461,6 +1525,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 IMADAIConfig adsConfigError = getDAIConfigDASHFROMSAMPLE();
                 config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
             }
+            case 13: {
+                promptMessage(DAI_PLUGIN, getDAIConfigLiveHlsZee5().getAssetTitle());
+                IMADAIConfig adsConfig13 = getDAIConfigLiveHlsZee5();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig13);
+            }
             break;
             default:
                 break;
@@ -1632,6 +1701,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 licenseUrl).enableDebugMode(true).setAlwaysStartWithPreroll(true);
     }
 
+    private IMADAIConfig getDAIConfigLiveHlsZee5() {
+        String assetTitle = "Live Video - Sample";
+        String assetKey = "Hs8aTJFeSCq7kWEvQiSGVg";
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
+        String licenseUrl = null;
+        return IMADAIConfig.getLiveIMADAIConfig(assetTitle,
+                assetKey,
+                apiKey,
+                streamFormat,
+                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+    }
+
     private IMADAIConfig getDAIConfigISSUE() {
         String assetTitle = "VOD - Tears of Steel";
         String apiKey = null;
@@ -1672,7 +1754,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             controlsView.release();
         }
         if (player != null) {
-            player.onApplicationPaused();
+         //   player.onApplicationPaused();
         }
         super.onPause();
     }
@@ -1828,6 +1910,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, PlayerEvent.tracksAvailable, event -> {
             //When the track data available, this event occurs. It brings the info object with it.
             tracksInfo = event.tracksInfo;
+            log.d("tracksInfo.getAudioTracks() Gourav = " + tracksInfo.getAudioTracks());
             populateSpinnersWithTrackInfo(event.tracksInfo);
         });
 
@@ -1925,9 +2008,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         PKExternalSubtitle pkExternalSubtitle = new PKExternalSubtitle()
                 .setUrl("https://vootvod.cdn.jio.com/s/enc/hls/p/1982551/sp/198255100/serveFlavor/entryId/0_wlu0b9eu/v/2/pv/1/ev/12/flavorId/0_t14tfa52/name/a.srt/index.m3u8/index.m3u8?__hdnea__=st=1597065030~exp=1597151430~acl=/s/enc/hls/p/1982551/sp/198255100/serveFlavor/entryId/0_wlu0b9eu/v/2/pv/1/ev/12/flavorId/0_*~hmac=dbebec71dfcdfdad2cf36dc340fc142bdc6640c65377d30a6aa9dfaf1fa68412")
                 .setMimeType(PKSubtitleFormat.vtt)
-                .setLabel("Voot-Buggy")
-                .setLanguage("en");
+                .setLabel("Voot-Buggy-en1")
+                .setLanguage(null);
         subsList.add(pkExternalSubtitle);
+
+        PKExternalSubtitle pkExternalSubtitle1 = new PKExternalSubtitle()
+                .setUrl("https://vootvod.cdn.jio.com/s/enc/hls/p/1982551/sp/198255100/serveFlavor/entryId/0_wlu0b9eu/v/2/pv/1/ev/12/flavorId/0_t14tfa52/name/a.srt/index.m3u8/index.m3u8?__hdnea__=st=1597065030~exp=1597151430~acl=/s/enc/hls/p/1982551/sp/198255100/serveFlavor/entryId/0_wlu0b9eu/v/2/pv/1/ev/12/flavorId/0_*~hmac=dbebec71dfcdfdad2cf36dc340fc142bdc6640c65377d30a6aa9dfaf1fa68412")
+                .setMimeType(PKSubtitleFormat.srt)
+                .setLabel("Voot-Buggy-en2")
+                .setLanguage("en");
+        subsList.add(pkExternalSubtitle1);
 
         PKExternalSubtitle pkExternalSubtitleDe = new PKExternalSubtitle()
                 .setUrl("https://zee5vod.akamaized.net/drm1/elemental/dash/Movies/TIGER_Revised_20112018_Hindi_Movie_REX_hi_292ea10f271d2643bfe36430772992a4/thumbnails/index.vtt")
@@ -1936,6 +2026,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setLanguage("ru");
         subsList.add(pkExternalSubtitleDe);
 
+        PKExternalSubtitle pkExternalSubtitleDe1 = new PKExternalSubtitle()
+                .setUrl("https://zee5vod.akamaized.net/drm1/elemental/dash/Movies/TIGER_Revised_20112018_Hindi_Movie_REX_hi_292ea10f271d2643bfe36430772992a4/thumbnails/index.vtt")
+                .setMimeType(PKSubtitleFormat.vtt)
+                .setLabel("Zee-2-russian2")
+                .setLanguage("ru");
+        subsList.add(pkExternalSubtitleDe1);
+
         PKExternalSubtitle pkExternalSubtitlefr = new PKExternalSubtitle()
                 .setUrl("https://zee5vod.akamaized.net/drm1/1080p/movies/MOVIE_PROJECT/KANNADA/19122018/TIGER_MOVIE_kn.mp4/thumbnails/index.vtt")
                 .setMimeType(PKSubtitleFormat.vtt)
@@ -1943,12 +2040,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setLanguage("fr");
         subsList.add(pkExternalSubtitlefr);
 
-        PKExternalSubtitle pkExternalSubtitlefr1 = new PKExternalSubtitle()
-                .setUrl("https://zee5vod.akamaized.net/drm1/elemental/dash/Movies/TIGER_Revised_20112018_Hindi_Movie_REX_hi_292ea10f271d2643bfe36430772992a4/thumbnails/index.vtt")
-                .setMimeType(PKSubtitleFormat.vtt)
-                .setLabel("Zee-2-french-1")
-                .setLanguage("fr");
-        subsList.add(pkExternalSubtitlefr1);
+//        PKExternalSubtitle pkExternalSubtitlefr1 = new PKExternalSubtitle()
+//                .setUrl("https://zee5vod.akamaized.net/drm1/elemental/dash/Movies/TIGER_Revised_20112018_Hindi_Movie_REX_hi_292ea10f271d2643bfe36430772992a4/thumbnails/index.vtt")
+//                .setMimeType(PKSubtitleFormat.vtt)
+//                .setLabel("Zee-2-french-1")
+//                .setLanguage("fr");
+//        subsList.add(pkExternalSubtitlefr1);
 
         PKExternalSubtitle pkExternalSubtitleja = new PKExternalSubtitle()
                 .setUrl("https://zee5vod.akamaized.net/drm1/1080p/movies/MOVIE_PROJECT/KANNADA/19122018/TIGER_MOVIE_kn.mp4/thumbnails/index.vtt")
@@ -1957,12 +2054,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setLanguage("ja");
         subsList.add(pkExternalSubtitleja);
 
-        PKExternalSubtitle pkExternalSubtitleja1 = new PKExternalSubtitle()
-                .setUrl("https://zee5vod.akamaized.net/drm1/elemental/dash/Movies/TIGER_Revised_20112018_Hindi_Movie_REX_hi_292ea10f271d2643bfe36430772992a4/thumbnails/index.vtt")
-                .setMimeType(PKSubtitleFormat.vtt)
-                .setLabel("Zee-2-japan")
-                .setLanguage("ja");
-        subsList.add(pkExternalSubtitleja1);
+//        PKExternalSubtitle pkExternalSubtitleja1 = new PKExternalSubtitle()
+//                .setUrl("https://zee5vod.akamaized.net/drm1/elemental/dash/Movies/TIGER_Revised_20112018_Hindi_Movie_REX_hi_292ea10f271d2643bfe36430772992a4/thumbnails/index.vtt")
+//                .setMimeType(PKSubtitleFormat.vtt)
+//                .setLabel("Zee-2-japan")
+//                .setLanguage("ja");
+//        subsList.add(pkExternalSubtitleja1);
 
         PKExternalSubtitle pkExternalSubtitlehe = new PKExternalSubtitle()
                 .setUrl("https://zee5vod.akamaized.net/drm1/1080p/movies/MOVIE_PROJECT/KANNADA/19122018/TIGER_MOVIE_kn.mp4/thumbnails/index.vtt")
@@ -2549,7 +2646,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //audio
         // String mediaId = "743297";
         // String formatHls  = "audio_only";
-          String formatHls  = "dash Main";
+        //  String formatHls  = "dash Main";
+          String formatHls  = "HLS_Linear_P";
         //                "Format": "dash Mobile",
 //                "Format": "ism Main",
 //                "Format": "Tablet Main",
@@ -2608,7 +2706,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         List<PKMediaSource> mediaSourceList = new ArrayList<>();
         PKMediaSource pkMediaSource = new PKMediaSource();
-        pkMediaSource.setUrl("https://livelinearhddash2.akamaized.net/dash/live/2003277/ch129/master.mpd");
+        pkMediaSource.setUrl("https://zee5vodnd.akamaized.net/hls1/elemental/hls/ORIGINAL_CONTENT_BRO/DOMESTIC/HINDI/MENTALHOOD_HINDI_EP01_BRO_BEBAAKEE_CROSS_PROMO_hi_08d64bc720265e5be53e09934ffc2848/index.m3u8?hdnea=st=1600841898~exp=1600844898~acl=/*~hmac=d9c4a72cda66ce66acccbdcd6c753fbde75954947d564627e37af60ada029e62");
         //  pkMediaSource.setId("929088");
      //   pkMediaSource.setMediaFormat(PKMediaFormat.dash);
 
@@ -2620,6 +2718,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         mediaSourceList.add(pkMediaSource);
         pkMediaEntry.setSources(mediaSourceList);
+
+        //External Subtitles
+        List<PKExternalSubtitle> subsList = new ArrayList<>();
+
+        PKExternalSubtitle pkExternalSubtitle = new PKExternalSubtitle()
+                .setUrl("https://zee5vod.akamaized.net/drm1/elemental/dash/ORIGINAL_CONTENT_BRO/DOMESTIC/HINDI/MENTALHOOD_HINDI_EP01_BRO_BEBAAKEE_CROSS_PROMO_hi_08d64bc720265e5be53e09934ffc2848/manifest-en.vtt")
+                .setMimeType(PKSubtitleFormat.vtt)
+                .setLabel("Zee-Not-Sync")
+                .setLanguage("En");
+        subsList.add(pkExternalSubtitle);
+
+        pkMediaEntry.setExternalSubtitleList(subsList);
 
         PKMediaConfig config = new PKMediaConfig();
         config.setMediaEntry(pkMediaEntry);

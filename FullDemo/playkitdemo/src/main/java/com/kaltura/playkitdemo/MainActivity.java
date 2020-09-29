@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isAdsEnabled = true;
+    private boolean isAdsEnabled = false;
     private boolean isDAIMode = false;
     SubtitleStyleSettings subtitleStyleSettings = new SubtitleStyleSettings("MyCustomSubtitleStyle");
     PKSubtitlePosition pkSubtitlePosition = new PKSubtitlePosition(true);
@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
    //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
      //    startVootOttMediaLoadingProd(playLoadedEntry, "975732"); // SRT/webvtt failure source error
      //    startVootOttMediaLoadingProd(playLoadedEntry, "633911"); //Gourav
-         startVootOttMediaLoadingProd(playLoadedEntry, "618620"); // Working Crackdown Ep:1
+  //       startVootOttMediaLoadingProd(playLoadedEntry, "618620"); // Working Crackdown Ep:1
         // startVootOttMediaLoadingProd(playLoadedEntry, "929686"); // Working; but not on clear formats
        //  startVootOttMediaLoadingProd(playLoadedEntry, "357141"); // working with clear Not premium
        //  startVootOttMediaLoadingProd(playLoadedEntry, "357824");
@@ -322,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
  //     startSimpleOvpMediaLoadingHls(playLoadedEntry);
  //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
 //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
-//     startMockMediaLoading(playLoadedEntry);
+     startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
  //       startSimpleOvpMediaLoadingHEVC(playLoadedEntry);

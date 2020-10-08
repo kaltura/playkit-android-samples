@@ -131,7 +131,7 @@ public class VideoMetadata {
                 "Vod DAI",
                 VOOT_URL1,
                 LIC_URL1,
-                null, "19463", "tears-of-steel",
+                null, "2528370", "tears-of-steel",
                 R.drawable.k_image));
         defaultVideos.add(new VideoItem(
                 "Live DAI",

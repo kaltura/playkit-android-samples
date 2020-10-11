@@ -20,6 +20,7 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKSubtitleFormat;
+import com.kaltura.playkit.PKSubtitlePreference;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -95,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ////player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO));
 
         player.getSettings().setSubtitleStyle(getDefaultPositionDefault());
-
+        player.getSettings().setSubtitlePreference(PKSubtitlePreference.EXTERNAL);
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
         player.play();
@@ -132,15 +133,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setUrl("http://brenopolanski.com/html5-video-webvtt-example/MIB2-subtitles-pt-BR.vtt")
                 .setMimeType(PKSubtitleFormat.vtt)
                 .setLabel("External_Deutsch")
-                .setLanguage("deu");
+                .setLanguage("nl");
         mList.add(pkExternalSubtitle);
 
         PKExternalSubtitle pkExternalSubtitleDe = new PKExternalSubtitle()
                 .setUrl("https://mkvtoolnix.download/samples/vsshort-en.srt")
                 .setMimeType(PKSubtitleFormat.srt)
                 .setLabel("External_English")
-                .setLanguage("eng")
-                .setDefault();
+                .setLanguage("eng");
+                //.setDefault();
         mList.add(pkExternalSubtitleDe);
 
         mediaEntry.setExternalSubtitleList(mList);

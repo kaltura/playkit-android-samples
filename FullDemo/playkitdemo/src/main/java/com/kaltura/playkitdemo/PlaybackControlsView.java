@@ -97,7 +97,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         seekBar.setScrubberColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
         seekBar.addListener(componentListener);
 
-        tvCurTime = this.findViewById(R.id.exo_position);
+        tvCurTime = this.findViewById(R.id.kexo_position);
         tvTime = this.findViewById(R.id.kexo_duration);
     }
 

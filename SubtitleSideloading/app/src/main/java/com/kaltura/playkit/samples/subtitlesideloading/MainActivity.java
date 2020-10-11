@@ -24,6 +24,7 @@ import com.kaltura.playkit.PKSubtitlePreference;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
+import com.kaltura.playkit.ads.AdController;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.PKExternalSubtitle;
 import com.kaltura.playkit.player.PKSubtitlePosition;
@@ -167,14 +168,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (player.isPlaying()) {
-                    //If player is playing, change text of the button and pause.
-                    playPauseButton.setText(R.string.play_text);
-                    player.pause();
+                AdController adController = player.getController(AdController.class);
+                if (adController != null && adController.isAdDisplayed()) {
+                    if (adController.isAdPlaying()) {
+                        playPauseButton.setText(R.string.play_text);
+                        adController.pause();
+                    } else {
+                        playPauseButton.setText(R.string.pause_text);
+                        adController.play();
+                    }
                 } else {
-                    //If player is not playing, change text of the button and play.
-                    playPauseButton.setText(R.string.pause_text);
-                    player.play();
+                    if (player.isPlaying()) {
+                        //If player is playing, change text of the button and pause.
+                        playPauseButton.setText(R.string.play_text);
+                        player.pause();
+                    } else {
+                        //If player is not playing, change text of the button and play.
+                        playPauseButton.setText(R.string.pause_text);
+                        player.play();
+                    }
                 }
             }
         });

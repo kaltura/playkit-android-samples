@@ -131,11 +131,11 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         if (!dragging && position != C.POSITION_UNSET && duration != C.TIME_UNSET) {
             //log.d("updateProgress Set Position:" + position);
             tvCurTime.setText(stringForTime(position));
-            seekBar.setPosition(progressBarValue(position));
-            seekBar.setDuration(progressBarValue(duration));
+            seekBar.setPosition(position);
+            seekBar.setDuration(duration);
         }
 
-        seekBar.setBufferedPosition(progressBarValue(bufferedPosition));
+        seekBar.setBufferedPosition(bufferedPosition);
         // Remove scheduled updates.
         removeCallbacks(updateProgressAction);
         // Schedule an update if necessary.
@@ -159,7 +159,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         @Override
         public void onScrubMove(TimeBar timeBar, long position) {
             if (player != null) {
-                tvCurTime.setText(stringForTime((position * player.getDuration()) / PROGRESS_BAR_MAX));
+                tvCurTime.setText(stringForTime(position));
             }
         }
 
@@ -167,7 +167,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
             dragging = false;
             if (player != null) {
-                player.seekTo((position * player.getDuration()) / PROGRESS_BAR_MAX);
+                player.seekTo(position);
 
             }
         }

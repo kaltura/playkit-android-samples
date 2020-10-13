@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             "524710","526594","537514","538376","540085"));
 
 
-    private String V18_PROD_KS = "djJ8MjI1fHxobFnnhgALrBBoj_9G7CGVh_I3tMd91KA-MuR7uRKQRWs0QVnJXLch4Wt9ZSjiU4UxaV6I3HFl0KvlTtNqnf1mFE68-IKoGwKhumSUy_R4mErLUiD27rfCYOnS90PDe1w97xXFuu-ZHdqDw81bqq4hVvNXh90PSFivIoXJ-0QmKQY1tCt3ioFamDhqYzY0W_cOzatN155vgr8Bvwv0GWMMvoB9vllV5D0WpKMWk8tJhUkIbNNevPmtrj4E3osAMzP0AndqzsXuDbGy6mq3GEPf9gCjJjX9dcpJUIYL77UsVF-GD6wfyjP3ccURiEZkkTHw8KYXifgj5yNBD2WK66TKuRn57hq0VZC9qczxIshXbg3-A36Eqzl0BVN6X2_iD2D7BLBlFRfZ0lRgWNr0t4g=";
+    private String V18_PROD_KS = "djJ8MjI1fAfIBbr-J3xa6bsYmng0KGvoEEU3xRAEo3ZdNUh5RBuLmBfiIDYXRvYsDxl1D5neQhyg96bLNMmDRUHJMTnQDgjNlBg40AKIHMxptZxN7u44Yfmrtlyw3REtQJ-T1WoNKexHMWgQcD5P3-sbkGqzcj1XzwcL6DvhJwHxblirbqKU9KVudiFd2CnJaKV8S_GH2wKGmePtwZpeEETolSeBE2t9F00Ein4Y9zX0R-urekURF0Zug3MwwKAoeFjTwxaANXqReh9onedXltyg-k7nmMoiudKZtT2w2em2W-t3gYIcFH9fOW7pOIT9ssKz1aVj6QmiQtUsrnoik6hYJie0XEZv5fq6e-8yxdfet_4pejrTBkcJ8QgQrhTlekCIn22AmA==";
 
     // Vootkids skype wala issue where they face device not in household issue
   //  private String V18_STAGING_KS = "djJ8MjI1fFGtaQKGiNorkymwcFkmw67G2KE5-lESHZc58uGT05TIMeNqHvlZYKGZOUPiMTZlRyczGovHu9jyQv_BT3rDYPqOOFrmoxJIizjb4xAu9XdLn6AZlrDE1vfBH6BWTU6YtU4s_dW6_Pv_Yr-ke35ilQoC69bAFqq3z7x5Ppf_AspaPGQ2Lb0EE5CufQBcgd0IoabD_5w15py5t9V5r70SkSF-Cn4ZAhNMUiytTDoJx_hH1QdYyAl389YiHNed_65f5gEZDGYUJgpUQpTk8u43SW-uHz9MrOMekvMIeO6Z7Tg-ormQxM0O0yIREi4UX9jXcTOR4iOF6dfAb2eHM7qNXuE-mSBYj_onyRz9b6_8GBtA";
@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // startVootOttMediaLoadingProd(playLoadedEntry, "926531"); // DTG
    //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
      //    startVootOttMediaLoadingProd(playLoadedEntry, "975732"); // SRT/webvtt failure source error
-         startVootOttMediaLoadingProd(playLoadedEntry, "633911"); //Gourav
+         startVootOttMediaLoadingProd(playLoadedEntry, "922743"); //Gourav
      //    startVootOttMediaLoadingProd(playLoadedEntry, "618620");
         // startVootOttMediaLoadingProd(playLoadedEntry, "929686"); // Working; but not on clear formats
        //  startVootOttMediaLoadingProd(playLoadedEntry, "357141"); // working with clear Not premium
@@ -2624,7 +2624,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 //  String ks = "djJ8MjI1fJqYQoKdrm0lWI2qygW7jk4EYCjgnBhqzHQ4PVBsRTNQ0D1s7FcYMH4xikLtWCX95Vcc4Uw0MUgMlabou_0cMpXF3DbCGce-5CU635jnqhD8zZqQ5kGeuCj3ylu1m45VYTVrIfB3p3IGX47OMshGbBnY0gLVuSM7F2IPAMeW6pxoTXdRMdp4Ois-SGtfkca2XQ==";
                 if (completion != null) {
-                    completion.onComplete(new PrimitiveResult(V18_PROD_KS));
+                    completion.onComplete(new PrimitiveResult(""));
                 }
             }
 

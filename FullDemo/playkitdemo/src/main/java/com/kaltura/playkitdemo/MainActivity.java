@@ -49,7 +49,6 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
-//import com.kaltura.playkit.PKVideoCodec;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -222,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //startOttMediaLoading(playLoadedEntry);
         //startSimpleOvpMediaLoadingVR(playLoadedEntry);
         //startSimpleOvpMediaLoadingHls(playLoadedEntry);
-        //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
+        //startSimpleOvpMediaLoadingLive(playLoadedEntry); // for this live media need to force hls since dash is not valid for this media
         //startMockMediaLoading(playLoadedEntry);
         //startOvpMediaLoading(playLoadedEntry);
         startSimpleOvpMediaLoadingDRM(playLoadedEntry);
@@ -449,8 +448,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             @Override
             public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                String ks = "";
                 if (completion != null) {
-                    completion.onComplete(new PrimitiveResult(OvpUserKS));
+                    completion.onComplete(new PrimitiveResult(ks));
                 }
             }
 
@@ -892,6 +892,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
+    protected void onResume() {
+        log.d("Application onResume");
+        super.onResume();
+        if (player != null) {
+            player.onApplicationResumed();
+        }
+        if (controlsView != null) {
+            controlsView.resume();
+        }
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
 
@@ -1135,18 +1147,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, OttEvent.ottEvent, event -> {
             log.d("Concurrency event = " + event.type);
         });
-    }
-
-    @Override
-    protected void onResume() {
-        log.d("Application onResume");
-        super.onResume();
-        if (player != null) {
-            player.onApplicationResumed();
-        }
-        if (controlsView != null) {
-            controlsView.resume();
-        }
     }
 
     @Override

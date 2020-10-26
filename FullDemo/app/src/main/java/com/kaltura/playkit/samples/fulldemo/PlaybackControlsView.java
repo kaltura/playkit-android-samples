@@ -6,19 +6,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
+import com.kaltura.android.exoplayer2.C;
+import com.kaltura.android.exoplayer2.Timeline;
+import com.kaltura.android.exoplayer2.ui.DefaultTimeBar;
+import com.kaltura.android.exoplayer2.ui.TimeBar;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.ads.AdController;
-import com.kaltura.playkit.utils.Consts;
 
 import java.util.Formatter;
 import java.util.Locale;
 
-public class PlaybackControlsView extends LinearLayout implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class PlaybackControlsView extends LinearLayout implements View.OnClickListener {
 
     private static final PKLog log = PKLog.get("PlaybackControlsView");
     private static final int PROGRESS_BAR_MAX = 100;
@@ -29,18 +34,15 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
     private Formatter formatter;
     private StringBuilder formatBuilder;
 
-    private SeekBar seekBar;
+    private DefaultTimeBar seekBar;
     private TextView tvCurTime, tvTime;
     private ImageButton btnPlay, btnPause, btnFastForward, btnRewind, btnNext, btnPrevious;
 
     private boolean dragging = false;
 
-    private Runnable updateProgressAction = new Runnable() {
-        @Override
-        public void run() {
-            updateProgress();
-        }
-    };
+    private ComponentListener componentListener;
+
+    private Runnable updateProgressAction = this::updateProgress;
 
     public PlaybackControlsView(Context context) {
         this(context, null);
@@ -55,17 +57,20 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         LayoutInflater.from(context).inflate(R.layout.playback_layout, this);
         formatBuilder = new StringBuilder();
         formatter = new Formatter(formatBuilder, Locale.getDefault());
+        componentListener = new ComponentListener();
         initPlaybackControls();
     }
 
     private void initPlaybackControls() {
 
-        btnPlay = this.findViewById(R.id.play);
-        btnPause = this.findViewById(R.id.pause);
-        btnFastForward = this.findViewById(R.id.ffwd);
-        btnRewind = this.findViewById(R.id.rew);
-        btnNext = this.findViewById(R.id.next);
-        btnPrevious = this.findViewById(R.id.prev);
+        btnPlay = this.findViewById(R.id.kexo_play);
+        btnPause = this.findViewById(R.id.kexo_pause);
+        btnFastForward = this.findViewById(R.id.kexo_ffwd);
+        btnFastForward.setVisibility(GONE);
+        btnRewind = this.findViewById(R.id.kexo_rew);
+        btnRewind.setVisibility(GONE);
+        btnNext = this.findViewById(R.id.kexo_next);
+        btnPrevious = this.findViewById(R.id.kexo_prev);
 
         btnPlay.setOnClickListener(this);
         btnPause.setOnClickListener(this);
@@ -74,79 +79,137 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         btnNext.setOnClickListener(this);
         btnPrevious.setOnClickListener(this);
 
-        seekBar = this.findViewById(R.id.mediacontroller_progress);
-        seekBar.setOnSeekBarChangeListener(this);
+        seekBar = this.findViewById(R.id.kexo_progress);
+        seekBar.setPlayedColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+        seekBar.setBufferedColor(ContextCompat.getColor(getContext(), R.color.grey));
+        seekBar.setUnplayedColor(ContextCompat.getColor(getContext(), R.color.black));
+        seekBar.setScrubberColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+        seekBar.addListener(componentListener);
 
-        tvCurTime = this.findViewById(R.id.time_current);
-        tvTime = this.findViewById(R.id.time);
+        tvCurTime = this.findViewById(R.id.kexo_position);
+        tvTime = this.findViewById(R.id.kexo_duration);
     }
 
+
     private void updateProgress() {
-        long duration = Consts.TIME_UNSET;
-        long position = Consts.POSITION_UNSET;
+        long duration = C.TIME_UNSET;
+        long position = C.POSITION_UNSET;
         long bufferedPosition = 0;
-        if(player != null){
+        if (player != null) {
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
                 duration = adController.getAdDuration();
                 position = adController.getAdCurrentPosition();
-                //log.d("XXX adController Duration:" + duration);
-                //log.d("XXX adController Position:" + position);
+
+                //log.d("adController Duration:" + duration);
+                //log.d("adController Position:" + position);
             } else {
                 duration = player.getDuration();
                 position = player.getCurrentPosition();
-                //log.d("XXX Duration:" + duration);
-                //log.d("XXX Position:" + position);
+                //log.d("Duration:" + duration);
+                //log.d("Position:" + position);
                 bufferedPosition = player.getBufferedPosition();
             }
         }
 
-        if(duration != Consts.TIME_UNSET){
+        if (duration != C.TIME_UNSET) {
             //log.d("updateProgress Set Duration:" + duration);
             tvTime.setText(stringForTime(duration));
         }
 
-        if (!dragging && position != Consts.POSITION_UNSET && duration != Consts.TIME_UNSET) {
+        if (!dragging && position != C.POSITION_UNSET && duration != C.TIME_UNSET) {
             //log.d("updateProgress Set Position:" + position);
             tvCurTime.setText(stringForTime(position));
-            seekBar.setProgress(progressBarValue(position));
+            seekBar.setPosition(position);
+            seekBar.setDuration(duration);
         }
 
-        seekBar.setSecondaryProgress(progressBarValue(bufferedPosition));
+        seekBar.setBufferedPosition(bufferedPosition);
         // Remove scheduled updates.
         removeCallbacks(updateProgressAction);
         // Schedule an update if necessary.
-        if (playerState != PlayerState.IDLE || (player.getController(AdController.class)  != null && player.getController(AdController.class).getAdCurrentPosition() >= 0)) {
-            long delayMs = 1000;
+        if (playerState != PlayerState.IDLE) {
+            long delayMs = 500;
             postDelayed(updateProgressAction, delayMs);
+        }
+    }
+
+    /**
+     * Component Listener for Default time bar from ExoPlayer UI
+     */
+    private final class ComponentListener
+            implements com.kaltura.android.exoplayer2.Player.EventListener, TimeBar.OnScrubListener, OnClickListener {
+
+        @Override
+        public void onScrubStart(TimeBar timeBar, long position) {
+            dragging = true;
+        }
+
+        @Override
+        public void onScrubMove(TimeBar timeBar, long position) {
+            if (player != null) {
+                tvCurTime.setText(stringForTime(position));
+            }
+        }
+
+        @Override
+        public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
+            dragging = false;
+            if (player != null) {
+                player.seekTo(position);
+            }
+        }
+
+        @Override
+        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+            updateProgress();
+        }
+
+        @Override
+        public void onPositionDiscontinuity(@com.kaltura.android.exoplayer2.Player.DiscontinuityReason int reason) {
+            updateProgress();
+        }
+
+        @Override
+        public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, @com.kaltura.android.exoplayer2.Player.TimelineChangeReason int reason) {
+            updateProgress();
+        }
+
+        @Override
+        public void onClick(View view) {
         }
     }
 
     private int progressBarValue(long position) {
         int progressValue = 0;
-        if(player != null){
+        if (player != null) {
+
             long duration = player.getDuration();
+            //log.d("position = "  + position);
+            //log.d("duration = "  + duration);
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
                 duration = adController.getAdDuration();
             }
             if (duration > 0) {
-                progressValue = (int) ((position * PROGRESS_BAR_MAX) / duration);
+                //log.d("position = "  + position);
+                progressValue = Math.round((position * PROGRESS_BAR_MAX) / duration);
             }
+            //log.d("progressValue = "  + progressValue);
         }
 
         return progressValue;
     }
 
-    private long positionValue(int progress) {
+    private long positionValue(long progress) {
         long positionValue = 0;
-        if(player != null){
+        if (player != null) {
             long duration = player.getDuration();
             AdController adController = player.getController(AdController.class);
             if (adController != null && adController.isAdDisplayed()) {
                 duration = adController.getAdDuration();
             }
-            positionValue = (duration * progress) / PROGRESS_BAR_MAX;
+            positionValue = Math.round((duration * progress) / PROGRESS_BAR_MAX);
         }
 
         return positionValue;
@@ -172,50 +235,36 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         updateProgress();
     }
 
+    public void setSeekBarStateForAd(boolean isAdPlaying) {
+        seekBar.setEnabled(!isAdPlaying);
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.play:
-                if(player != null) {
+            case R.id.kexo_play:
+                if (player != null) {
                     player.play();
                 }
                 break;
-            case R.id.pause:
-                if(player != null) {
+            case R.id.kexo_pause:
+                if (player != null) {
                     player.pause();
                 }
                 break;
-            case R.id.ffwd:
+            case R.id.kexo_ffwd:
                 //Do nothing for now
                 break;
-            case R.id.rew:
+            case R.id.kexo_rew:
                 ///Do nothing for now
                 break;
-            case R.id.next:
+            case R.id.kexo_next:
                 //Do nothing for now
                 break;
-            case R.id.prev:
+            case R.id.kexo_prev:
                 //Do nothing for now
                 break;
         }
-    }
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if (fromUser) {
-            tvCurTime.setText(stringForTime(positionValue(progress)));
-        }
-    }
-
-
-    public void onStartTrackingTouch(SeekBar seekBar) {
-        dragging = true;
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-        dragging = false;
-        player.seekTo(positionValue(seekBar.getProgress()));
     }
 
     public void release() {
@@ -225,4 +274,6 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
     public void resume() {
         updateProgress();
     }
+
 }
+

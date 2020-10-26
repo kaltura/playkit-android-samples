@@ -20,9 +20,11 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKSubtitleFormat;
+import com.kaltura.playkit.PKSubtitlePreference;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
+import com.kaltura.playkit.ads.AdController;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.PKExternalSubtitle;
 import com.kaltura.playkit.player.PKSubtitlePosition;
@@ -95,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         ////player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.AUTO));
 
         player.getSettings().setSubtitleStyle(getDefaultPositionDefault());
-
+        player.getSettings().setSubtitlePreference(PKSubtitlePreference.EXTERNAL);
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
         player.play();
@@ -132,15 +134,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setUrl("http://brenopolanski.com/html5-video-webvtt-example/MIB2-subtitles-pt-BR.vtt")
                 .setMimeType(PKSubtitleFormat.vtt)
                 .setLabel("External_Deutsch")
-                .setLanguage("deu");
+                .setLanguage("nl");
         mList.add(pkExternalSubtitle);
 
         PKExternalSubtitle pkExternalSubtitleDe = new PKExternalSubtitle()
                 .setUrl("https://mkvtoolnix.download/samples/vsshort-en.srt")
                 .setMimeType(PKSubtitleFormat.srt)
                 .setLabel("External_English")
-                .setLanguage("eng")
-                .setDefault();
+                .setLanguage("eng");
+                //.setDefault();
         mList.add(pkExternalSubtitleDe);
 
         mediaEntry.setExternalSubtitleList(mList);
@@ -166,14 +168,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (player.isPlaying()) {
-                    //If player is playing, change text of the button and pause.
-                    playPauseButton.setText(R.string.play_text);
-                    player.pause();
+                AdController adController = player.getController(AdController.class);
+                if (adController != null && adController.isAdDisplayed()) {
+                    if (adController.isAdPlaying()) {
+                        playPauseButton.setText(R.string.play_text);
+                        adController.pause();
+                    } else {
+                        playPauseButton.setText(R.string.pause_text);
+                        adController.play();
+                    }
                 } else {
-                    //If player is not playing, change text of the button and play.
-                    playPauseButton.setText(R.string.pause_text);
-                    player.play();
+                    if (player.isPlaying()) {
+                        //If player is playing, change text of the button and pause.
+                        playPauseButton.setText(R.string.play_text);
+                        player.pause();
+                    } else {
+                        //If player is not playing, change text of the button and play.
+                        playPauseButton.setText(R.string.pause_text);
+                        player.play();
+                    }
                 }
             }
         });

@@ -49,7 +49,6 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
-//import com.kaltura.playkit.PKVideoCodec;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -222,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //startOttMediaLoading(playLoadedEntry);
         //startSimpleOvpMediaLoadingVR(playLoadedEntry);
         //startSimpleOvpMediaLoadingHls(playLoadedEntry);
-        //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
+        //startSimpleOvpMediaLoadingLive(playLoadedEntry); // for this live media need to force hls since dash is not valid for this media
         //startMockMediaLoading(playLoadedEntry);
         //startOvpMediaLoading(playLoadedEntry);
         startSimpleOvpMediaLoadingDRM(playLoadedEntry);
@@ -315,15 +314,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void initDrm() {
-        MediaSupport.initializeDrm(this, (supportedDrmSchemes, isHardwareDrmSupported, provisionPerformed, provisionError) -> {
-            if (provisionPerformed) {
+        MediaSupport.initializeDrm(this, (pkDeviceSupportInfo, provisionError) -> {
+            if (pkDeviceSupportInfo.isProvisionPerformed()) {
                 if (provisionError != null) {
                     log.e("DRM Provisioning failed", provisionError);
                 } else {
                     log.d("DRM Provisioning succeeded");
                 }
             }
-            log.d("DRM initialized; supported: " + supportedDrmSchemes + " isHardwareDrmSupported = " + isHardwareDrmSupported);
+            log.d("DRM initialized; supported: " + pkDeviceSupportInfo.getSupportedDrmSchemes() + " isHardwareDrmSupported = " + pkDeviceSupportInfo.isHardwareDrmSupported());
 
             // Now it's safe to look at `supportedDrmSchemes`
         });
@@ -449,8 +448,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             @Override
             public void getSessionToken(OnCompletion<PrimitiveResult> completion) {
+                String ks = "";
                 if (completion != null) {
-                    completion.onComplete(new PrimitiveResult(OvpUserKS));
+                    completion.onComplete(new PrimitiveResult(ks));
                 }
             }
 
@@ -878,7 +878,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private IMADAIConfig getDAIConfig1() {
         String assetTitle = "VOD - Tears of Steel";
         String apiKey = null;
-        String contentSourceId = "2477953";
+        String contentSourceId = "2528370";
         String videoId = "tears-of-steel";
         StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
         String licenseUrl = null;
@@ -889,6 +889,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 apiKey,
                 streamFormat,
                 licenseUrl).enableDebugMode(true).setAlwaysStartWithPreroll(true);
+    }
+
+    @Override
+    protected void onResume() {
+        log.d("Application onResume");
+        super.onResume();
+        if (player != null) {
+            player.onApplicationResumed();
+        }
+        if (controlsView != null) {
+            controlsView.resume();
+        }
     }
 
     @Override
@@ -1135,18 +1147,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, OttEvent.ottEvent, event -> {
             log.d("Concurrency event = " + event.type);
         });
-    }
-
-    @Override
-    protected void onResume() {
-        log.d("Application onResume");
-        super.onResume();
-        if (player != null) {
-            player.onApplicationResumed();
-        }
-        if (controlsView != null) {
-            controlsView.resume();
-        }
     }
 
     @Override

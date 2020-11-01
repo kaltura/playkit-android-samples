@@ -61,9 +61,9 @@ dependencies {
 //    implementation project(":MD360")
 //    implementation project(':fbads')
 
-    implementation 'androidx.annotation:annotation:1.0.2'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.nineoldandroids:library:2.4.0'
 }
 

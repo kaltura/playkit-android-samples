@@ -236,16 +236,12 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         @Override
         public void onConnected() {
             super.onConnected();
-            try {
-                Log.e("XXX", "onConnected");
-                mMediaControllerCompat = new MediaControllerCompat(MainActivity.this, mMediaSessionCompat.getSessionToken());
-                mMediaControllerCompat.registerCallback(mMediaControllerCompatCallback);
-                MediaControllerCompat.setMediaController(MainActivity.this , mMediaControllerCompat);
-                //getSupportMediaController().getTransportControls().playFromMediaId(String.valueOf(R.raw.warner_tautz_off_broadway), null);
+            Log.e("XXX", "onConnected");
+            mMediaControllerCompat = new MediaControllerCompat(MainActivity.this, mMediaSessionCompat.getSessionToken());
+            mMediaControllerCompat.registerCallback(mMediaControllerCompatCallback);
+            MediaControllerCompat.setMediaController(MainActivity.this , mMediaControllerCompat);
+            //getSupportMediaController().getTransportControls().playFromMediaId(String.valueOf(R.raw.warner_tautz_off_broadway), null);
 
-            } catch( RemoteException e ) {
-
-            }
         }
     };
 
@@ -446,11 +442,7 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
         mMediaSessionCompat.setMediaButtonReceiver(pendingIntent);
 
-        try {
-            mMediaControllerCompat = new MediaControllerCompat(MainActivity.this, mMediaSessionCompat.getSessionToken());
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        mMediaControllerCompat = new MediaControllerCompat(MainActivity.this, mMediaSessionCompat.getSessionToken());
         mMediaControllerCompat.registerCallback(mMediaControllerCompatCallback);
         MediaControllerCompat.setMediaController(this, mMediaControllerCompat);
 //        try {

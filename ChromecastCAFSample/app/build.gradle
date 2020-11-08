@@ -39,14 +39,14 @@ android {
 
 dependencies {
 
-    implementation 'com.kaltura.playkit:playkit:4.9.0'
-    implementation 'com.kaltura.playkit:playkitproviders:4.9.0'
-    implementation 'com.kaltura.playkit:youboraplugin:4.9.0'
-    implementation 'com.kaltura.playkit:imaplugin:4.9.0'
-    implementation 'com.kaltura.playkit:kavaplugin:4.9.0'
-    implementation 'com.kaltura.playkit:googlecast:4.9.0'
-    implementation 'com.kaltura.playkit:vrplugin:4.9.0'
-    implementation 'com.kaltura.playkit:fbadsplugin:4.9.0'
+    implementation 'com.kaltura.playkit:playkit:4.10.0'
+    implementation 'com.kaltura.playkit:playkitproviders:4.10.0'
+    implementation 'com.kaltura.playkit:youboraplugin:4.10.0'
+    implementation 'com.kaltura.playkit:imaplugin:4.10.0'
+    implementation 'com.kaltura.playkit:kavaplugin:4.10.0'
+    implementation 'com.kaltura.playkit:googlecast:4.10.0'
+    implementation 'com.kaltura.playkit:vrplugin:4.10.0'
+    implementation 'com.kaltura.playkit:fbadsplugin:4.10.0'
 
 //    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'
@@ -69,9 +69,9 @@ dependencies {
 //    implementation project(':fbads')
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.test.espresso:espresso-core:3.1.0'
-    implementation 'androidx.appcompat:appcompat:1.0.0'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.2.1'
     testImplementation 'junit:junit:4.12'
 }
 

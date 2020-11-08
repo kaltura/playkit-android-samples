@@ -227,9 +227,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         startSimpleOvpMediaLoadingDRM(playLoadedEntry);
         //startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
-        playerContainer = (RelativeLayout)findViewById(R.id.player_container);
-        spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
-        fullScreenBtn = (AppCompatImageView)findViewById(R.id.full_screen_switcher);
+        playerContainer = findViewById(R.id.player_container);
+        spinerContainer = findViewById(R.id.spiner_container);
+        fullScreenBtn   = findViewById(R.id.full_screen_switcher);
         fullScreenBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -513,7 +513,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
 
-            FrameLayout layout = (FrameLayout) findViewById(R.id.player_view);
+            FrameLayout layout = findViewById(R.id.player_view);
             layout.addView(player.getView());
 
 
@@ -521,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
            // player.setVideoSurfaceView(surface);
             //surface.setVisibility(View.VISIBLE);
             player.pause();
-            controlsView = (PlaybackControlsView) this.findViewById(R.id.playerControls);
+            controlsView = findViewById(R.id.playerControls);
             controlsView.setPlayer(player);
             initSpinners();
         } else {
@@ -591,9 +591,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void initSpinners() {
-        videoSpinner = this.findViewById(R.id.videoSpinner);
-        audioSpinner = this.findViewById(R.id.audioSpinner);
-        textSpinner =  this.findViewById(R.id.subtitleSpinner);
+        videoSpinner = findViewById(R.id.videoSpinner);
+        audioSpinner = findViewById(R.id.audioSpinner);
+        textSpinner  = findViewById(R.id.subtitleSpinner);
 
         textSpinner.setOnItemSelectedListener(this);
         audioSpinner.setOnItemSelectedListener(this);
@@ -1211,7 +1211,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         TrackItem[] trackItems = new TrackItem[trackInfos.size()];
         switch (trackType) {
             case Consts.TRACK_TYPE_VIDEO:
-                TextView tvVideo = (TextView) this.findViewById(R.id.tvVideo);
+                TextView tvVideo = findViewById(R.id.tvVideo);
                 changeSpinnerVisibility(videoSpinner, tvVideo, trackInfos);
 
                 for (int i = 0; i < trackInfos.size(); i++) {
@@ -1225,7 +1225,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 break;
             case Consts.TRACK_TYPE_AUDIO:
-                TextView tvAudio = (TextView) this.findViewById(R.id.tvAudio);
+                TextView tvAudio = findViewById(R.id.tvAudio);
                 changeSpinnerVisibility(audioSpinner, tvAudio, trackInfos);
                 //Map<Integer, AtomicInteger> channelMap = new HashMap<>();
                 SparseArray<AtomicInteger> channelSparseIntArray = new SparseArray<>();
@@ -1262,7 +1262,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 }
                 break;
             case Consts.TRACK_TYPE_TEXT:
-                TextView tvSubtitle = (TextView) this.findViewById(R.id.tvText);
+                TextView tvSubtitle = findViewById(R.id.tvText);
                 changeSpinnerVisibility(textSpinner, tvSubtitle, trackInfos);
 
                 for (int i = 0; i < trackInfos.size(); i++) {

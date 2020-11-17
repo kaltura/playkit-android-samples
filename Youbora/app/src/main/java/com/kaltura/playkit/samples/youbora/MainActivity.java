@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     //The id of the source.
     private static final String MEDIA_SOURCE_ID = "source_id";
 
-    //Youbora analytics Constants
+    //Youbora analytics Constants - https://developer.nicepeopleatwork.com/apidocs/js6/youbora.Options.html
     public static final String ACCOUNT_CODE = "kalturatest";
     public static final String UNIQUE_USER_NAME = "a@a.com";
     public static final String MEDIA_TITLE = "your_media_title";
@@ -93,11 +93,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String DEVICE = "your_device";
     public static final String QUALITY = "your_quality";
     /**
-     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Properties#contentCdnCode}
+     Follow this {@link  http://mapi.youbora.com:8081/cdns}
      */
     public static final String CONTENT_CDN_CODE = "your_cdn_code";
     /**
-     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Device#deviceCode}
+     Follow this {@link http://mapi.youbora.com:8081/devices}
      */
     public static final String DEVICE_CODE = "your_device_code";
 

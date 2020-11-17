@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String DEVICE = "your_device";
     public static final String QUALITY = "your_quality";
     /**
-     Follow this {@link  http://mapi.youbora.com:8081/cdns}
+     Follow this {@link http://mapi.youbora.com:8081/cdns}
      */
     public static final String CONTENT_CDN_CODE = "your_cdn_code";
     /**

@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
     private IMADAIConfig getDAIConfigVodHls1() {
         String assetTitle = "VOD - Tears of Steel";
         String apiKey = null;
-        String contentSourceId = "2477953";
+        String contentSourceId = "2528370";
         String videoId = "tears-of-steel";
         StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;
         String licenseUrl = null;

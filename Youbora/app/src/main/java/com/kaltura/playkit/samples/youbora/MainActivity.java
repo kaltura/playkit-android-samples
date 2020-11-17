@@ -32,6 +32,7 @@ import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_HOUSEHOLD_ID;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_ACCOUNT_CODE;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_AD_CAMPAIGN;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CDN;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CHANNEL;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_ENCODING_AUDIO_CODEC;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_GENRE;
@@ -91,7 +92,14 @@ public class MainActivity extends AppCompatActivity {
     public static final String AUDIO_CHANNELS = "your_audio_channels";
     public static final String DEVICE = "your_device";
     public static final String QUALITY = "your_quality";
-
+    /**
+     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Properties#contentCdnCode}
+     */
+    public static final String CONTENT_CDN_CODE = "your_cdn_code";
+    /**
+     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Device#deviceCode}
+     */
+    public static final String DEVICE_CODE = "your_device_code";
 
     private Player player;
     private PKMediaConfig mediaConfig;
@@ -107,6 +115,10 @@ public class MainActivity extends AppCompatActivity {
 
         //Initialize PKPluginConfigs object with Youbora.
         PKPluginConfigs pluginConfigs = getYouboraBundle();
+
+        // @Deprecated Set plugin entry to the plugin configs.
+        //JsonObject pluginEntry = createYouboraPluginUsingJson(isLive, title);
+        //pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
 
         //Create instance of the player with specified pluginConfigs.
         player = PlayKitManager.loadPlayer(this, pluginConfigs);
@@ -155,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         optBundle.putString(KEY_CONTENT_TITLE, MEDIA_TITLE);
 
         //Optional - Device bundle o/w youbora will decide by its own.
-        optBundle.putString(KEY_DEVICE_CODE, "AndroidTV");
+        optBundle.putString(KEY_DEVICE_CODE, DEVICE_CODE);
         optBundle.putString(KEY_DEVICE_BRAND, "Xiaomi");
         optBundle.putString(KEY_DEVICE_MODEL, "Mii3");
         optBundle.putString(KEY_DEVICE_TYPE, "TvBox");
@@ -171,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
         optBundle.putString(KEY_CONTENT_GENRE, GENRE);
         optBundle.putString(KEY_CONTENT_TYPE, TYPE);
         optBundle.putString(KEY_CONTENT_TRANSACTION_CODE, TRANSACTION_TYPE); // NEED TO CHECK
+        optBundle.putString(KEY_CONTENT_CDN, CONTENT_CDN_CODE);
 
         // Create Content Metadata bundle
         Bundle contentMetaDataBundle = new Bundle();
@@ -208,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @return - the pluginConfig object that should be passed as parameter when loading the player.
      */
-    private PKPluginConfigs createYouboraPlugin() {
+    private PKPluginConfigs createYouboraPluginUsingJson() {
 
         //Important!!! First you need to register your plugin.
         PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
@@ -230,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Optional - Device json o/w youbora will decide by its own.
         JsonObject deviceJson = new JsonObject();
-        deviceJson.addProperty("deviceCode", "AndroidTV");
+        deviceJson.addProperty("deviceCode", DEVICE_CODE);
         deviceJson.addProperty("brand", "Xiaomi");
         deviceJson.addProperty("model", "Mii3");
         deviceJson.addProperty("type", "TvBox");
@@ -264,6 +277,7 @@ public class MainActivity extends AppCompatActivity {
         propertiesJson.addProperty("audioChannels", "");
         propertiesJson.addProperty("device", "");
         propertiesJson.addProperty("quality", "");
+        propertiesJson.addProperty("contentCdnCode", CONTENT_CDN_CODE);
 
         //You can add some extra params here:
         JsonObject extraParamJson = new JsonObject();

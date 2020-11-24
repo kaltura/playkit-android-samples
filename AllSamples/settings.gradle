@@ -39,7 +39,7 @@ def samples = [
         'KavaAnalytics',
         'Providers',
         //'TVPapiStats',
-        //'ChromecastSample',
+        'ChromecastSample',
         'ChromecastCAFSample',
         'FBAdsSample',
         'MiniPlayer',

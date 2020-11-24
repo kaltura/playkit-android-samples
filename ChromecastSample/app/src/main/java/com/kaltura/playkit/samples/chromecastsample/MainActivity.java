@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         mCastContext.getSessionManager().addSessionManagerListener(
                 mSessionManagerListener, CastSession.class);
         // mCastContext.registerLifecycleCallbacksBeforeIceCreamSandwich(this, savedInstanceState);
-        // mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
+         mCastSession = mCastContext.getSessionManager().getCurrentCastSession();
 
 
         addCastOvpButton();
@@ -117,9 +117,9 @@ public class MainActivity extends AppCompatActivity {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "This DEMO IS DEPRECATED Instead use ChromecastCAFSample with ott variant", Toast.LENGTH_LONG).show();
-                //loadRemoteMediaOtt(0,true);
-                return;
+                //Toast.makeText(MainActivity.this, "This DEMO IS DEPRECATED Instead use ChromecastCAFSample with ott variant", Toast.LENGTH_LONG).show();
+                loadRemoteMediaOtt(0,true);
+               // return;
             }
         });
     }
@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
             public void onStatusUpdated() {
                 Intent intent = new Intent(MainActivity.this, ExpandedControlsActivity.class);
                 startActivity(intent);
-                //remoteMediaClient.unregisterCallback(this);
+                remoteMediaClient.unregisterCallback(this);
             }
 
             @Override

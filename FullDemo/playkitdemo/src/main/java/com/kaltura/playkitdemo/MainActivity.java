@@ -4,20 +4,11 @@ import android.Manifest;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-
 import android.hardware.SensorManager;
-
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
-
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -29,6 +20,12 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
@@ -53,7 +50,6 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
-import com.kaltura.playkit.player.ABRSettings;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
 import com.kaltura.playkit.player.ExoPlayerWrapper;
@@ -62,7 +58,6 @@ import com.kaltura.playkit.player.MediaSupport;
 import com.kaltura.playkit.player.PKHttpClientManager;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.TextTrack;
-//import com.kaltura.playkit.player.VideoCodecSettings;
 import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
 import com.kaltura.playkit.player.vr.VRSettings;
@@ -85,26 +80,56 @@ import com.kaltura.playkit.providers.MediaEntryProvider;
 import com.kaltura.playkit.providers.api.SimpleSessionProvider;
 import com.kaltura.playkit.providers.api.phoenix.APIDefines;
 import com.kaltura.playkit.providers.base.OnMediaLoadCompletion;
-import com.kaltura.playkit.providers.base.OnPlaylistLoadCompletion;
 import com.kaltura.playkit.providers.mock.MockMediaProvider;
 import com.kaltura.playkit.providers.ott.OTTMediaAsset;
 import com.kaltura.playkit.providers.ott.PhoenixMediaProvider;
 import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
-
 import com.kaltura.playkit.utils.Consts;
 import com.kaltura.playkitvr.VRUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_CAST;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_DIRECTOR;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_OWNER;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_PARENTAL;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_QUALITY;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_RATING;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_YEAR;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_HOUSEHOLD_ID;
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
 import static com.kaltura.playkitdemo.MockParams.FormatTest;
 import static com.kaltura.playkitdemo.MockParams.MediaIdTest;
-import static com.kaltura.playkitdemo.MockParams.OvpUserKS;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_ACCOUNT_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_AD_CAMPAIGN;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_APP_NAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_APP_RELEASE_VERSION;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CDN;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CHANNEL;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_ENCODING_AUDIO_CODEC;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_GENRE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_METADATA;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_PRICE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TITLE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TRANSACTION_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TYPE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_1;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_2;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_BRAND;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_MODEL;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_NAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_VERSION;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_TYPE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_ENABLED;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_USERNAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_USER_EMAIL;
+
+//import com.kaltura.playkit.player.VideoCodecSettings;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
@@ -144,6 +169,38 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private PKTracks tracksInfo;
     private boolean isAdsEnabled = true;
     private boolean isDAIMode = false;
+
+    //Youbora analytics Constants
+    public static final String ACCOUNT_CODE = "kalturatest";
+    public static final String UNIQUE_USER_NAME = "a@a.com";
+    public static final String MEDIA_TITLE = "your_media_title";
+    public static final boolean IS_LIVE = false;
+    public static final boolean ENABLE_SMART_ADS = true;
+    private static final String CAMPAIGN = "your_campaign_name";
+    public static final String EXTRA_PARAM_1 = "playKitPlayer";
+    public static final String EXTRA_PARAM_2 = "";
+    public static final String GENRE = "your_genre";
+    public static final String TYPE = "your_type";
+    public static final String TRANSACTION_TYPE = "your_transaction_type";
+    public static final String YEAR = "your_year";
+    public static final String CAST = "your_cast";
+    public static final String DIRECTOR = "your_director";
+    private static final String OWNER = "your_owner";
+    public static final String PARENTAL = "your_parental";
+    public static final String PRICE = "your_price";
+    public static final String RATING = "your_rating";
+    public static final String AUDIO_TYPE = "your_audio_type";
+    public static final String AUDIO_CHANNELS = "your_audio_channels";
+    public static final String DEVICE = "your_device";
+    public static final String QUALITY = "your_quality";
+    /**
+     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Properties#contentCdnCode}
+     */
+    public static final String CONTENT_CDN_CODE = "your_cdn_code";
+    /**
+     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Device#deviceCode}
+     */
+    public static final String DEVICE_CODE = "your_device_code";
 
     private ExoPlayerWrapper.LoadControlStrategy loadControlStrategy;
 
@@ -366,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         OTTMediaAsset ottMediaAsset = new OTTMediaAsset()
                 .setAssetId(mediaId)
                 .setKs(null)
-                 //.setReferrer()
+                //.setReferrer()
                 .setFormats(Collections.singletonList(mediaFormat))
                 .setProtocol(PhoenixMediaProvider.HttpProtocol.Http)
                 .setContextType(APIDefines.PlaybackContextType.Playback)
@@ -518,7 +575,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
             //SurfaceView surface = findViewById(R.id.player_view);
-           // player.setVideoSurfaceView(surface);
+            // player.setVideoSurfaceView(surface);
             //surface.setVisibility(View.VISIBLE);
             player.pause();
             controlsView = findViewById(R.id.playerControls);
@@ -576,7 +633,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preSkipAdTagUrl));
                     }
                 }
-                
+
                 player.getSettings().setPlayerBuffers(new LoadControlBuffers().
                         setMinPlayerBufferMs(2500).
                         setMaxPlayerBufferMs(50000).setAllowedVideoJoiningTimeMs(4000));
@@ -634,7 +691,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         JsonObject pluginEntry = getYouboraJsonObject(isLive, title);
 
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry); // JsonObject
+        //pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), getYouboraBundle()); // Bundle
     }
 
     @NonNull
@@ -651,13 +709,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //Optional - Device json o/w youbora will decide by its own.
         JsonObject deviceJson = new JsonObject();
-        deviceJson.addProperty("deviceCode", "AndroidTV");
+        deviceJson.addProperty("deviceCode", DEVICE_CODE);
         deviceJson.addProperty("brand", "Xiaomi");
         deviceJson.addProperty("model", "Mii3");
         deviceJson.addProperty("type", "TvBox");
         deviceJson.addProperty("osName", "Android/Oreo");
         deviceJson.addProperty("osVersion", "8.1");
-
 
         //Media entry json.
         JsonObject mediaEntryJson = new JsonObject();
@@ -685,6 +742,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         propertiesJson.addProperty("audioChannels", "");
         propertiesJson.addProperty("device", "");
         propertiesJson.addProperty("quality", "");
+        propertiesJson.addProperty("contentCdnCode", CONTENT_CDN_CODE);
 
         //You can add some extra params here:
         JsonObject extraParamJson = new JsonObject();
@@ -698,6 +756,69 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         pluginEntry.add("properties", propertiesJson);
         pluginEntry.add("extraParams", extraParamJson);
         return pluginEntry;
+    }
+
+    /**
+     * Youbora options Bundle (Recommended)
+     *
+     * Will create {@link PKPluginConfigs} object with {@link YouboraPlugin}.
+     *
+     * @return - the pluginConfig object that should be passed as parameter when loading the player.
+     */
+    private Bundle getYouboraBundle() {
+        Bundle optBundle = new Bundle();
+
+        //Youbora config bundle. Main config goes here.
+        optBundle.putString(KEY_ACCOUNT_CODE, ACCOUNT_CODE);
+        optBundle.putString(KEY_USERNAME, UNIQUE_USER_NAME);
+        optBundle.putString(KEY_USER_EMAIL, UNIQUE_USER_NAME);
+        optBundle.putString(KEY_APP_NAME, "TestApp");
+        optBundle.putString(KEY_APP_RELEASE_VERSION, "v1.0");
+        optBundle.putBoolean(KEY_ENABLED, true);
+        //Media entry bundle.
+        optBundle.putString(KEY_CONTENT_TITLE, MEDIA_TITLE);
+
+        //Optional - Device bundle o/w youbora will decide by its own.
+        optBundle.putString(KEY_DEVICE_CODE, DEVICE_CODE);
+        optBundle.putString(KEY_DEVICE_BRAND, "Xiaomi");
+        optBundle.putString(KEY_DEVICE_MODEL, "Mii3");
+        optBundle.putString(KEY_DEVICE_TYPE, "TvBox");
+        optBundle.putString(KEY_DEVICE_OS_NAME, "Android/Oreo");
+        optBundle.putString(KEY_DEVICE_OS_VERSION, "8.1");
+
+        //Youbora ads configuration bundle.
+        optBundle.putString(KEY_AD_CAMPAIGN, CAMPAIGN);
+
+        optBundle.putString(KEY_HOUSEHOLD_ID, "householdId");
+
+        //Configure custom properties here:
+        optBundle.putString(KEY_CONTENT_GENRE, GENRE);
+        optBundle.putString(KEY_CONTENT_TYPE, TYPE);
+        optBundle.putString(KEY_CONTENT_TRANSACTION_CODE, TRANSACTION_TYPE); // NEED TO CHECK
+        optBundle.putString(KEY_CONTENT_CDN, CONTENT_CDN_CODE);
+
+        // Create Content Metadata bundle
+        Bundle contentMetaDataBundle = new Bundle();
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_YEAR, YEAR);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_CAST, CAST);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_DIRECTOR, DIRECTOR);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_OWNER, OWNER);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_PARENTAL, PARENTAL);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_RATING, RATING);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_QUALITY, QUALITY);
+
+        // Add Content Metadata bundle to the main Options bundle
+        optBundle.putBundle(KEY_CONTENT_METADATA, contentMetaDataBundle);
+
+        optBundle.putString(KEY_CONTENT_PRICE, PRICE);
+        optBundle.putString(KEY_CONTENT_ENCODING_AUDIO_CODEC, AUDIO_TYPE); // NEED TO CHECK
+        optBundle.putString(KEY_CONTENT_CHANNEL, AUDIO_CHANNELS);  // NEED TO CHECK
+
+        //You can add some extra params here:
+        optBundle.putString(KEY_CUSTOM_DIMENSION_1, EXTRA_PARAM_1);
+        optBundle.putString(KEY_CUSTOM_DIMENSION_2, EXTRA_PARAM_2);
+
+        return optBundle;
     }
 
     private void addPhoenixAnalyticsPluginConfig(PKPluginConfigs config) {

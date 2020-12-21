@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      Follow this {@link http://mapi.youbora.com:8081/cdns}
      */
-    public static final String CONTENT_CDN_CODE = "your_cdn_code";
+    public static final String CONTENT_CDN_CODE = "AAPTLIMI";
     /**
      Follow this {@link http://mapi.youbora.com:8081/devices}
      */
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         PKPluginConfigs pluginConfigs = getYouboraBundle();
 
         // @Deprecated Set plugin entry to the plugin configs.
-        //JsonObject pluginEntry = createYouboraPluginUsingJson(isLive, title);
+        //PKPluginConfigs pluginConfigs = createYouboraPluginUsingJson();
         //pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
 
         //Create instance of the player with specified pluginConfigs.

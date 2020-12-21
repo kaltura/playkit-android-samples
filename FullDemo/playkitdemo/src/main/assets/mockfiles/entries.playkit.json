@@ -121,7 +121,7 @@
         "mimeType": "application/x-mpegURL",
         "url": "http://qa-apache-php7.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_ibls79gu/protocol/http/format/applehttp/flavorIds/0_569yfwdc,0_g9m3gaz4,0_vwd0t6j7,0_y7qzv7o9,0_o322iu2r/a.m3u8"
       }
-    ],
+    ]
   },
   "harold": {
     "duration": 102000,

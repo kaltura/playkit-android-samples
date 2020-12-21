@@ -5,13 +5,9 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -58,13 +54,10 @@ import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
 import com.kaltura.playkit.PKSubtitleFormat;
-import com.kaltura.playkit.PKSubtitlePreference;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
-import com.kaltura.playkit.player.ABRSettings;
-import com.kaltura.playkit.player.AudioCodecSettings;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
 import com.kaltura.playkit.player.LoadControlBuffers;
@@ -75,7 +68,6 @@ import com.kaltura.playkit.player.PKSubtitlePosition;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.SubtitleStyleSettings;
 import com.kaltura.playkit.player.TextTrack;
-import com.kaltura.playkit.player.VideoCodecSettings;
 import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
 import com.kaltura.playkit.player.vr.VRSettings;
@@ -111,11 +103,43 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static android.app.Notification.EXTRA_NOTIFICATION_ID;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_CAST;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_DIRECTOR;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_OWNER;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_PARENTAL;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_QUALITY;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_RATING;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_YEAR;
+import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_HOUSEHOLD_ID;
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
 import static com.kaltura.playkitdemo.MockParams.FormatTest;
 import static com.kaltura.playkitdemo.MockParams.MediaIdTest;
 import static com.kaltura.playkitdemo.MockParams.OvpUserKS;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_ACCOUNT_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_AD_CAMPAIGN;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_APP_NAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_APP_RELEASE_VERSION;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CDN;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CHANNEL;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_ENCODING_AUDIO_CODEC;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_GENRE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_METADATA;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_PRICE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TITLE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TRANSACTION_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TYPE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_1;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_2;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_BRAND;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_ID;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_CODE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_MODEL;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_NAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_VERSION;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_TYPE;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_ENABLED;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_USERNAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_USER_EMAIL;
 
 //import com.kaltura.playkit.PKVideoCodec;
 //import com.kaltura.playkit.player.VideoCodecSettings;
@@ -135,10 +159,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             "524710","526594","537514","538376","540085"));
 
 
-    private String V18_PROD_KS = "djJ8MjI1fGAzjTYJ568a69O13CRHNtVN-CObBr0M81iMCB2-5cWZJ03IiwOBQEQxDEToLJ_jElkHzIINSCxjMoU_Gt6RArEeD850ScZJrw01zsPwnT7JRj7ZTAlBhThf4Wxw7x0BqZ4zHjhSUhJB5ptdTpzIFmsFMk3A4UirqWzHxCgKxlBqw6dN6M3PWZnIXscqpNZRgEYVb61s25nLrIqgpXmfpScoxgBnwTZ1faElbwPy8YN8RS7BxtbNelUzGy0QK5eO_ZZ_2emh4bQ-0XF3K_rrcl6sw_Z6-I7aqjAWH1nChKTH4jl-5LHayYz90mfrE8uIVFv9Umy5VD6xKoHW3syQcH81ixUpKfyqWg3WBBvbdtGwJQXYLkR67_r8f9BKrE5h0Aq7s-oluHYVLaGz7C1LfbVlVrNtIxk-9wp7cQ36cGY_";
+    private String V18_PROD_KS = "djJ8MjI1fFJ7gRS_tbdcdYmcPShsm1rj7kT3GOerQPJEcAHzcf8PTyRc1J7D3F86Zu-EVKH_yoZN6oxT8gcImkIxCwyPMAm1Pi_Nmr4mwvEEl_EFCEuWwXHDI490BrI2eVOitLn-45OReVRUWj_HgTFzhh-cFL9iuKSrR0mAxFADHOks_BI8e9NvzMDkxrySKHdHB-TM0AUBi6l9EbhDhhDrOkzXvkgVuSt47Nf-qOPz-ZxHsvK6e4nRWg1TEqF11qE8B6zI5yBAQrM6BJicJPPkJiF_YpC83eNZLahqoCz44mqqrW6qVVEtUGJyLDIQlU3L2GDZvp-XK2_YZEsIoO6s7-cyIIBdMZ00__amn4BzlpXHRpE6yYnM8YtYC557ZPkut82yXX37Ca-dDhrgytiv3503VrjnNTgq-nKqGhoxOckdmqme";
 
     // Vootkids skype wala issue where they face device not in household issue
-  //  private String V18_STAGING_KS = "djJ8MjI1fFGtaQKGiNorkymwcFkmw67G2KE5-lESHZc58uGT05TIMeNqHvlZYKGZOUPiMTZlRyczGovHu9jyQv_BT3rDYPqOOFrmoxJIizjb4xAu9XdLn6AZlrDE1vfBH6BWTU6YtU4s_dW6_Pv_Yr-ke35ilQoC69bAFqq3z7x5Ppf_AspaPGQ2Lb0EE5CufQBcgd0IoabD_5w15py5t9V5r70SkSF-Cn4ZAhNMUiytTDoJx_hH1QdYyAl389YiHNed_65f5gEZDGYUJgpUQpTk8u43SW-uHz9MrOMekvMIeO6Z7Tg-ormQxM0O0yIREi4UX9jXcTOR4iOF6dfAb2eHM7qNXuE-mSBYj_onyRz9b6_8GBtA";
+    //  private String V18_STAGING_KS = "djJ8MjI1fFGtaQKGiNorkymwcFkmw67G2KE5-lESHZc58uGT05TIMeNqHvlZYKGZOUPiMTZlRyczGovHu9jyQv_BT3rDYPqOOFrmoxJIizjb4xAu9XdLn6AZlrDE1vfBH6BWTU6YtU4s_dW6_Pv_Yr-ke35ilQoC69bAFqq3z7x5Ppf_AspaPGQ2Lb0EE5CufQBcgd0IoabD_5w15py5t9V5r70SkSF-Cn4ZAhNMUiytTDoJx_hH1QdYyAl389YiHNed_65f5gEZDGYUJgpUQpTk8u43SW-uHz9MrOMekvMIeO6Z7Tg-ormQxM0O0yIREi4UX9jXcTOR4iOF6dfAb2eHM7qNXuE-mSBYj_onyRz9b6_8GBtA";
 
     // Device Not in household wala issue
 //    private String V18_PROD_KS = "djJ8MjI1fGcixuqp4KWEfBYF5snfFQ6toIzf10grFxTZeP3jVlXsYUp8WST_van4g418bq1ZuvOFqKtWBy7-j2UUBg_DZeobrJxwOrAqIhzgG7dsnaRLJHS_vkDRFgScrR19xvNRbgpVcdQa0JU7QKyXXDTN8PtcLaJobPoBxCV-Fv7wrC-3vifH-Hrj71N0JYybCSHuDnovUX6BbV_QK-AhuqpDyvTtfy5LUnhfnbFIiqEmpSPdzSPPLzKkmwW-AgYjGdzqroBeGHDXv7DuwjC5GLxFXXuoeQVIA0IAeN8DPc-fK8JlHbzMtENaieaJcaVvm198SvzjxdY-TYsfLZC9rajMcKXuHAhG13pihAEhogUryUatGXbQFIfSI8N4wfeR0JBFafZLYYNhfjB79uuHkqwX1Rq_oixiNr8Ak0to4cAh2Ix91ZXjD0EOcrj08Z3ahV0Xxf4Y9r2gzK6LrziuqRCUbhnH1k2o1b6ZDJ2fbxqX4HAG";
@@ -188,15 +212,47 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isAdsEnabled = false;
+    private boolean isAdsEnabled = true;
     private boolean isDAIMode = false;
     SubtitleStyleSettings subtitleStyleSettings = new SubtitleStyleSettings("MyCustomSubtitleStyle");
     PKSubtitlePosition pkSubtitlePosition = new PKSubtitlePosition(true);
     private TextView tvSourceUrl;
 
+    //Youbora analytics Constants - https://developer.nicepeopleatwork.com/apidocs/js6/youbora.Options.html
+    public static final String ACCOUNT_CODE = "kalturatest";
+    public static final String UNIQUE_USER_NAME = "gourav@bundle.com";
+    public static final String MEDIA_TITLE = "your_media_title";
+    public static final boolean IS_LIVE = false;
+    public static final boolean ENABLE_SMART_ADS = true;
+    private static final String CAMPAIGN = "your_campaign_name";
+    public static final String EXTRA_PARAM_1 = "playKitPlayer";
+    public static final String EXTRA_PARAM_2 = "";
+    public static final String GENRE = "your_genre";
+    public static final String TYPE = "your_type";
+    public static final String TRANSACTION_TYPE = "your_transaction_type";
+    public static final String YEAR = "your_year";
+    public static final String CAST = "your_cast";
+    public static final String DIRECTOR = "your_director";
+    private static final String OWNER = "your_owner";
+    public static final String PARENTAL = "your_parental";
+    public static final String PRICE = "your_price";
+    public static final String RATING = "your_rating";
+    public static final String AUDIO_TYPE = "your_audio_type";
+    public static final String AUDIO_CHANNELS = "your_audio_channels";
+    public static final String DEVICE = "your_device";
+    public static final String QUALITY = "your_quality";
+    /**
+     Follow this {@link http://mapi.youbora.com:8081/cdns}
+     */
+    public static final String CONTENT_CDN_CODE = "AAPTLIMI";
+    /**
+     Follow this {@link http://mapi.youbora.com:8081/devices}
+     */
+    public static final String DEVICE_CODE = "your_device_code";
+
     static {
         PKHttpClientManager.setHttpProvider("okhttp");
-   //     PKHttpClientManager.setHttpProvider("system");
+        //     PKHttpClientManager.setHttpProvider("system");
 
         PKHttpClientManager.warmUp(
                 "https://rest-as.ott.kaltura.com/crossdomain.xml", // Some Phoenix URL
@@ -245,19 +301,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Button button = findViewById(R.id.changeMedia);
         AtomicBoolean click = new AtomicBoolean(false);
         button.setOnClickListener(v -> {
-            /*if (player != null) {
-                player.replay();
-            }*/
+
             if (!click.get()) {
                 click.set(true);
                 pkSubtitlePosition.setPosition(70, 30, Layout.Alignment.ALIGN_CENTER);
-                subtitleStyleSettings.setSubtitlePosition(pkSubtitlePosition);
-                useSubtitleStyle(false, subtitleStyleSettings);
             } else {
                 click.set(false);
                 pkSubtitlePosition.setPosition(0, 70, Layout.Alignment.ALIGN_NORMAL);
-                subtitleStyleSettings.setSubtitlePosition(pkSubtitlePosition);
-                useSubtitleStyle(false, subtitleStyleSettings);
+            }
+            SubtitleStyleSettings subtitleStyleSettings1 = new SubtitleStyleSettings("Replay_MyCustomSubtitleStyle");
+            subtitleStyleSettings1.setSubtitlePosition(pkSubtitlePosition);
+            subtitleStyleSettings1.setBackgroundColor(Color.CYAN);
+            useSubtitleStyle(false, subtitleStyleSettings1);
+
+            if (player != null) {
+                player.replay();
             }
         });
 
@@ -279,41 +337,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // HEVC Clear live Dialog
         // createPlayerWithoutPhoenixProvider();
 
-         //startVootOttMediaLoadingProd(playLoadedEntry, "873033"); // 404 on cdnapisec
+        //startVootOttMediaLoadingProd(playLoadedEntry, "873033"); // 404 on cdnapisec
         // startVootOttMediaLoadingProd(playLoadedEntry, "926531"); // DTG
-   //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
-     //    startVootOttMediaLoadingProd(playLoadedEntry, "975732"); // SRT/webvtt failure source error
-     //    startVootOttMediaLoadingProd(playLoadedEntry, "979570"); //Gourav
-     //    startVootOttMediaLoadingProd(playLoadedEntry, "1017737"); //Gourav // no text track
-      //   startVootOttMediaLoadingProd(playLoadedEntry, "1013774"); //Gourav // 1 non default text track
-     //    startVootOttMediaLoadingProd(playLoadedEntry, "618620");
+        //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
+        //    startVootOttMediaLoadingProd(playLoadedEntry, "975732"); // SRT/webvtt failure source error
+        startVootOttMediaLoadingProd(playLoadedEntry, "979570"); //Gourav
+        //    startVootOttMediaLoadingProd(playLoadedEntry, "1017737"); //Gourav // no text track
+        //   startVootOttMediaLoadingProd(playLoadedEntry, "1013774"); //Gourav // 1 non default text track
+        //    startVootOttMediaLoadingProd(playLoadedEntry, "618620");
         // startVootOttMediaLoadingProd(playLoadedEntry, "929686"); // Working; but not on clear formats
-       //  startVootOttMediaLoadingProd(playLoadedEntry, "357141"); // working with clear Not premium
-       //  startVootOttMediaLoadingProd(playLoadedEntry, "357824");
+        //  startVootOttMediaLoadingProd(playLoadedEntry, "357141"); // working with clear Not premium
+        //  startVootOttMediaLoadingProd(playLoadedEntry, "357824");
 
-  //        startVootOttMediaLoadingStaging(playLoadedEntry, "316699"); // Vootkids device not in household issue
+        //        startVootOttMediaLoadingStaging(playLoadedEntry, "316699"); // Vootkids device not in household issue
 //          startVootOttMediaLoadingStaging(playLoadedEntry, "327807"); // BE 5.6.0 Testing
+        //       startVootOttMediaLoadingStaging(playLoadedEntry, "327807"); // BE 5.6.0 Testing
 
 
         //    startVootOttMediaLoadingProd(playLoadedEntry, "805985"); // Voot Live Channel DASH_LINEAR_TV
         //  startVootOttMediaLoadingStaging(playLoadedEntry, "326666"); // 403 Soruce Error asset for Tablet Main
         //  startVootOttMediaLoadingStaging(playLoadedEntry, "326683"); // 404 Soruce Error asset for dashclear
-       // startVootOttMediaLoadingStaging(playLoadedEntry, "317519"); // Staging asset to test L1 and L3 with DASHENC_TV_PremiumHD
+        // startVootOttMediaLoadingStaging(playLoadedEntry, "317519"); // Staging asset to test L1 and L3 with DASHENC_TV_PremiumHD
         // startVootOttMediaLoadingStaging(playLoadedEntry, "326510"); // Jio tokenization on clear content
         //  startVootOttMediaLoadingProd(playLoadedEntry, "805990"); // chromecast not working only 24-07-2020 [DASH_LINEAR_APP]
 
         //     startHorizonOttMediaLoadingLive(playLoadedEntry);
-     //   startVootOttMediaLoadingStaging(playLoadedEntry, "326510");// Staging asset
+        //   startVootOttMediaLoadingStaging(playLoadedEntry, "326510");// Staging asset
 
 
-     //     startVootOttMediaLoadingStaging(playLoadedEntry, "334357"); // Staging HEVC assets only HEVC
-    //      startVootOttMediaLoadingStaging(playLoadedEntry, "334570"); // Staging HEVC with AVC
-    //      startVootOttMediaLoadingStaging(playLoadedEntry, "334577"); // Staging HEVC assets only HEVC
+        //     startVootOttMediaLoadingStaging(playLoadedEntry, "334357"); // Staging HEVC assets only HEVC
+        //      startVootOttMediaLoadingStaging(playLoadedEntry, "334570"); // Staging HEVC with AVC
+        //      startVootOttMediaLoadingStaging(playLoadedEntry, "334577"); // Staging HEVC assets only HEVC
         //334570,334578 HEVC with AVC
 
-      //    startVootOttMediaLoadingStaging(playLoadedEntry, "317071"); // vootkids jio cdn audio only "audio_only_dash"
+        //    startVootOttMediaLoadingStaging(playLoadedEntry, "317071"); // vootkids jio cdn audio only "audio_only_dash"
 
-        startWOW(playLoadedEntry);
+//        startWOW(playLoadedEntry);
+
+//        startEmiritus(playLoadedEntry);
 
         //startOVPVootKids(playLoadedEntry);
 
@@ -327,14 +388,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 //        startOttMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingVR(playLoadedEntry);
- //     startSimpleOvpMediaLoadingHls(playLoadedEntry);
- //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
+        //     startSimpleOvpMediaLoadingHls(playLoadedEntry);
+        //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
 //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
- //    startMockMediaLoading(playLoadedEntry);
+//        startSimpleOvpMediaLoadingLive(playLoadedEntry);
+//     startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
- //       startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
- //       startSimpleOvpMediaLoadingHEVCKarin(playLoadedEntry);
+        //       startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
+        //       startSimpleOvpMediaLoadingHEVCKarin(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
         spinerContainer = (RelativeLayout)findViewById(R.id.spiner_container);
@@ -442,7 +504,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
         //PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
         PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
-        // PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
+        PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
         //PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
         //PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
     }
@@ -585,7 +647,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void startSimpleOvpMediaLoadingLive(OnMediaLoadCompletion completion) {
         new KalturaOvpMediaProvider()
-                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, null))
+                .setSessionProvider(new SimpleSessionProvider("http://qa-apache-php7.dev.kaltura.com/", 1091, "NGExOGE0ODQ4MDA0Zjk2ZmIwNzJiNGMwOTM1ZjA5NzQ3ZWNhOTQ3Y3wxMDkxOzEwOTE7MTYwNjg5NDI2ODswOzE2MDY4MDc4NjguMzUxMzswO3ZpZXc6Kix3aWRnZXQ6MTs7"))
                 .setEntryId("0_nwkp7jtx")
                 .load(completion);
     }
@@ -599,9 +661,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void startMockMediaLoading(OnMediaLoadCompletion completion) {
 
-        //mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "harold");
-        mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "wow");
-
+        mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "hls");
         mediaProvider.load(completion);
     }
 
@@ -655,9 +715,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         PKMediaConfig mediaConfig = new PKMediaConfig();
-     //   if (changeMediaIndex == 0) {
-      //      setExternalSubtitles(mediaEntry);
-     //   }
+        //   if (changeMediaIndex == 0) {
+        //      setExternalSubtitles(mediaEntry);
+        //   }
         mediaConfig.setMediaEntry(mediaEntry).setStartPosition(null);
 
         PKPluginConfigs pluginConfig = new PKPluginConfigs();
@@ -666,8 +726,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             configurePlugins(pluginConfig);
 
             player = PlayKitManager.loadPlayer(this, pluginConfig);
-      //      KalturaPlaybackRequestAdapter.install(player, "app://PlaykitTestApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
-      //      KalturaUDRMLicenseRequestAdapter.install(player, "app://PlaykitTestApp");
+            //      KalturaPlaybackRequestAdapter.install(player, "app://PlaykitTestApp"); // in case app developer wants to give customized referrer instead the default referrer in the playmanifest
+            //      KalturaUDRMLicenseRequestAdapter.install(player, "app://PlaykitTestApp");
 
 
 //            String customAdapterData = "PEtleU9TQXV0aGVudGljYXRpb25YTUw+PERhdGE+PEdlbmVyYXRpb25UaW1lPjIwMTktMDItMDQgMTE6MjA6NTQuNzcwPC9HZW5lcmF0aW9uVGltZT48RXhwaXJhdGlvblRpbWU+MjAxOS0wMi0wNiAxMToyMDo1NC43NzA8L0V4cGlyYXRpb25UaW1lPjxVbmlxdWVJZD4yODNjMmY3ZDlkYjg0ZmE1ODdiNTlhYmM2MDA5YWEzMjwvVW5pcXVlSWQ+PFJTQVB1YktleUlkPmIxOWQ0MjJkODkwNjQ0ZDUxMTJkMDg0NjljMmU1OTQ2PC9SU0FQdWJLZXlJZD48V2lkZXZpbmVQb2xpY3kgZmxfQ2FuUGxheT0idHJ1ZSIgZmxfQ2FuUGVyc2lzdD0idHJ1ZSI+PExpY2Vuc2VEdXJhdGlvbj4xNzI4MDA8L0xpY2Vuc2VEdXJhdGlvbj48UGxheWJhY2tEdXJhdGlvbj4xNzI4MDA8L1BsYXliYWNrRHVyYXRpb24+PC9XaWRldmluZVBvbGljeT48V2lkZXZpbmVDb250ZW50S2V5U3BlYyBUcmFja1R5cGU9IkhEIj48U2VjdXJpdHlMZXZlbD4xPC9TZWN1cml0eUxldmVsPjwvV2lkZXZpbmVDb250ZW50S2V5U3BlYz48RmFpclBsYXlQb2xpY3kgcGVyc2lzdGVudD0idHJ1ZSI+PFBlcnNpc3RlbmNlU2Vjb25kcz4xNzI4MDA8L1BlcnNpc3RlbmNlU2Vjb25kcz48L0ZhaXJQbGF5UG9saWN5PjxMaWNlbnNlIHR5cGU9InNpbXBsZSI+PFBvbGljeT48SWQ+YmUxM2NiM2ItNTM3OS00N2Q1LWIyM2QtZWQ0OWU0NTFkMjU5PC9JZD48L1BvbGljeT48UGxheT48SWQ+YmQ5YjdjZTItMmUzYi00NTZlLWExZDMtM2QwMDNkMWNjZjdiPC9JZD48L1BsYXk+PC9MaWNlbnNlPjxQb2xpY3kgaWQ9ImJlMTNjYjNiLTUzNzktNDdkNS1iMjNkLWVkNDllNDUxZDI1OSIgcGVyc2lzdGVudD0idHJ1ZSI+PEV4cGlyYXRpb25BZnRlckZpcnN0UGxheT4xNzI4MDA8L0V4cGlyYXRpb25BZnRlckZpcnN0UGxheT48TWluaW11bVNlY3VyaXR5TGV2ZWw+MjAwMDwvTWluaW11bVNlY3VyaXR5TGV2ZWw+PC9Qb2xpY3k+PFBsYXkgaWQ9ImJkOWI3Y2UyLTJlM2ItNDU2ZS1hMWQzLTNkMDAzZDFjY2Y3YiI+PE91dHB1dFByb3RlY3Rpb25zPjxPUEw+PENvbXByZXNzZWREaWdpdGFsQXVkaW8+MzAwPC9Db21wcmVzc2VkRGlnaXRhbEF1ZGlvPjxVbmNvbXByZXNzZWREaWdpdGFsQXVkaW8+MzAwPC9VbmNvbXByZXNzZWREaWdpdGFsQXVkaW8+PENvbXByZXNzZWREaWdpdGFsVmlkZW8+NTAwPC9Db21wcmVzc2VkRGlnaXRhbFZpZGVvPjxVbmNvbXByZXNzZWREaWdpdGFsVmlkZW8+MzAwPC9VbmNvbXByZXNzZWREaWdpdGFsVmlkZW8+PEFuYWxvZ1ZpZGVvPjIwMDwvQW5hbG9nVmlkZW8+PC9PUEw+PC9PdXRwdXRQcm90ZWN0aW9ucz48RW5hYmxlcnM+PElkPjc4NjYyN2Q4LWMyYTYtNDRiZS04Zjg4LTA4YWUyNTViMDFhNzwvSWQ+PElkPmQ2ODUwMzBiLTBmNGYtNDNhNi1iYmFkLTM1NmYxZWEwMDQ5YTwvSWQ+PElkPjAwMmY5NzcyLTM4YTAtNDNlNS05Zjc5LTBmNjM2MWRjYzYyYTwvSWQ+PC9FbmFibGVycz48L1BsYXk+PC9EYXRhPjxTaWduYXR1cmU+b085eE9BeS9OblZFN3V4UWJtYzFTdlBPRGxGMytGNUpqV0RKR3ZCd3U4cHgyUWx2VERxUGJySU03M0Z5b0dkUHBJeWhpZENwMkJ4eWtCWThFcitMWHFzQXY5aGJZKzdCNkJOc00xMW1DOE4wbCswZlp5dmNzeHpwWGx3UlZMajNJVk9MYTNDdVcrbnV2dlYxUThheWZjeEhwVXc0b25BdEZDYlZaR3lkQS9oQTRLaXorWVhWdDZReEdsbDhVSFFJRUJVRWlDbzFvVmtRMlJGcEU1S2Jac2pTQ1FST3lvZ1MrUmo4dFo0b3FpQlNpMlNVamVvRUduY0RueHdFK1dDWkhrSUxSSjNiSktkbkZUSTRJR0prQ0traWtxUWZrUWRjSzQ0Y2d1aEY0UTJEQkd3eUxqUmFucVhuTFNaVS9obFlZUDJVbWlIa29UMWdFZ3JyYU8yanF3PT08L1NpZ25hdHVyZT48L0tleU9TQXV0aGVudGljYXRpb25YTUw+";
@@ -675,15 +735,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //            final DRMAdapter licenseRequestAdapter = new DRMAdapter();
 //            player.getSettings().setLicenseRequestAdapter(licenseRequestAdapter);
             player.getSettings().setAllowCrossProtocolRedirect(true);
-            player.getSettings().setPreferredMediaFormat(PKMediaFormat.dash);
+           //    player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
             //Gourav
-            player.getSettings().setSubtitlePreference(PKSubtitlePreference.EXTERNAL);
+            //   player.getSettings().setSubtitlePreference(PKSubtitlePreference.EXTERNAL);
 //            player.getSettings().enableDecoderFallback(true);
 //            player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings().setAllowSoftwareDecoder(true));
 //            player.getSettings().setPreferredAudioCodecSettings(new AudioCodecSettings().setAllowMixedCodecs(true));
 
             // Audio Player Configuration
-         //   player.getSettings().setAudioPlayerMode(true, createNotificationForAudioOnlyService());
+            //   player.getSettings().setAudioPlayerMode(true, createNotificationForAudioOnlyService());
 
             if (mediaEntry.isVRMediaType()) {
                 VRSettings vrSettings = new VRSettings();
@@ -699,17 +759,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 player.getSettings().setVRSettings(vrSettings);
             }
 
-           // pkSubtitlePosition.setPosition( 80, 20, Layout.Alignment.ALIGN_OPPOSITE);
-           // subtitleStyleSettings.setSubtitlePosition(pkSubtitlePosition);
-           // subtitleStyleSettings.setBackgroundColor(Color.BLUE);
-            //useSubtitleStyle(true, subtitleStyleSettings);
+            pkSubtitlePosition.setPosition( 80, 20, Layout.Alignment.ALIGN_OPPOSITE);
+            subtitleStyleSettings.setSubtitlePosition(pkSubtitlePosition);
+            subtitleStyleSettings.setBackgroundColor(Color.BLUE);
+            useSubtitleStyle(true, subtitleStyleSettings);
 
             player.getSettings().setSecureSurface(true);
             //  player.getSettings().forceSinglePlayerEngine(true);
-             // player.getSettings().setPreferredMediaFormat(PKMediaFormat.dash);
+            // player.getSettings().setPreferredMediaFormat(PKMediaFormat.dash);
             // player.getSettings().setAdAutoPlayOnResume(true);
-          //  player.getSettings().setABRSettings(new ABRSettings().setMaxVideoBitrate(600000));
-        //    player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings().setCodecPriorityList(Collections.singletonList(PKVideoCodec.HEVC)));
+            //  player.getSettings().setABRSettings(new ABRSettings().setMaxVideoBitrate(600000));
+            //    player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings().setCodecPriorityList(Collections.singletonList(PKVideoCodec.HEVC)));
             // player.getSettings().setAllowCrossProtocolRedirect(true);
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
             // player.getSettings().enableDecoderFallback(true);
@@ -794,12 +854,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void startWOW(final OnMediaLoadCompletion completion) {
-        String KS = "djJ8MzA3OXxE0XnSj9172G1_TQYFWGMYwtJy4nTViRoiu9HDC2zm9aDKnaEf9qDyyp8AI439gips6KQdWKQN9poRcXSjLL54LLf3CCfU7eqn-UtK4Is8fz2Ka9wsMVX9086F6VUZooBz99-6yVTr9x3HUT_HoR2S4_ZIXx-JcVpXqhZoWawi83VyyKt0MC4MDqQpDVLvxRnTxWnYYdhlN31YaIw5KoFjhJ4NWGVfemY75e7ZnfxM1XelpV5kzVf5oWsbFAeoZJyq2VBcdMnJQW0FpKIIH7GbhedfXgV2NojPHGs8Ophst7B7vCcz_2n1t0WjR3Qg2US16V6_c-kL3vXo-EGCzsZPGz2B5i66N69JvMTOQRuIWw==";
+        String KS = "djJ8MzA3OXzkci-kG7MQY24PBxJ0S8mPz2svDFkAQJkXR9PlK1_kAPif5-1FFSEbRY37PcYiVoubPtwEFTp4WwYQ9C1DbZn90yzRQ0hmcGD719vqrAQJ6EysxDg5WG7iGAvt85sKe3Xl54n54_X5l5BdaXkaT0CLQvuNyCIZSCuL9YhoTKY23iRAOPFG-7CZNCvefL7xGbv9BhdybPYT0gdrFjGz0IozqL64CymTKsz987TsVXN8adP7Vo4Sy44PpQVrQdQTY4A27BivMZrpgCnZJ7rfLnJbotleL5lJb2M6PuBMVbHV1BG-0HyRfoirBRy9ZPQgTlTu5IXfXgsSbhEgI6BethNFozWUco_M1h2HBBYWjv5cAg==";
         String mediaId = "4439843";
         mediaProvider = new PhoenixMediaProvider("https://rest-us.ott.kaltura.com/api_v3/", 3079, KS)
                 .setAssetId(mediaId)
                 .setFormats("BP_VOD_Dash")
                 .setProtocol(PhoenixMediaProvider.HttpProtocol.Http)
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media);
+        // .setPKStreamerType(APIDefines.KalturaStreamerType.Mpegdash);
+
+        mediaProvider.load(completion);
+    }
+
+    private void startEmiritus(final OnMediaLoadCompletion completion) {
+        String KS = "djJ8MzIwOHxcsKh3h1zqX_foOl6oA026WtmBo4NV3Bh5V80fCdC0tJRmJGyp7yplkRowNYCaW2LX5h52YXsiPUot8qJcYOKuGGQD73shLXRArRmJ1H285Hi0ilJDvN5YqPJ_mASRhmWIDyZrnpuDoAaTtaB9i92ZFkpUuaeQwIPkPX13USabp0QCVkBbnTZDoOzXOuI8a-4bcMFb93gngVhkvVb9hADtkn6ULolA4QuSw2AU_I_XErI2wS3xedgOkhEzPVh_cYd8zjAmGGpQrcKxfsrto_mc014bWvEI7g1KY12pekMKCSHRz0qjVvYO2kqbGdKubIuLBxEYkFspAudS8mDr4Y8JNO-59cNkHFfwr2XVDshnd4VmRYn8-ohO2KCQZtASYnfHtPSF8iBLMSnSgqrtNtXw";
+        String mediaId = "338548";
+        mediaProvider = new PhoenixMediaProvider("https://rest-sgs1.ott.kaltura.com/api_v3/", 3208, KS)
+                .setAssetId(mediaId)
+                .setFileIds("800396")
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
                 .setContextType(APIDefines.PlaybackContextType.Playback)
                 .setAssetType(APIDefines.KalturaAssetType.Media);
         // .setPKStreamerType(APIDefines.KalturaStreamerType.Mpegdash);
@@ -885,7 +959,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         JsonObject pluginEntry = getYouboraJsonObject(isLive, title);
 
         //Set plugin entry to the plugin configs.
-        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
+        pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), getYouboraBundle());
     }
 
     @NonNull
@@ -903,6 +977,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         JsonObject deviceJson = new JsonObject();
         deviceJson.addProperty("deviceCode", "AndroidTV");
         deviceJson.addProperty("brand", "Xiaomi");
+        deviceJson.addProperty("id", "Gourav-MotoG6-Unique-Id");
         deviceJson.addProperty("model", "Mii3");
         deviceJson.addProperty("type", "TvBox");
         deviceJson.addProperty("osName", "Android/Oreo");
@@ -951,6 +1026,73 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return pluginEntry;
     }
 
+    /**
+     * Youbora options Bundle (Recommended)
+     *
+     * Will create {@link PKPluginConfigs} object with {@link YouboraPlugin}.
+     *
+     * @return - the pluginConfig object that should be passed as parameter when loading the player.
+     */
+    private Bundle getYouboraBundle() {
+        //Initialize Json object that will hold all the configurations for the plugin.
+
+        Bundle optBundle = new Bundle();
+
+        //Youbora config bundle. Main config goes here.
+        optBundle.putString(KEY_ACCOUNT_CODE, ACCOUNT_CODE);
+        optBundle.putString(KEY_USERNAME, UNIQUE_USER_NAME);
+        optBundle.putString(KEY_USER_EMAIL, UNIQUE_USER_NAME);
+        optBundle.putString(KEY_APP_NAME, "TestApp");
+        optBundle.putString(KEY_APP_RELEASE_VERSION, "v1.0");
+        optBundle.putBoolean(KEY_ENABLED, true);
+
+        //Media entry bundle.
+        optBundle.putString(KEY_CONTENT_TITLE, MEDIA_TITLE);
+
+        //Optional - Device bundle o/w youbora will decide by its own.
+        optBundle.putString(KEY_DEVICE_CODE, DEVICE_CODE);
+        optBundle.putString(KEY_DEVICE_BRAND, "Xiaomi");
+        optBundle.putString(KEY_DEVICE_ID, "Gourav-MotoG6-Unique-Id-Bundle");
+        optBundle.putString(KEY_DEVICE_MODEL, "Mii3");
+        optBundle.putString(KEY_DEVICE_TYPE, "TvBox");
+        optBundle.putString(KEY_DEVICE_OS_NAME, "Android/Oreo");
+        optBundle.putString(KEY_DEVICE_OS_VERSION, "8.1");
+
+        //Youbora ads configuration bundle.
+        optBundle.putString(KEY_AD_CAMPAIGN, CAMPAIGN);
+
+        optBundle.putString(KEY_HOUSEHOLD_ID, "householdId");
+
+        //Configure custom properties here:
+        optBundle.putString(KEY_CONTENT_GENRE, GENRE);
+        optBundle.putString(KEY_CONTENT_TYPE, TYPE);
+        optBundle.putString(KEY_CONTENT_TRANSACTION_CODE, TRANSACTION_TYPE); // NEED TO CHECK
+        optBundle.putString(KEY_CONTENT_CDN, CONTENT_CDN_CODE);
+
+        // Create Content Metadata bundle
+        Bundle contentMetaDataBundle = new Bundle();
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_YEAR, YEAR);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_CAST, CAST);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_DIRECTOR, DIRECTOR);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_OWNER, OWNER);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_PARENTAL, PARENTAL);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_RATING, RATING);
+        contentMetaDataBundle.putString(KEY_CONTENT_METADATA_QUALITY, QUALITY);
+
+        // Add Content Metadata bundle to the main Options bundle
+        optBundle.putBundle(KEY_CONTENT_METADATA, contentMetaDataBundle);
+
+        optBundle.putString(KEY_CONTENT_PRICE, PRICE);
+        optBundle.putString(KEY_CONTENT_ENCODING_AUDIO_CODEC, AUDIO_TYPE); // NEED TO CHECK
+        optBundle.putString(KEY_CONTENT_CHANNEL, AUDIO_CHANNELS);  // NEED TO CHECK
+
+        //You can add some extra params here:
+        optBundle.putString(KEY_CUSTOM_DIMENSION_1, EXTRA_PARAM_1);
+        optBundle.putString(KEY_CUSTOM_DIMENSION_2, EXTRA_PARAM_2);
+
+        return optBundle;
+    }
+
     private void addPhoenixAnalyticsPluginConfig(PKPluginConfigs config) {
         String ks = "djJ8MTk4fHFftqeAPxdlLVzZBk0Et03Vb8on1wLsKp7cbOwzNwfOvpgmOGnEI_KZDhRWTS-76jEY7pDONjKTvbWyIJb5RsP4NL4Ng5xuw6L__BeMfLGAktkVliaGNZq9SXF5n2cMYX-sqsXLSmWXF9XN89io7-k=";
         PhoenixAnalyticsConfig phoenixAnalyticsConfig = new PhoenixAnalyticsConfig(198, "http://api-preprod.ott.kaltura.com/v4_2/api_v3/", ks, 30);
@@ -964,8 +1106,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         log.d("Play Ad preSkipAdTagUrl");
         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
-       // IMAConfig adsConfig = getAdsConfigResponsePostrollBuggy(ads5AdsEvery10Secs);
-        IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl);
+        // IMAConfig adsConfig = getAdsConfigResponsePostrollBuggy(ads5AdsEvery10Secs);
+        IMAConfig adsConfig = getAdsConfig(preMidPostAdTagUrl);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
@@ -1912,6 +2054,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             log.d("resizeMode updated" + event.resizeMode);
         });
 
+        player.addListener(this, PlayerEvent.subtitlesStyleChanged, event -> {
+            log.d("subtitlesStyleChanged " + event.styleName);
+        });
+
         player.addListener(this, PlayerEvent.volumeChanged, event -> {
             log.d("volume == " + event.volume);
         });
@@ -2564,7 +2710,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 //  String ks = "djJ8MjI1fJqYQoKdrm0lWI2qygW7jk4EYCjgnBhqzHQ4PVBsRTNQ0D1s7FcYMH4xikLtWCX95Vcc4Uw0MUgMlabou_0cMpXF3DbCGce-5CU635jnqhD8zZqQ5kGeuCj3ylu1m45VYTVrIfB3p3IGX47OMshGbBnY0gLVuSM7F2IPAMeW6pxoTXdRMdp4Ois-SGtfkca2XQ==";
                 if (completion != null) {
-                    completion.onComplete(new PrimitiveResult(V18_STAGING_KS));
+                    //  completion.onComplete(new PrimitiveResult(V18_STAGING_KS));
+                    completion.onComplete(new PrimitiveResult("djJ8MzIwOHxFk2kYBpE2A10ELbzigwC78oKEnLkVUS8XO-DobJNEAQ6ntMbsAXiGymdeFFLNzKibgQZ5W8bzOpD9jUew-bsmjysMPd_Ou5Hv_yHfa4Sm98JkJdqUtlY2LRGYDNcencC3YnPlh0_PMkXPE9sQuDRv6Dx9uNCDDVTtq8S6O8G8tR_sxXEhXvqchRpERoMWf6gpHMTVjvPk8nQCQANfjqA8FL49XXh11rKhgDIoL8JrmHnLeJquoF9LRdSVNnhxt0RZt9dU8CfNnowiGpPoFEuuzDyHTXNhXA8Q4KbuDWHnvznQ6sGQobZ3zXE3QTpXaLhdca_ThBdhIqiczHqusCZyEEYVpGkvofQUqIm_adLdGmpdd4I8LtiNTWuhN9r7g2PCtqJZLDo2CPpHOJ_N5qqGVTEG8sH0mBSHKEWcS85oWhwxzcuf3Wl5nz7Ziolwr5I="));
                 }
             }
 
@@ -2577,16 +2724,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //  SimpleSessionProvider ksSessionProvider = new SimpleSessionProvider("https://rest-as.ott.kaltura.com/v4_4/api_v3", 255, null);
 
-        String mediaIdPhoenix = mediaId;
+        String mediaIdPhoenix = "337279";
         //String formatHls = fileType % 2 == 0 ? "Tablet Main" : "dash Main";
         //  String formatHls = "dashclear";
         //String formatHls = "DASHENC_TV_PremiumHD";
         //String formatHls = "DASHENC_TV_PremiumHD";
-       // String formatHls = "dash Main";
-        String formatHls = "audio_only_dash";
+        // String formatHls = "dash Main";
+        String formatHls = "dash_widevine";
 
-      //  String formatHls = "dashclear";
-      //  String formatHls = "HEVCDASH";
+        //  String formatHls = "dashclear";
+        //  String formatHls = "HEVCDASH";
 
         //audio
         // String mediaId = "743297";
@@ -2627,7 +2774,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setSessionProvider(ksSessionProvider)
                 .setAssetId(mediaIdPhoenix)
                 //.setReferrer()
-             //   .setFileIds("581875") // Devive not in household wala skype ka issue
+                .setFileIds("792385") // Devive not in household wala skype ka issue
                 .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
                 .setContextType(APIDefines.PlaybackContextType.Playback)
                 .setAssetType(APIDefines.KalturaAssetType.Media)
@@ -2684,14 +2831,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         String mediaIdPhoenix = mediaId;
         //String formatHls = fileType % 2 == 0 ? "Tablet Main" : "dash Main";
-         // String formatHls = "Tablet Main";
+        // String formatHls = "Tablet Main";
         //  String formatHls = "DASHENC_PremiumHD"; // Device Not in household wala issue
         //  String formatHls = "TV Main";
         //String formatHls = "DASHENC_TV_PremiumHD";
         //audio
         // String mediaId = "743297";
         // String formatHls  = "audio_only";
-          String formatHls  = "dash Main";
+        String formatHls  = "dash Main";
         //  String formatHls  = "HLS_Linear_P";
         //                "Format": "dash Mobile",
 //                "Format": "ism Main",
@@ -2727,7 +2874,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mediaProvider = new PhoenixMediaProvider()
                 .setSessionProvider(ksSessionProvider)
                 .setAssetId(mediaIdPhoenix)
-          //      .setFileIds("11704300") // Device Not in household wala issue
+                //      .setFileIds("11704300") // Device Not in household wala issue
                 //.setReferrer()
                 //    .setFileIds("10677547", "10677551")
                 .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
@@ -2747,13 +2894,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         List<PKDrmParams> pkDrmDataList = new ArrayList<>();
         String licenseUri = "https://udrm-stg.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJodHRwczovL3Jlc3Qtc2dzMS5vdHQua2FsdHVyYS5jb20vcmVzdGZ1bF92NV8wL2FwaV92My9zZXJ2aWNlL2Fzc2V0RmlsZS9hY3Rpb24vZ2V0Q29udGV4dD9rcz1kako4TWpJMWZKNEVqbHc5LXFLUTBkRXZPbUwwS3JqandubFlJMG5fWGJLdC04dTZUUUhndUhuVDlOeEVGTmFYZHpKck81Vl9kLUtjLXJLNGgySU5ndHJFOWNZNWtvTzVQZWpybXNFMlQ2Y3o1anNwRUY2SmI1aHZwVENoS2tPU2t5bG9JRVJYQmwyRGs1TlVuUXk4Ty0wRVpCSmQyMUNtRDBNdUYxZVRRVnZfZTg3UDBSQS14X29nVV85Q3NUTlU4c2UwcUR1Y0FDS1labmREMWRHMklLLWpoNGFhRkdVM0NIOEx1QS16RkpXVk0xVGFtaHNlcGl6eGVNaDc3R0NXWUNkRFBReW9JNzZFWEtpMXE4OFNJWWhKV0xDY0c0WkJ4TTJWWGFfVDhIenMwd1l6VWhlTGZBdWNrdUFha1dMN285MzlIa2k3M2JDa2xFSVhCZlVOV3JHX3Y5aFVPX2s9JmNvbnRleHRUeXBlPW5vbmUmaWQ9NTg2NTQxIiwiYWNjb3VudF9pZCI6MTk4MjU0MSwiY29udGVudF9pZCI6IjBfYXgzdXIyeHZfMF9pZXY3bWJ0dCwwX2F4M3VyMnh2XzBfeXk5a3ZwZWwsMF9heDN1cjJ4dl8wX3hvYmFoa29qLDBfYXgzdXIyeHZfMF9vaWRoYThvaywwX2F4M3VyMnh2XzBfMnRwNWgxOWEiLCJmaWxlcyI6IiIsInVzZXJfdG9rZW4iOiJkako4TWpJMWZKNEVqbHc5LXFLUTBkRXZPbUwwS3JqandubFlJMG5fWGJLdC04dTZUUUhndUhuVDlOeEVGTmFYZHpKck81Vl9kLUtjLXJLNGgySU5ndHJFOWNZNWtvTzVQZWpybXNFMlQ2Y3o1anNwRUY2SmI1aHZwVENoS2tPU2t5bG9JRVJYQmwyRGs1TlVuUXk4Ty0wRVpCSmQyMUNtRDBNdUYxZVRRVnZfZTg3UDBSQS14X29nVV85Q3NUTlU4c2UwcUR1Y0FDS1labmREMWRHMklLLWpoNGFhRkdVM0NIOEx1QS16RkpXVk0xVGFtaHNlcGl6eGVNaDc3R0NXWUNkRFBReW9JNzZFWEtpMXE4OFNJWWhKV0xDY0c0WkJ4TTJWWGFfVDhIenMwd1l6VWhlTGZBdWNrdUFha1dMN285MzlIa2k3M2JDa2xFSVhCZlVOV3JHX3Y5aFVPX2s9IiwidWRpZCI6IiIsImFkZGl0aW9uYWxfY2FzX3N5c3RlbSI6MjI1fQ%3d%3d&signature=dEra120gz44b7fSp%2bjcuXFAZmtI%3d";
         PKDrmParams pkDrmParams = new PKDrmParams(licenseUri, PKDrmParams.Scheme.WidevineCENC);
-       // pkDrmDataList.add(pkDrmParams);
+        // pkDrmDataList.add(pkDrmParams);
 
         List<PKMediaSource> mediaSourceList = new ArrayList<>();
         PKMediaSource pkMediaSource = new PKMediaSource();
         pkMediaSource.setUrl("https://zee5vodnd.akamaized.net/hls1/elemental/hls/ORIGINAL_CONTENT_BRO/DOMESTIC/HINDI/MENTALHOOD_HINDI_EP01_BRO_BEBAAKEE_CROSS_PROMO_hi_08d64bc720265e5be53e09934ffc2848/index.m3u8?hdnea=st=1600841898~exp=1600844898~acl=/*~hmac=d9c4a72cda66ce66acccbdcd6c753fbde75954947d564627e37af60ada029e62");
         //  pkMediaSource.setId("929088");
-     //   pkMediaSource.setMediaFormat(PKMediaFormat.dash);
+        //   pkMediaSource.setMediaFormat(PKMediaFormat.dash);
 
         //  pkMediaSource.setDrmData(pkDrmDataList);
 

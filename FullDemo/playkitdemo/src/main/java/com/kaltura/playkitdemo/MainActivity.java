@@ -131,7 +131,6 @@ import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_TYPE;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_1;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_CUSTOM_DIMENSION_2;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_BRAND;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_ID;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_CODE;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_MODEL;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_OS_NAME;
@@ -196,6 +195,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public String singlePostRoll = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpostonly&cmsid=496&vid=short_onecue&correlator=";
     public String vootPremiumEmptyAdTag = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360%7C640x480&iu=%2F21633895671%2FQASVOD%2FVideo%2FAndroid_Native_App%2FVSO&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D13%26KidsPinEnabled%3DN%26distinct_id%3DXmWLVbUThyY3NzJGgw7NGPsFYAp2%26AppVersion%3D0.3.4_PPE_DBG%26DeviceModel%3DAndroid%20SDK%20built%20for%20x86%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2510338&ppid=XmWLVbUThyY3NzJGgw7NGPsFYAp2&vid=0_1sz284bq&ad_rule=1&correlator=1440&InterstitialRendered=False";
 
+    public String ad_youbora = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F124319096%2Fexternal%2Fad_rule_samples&ciu_szs=300x250&ad_rule=1&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=4178520229405531&ms=upuacR6gQAr0KtuYm2jCKRfQ-dLzlTIkrpS9TCxaPhnR7jZi4aliCtq_qpOxVhKVsrwzgAxQX64X-FRZgT0yFR8oHyu_FznoTFnlKO2ie-0NTNYNu6lNmTT2DqcBvY_DN6DPu9k2ZJiR6ZaSIqTp987s99clneQsdaRaqFfpVo7suWVijnukZQ6sFtTMk9z-h6IklSeaP3XaZjN22MF15IqFaraVcMmzpwmT3I4MOPUceENqvXOa-0iGbLnyLiv61ixK65d6fu-LzaRAeK5Ogm_OuWxI6r0rF4N0SQp_mQ4n3h6FWB2jfd8-Sx7036W7eFhyU435mQC2Z_N2txoiLg&sdkv=h.3.258.1%2Fn.android.3.20.0%2Fcom.kaltura.kalturaplayertestapp&osd=2&frm=0&vis=1&sdr=1&hl=en&is_lat=0&idtype=adid&rdid=0c714bb8-889b-4297-a158-8dec2c15e2b6&is_amp=0&js=ima-android.3.20.0&an=com.kaltura.kalturaplayertestapp&msid=com.kaltura.kalturaplayertestapp&mv=82313010.com.android.vending&u_so=l&ctv=0&mpt=kaltura-vp-android&mpv=dev.2580ad14&sdki=445&sdk_apis=7%2C8&omid_p=Google1%2Fandroid.3.20.0&sid=172941A5-6E09-4564-B929-5E293F97FEC7&url=com.kaltura.kalturaplayertestapp.adsenseformobileapps.com%2F&eid=21064201%2C46130026&dlt=1608632084524&idt=102&dt=1608632084673&scor=4206523438118768";
+
     private Player player;
     private MediaEntryProvider mediaProvider;
     private PlaybackControlsView controlsView;
@@ -241,13 +242,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String AUDIO_CHANNELS = "your_audio_channels";
     public static final String DEVICE = "your_device";
     public static final String QUALITY = "your_quality";
-    /**
-     Follow this {@link http://mapi.youbora.com:8081/cdns}
-     */
     public static final String CONTENT_CDN_CODE = "AAPTLIMI";
-    /**
-     Follow this {@link http://mapi.youbora.com:8081/devices}
-     */
     public static final String DEVICE_CODE = "your_device_code";
 
     static {
@@ -341,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // startVootOttMediaLoadingProd(playLoadedEntry, "926531"); // DTG
         //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
         //    startVootOttMediaLoadingProd(playLoadedEntry, "975732"); // SRT/webvtt failure source error
-        startVootOttMediaLoadingProd(playLoadedEntry, "979570"); //Gourav
+        //startVootOttMediaLoadingProd(playLoadedEntry, "979570"); //Gourav
         //    startVootOttMediaLoadingProd(playLoadedEntry, "1017737"); //Gourav // no text track
         //   startVootOttMediaLoadingProd(playLoadedEntry, "1013774"); //Gourav // 1 non default text track
         //    startVootOttMediaLoadingProd(playLoadedEntry, "618620");
@@ -392,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
 //      startSimpleOvpMediaLoadingLive1(playLoadedEntry);
 //        startSimpleOvpMediaLoadingLive(playLoadedEntry);
-//     startMockMediaLoading(playLoadedEntry);
+     startMockMediaLoading(playLoadedEntry);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
         //       startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
@@ -850,7 +845,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         player.prepare(mediaConfig);
-        player.play();
+     //   player.play();
     }
 
     private void startWOW(final OnMediaLoadCompletion completion) {
@@ -1052,7 +1047,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //Optional - Device bundle o/w youbora will decide by its own.
         optBundle.putString(KEY_DEVICE_CODE, DEVICE_CODE);
         optBundle.putString(KEY_DEVICE_BRAND, "Xiaomi");
-        optBundle.putString(KEY_DEVICE_ID, "Gourav-MotoG6-Unique-Id-Bundle");
         optBundle.putString(KEY_DEVICE_MODEL, "Mii3");
         optBundle.putString(KEY_DEVICE_TYPE, "TvBox");
         optBundle.putString(KEY_DEVICE_OS_NAME, "Android/Oreo");
@@ -1107,7 +1101,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         log.d("Play Ad preSkipAdTagUrl");
         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
         // IMAConfig adsConfig = getAdsConfigResponsePostrollBuggy(ads5AdsEvery10Secs);
-        IMAConfig adsConfig = getAdsConfig(preMidPostAdTagUrl);
+        IMAConfig adsConfig = getAdsConfig(ad_youbora);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 

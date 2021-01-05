@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                     String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=" + 43543;
                     if (remoteMediaClient != null) {
                         if ("ovp".equals(BuildConfig.FLAVOR)) {
-                            pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_b7s02kjl", vastAdTag, CAFCastBuilder.AdTagType.VAST, null), loadOptions);
+                            pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_1l9q18gy", vastAdTag, CAFCastBuilder.AdTagType.VAST, null), loadOptions);
                             if (pendingResult != null) {
                                 pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
@@ -363,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
         MediaLoadOptions loadOptions = new MediaLoadOptions.Builder().setAutoplay(true).setPlayPosition(position).build();
         String vastAdTag = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=" +  11223;
         //using QA partner 1091
-        pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_ttfy4uu0", vastAdTag, CAFCastBuilder.AdTagType.VAST, getExternalVttCaptions()), loadOptions);
+        pendingResult = remoteMediaClient.load(getOvpCastMediaInfo("0_1l9q18gy", vastAdTag, CAFCastBuilder.AdTagType.VAST, getExternalVttCaptions()), loadOptions);
         pendingResult.setResultCallback(new ResultCallback<RemoteMediaClient.MediaChannelResult>() {
 
             @Override
@@ -679,6 +679,7 @@ public class MainActivity extends AppCompatActivity {
         CAFCastBuilder ovpV3CastBuilder =  new KalturaCastBuilder()
                 .setMediaEntryId(entryId)
                 .setKs("")
+                .setReferenceId("Alex1234")
                 .setStreamType(CAFCastBuilder.StreamType.VOD);
 
         if (externalVttCaptions != null) {

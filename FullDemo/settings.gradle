@@ -31,8 +31,8 @@ project(':fbads').projectDir = new File('../../playkit-android-fb-ads/fbadsplugi
 include ':fbads'
 project(':fbads').projectDir = new File('../../playkit-android-fb-ads/fbadsplugin')
 
-include ':netkit'
-project(':netkit').projectDir = new File('../../netkit-android/netkit')
+//include ':netkit'
+//project(':netkit').projectDir = new File('../../netkit-android/netkit')
 
 
 //gradle.ext.exoplayerRoot = '../../../../../Dev/android/google/ExoPlayer'

@@ -135,6 +135,18 @@
       }
     ]
   },
+  "wowhls": {
+    "duration": 102000,
+    "id": "0_uka1msg4",
+    "name": "wowhls",
+    "sources": [
+      {
+        "id": "0_uka1msg4",
+        "mimeType": "application/x-mpegURL",
+        "url": "http://player.ipve.md0.as12083.net/vod/TVN_RADS1010212000036966_AVC30_MEZZ_HD/TVN_RADS1010212000036966_AVC30_MEZZ_HD.ism/output/index.m3u8"
+      }
+    ]
+  },
   "audioOnly": {
     "duration": 102000,
     "id": "0_uka1msg4",

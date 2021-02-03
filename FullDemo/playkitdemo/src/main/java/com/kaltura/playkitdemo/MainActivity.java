@@ -1209,7 +1209,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, PlayerEvent.error, event -> {
             //When the track data available, this event occurs. It brings the info object with it.
             if (event != null && event.error != null) {
-                log.d("PlayerEvent.Error event  position = " + event.error.errorType + " errorMessage = " + event.error.message);
+                log.d("PlayerEvent.Error event  errorType = " + event.error.errorType + " errorMessage = " + event.error.message);
             }
         });
 

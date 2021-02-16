@@ -18,23 +18,23 @@
     ]
   },
   "wow": {
-  "duration": 102000,
-  "id": "0_hbhe2o9x",
-  "name": "wow",
-  "sources": [
-    {
-      "id": "0_hbhe2o9x",
-      "url": "https://rest-us.ott.kaltura.com/api_v3/service/assetFile/action/playManifest/partnerId/3079/assetId/4439843/assetType/media/assetFileId/35835059/contextType/PLAYBACK/ks/djJ8MzA3OXxj5Vxc7ecNiCwlWbX_-SUD-W_w8leivwgvJ_vZns5WBBXTUjixlhclIoJN_4yU1hcy-_CY04Kliqq4LDCRJVm3oTgJVaEb0EMFufOVQRl7iJ1685AN1DPrMK0am-sBpIrHJS1GmgNNbxBhhDllzYvtxEFQUPnege_KeX2K0MJAa991-0HY3xKmEBHfR_EVXv3bHOP9yyrMyUHO3Gsbu-u1995P7XhKUoXBsELRMagy5eCJLL_ubdnXQCcm41YIS2x4ky4G2zMDmjJiTej1gmU8GdWVPPLizB14yRLQGPSEsLWqJqjLCuEVw-nby94uSX4=/a.mpd",
-      "mimeType": "application/dash+xml",
-      "drmData": [
-        {
-          "scheme": "WidevineCENC",
-          "licenseUri": "https://udrmv3.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJodHRwczovL3Jlc3QtdXMub3R0LmthbHR1cmEuY29tL2FwaV92My9zZXJ2aWNlL2Fzc2V0RmlsZS9hY3Rpb24vZ2V0Q29udGV4dD9rcz1kako4TXpBM09YeGo1VnhjN2VjTmlDd2xXYlhfLVNVRC1XX3c4bGVpdndndkpfdlpuczVXQkJYVFVqaXhsaGNsSW9KTl80eVUxaGN5LV9DWTA0S2xpcXE0TERDUkpWbTNvVGdKVmFFYjBFTUZ1Zk9WUVJsN2lKMTY4NUFOMURQck1LMGFtLXNCcElySEpTMUdtZ05OYnhCaGhEbGx6WXZ0eEVGUVVQbmVnZV9LZVgySzBNSkFhOTkxLTBIWTN4S21FQkhmUl9FVlh2M2JIT1A5eXlyTXlVSE8zR3NidS11MTk5NVA3WGhLVW9YQnNFTFJNYWd5NWVDSkxMX3ViZG5YUUNjbTQxWUlTMng0a3k0RzJ6TURtakppVGVqMWdtVThHZFdWUFBMaXpCMTR5UkxRR1BTRXNMV3FKcWpMQ3VFVnctbmJ5OTR1U1g0PSZjb250ZXh0VHlwZT1ub25lJmlkPTM1ODM1MDU5IiwiYWNjb3VudF9pZCI6MzA3OSwiY29udGVudF9pZCI6IlRWTl9SQURTMTAxMDIxMjAwMDAzNjk2Nl9BVkMzMF9NRVpaX0hEIiwiZmlsZXMiOiIiLCJ1c2VyX3Rva2VuIjoiZGpKOE16QTNPWHhqNVZ4YzdlY05pQ3dsV2JYXy1TVUQtV193OGxlaXZ3Z3ZKX3ZabnM1V0JCWFRVaml4bGhjbElvSk5fNHlVMWhjeS1fQ1kwNEtsaXFxNExEQ1JKVm0zb1RnSlZhRWIwRU1GdWZPVlFSbDdpSjE2ODVBTjFEUHJNSzBhbS1zQnBJckhKUzFHbWdOTmJ4QmhoRGxsell2dHhFRlFVUG5lZ2VfS2VYMkswTUpBYTk5MS0wSFkzeEttRUJIZlJfRVZYdjNiSE9QOXl5ck15VUhPM0dzYnUtdTE5OTVQN1hoS1VvWEJzRUxSTWFneTVlQ0pMTF91YmRuWFFDY200MVlJUzJ4NGt5NEcyek1EbWpKaVRlajFnbVU4R2RXVlBQTGl6QjE0eVJMUUdQU0VzTFdxSnFqTEN1RVZ3LW5ieTk0dVNYND0iLCJ1ZGlkIjoiMTE4NDQwNDAzNCIsImFkZGl0aW9uYWxfY2FzX3N5c3RlbSI6MzA3OX0%3d&signature=%2bLLE11FwGP04j4mGbd%2b%2fa0BaH1U%3d"
-        }
-      ]
-    }
-  ]
-},
+    "duration": 102000,
+    "id": "0_hbhe2o9x",
+    "name": "wow",
+    "sources": [
+      {
+        "id": "0_hbhe2o9x",
+        "url": "https://rest-us.ott.kaltura.com/api_v3/service/assetFile/action/playManifest/partnerId/3079/assetId/4439843/assetType/media/assetFileId/35835059/contextType/PLAYBACK/ks/djJ8MzA3OXxj5Vxc7ecNiCwlWbX_-SUD-W_w8leivwgvJ_vZns5WBBXTUjixlhclIoJN_4yU1hcy-_CY04Kliqq4LDCRJVm3oTgJVaEb0EMFufOVQRl7iJ1685AN1DPrMK0am-sBpIrHJS1GmgNNbxBhhDllzYvtxEFQUPnege_KeX2K0MJAa991-0HY3xKmEBHfR_EVXv3bHOP9yyrMyUHO3Gsbu-u1995P7XhKUoXBsELRMagy5eCJLL_ubdnXQCcm41YIS2x4ky4G2zMDmjJiTej1gmU8GdWVPPLizB14yRLQGPSEsLWqJqjLCuEVw-nby94uSX4=/a.mpd",
+        "mimeType": "application/dash+xml",
+        "drmData": [
+          {
+            "scheme": "WidevineCENC",
+            "licenseUri": "https://udrmv3.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJodHRwczovL3Jlc3QtdXMub3R0LmthbHR1cmEuY29tL2FwaV92My9zZXJ2aWNlL2Fzc2V0RmlsZS9hY3Rpb24vZ2V0Q29udGV4dD9rcz1kako4TXpBM09YeGo1VnhjN2VjTmlDd2xXYlhfLVNVRC1XX3c4bGVpdndndkpfdlpuczVXQkJYVFVqaXhsaGNsSW9KTl80eVUxaGN5LV9DWTA0S2xpcXE0TERDUkpWbTNvVGdKVmFFYjBFTUZ1Zk9WUVJsN2lKMTY4NUFOMURQck1LMGFtLXNCcElySEpTMUdtZ05OYnhCaGhEbGx6WXZ0eEVGUVVQbmVnZV9LZVgySzBNSkFhOTkxLTBIWTN4S21FQkhmUl9FVlh2M2JIT1A5eXlyTXlVSE8zR3NidS11MTk5NVA3WGhLVW9YQnNFTFJNYWd5NWVDSkxMX3ViZG5YUUNjbTQxWUlTMng0a3k0RzJ6TURtakppVGVqMWdtVThHZFdWUFBMaXpCMTR5UkxRR1BTRXNMV3FKcWpMQ3VFVnctbmJ5OTR1U1g0PSZjb250ZXh0VHlwZT1ub25lJmlkPTM1ODM1MDU5IiwiYWNjb3VudF9pZCI6MzA3OSwiY29udGVudF9pZCI6IlRWTl9SQURTMTAxMDIxMjAwMDAzNjk2Nl9BVkMzMF9NRVpaX0hEIiwiZmlsZXMiOiIiLCJ1c2VyX3Rva2VuIjoiZGpKOE16QTNPWHhqNVZ4YzdlY05pQ3dsV2JYXy1TVUQtV193OGxlaXZ3Z3ZKX3ZabnM1V0JCWFRVaml4bGhjbElvSk5fNHlVMWhjeS1fQ1kwNEtsaXFxNExEQ1JKVm0zb1RnSlZhRWIwRU1GdWZPVlFSbDdpSjE2ODVBTjFEUHJNSzBhbS1zQnBJckhKUzFHbWdOTmJ4QmhoRGxsell2dHhFRlFVUG5lZ2VfS2VYMkswTUpBYTk5MS0wSFkzeEttRUJIZlJfRVZYdjNiSE9QOXl5ck15VUhPM0dzYnUtdTE5OTVQN1hoS1VvWEJzRUxSTWFneTVlQ0pMTF91YmRuWFFDY200MVlJUzJ4NGt5NEcyek1EbWpKaVRlajFnbVU4R2RXVlBQTGl6QjE0eVJMUUdQU0VzTFdxSnFqTEN1RVZ3LW5ieTk0dVNYND0iLCJ1ZGlkIjoiMTE4NDQwNDAzNCIsImFkZGl0aW9uYWxfY2FzX3N5c3RlbSI6MzA3OX0%3d&signature=%2bLLE11FwGP04j4mGbd%2b%2fa0BaH1U%3d"
+          }
+        ]
+      }
+    ]
+  },
   "drm1": {
     "id": "0_pl5lbfo0",
     "sources": [
@@ -44,6 +44,38 @@
         "drmData": {
           "licenseUri": "https://udrm.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJPVlAiLCJ1c2VyX3Rva2VuIjoiZGpKOE1UZzFNVFUzTVh6NnJxM3hFYnI0aFBWU3N0ajRDaGtkT1NoVU1QYV9sTFFaNWpkSVdscWdYNld6YnJuSGZORHZ0V3hmYmExT3dJVmVjeXNIVTc3ci1VazBvWWZkaGttd0dZNWQwSmdCUGdfMkZ3Wi13cE1yRlE9PSIsImFjY291bnRfaWQiOiIxODUxNTcxIiwiY29udGVudF9pZCI6IjBfcGw1bGJmbzAiLCJmaWxlcyI6IjBfendxM2w0NHIsMF91YTYycms2cywwX290bWFxcG5mLDBfeXdrbXFua2csMV9lMHF0YWoxaiwxX2IycXp5dmE3In0%3D&signature=eFrsxqplBh6b8%2BRkn4XaLsKD7Lc%3D"
         }
+      }
+    ]
+  },
+  "widevine_L1": {
+    "id": "widevine_L1",
+    "sources": [
+      {
+        "id": "widevine_L1_dash",
+        "url": "https://storage.googleapis.com/wvmedia/cenc/h264/tears/tears.mpd",
+        "mimeType": "application/dash+xml",
+        "drmData": [
+          {
+            "scheme": "WidevineCENC",
+            "licenseUri": "https://proxy.uat.widevine.com/proxy?video_id=GTS_HW_SECURE_ALL&provider=widevine_test"
+          }
+        ]
+      }
+    ]
+  },
+  "Zee5": {
+    "id": "widevine_L1",
+    "sources": [
+      {
+        "id": "Zee5",
+        "url": "https://zee5vod.akamaized.net/drm1/PROMOS_FOR_ZEE5/Kaagaz_BTSVideo_Hi_c6b57c2d.mp4/manifest.mpd?c3.ri=6908522369903428733",
+        "mimeType": "application/dash+xml",
+        "drmData": [
+          {
+            "scheme": "WidevineCENC",
+            "licenseUri": "https://wv-keyos-aps1.licensekeyserver.com/"
+          }
+        ]
       }
     ]
   },
@@ -78,6 +110,18 @@
         "id": "0_rccv43zr_mp4",
         "mimeType": "video/mp4",
         "url": "http://qa-apache-php7.dev.kaltura.com/p/1091/sp/1091/playManifest/entryId/0_rccv43zr/flavorIds/0_qm8yk6bg,0_5artpfqc,0_ee3vdk7h,0_jkit9w6a,0_8qt13atw,0_rgajlpf4/deliveryProfileId/261/protocol/http/format/url/name/a.mp4"
+      }
+    ]
+  },
+  "wvm": {
+    "duration": 102000,
+    "id": "0_rccv43zr",
+    "name": "wmv sample",
+    "sources": [
+      {
+        "id": "0_rccv43zr_mp4",
+        "mimeType": "video/wvm",
+        "url": "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-wmv-file.wmv"
       }
     ]
   },
@@ -158,16 +202,64 @@
       }
     ]
   },
-"live": {
-  "duration": 102000,
-  "id": "0_f8re4ujs",
-  "name": "Live",
-  "sources": [
-    {
-      "id": "0_f8re4ujs_live",
-      "mimeType": "application/x-mpegURL",
-      "url": "http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_f8re4ujs/format/applehttp/protocol/http/uiConfId/15068781/a.m3u8"
-    }
-  ]
-}
+  "live": {
+    "duration": 102000,
+    "id": "0_f8re4ujs",
+    "name": "Live",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live",
+        "mimeType": "application/x-mpegURL",
+        "url": "http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_f8re4ujs/format/applehttp/protocol/http/uiConfId/15068781/a.m3u8"
+      }
+    ]
+  },
+  "LL-1": {
+    "duration": 102000,
+    "id": "LL-1",
+    "name": "LL-1",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll",
+        "mimeType": "application/dash+xml",
+        "url": "https://livesim.dashif.org/livesim/chunkdur_1/ato_7/testpic4_8s/Manifest300.mpd"
+      }
+    ]
+  },
+  "LL-2": {
+    "duration": 102000,
+    "id": "LL-2",
+    "name": "LL-2",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll_2",
+        "mimeType": "application/dash+xml",
+        "url": "https://akamaibroadcasteruseast.akamaized.net/cmaf/live/657078/akasource/out.mpd"
+      }
+    ]
+  },
+  "HLS-BP": {
+    "duration": 102000,
+    "id": "HLS-BP",
+    "name": "HLS-BP",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll_2",
+        "mimeType": "application/x-mpegURL",
+        "url": "https://pf5.broadpeak-vcdn.com/bpk-tv/tvrll/llcmaf/index.m3u8"
+      }
+    ]
+  },
+  "HLS-APPLE": {
+    "duration": 102000,
+    "id": "HLS-APPLE",
+    "name": "HLS-APPLE",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll_2",
+        "mimeType": "application/x-mpegURL",
+        "url": "https://ll-hls-test.apple.com/cmaf/master.m3u8"
+      }
+    ]
+  }
 }

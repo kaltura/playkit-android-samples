@@ -13,7 +13,9 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,6 +43,8 @@ import androidx.core.content.ContextCompat;
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
 import com.kaltura.netkit.BuildConfig;
+import com.kaltura.netkit.connect.executor.APIOkRequestsExecutor;
+import com.kaltura.netkit.connect.request.RequestConfiguration;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.utils.OnCompletion;
 import com.kaltura.netkit.utils.SessionProvider;
@@ -49,6 +53,7 @@ import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
+import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
@@ -57,6 +62,7 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
+import com.kaltura.playkit.player.ABRSettings;
 import com.kaltura.playkit.player.AudioCodecSettings;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
@@ -64,8 +70,10 @@ import com.kaltura.playkit.player.LoadControlBuffers;
 import com.kaltura.playkit.player.MediaSupport;
 import com.kaltura.playkit.player.PKExternalSubtitle;
 import com.kaltura.playkit.player.PKHttpClientManager;
+import com.kaltura.playkit.player.PKLlLiveConfiguration;
 import com.kaltura.playkit.player.PKSubtitlePosition;
 import com.kaltura.playkit.player.PKTracks;
+import com.kaltura.playkit.player.PlayerSettings;
 import com.kaltura.playkit.player.SubtitleStyleSettings;
 import com.kaltura.playkit.player.TextTrack;
 import com.kaltura.playkit.player.VideoTrack;
@@ -98,11 +106,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.kaltura.playkit.Utils.toBase64;
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_CAST;
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_DIRECTOR;
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_OWNER;
@@ -112,6 +123,7 @@ import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_YEAR;
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_HOUSEHOLD_ID;
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
+import static com.kaltura.playkit.utils.Consts.TIME_UNSET;
 import static com.kaltura.playkitdemo.MockParams.FormatTest;
 import static com.kaltura.playkitdemo.MockParams.MediaIdTest;
 import static com.kaltura.playkitdemo.MockParams.OvpUserKS;
@@ -158,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             "524710","526594","537514","538376","540085"));
 
 
-    private String V18_PROD_KS = "djJ8MjI1fArSGl5aA3ksuowmGntZE14iILgfHdb3Dq0Ei64a5oSXm6vADNFobAyrSXo6wmXMWOmdWzEM3AIPQIe7XPsZasfD_7r_ltZX5Db3l6qlFIgie8xyCZ1PUPNJ5h3tPycYsdIQYo-AQXbYiBk9MeZf85v9NWx5yqCEKiA6bNhlsfyKspnSUnn-uCgX2tf3Pd5iPiLt49tV_dld8tfdZT_XEPeYT0DLinauTJghk2knszEcXn8758uACft1gjoVVOiq2MP4tGfFFwgWDpWDmlDt2QC0Bg0PyHP7mx4wdpf-3tIJKJRyTdfrPvOmevV6vHCkmxEOP_2i8dS4AiGms09y-Ouwlih6kszG49LpMTpe3a25rvy1JLIp3S8KBBa5rAgK3A==";
+    private String V18_PROD_KS = "djJ8MjI1fK83pnJr12WYXuBZNjXjrbMc3gQFwiiLNLLt2RCtxLeJbOVcYCCgO4eiGyr9N103BSXhqozm1IhcHfc-tgOlV-ANrUG4mxvIDaNJqx5TQmM9XxUbYD3ZTCTH5AxoumYhegBxXplDzLqloSr9gl7DIZLws4_yQGFygw2h5iw7gnvtsJK0dav-k_DTLl05qXJklLDuBCZz7sUiG6mSyf2fPCp5elgyjfYp4X1-6LMADPtdtiTEUzZ7ReWxQQJjlkrR_tOOry2d1hczoDA6g9pgG9QxYIehuVKRA_QKBMu20DSvWDQKcvsEXpHtwh0JdXxsDpMKRjwJpgfYxtYViWpnkTx-bQpOzmoPfakm6vs42OxhpZoZ02SvOSA1s6lc_FwRUw==";
 
     // Vootkids skype wala issue where they face device not in household issue
     //  private String V18_STAGING_KS = "djJ8MjI1fFGtaQKGiNorkymwcFkmw67G2KE5-lESHZc58uGT05TIMeNqHvlZYKGZOUPiMTZlRyczGovHu9jyQv_BT3rDYPqOOFrmoxJIizjb4xAu9XdLn6AZlrDE1vfBH6BWTU6YtU4s_dW6_Pv_Yr-ke35ilQoC69bAFqq3z7x5Ppf_AspaPGQ2Lb0EE5CufQBcgd0IoabD_5w15py5t9V5r70SkSF-Cn4ZAhNMUiytTDoJx_hH1QdYyAl389YiHNed_65f5gEZDGYUJgpUQpTk8u43SW-uHz9MrOMekvMIeO6Z7Tg-ormQxM0O0yIREi4UX9jXcTOR4iOF6dfAb2eHM7qNXuE-mSBYj_onyRz9b6_8GBtA";
@@ -180,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static int changeMediaIndex = -1;
     public static Long START_POSITION = 0L;//65L;
 
+    public String AD_GOOGLE_SEARCH = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
     String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
     String preSkipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
     String inLinePreAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
@@ -189,11 +202,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String v18_ad_tag = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOI&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D33%26KidsPinEnabled%3DN%26distinct_id%3D42c92f17603e4ee2b4232666b9591134%26AppVersion%3D0.1.80%26DeviceModel%3Dmoto%20g(6)%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2467608&ppid=42c92f17603e4ee2b4232666b9591134&vid=0_im5ianso&ad_rule=1&correlator=10771&InterstitialRendered=False";
     String Kaltura_Skippable = "https://kaltura.github.io/playkit-admanager-samples/vast/pod-inline-someskip.xml";
     String V18_empty_reponse = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360%7C640x480&iu=%2F21633895671%2FSVOD%2FVideo%2FAndroid_Native_App%2FVOOT%20Select%20Originals&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D32%26KidsPinEnabled%3DN%26distinct_id%3D5a096e8094e542c99b00c84caa070e40%26AppVersion%3D0.3.3%26DeviceModel%3DONEPLUS%20A6010%26OptOut%3DTrue%26OSVersion%3D10%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DFacebook&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2511390&ppid=5a096e8094e542c99b00c84caa070e40&vid=1_wiibrart&ad_rule=1&correlator=9489&InterstitialRendered=False";
-    public String AD_GOOGLE_SEARCH = "http://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
     public String AD_1 = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
     public String SKIP_WRONG_AD = "https://pubads.g.doubleclick.net/gampad/ads?sz=850x478%7C640x480&iu=%2F21633895671%2Fvideo%2FDesktop%2FMTV&description_url=https%3A%2F%2Fwww.voot.com&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&ad_rule=1&cmsid=2467608&vid=0_hmq5k9d6&url=https%3A%2F%2Fvoot.com%2Fshows%2Fmtv-hustle-from-home%2F2%2F100824%2Frcr-rolls-back-the-time%2F940097&correlator=4202960119303889&cust_params=sample_ar%3Dskippablelinear%26age%3D31%26gender%3DF%26distinct_id%3D1719d89c24e14-08778a2ac6a557-396c7f07-1aeaa0-1719d89c24fa8b&ppid=1719d89c24e14-08778a2ac6a557-396c7f07-1aeaa0-1719d89c24fa8b&vpa=auto&vpmute=0&sdkv=h.3.384.1&osd=2&frm=0&vis=1&sdr=1&hl=en&is_amp=0&u_so=l&mpt=kaltura-player-js&mpv=0.53.3&adsid=ChAI8OPO9QUQxv_6ifWZmZ4LEkwA2UDr0bZ79j77YjFi4cz3CHrvnQR0mlxe2PFW4aDaNZcN_F2wc5n7BVCtHT6igb-X1L5mEOW4LIkPAhIlvOApwmeJ6-cam5ghVqEY&sdki=44d&adk=300787811&eid=420706105&dlt=1588915545856&idt=32358&dt=1588915601841&cookie=ID%3D48ac7d6646a33603%3AT%3D1587485985%3AS%3DALNI_MaoMJD4gbSk3JGY_xpeqkzfvM-81w&scor=1338166435667239&ged=ve4_td56_tt24_pd56_la0_er0.0.0.0_vi0.0.898.878_vp0_eb16491%22";
     public String singlePostRoll = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpostonly&cmsid=496&vid=short_onecue&correlator=";
     public String vootPremiumEmptyAdTag = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360%7C640x480&iu=%2F21633895671%2FQASVOD%2FVideo%2FAndroid_Native_App%2FVSO&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D13%26KidsPinEnabled%3DN%26distinct_id%3DXmWLVbUThyY3NzJGgw7NGPsFYAp2%26AppVersion%3D0.3.4_PPE_DBG%26DeviceModel%3DAndroid%20SDK%20built%20for%20x86%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2510338&ppid=XmWLVbUThyY3NzJGgw7NGPsFYAp2&vid=0_1sz284bq&ad_rule=1&correlator=1440&InterstitialRendered=False";
+    public String v_18_ad = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOI&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DU%26Age%3DNULL%26KidsPinEnabled%3DN%26AppVersion%3D0.1.37%26DeviceModel%3DNexus%206&cmsid=2467608&ppid=693f0645-201b-4f2e-84c5-4879abd395aa&vid=0_b49uc8t6&ad_rule=1&correlator=12678";
 
     public String ad_youbora = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F124319096%2Fexternal%2Fad_rule_samples&ciu_szs=300x250&ad_rule=1&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=4178520229405531&ms=upuacR6gQAr0KtuYm2jCKRfQ-dLzlTIkrpS9TCxaPhnR7jZi4aliCtq_qpOxVhKVsrwzgAxQX64X-FRZgT0yFR8oHyu_FznoTFnlKO2ie-0NTNYNu6lNmTT2DqcBvY_DN6DPu9k2ZJiR6ZaSIqTp987s99clneQsdaRaqFfpVo7suWVijnukZQ6sFtTMk9z-h6IklSeaP3XaZjN22MF15IqFaraVcMmzpwmT3I4MOPUceENqvXOa-0iGbLnyLiv61ixK65d6fu-LzaRAeK5Ogm_OuWxI6r0rF4N0SQp_mQ4n3h6FWB2jfd8-Sx7036W7eFhyU435mQC2Z_N2txoiLg&sdkv=h.3.258.1%2Fn.android.3.20.0%2Fcom.kaltura.kalturaplayertestapp&osd=2&frm=0&vis=1&sdr=1&hl=en&is_lat=0&idtype=adid&rdid=0c714bb8-889b-4297-a158-8dec2c15e2b6&is_amp=0&js=ima-android.3.20.0&an=com.kaltura.kalturaplayertestapp&msid=com.kaltura.kalturaplayertestapp&mv=82313010.com.android.vending&u_so=l&ctv=0&mpt=kaltura-vp-android&mpv=dev.2580ad14&sdki=445&sdk_apis=7%2C8&omid_p=Google1%2Fandroid.3.20.0&sid=172941A5-6E09-4564-B929-5E293F97FEC7&url=com.kaltura.kalturaplayertestapp.adsenseformobileapps.com%2F&eid=21064201%2C46130026&dlt=1608632084524&idt=102&dt=1608632084673&scor=4206523438118768";
 
@@ -217,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private boolean isDAIMode = false;
     SubtitleStyleSettings subtitleStyleSettings = new SubtitleStyleSettings("MyCustomSubtitleStyle");
     PKSubtitlePosition pkSubtitlePosition = new PKSubtitlePosition(true);
-    private TextView tvSourceUrl;
+    // private TextView tvSourceUrl;
 
     //Youbora analytics Constants - https://developer.nicepeopleatwork.com/apidocs/js6/youbora.Options.html
     public static final String ACCOUNT_CODE = "kalturatest";
@@ -257,12 +270,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -280,8 +287,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mOrientationManager.enable();
         setContentView(R.layout.activity_main);
 
-        tvSourceUrl = findViewById(R.id.sourceUrlText);
-        registerForContextMenu(tvSourceUrl);
+        //  tvSourceUrl = findViewById(R.id.sourceUrlText);
+        //  registerForContextMenu(tvSourceUrl);
 
 //        Map<String, Map<String, List<String>>> map = new HashMap<>();
 //        Map<String, List<String>> nMap = new HashMap<>();
@@ -293,25 +300,42 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         log.i("PlayKitManager: " + PlayKitManager.CLIENT_TAG);
 
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                log.v("Gourav 1sec In timer");
+                if (player != null && player.isPlaying()) {
+                    log.v("Gourav player.getCurrentLiveOffset() " +  player.getCurrentLiveOffset());
+                }
+                handler.postDelayed(this, 1000);
+            }
+        }, 1000);
+
         Button button = findViewById(R.id.changeMedia);
+        button.setText("Change");
+
         AtomicBoolean click = new AtomicBoolean(false);
         button.setOnClickListener(v -> {
 
-            if (!click.get()) {
-                click.set(true);
-                pkSubtitlePosition.setPosition(70, 30, Layout.Alignment.ALIGN_CENTER);
-            } else {
-                click.set(false);
-                pkSubtitlePosition.setPosition(0, 70, Layout.Alignment.ALIGN_NORMAL);
-            }
-            SubtitleStyleSettings subtitleStyleSettings1 = new SubtitleStyleSettings("Replay_MyCustomSubtitleStyle");
-            subtitleStyleSettings1.setSubtitlePosition(pkSubtitlePosition);
-            subtitleStyleSettings1.setBackgroundColor(Color.CYAN);
-            useSubtitleStyle(false, subtitleStyleSettings1);
+//            if (!click.get()) {
+//                click.set(true);
+//                pkSubtitlePosition.setPosition( 0, 60, Layout.Alignment.ALIGN_CENTER);
+//                SubtitleStyleSettings subtitleStyleSettings1 = new SubtitleStyleSettings("Replay_MyCustomSubtitleStyle1");
+//                useSubtitleStyle(false, subtitleStyleSettings1);
+//            } else {
+//                click.set(false);
+//                pkSubtitlePosition.setPosition( 0, 90, Layout.Alignment.ALIGN_CENTER);
+//                SubtitleStyleSettings subtitleStyleSettings2 = new SubtitleStyleSettings("Replay_MyCustomSubtitleStyle2");
+//                useSubtitleStyle(false, subtitleStyleSettings2);
+//            }
 
-            if (player != null) {
-                player.replay();
-            }
+            player.updateLlLiveConfiguration(new PKLlLiveConfiguration()
+                    .setTargetOffsetMs(10000L).setMaxOffsetMs(7000L).setMaxPlaybackSpeed(1.5f));
+
+//            if (player != null) {
+//                player.replay();
+//            }
         });
 
         progressBar = findViewById(R.id.progressBar);
@@ -334,14 +358,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
 
-        //    startVootOttMediaLoadingProd(playLoadedEntry, "618610", "HLS_Linear_P"); // Live News18 asset
+        //      startVootOttMediaLoadingProd(playLoadedEntry, "618610", "HLS_Linear_P"); // Live News18 asset
 
 
         //startVootOttMediaLoadingProd(playLoadedEntry, "873033"); // 404 on cdnapisec
         // startVootOttMediaLoadingProd(playLoadedEntry, "926531"); // DTG
         //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
-        //    startVootOttMediaLoadingProd(playLoadedEntry, "975732"); // SRT/webvtt failure source error
-        startVootOttMediaLoadingProd(playLoadedEntry, "979570", "dash Main"); //Gourav
+        //    startVootOttMediaLoadingProd(playLoadedEntry, "975732", "dash Main"); // SRT/webvtt failure source error
+   //           startVootOttMediaLoadingProd(playLoadedEntry, "979570", "dash Main"); //Gourav
         //    startVootOttMediaLoadingProd(playLoadedEntry, "1017737"); //Gourav // no text track
         //   startVootOttMediaLoadingProd(playLoadedEntry, "1013774"); //Gourav // 1 non default text track
         //    startVootOttMediaLoadingProd(playLoadedEntry, "618620");
@@ -354,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //       startVootOttMediaLoadingStaging(playLoadedEntry, "327807"); // BE 5.6.0 Testing
 
 
-        //        startVootOttMediaLoadingProd(playLoadedEntry, "618613"); // Voot Live Channel News-18 Kannada
+//        startVootOttMediaLoadingProd(playLoadedEntry, "618613", "HLS_Linear_P"); // Voot Live Channel News-18 Kannada
         //  startVootOttMediaLoadingStaging(playLoadedEntry, "326666"); // 403 Soruce Error asset for Tablet Main
         //  startVootOttMediaLoadingStaging(playLoadedEntry, "326683"); // 404 Soruce Error asset for dashclear
         // startVootOttMediaLoadingStaging(playLoadedEntry, "317519"); // Staging asset to test L1 and L3 with DASHENC_TV_PremiumHD
@@ -385,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //    startHorizonOttMediaLoadingLive(playLoadedEntry);
 
-//          createPlayerWithoutPhoenixProvider();
+        // createPlayerWithoutPhoenixProvider();
 
 //        startSimpleOvpMediaLoadingHls(playLoadedEntry);
 
@@ -398,9 +422,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive(playLoadedEntry);
-//     startMockMediaLoading(playLoadedEntry);
+ //       startMockMediaLoading(playLoadedEntry, 3);
 //      startOvpMediaLoading(playLoadedEntry);
-//      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
+      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
 //               startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
         //       startSimpleOvpMediaLoadingHEVCKarin(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
@@ -444,21 +468,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 controlsView.setSeekBarStateForAd(false);
             }
             changeMediaIndex++;
+
             OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
-            startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
+            //startMockMediaLoading(playLoadedEntry, 3);
+            //     startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
 
 
-                    /*if (changeMediaIndex % 4 == 0) {
-                        startSimpleOvpMediaLoadingDRM(playLoadedEntry);
-                        //startSimpleOvpMediaLoadingVR(playLoadedEntry);
-                        //startMockMediaLoading(playLoadedEntry);
-                    } else if (changeMediaIndex % 4 == 1) {
-                        startSimpleOvpMediaLoadingHls(playLoadedEntry);
-                    } if (changeMediaIndex % 4 == 2) {
-                        startSimpleOvpMediaLoadingClear(playLoadedEntry);
-                    } if (changeMediaIndex % 4 == 3) {
-                        startSimpleOvpMediaLoadingHls(playLoadedEntry);
-                    }*/
+            if (changeMediaIndex % 4 == 0) {
+                startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
+
+            } else if (changeMediaIndex % 4 == 1) {
+                startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
+            } else if (changeMediaIndex % 4 == 2) {
+                startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
+            } else if (changeMediaIndex % 4 == 3) {
+                startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
+
+
+            }
         }
     }
 
@@ -673,9 +700,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .load(completion);
     }
 
-    private void startMockMediaLoading(OnMediaLoadCompletion completion) {
-
-        mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "wowhls");
+    private void startMockMediaLoading(OnMediaLoadCompletion completion, int val) {
+        if (val == 1) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "widevine_L1");
+        } else if (val == 2) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "Zee5");
+        } else if (val == 3) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "LL-1");
+        } else if (val == 4) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "LL-2");
+        } else if (val == 5) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "HLS-BP");
+        } else if (val == 6) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "HLS-APPLE");
+        } else {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "harold");
+        }
         mediaProvider.load(completion);
     }
 
@@ -723,20 +763,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
-
+        //  APIOkRequestsExecutor.getSingleton().setRequestConfiguration(new RequestConfiguration().setMaxRetries(5).setReadTimeoutMs(15000));
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
             START_POSITION = null; // force live streams to play from live edge
         }
+        mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Live);
         PKMediaConfig mediaConfig = new PKMediaConfig();
-        if (changeMediaIndex % 4 == 0) {
-            setExternalSubtitles(mediaEntry, true);
-        } else if (changeMediaIndex % 4 == 1) {
-            setExternalSubtitles(mediaEntry, false);
-        } else if (changeMediaIndex % 4 == 2) {
-            setExternalSubtitles(mediaEntry, true);
-        } else if (changeMediaIndex % 4 == 3) {
-            setExternalSubtitles(mediaEntry, false);
-        }
+//        if (changeMediaIndex % 4 == 0) {
+//            setExternalSubtitles(mediaEntry, true);
+//        } else if (changeMediaIndex % 4 == 1) {
+//            setExternalSubtitles(mediaEntry, false);
+//        } else if (changeMediaIndex % 4 == 2) {
+//            setExternalSubtitles(mediaEntry, true);
+//        } else if (changeMediaIndex % 4 == 3) {
+//               setExternalSubtitles(mediaEntry, true);
+//        }
 
         mediaConfig.setMediaEntry(mediaEntry).setStartPosition(null);
 
@@ -750,20 +791,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //      KalturaUDRMLicenseRequestAdapter.install(player, "app://PlaykitTestApp");
 
 
-//            String customAdapterData = "PEtleU9TQXV0aGVudGljYXRpb25YTUw+PERhdGE+PEdlbmVyYXRpb25UaW1lPjIwMTktMDItMDQgMTE6MjA6NTQuNzcwPC9HZW5lcmF0aW9uVGltZT48RXhwaXJhdGlvblRpbWU+MjAxOS0wMi0wNiAxMToyMDo1NC43NzA8L0V4cGlyYXRpb25UaW1lPjxVbmlxdWVJZD4yODNjMmY3ZDlkYjg0ZmE1ODdiNTlhYmM2MDA5YWEzMjwvVW5pcXVlSWQ+PFJTQVB1YktleUlkPmIxOWQ0MjJkODkwNjQ0ZDUxMTJkMDg0NjljMmU1OTQ2PC9SU0FQdWJLZXlJZD48V2lkZXZpbmVQb2xpY3kgZmxfQ2FuUGxheT0idHJ1ZSIgZmxfQ2FuUGVyc2lzdD0idHJ1ZSI+PExpY2Vuc2VEdXJhdGlvbj4xNzI4MDA8L0xpY2Vuc2VEdXJhdGlvbj48UGxheWJhY2tEdXJhdGlvbj4xNzI4MDA8L1BsYXliYWNrRHVyYXRpb24+PC9XaWRldmluZVBvbGljeT48V2lkZXZpbmVDb250ZW50S2V5U3BlYyBUcmFja1R5cGU9IkhEIj48U2VjdXJpdHlMZXZlbD4xPC9TZWN1cml0eUxldmVsPjwvV2lkZXZpbmVDb250ZW50S2V5U3BlYz48RmFpclBsYXlQb2xpY3kgcGVyc2lzdGVudD0idHJ1ZSI+PFBlcnNpc3RlbmNlU2Vjb25kcz4xNzI4MDA8L1BlcnNpc3RlbmNlU2Vjb25kcz48L0ZhaXJQbGF5UG9saWN5PjxMaWNlbnNlIHR5cGU9InNpbXBsZSI+PFBvbGljeT48SWQ+YmUxM2NiM2ItNTM3OS00N2Q1LWIyM2QtZWQ0OWU0NTFkMjU5PC9JZD48L1BvbGljeT48UGxheT48SWQ+YmQ5YjdjZTItMmUzYi00NTZlLWExZDMtM2QwMDNkMWNjZjdiPC9JZD48L1BsYXk+PC9MaWNlbnNlPjxQb2xpY3kgaWQ9ImJlMTNjYjNiLTUzNzktNDdkNS1iMjNkLWVkNDllNDUxZDI1OSIgcGVyc2lzdGVudD0idHJ1ZSI+PEV4cGlyYXRpb25BZnRlckZpcnN0UGxheT4xNzI4MDA8L0V4cGlyYXRpb25BZnRlckZpcnN0UGxheT48TWluaW11bVNlY3VyaXR5TGV2ZWw+MjAwMDwvTWluaW11bVNlY3VyaXR5TGV2ZWw+PC9Qb2xpY3k+PFBsYXkgaWQ9ImJkOWI3Y2UyLTJlM2ItNDU2ZS1hMWQzLTNkMDAzZDFjY2Y3YiI+PE91dHB1dFByb3RlY3Rpb25zPjxPUEw+PENvbXByZXNzZWREaWdpdGFsQXVkaW8+MzAwPC9Db21wcmVzc2VkRGlnaXRhbEF1ZGlvPjxVbmNvbXByZXNzZWREaWdpdGFsQXVkaW8+MzAwPC9VbmNvbXByZXNzZWREaWdpdGFsQXVkaW8+PENvbXByZXNzZWREaWdpdGFsVmlkZW8+NTAwPC9Db21wcmVzc2VkRGlnaXRhbFZpZGVvPjxVbmNvbXByZXNzZWREaWdpdGFsVmlkZW8+MzAwPC9VbmNvbXByZXNzZWREaWdpdGFsVmlkZW8+PEFuYWxvZ1ZpZGVvPjIwMDwvQW5hbG9nVmlkZW8+PC9PUEw+PC9PdXRwdXRQcm90ZWN0aW9ucz48RW5hYmxlcnM+PElkPjc4NjYyN2Q4LWMyYTYtNDRiZS04Zjg4LTA4YWUyNTViMDFhNzwvSWQ+PElkPmQ2ODUwMzBiLTBmNGYtNDNhNi1iYmFkLTM1NmYxZWEwMDQ5YTwvSWQ+PElkPjAwMmY5NzcyLTM4YTAtNDNlNS05Zjc5LTBmNjM2MWRjYzYyYTwvSWQ+PC9FbmFibGVycz48L1BsYXk+PC9EYXRhPjxTaWduYXR1cmU+b085eE9BeS9OblZFN3V4UWJtYzFTdlBPRGxGMytGNUpqV0RKR3ZCd3U4cHgyUWx2VERxUGJySU03M0Z5b0dkUHBJeWhpZENwMkJ4eWtCWThFcitMWHFzQXY5aGJZKzdCNkJOc00xMW1DOE4wbCswZlp5dmNzeHpwWGx3UlZMajNJVk9MYTNDdVcrbnV2dlYxUThheWZjeEhwVXc0b25BdEZDYlZaR3lkQS9oQTRLaXorWVhWdDZReEdsbDhVSFFJRUJVRWlDbzFvVmtRMlJGcEU1S2Jac2pTQ1FST3lvZ1MrUmo4dFo0b3FpQlNpMlNVamVvRUduY0RueHdFK1dDWkhrSUxSSjNiSktkbkZUSTRJR0prQ0traWtxUWZrUWRjSzQ0Y2d1aEY0UTJEQkd3eUxqUmFucVhuTFNaVS9obFlZUDJVbWlIa29UMWdFZ3JyYU8yanF3PT08L1NpZ25hdHVyZT48L0tleU9TQXV0aGVudGljYXRpb25YTUw+";
-//            DRMAdapter.customData = customAdapterData;
-//            final DRMAdapter licenseRequestAdapter = new DRMAdapter();
-//            player.getSettings().setLicenseRequestAdapter(licenseRequestAdapter);
+            DRMAdapter.customData = "PEtleU9TQXV0aGVudGljYXRpb25YTUw+PERhdGE+PEdlbmVyYXRpb25UaW1lPjIwMjEtMDEtMjAgMTI6MTM6NTYuMTA3PC9HZW5lcmF0aW9uVGltZT48RXhwaXJhdGlvblRpbWU+MjAyMS0wMS0yMiAxMjoxMzo1Ni4xMDc8L0V4cGlyYXRpb25UaW1lPjxVbmlxdWVJZD40YjVjYWUzZDU3MWQ0ZjU4OGVhOWRhMTczZDk3MjUzYTwvVW5pcXVlSWQ+PFJTQVB1YktleUlkPmIxOWQ0MjJkODkwNjQ0ZDUxMTJkMDg0NjljMmU1OTQ2PC9SU0FQdWJLZXlJZD48V2lkZXZpbmVQb2xpY3kgZmxfQ2FuUGxheT0idHJ1ZSIgZmxfQ2FuUGVyc2lzdD0idHJ1ZSI+PExpY2Vuc2VEdXJhdGlvbj4xNzI4MDA8L0xpY2Vuc2VEdXJhdGlvbj48UGxheWJhY2tEdXJhdGlvbj4xNzI4MDA8L1BsYXliYWNrRHVyYXRpb24+PC9XaWRldmluZVBvbGljeT48V2lkZXZpbmVDb250ZW50S2V5U3BlYyBUcmFja1R5cGU9IkhEIj48U2VjdXJpdHlMZXZlbD4xPC9TZWN1cml0eUxldmVsPjwvV2lkZXZpbmVDb250ZW50S2V5U3BlYz48RmFpclBsYXlQb2xpY3kgcGVyc2lzdGVudD0idHJ1ZSI+PFBlcnNpc3RlbmNlU2Vjb25kcz4xNzI4MDA8L1BlcnNpc3RlbmNlU2Vjb25kcz48L0ZhaXJQbGF5UG9saWN5PjxMaWNlbnNlIHR5cGU9InNpbXBsZSI+PFBvbGljeT48SWQ+ZjJjYWZjNGUtNmE0OC00ZTQ5LTkwMTEtYWZiMGMwOWI3ZTQxPC9JZD48L1BvbGljeT48UGxheT48SWQ+M2QxNDYwYzYtNzM5OC00YjUwLWFlODEtMDAyZjcwMmRjZTU1PC9JZD48L1BsYXk+PC9MaWNlbnNlPjxQb2xpY3kgaWQ9ImYyY2FmYzRlLTZhNDgtNGU0OS05MDExLWFmYjBjMDliN2U0MSIgcGVyc2lzdGVudD0idHJ1ZSI+PEV4cGlyYXRpb25BZnRlckZpcnN0UGxheT4xNzI4MDA8L0V4cGlyYXRpb25BZnRlckZpcnN0UGxheT48TWluaW11bVNlY3VyaXR5TGV2ZWw+MjAwMDwvTWluaW11bVNlY3VyaXR5TGV2ZWw+PC9Qb2xpY3k+PFBsYXkgaWQ9IjNkMTQ2MGM2LTczOTgtNGI1MC1hZTgxLTAwMmY3MDJkY2U1NSI+PE91dHB1dFByb3RlY3Rpb25zPjxPUEw+PENvbXByZXNzZWREaWdpdGFsQXVkaW8+MzAwPC9Db21wcmVzc2VkRGlnaXRhbEF1ZGlvPjxVbmNvbXByZXNzZWREaWdpdGFsQXVkaW8+MzAwPC9VbmNvbXByZXNzZWREaWdpdGFsQXVkaW8+PENvbXByZXNzZWREaWdpdGFsVmlkZW8+NTAwPC9Db21wcmVzc2VkRGlnaXRhbFZpZGVvPjxVbmNvbXByZXNzZWREaWdpdGFsVmlkZW8+MzAwPC9VbmNvbXByZXNzZWREaWdpdGFsVmlkZW8+PEFuYWxvZ1ZpZGVvPjIwMDwvQW5hbG9nVmlkZW8+PC9PUEw+PC9PdXRwdXRQcm90ZWN0aW9ucz48RW5hYmxlcnM+PElkPjc4NjYyN2Q4LWMyYTYtNDRiZS04Zjg4LTA4YWUyNTViMDFhNzwvSWQ+PElkPmQ2ODUwMzBiLTBmNGYtNDNhNi1iYmFkLTM1NmYxZWEwMDQ5YTwvSWQ+PElkPjAwMmY5NzcyLTM4YTAtNDNlNS05Zjc5LTBmNjM2MWRjYzYyYTwvSWQ+PC9FbmFibGVycz48L1BsYXk+PC9EYXRhPjxTaWduYXR1cmU+UkxPTDhmNXdNRzhtMTVpcFhRUGpyVDF2UC9UYzVodUg4UTFJUjU1Tmp5TG51UHVramhxU3QwTWh3dURzdzFhSERpNW5qK3M1ZlF5Vm5STm01V1JrWVcvbmdzeHJ2Ung1WDgvalU0OGUvNm5GMHpybXdDOWR3MUVYTGhqZDQrWnZVUzFHSUhXNzdFQk5FRG84WUlCRWNnbDl0QWlxczhNbjk4Z0FoLzcydS93UFVhZXRIL09mUXRFSVVDeG5pVkpRcXA1NjNuRDdYT042OWg5U0I0NzBremRWNU8xWVVpRzJvOVpIY2R3OVFUUVdEMlZkQThxYUVHVnNBUzRQSjE0by9LSHc5K1JnY09xdU9PMUgrRS9HWE53TkJsM0wvOUoycHJpcUROMjNYVFh4MnliMkYraFI0cW1mYkxIRks2RER4aDJiWFhOWHRnNDVWSHlNVVB3bGJRPT08L1NpZ25hdHVyZT48L0tleU9TQXV0aGVudGljYXRpb25YTUw+";
+            final DRMAdapter licenseRequestAdapter = new DRMAdapter();
+            //  player.getSettings().setLicenseRequestAdapter(licenseRequestAdapter);
             player.getSettings().setAllowCrossProtocolRedirect(true);
-            //  player.getSettings().setPreferredMediaFormat(PKMediaFormat.wvm);
+            //     player.getSettings().setPlayReadyPlayback(false);
+            player.getSettings().forceWidevineL3Playback(true);
+            // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
             //Gourav
             //   player.getSettings().setSubtitlePreference(PKSubtitlePreference.EXTERNAL);
 //            player.getSettings().enableDecoderFallback(true);
 //            player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings().setAllowSoftwareDecoder(true));
-            player.getSettings().setPreferredAudioCodecSettings(new AudioCodecSettings().setAllowMixedCodecs(true));
+            //   player.getSettings().setPreferredAudioCodecSettings(new AudioCodecSettings().setAllowMixedCodecs(true));
 
             // Audio Player Configuration
             //   player.getSettings().setAudioPlayerMode(true, createNotificationForAudioOnlyService());
+
+//            player.getSettings().setLlLiveConfiguration(new PKLlLiveConfiguration()
+//                    .setTargetOffsetMs(5000L)
+//                    .setMinOffsetMs(10000L)
+//                    .setMaxOffsetMs(3000L)
+//                    .setMaxPlaybackSpeed(2.5f)
+//                    .setMinPlaybackSpeed(1.5f));
+
+//            player.getSettings().setLlLiveConfiguration(new PKLlLiveConfiguration()
+//                    .setTargetOffsetMs(10000L).setMaxOffsetMs(7000L).setMaxPlaybackSpeed(1.5f));
+
+            player.getSettings().setLlLiveConfiguration(new PKLlLiveConfiguration()
+                    .setTargetOffsetMs(15000L).setMaxOffsetMs(12000L).setMaxPlaybackSpeed(1.5f));
 
             if (mediaEntry.isVRMediaType()) {
                 VRSettings vrSettings = new VRSettings();
@@ -779,12 +834,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 player.getSettings().setVRSettings(vrSettings);
             }
 
-            pkSubtitlePosition.setPosition( 80, 20, Layout.Alignment.ALIGN_OPPOSITE);
+            pkSubtitlePosition.setPosition( 0, 90, Layout.Alignment.ALIGN_CENTER);
             subtitleStyleSettings.setSubtitlePosition(pkSubtitlePosition);
-            subtitleStyleSettings.setBackgroundColor(Color.BLUE);
             useSubtitleStyle(true, subtitleStyleSettings);
 
-            player.getSettings().setSecureSurface(true);
+            player.getSettings().setSecureSurface(false);
             //  player.getSettings().forceSinglePlayerEngine(true);
             // player.getSettings().setPreferredMediaFormat(PKMediaFormat.dash);
             // player.getSettings().setAdAutoPlayOnResume(true);
@@ -797,6 +851,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //    player.getSettings().setAdAutoPlayOnResume(true);
             //   player.getSettings().setMaxVideoBitrate(878786);
             //   player.getSettings().setMaxVideoSize(new PKMaxVideoSize(640,360));
+
+
+            Map<String,String> headers = new HashMap<>();
+            headers.put("aaa", "bbb");
+            headers.put("ccc","ddd");
+
+            final MediaAdapter mediaAdapter = new MediaAdapter("app://PlaykitTestApp", player);
+            mediaAdapter.customHeaders = headers;
+           // player.getSettings().setContentRequestAdapter(mediaAdapter);
+
+
             log.d("Player: " + player.getClass());
             addPlayerListeners(progressBar);
 
@@ -816,7 +881,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     } else {
                         log.d("Play Ad preMidPostAdTagUrl");
                         promptMessage(IMA_PLUGIN, "preMidPostAdTagUrl");
-                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostSingleAdTagUrl));
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(AD_GOOGLE_SEARCH).setCompanionAdConfig(companionAdSlot, 300, 250));
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preMidPostAdTagUrl media2"));
@@ -830,7 +895,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     } else {
                         log.d("Play Ad inLinePreAdTagUrl");
                         promptMessage(IMA_PLUGIN, "inLinePreAdTagUrl");
-                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostSingleAdTagUrl));
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostSingleAdTagUrl).setCompanionAdConfig(companionAdSlot, 300, 250));
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(true, "inLinePreAdTagUrl media3"));
@@ -843,7 +908,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     } else {
                         log.d("Play NO Ad");
                         promptMessage(IMA_PLUGIN, "Enpty AdTag");
-                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostSingleAdTagUrl));
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(Kaltura_Skippable));
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "NO AD media4"));
@@ -856,7 +921,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     } else {
                         log.d("Play Ad preSkipAdTagUrl");
                         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
-                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(preMidPostSingleAdTagUrl));
+                        player.updatePluginConfig(IMAPlugin.factory.getName(), getAdsConfig(AD_GOOGLE_SEARCH).setCompanionAdConfig(companionAdSlot, 300, 250));
                     }
                 }
 
@@ -872,9 +937,78 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player.updatePluginConfig(PhoenixAnalyticsPlugin.factory.getName(), phoenixAnalyticsConfig);
         }
 
-
+        //  player.setPlaybackRate(2f);
         player.prepare(mediaConfig);
         player.play();
+    }
+
+    static class MediaAdapter implements PKRequestParams.Adapter {
+
+        private static final String CLIENT_TAG = "customAdapter" ;
+        private final String applicationName;
+        private String playSessionId;
+        public Map<String,String> customHeaders;
+
+        public static void install(Player player, String applicationName) {
+            if (player.getSettings() instanceof PlayerSettings &&
+                    ((PlayerSettings)player.getSettings()).getContentRequestAdapter() != null &&
+                    TextUtils.isEmpty(applicationName)) {
+                applicationName = ((PlayerSettings)player.getSettings()).getContentRequestAdapter().getApplicationName();
+            }
+
+            MediaAdapter decorator = new MediaAdapter(applicationName, player);
+            player.getSettings().setContentRequestAdapter(decorator);
+        }
+
+        private MediaAdapter(String applicationName, Player player) {
+            this.applicationName = applicationName;
+            updateParams(player);
+        }
+
+        @NonNull
+        @Override
+        public PKRequestParams adapt(PKRequestParams requestParams) {
+            Uri url = requestParams.url;
+
+            if (url != null && url.getPath().contains("/playManifest/")) {
+                Uri alt = url.buildUpon()
+                        .appendQueryParameter("clientTag", CLIENT_TAG)
+                        .appendQueryParameter("playSessionId", playSessionId).build();
+
+                if (!TextUtils.isEmpty(applicationName)) {
+                    alt = alt.buildUpon().appendQueryParameter("referrer", toBase64(applicationName.getBytes())).build();
+                }
+
+                String lastPathSegment = requestParams.url.getLastPathSegment();
+                if (lastPathSegment != null && lastPathSegment.endsWith(".wvm")) {
+                    // in old android device it will not play wvc if url is not ended in wvm
+                    alt = alt.buildUpon().appendQueryParameter("name", lastPathSegment).build();
+                }
+
+                setCustomHeaders(requestParams);
+                return new PKRequestParams(alt, requestParams.headers);
+            }
+            setCustomHeaders(requestParams);
+            return requestParams;
+        }
+
+        private void setCustomHeaders(PKRequestParams requestParams) {
+            if (customHeaders != null && !customHeaders.isEmpty()) {
+                for (Map.Entry<String, String> entry : customHeaders.entrySet()) {
+                    requestParams.headers.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+
+        @Override
+        public void updateParams(Player player) {
+            this.playSessionId = player.getSessionId();
+        }
+
+        @Override
+        public String getApplicationName() {
+            return applicationName;
+        }
     }
 
     private void startWOW(final OnMediaLoadCompletion completion) {
@@ -2022,7 +2156,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
 
         player.addListener(this, AdEvent.error, event -> {
-            log.d("AdEvent.error = " + event.error.errorType.name());
+            log.d("AdEvent.error = " + event.error.severity.name());
 //            log.d("AdEvent.category = " + event.error.errorCategory.name());
             appProgressBar.setVisibility(View.VISIBLE);
         });
@@ -2128,7 +2262,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         player.addListener(this, PlayerEvent.sourceSelected, event -> {
             log.d("sourceSelected event source = " + event.source.getUrl());
-            tvSourceUrl.setText(event.source.getUrl());
+            //    tvSourceUrl.setText(event.source.getUrl());
         });
 
         player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
@@ -2243,7 +2377,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             PKExternalSubtitle pkExternalSubtitlejaC = new PKExternalSubtitle()
                     .setUrl("https://zee5vod.akamaized.net/drm1/1080p/movies/MOVIE_PROJECT/KANNADA/19122018/TIGER_MOVIE_kn.mp4/thumbnails/index.vtt")
                     .setMimeType(PKSubtitleFormat.vtt)
-                    .setLabel("Zee-1-japan")
+                    .setLabel("Zee5-working")
                     .setDefault()
                     .setLanguage("ja");
             subsList.add(pkExternalSubtitlejaC);
@@ -2929,17 +3063,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void createPlayerWithoutPhoenixProvider() {
 
         List<PKDrmParams> pkDrmDataList = new ArrayList<>();
-        String licenseUri = "https://udrm-stg.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJodHRwczovL3Jlc3Qtc2dzMS5vdHQua2FsdHVyYS5jb20vcmVzdGZ1bF92NV8wL2FwaV92My9zZXJ2aWNlL2Fzc2V0RmlsZS9hY3Rpb24vZ2V0Q29udGV4dD9rcz1kako4TWpJMWZKNEVqbHc5LXFLUTBkRXZPbUwwS3JqandubFlJMG5fWGJLdC04dTZUUUhndUhuVDlOeEVGTmFYZHpKck81Vl9kLUtjLXJLNGgySU5ndHJFOWNZNWtvTzVQZWpybXNFMlQ2Y3o1anNwRUY2SmI1aHZwVENoS2tPU2t5bG9JRVJYQmwyRGs1TlVuUXk4Ty0wRVpCSmQyMUNtRDBNdUYxZVRRVnZfZTg3UDBSQS14X29nVV85Q3NUTlU4c2UwcUR1Y0FDS1labmREMWRHMklLLWpoNGFhRkdVM0NIOEx1QS16RkpXVk0xVGFtaHNlcGl6eGVNaDc3R0NXWUNkRFBReW9JNzZFWEtpMXE4OFNJWWhKV0xDY0c0WkJ4TTJWWGFfVDhIenMwd1l6VWhlTGZBdWNrdUFha1dMN285MzlIa2k3M2JDa2xFSVhCZlVOV3JHX3Y5aFVPX2s9JmNvbnRleHRUeXBlPW5vbmUmaWQ9NTg2NTQxIiwiYWNjb3VudF9pZCI6MTk4MjU0MSwiY29udGVudF9pZCI6IjBfYXgzdXIyeHZfMF9pZXY3bWJ0dCwwX2F4M3VyMnh2XzBfeXk5a3ZwZWwsMF9heDN1cjJ4dl8wX3hvYmFoa29qLDBfYXgzdXIyeHZfMF9vaWRoYThvaywwX2F4M3VyMnh2XzBfMnRwNWgxOWEiLCJmaWxlcyI6IiIsInVzZXJfdG9rZW4iOiJkako4TWpJMWZKNEVqbHc5LXFLUTBkRXZPbUwwS3JqandubFlJMG5fWGJLdC04dTZUUUhndUhuVDlOeEVGTmFYZHpKck81Vl9kLUtjLXJLNGgySU5ndHJFOWNZNWtvTzVQZWpybXNFMlQ2Y3o1anNwRUY2SmI1aHZwVENoS2tPU2t5bG9JRVJYQmwyRGs1TlVuUXk4Ty0wRVpCSmQyMUNtRDBNdUYxZVRRVnZfZTg3UDBSQS14X29nVV85Q3NUTlU4c2UwcUR1Y0FDS1labmREMWRHMklLLWpoNGFhRkdVM0NIOEx1QS16RkpXVk0xVGFtaHNlcGl6eGVNaDc3R0NXWUNkRFBReW9JNzZFWEtpMXE4OFNJWWhKV0xDY0c0WkJ4TTJWWGFfVDhIenMwd1l6VWhlTGZBdWNrdUFha1dMN285MzlIa2k3M2JDa2xFSVhCZlVOV3JHX3Y5aFVPX2s9IiwidWRpZCI6IiIsImFkZGl0aW9uYWxfY2FzX3N5c3RlbSI6MjI1fQ%3d%3d&signature=dEra120gz44b7fSp%2bjcuXFAZmtI%3d";
+        String licenseUri = "https://udrmv3.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJodHRwczovL3Jlc3QtYXMub3R0LmthbHR1cmEuY29tL2FwaV92My9zZXJ2aWNlL2Fzc2V0RmlsZS9hY3Rpb24vZ2V0Q29udGV4dD9rcz1kako4TWpJMWZBclNHbDVhQTNrc3Vvd21HbnRaRTE0aUlMZ2ZIZGIzRHEwRWk2NGE1b1NYbTZ2QURORm9iQXlyU1hvNndtWE1XT21kV3pFTTNBSVBRSWU3WFBzWmFzZkRfN3JfbHRaWDVEYjNsNnFsRklnaWU4eHlDWjFQVVBOSjVoM3RQeWNZc2RJUVlvLUFRWGJZaUJrOU1lWmY4NXY5Tld4NXlxQ0VLaUE2Yk5obHNmeUtzcG5TVW5uLXVDZ1gydGYzUGQ1aVBpTHQ0OXRWX2RsZDh0ZmRaVF9YRVBlWVQwRExpbmF1VEpnaGsya25zekVjWG44NzU4dUFDZnQxZ2pvVlZPaXEyTVA0dEdmRkZ3Z1dEcFdEbWxEdDJRQzBCZzBQeUhQN214NHdkcGYtM3RJSktKUnlUZGZyUHZPbWV2VjZ2SENrbXhFT1BfMmk4ZFM0QWlHbXMwOXktT3V3bGloNmtzekc0OUxwTVRwZTNhMjVydnkxSkxJcDNTOEtCQmE1ckFnSzNBPT0mY29udGV4dFR5cGU9bm9uZSZpZD0xMDg0NzUwNCIsImFjY291bnRfaWQiOjE5ODI1NTEsImNvbnRlbnRfaWQiOiIwXzRicGZiMnRmXzBfNTl0N3Z4ZjAsMF80YnBmYjJ0Zl8wXzg3bHB1YnhmLDBfNGJwZmIydGZfMF9jMDEwb2x6bCIsImZpbGVzIjoiIiwidXNlcl90b2tlbiI6ImRqSjhNakkxZkFyU0dsNWFBM2tzdW93bUdudFpFMTRpSUxnZkhkYjNEcTBFaTY0YTVvU1htNnZBRE5Gb2JBeXJTWG82d21YTVdPbWRXekVNM0FJUFFJZTdYUHNaYXNmRF83cl9sdFpYNURiM2w2cWxGSWdpZTh4eUNaMVBVUE5KNWgzdFB5Y1lzZElRWW8tQVFYYllpQms5TWVaZjg1djlOV3g1eXFDRUtpQTZiTmhsc2Z5S3NwblNVbm4tdUNnWDJ0ZjNQZDVpUGlMdDQ5dFZfZGxkOHRmZFpUX1hFUGVZVDBETGluYXVUSmdoazJrbnN6RWNYbjg3NTh1QUNmdDFnam9WVk9pcTJNUDR0R2ZGRndnV0RwV0RtbER0MlFDMEJnMFB5SFA3bXg0d2RwZi0zdElKS0pSeVRkZnJQdk9tZXZWNnZIQ2tteEVPUF8yaThkUzRBaUdtczA5eS1PdXdsaWg2a3N6RzQ5THBNVHBlM2EyNXJ2eTFKTElwM1M4S0JCYTVyQWdLM0E9PSIsInVkaWQiOiI4RjZDMTk5QS1DMUQ5LTQ5NzctQTA0MC01MzEzQkM0MDcxNzIiLCJhZGRpdGlvbmFsX2Nhc19zeXN0ZW0iOjIyNX0%3d&signature=IciIHVyQmV1lH58Y8wLH83eqfeM%3d";
         PKDrmParams pkDrmParams = new PKDrmParams(licenseUri, PKDrmParams.Scheme.WidevineCENC);
-        // pkDrmDataList.add(pkDrmParams);
+        pkDrmDataList.add(pkDrmParams);
 
         List<PKMediaSource> mediaSourceList = new ArrayList<>();
         PKMediaSource pkMediaSource = new PKMediaSource();
-        pkMediaSource.setUrl("https://zee5vodnd.akamaized.net/hls1/elemental/hls/ORIGINAL_CONTENT_BRO/DOMESTIC/HINDI/MENTALHOOD_HINDI_EP01_BRO_BEBAAKEE_CROSS_PROMO_hi_08d64bc720265e5be53e09934ffc2848/index.m3u8?hdnea=st=1600841898~exp=1600844898~acl=/*~hmac=d9c4a72cda66ce66acccbdcd6c753fbde75954947d564627e37af60ada029e62");
+        pkMediaSource.setUrl("https://cdnapisec.kaltura.com/p/1982551/sp/198255100/playManifest/protocol/https/entryId/0_4bpfb2tf/format/mpegdash/tags/dash/f/a.mpd");
         //  pkMediaSource.setId("929088");
         //   pkMediaSource.setMediaFormat(PKMediaFormat.dash);
 
-        //  pkMediaSource.setDrmData(pkDrmDataList);
+        // pkMediaSource.setDrmData(pkDrmDataList);
 
         PKMediaEntry  pkMediaEntry = new PKMediaEntry();
         //  pkMediaEntry.setId("929088");
@@ -2958,7 +3092,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .setLanguage("En");
         subsList.add(pkExternalSubtitle);
 
-        pkMediaEntry.setExternalSubtitleList(subsList);
+        //  pkMediaEntry.setExternalSubtitleList(subsList);
 
         PKMediaConfig config = new PKMediaConfig();
         config.setMediaEntry(pkMediaEntry);
@@ -3000,7 +3134,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void startOttMediaLoadingAstro(final OnMediaLoadCompletion completion) {
 
         String mediaId = "338882";
-        String KS = "djJ8MzIwOXyqeLHQBK3Hr144v_ubMG937jDTFxKk-_tKKa7wQczZ6Z8WOzU7BCsOsH1youUbvnQ1wzVZZeTIxJYllqIFnTVovW6ZREKRYZkds7aLam3y0jxAIxyw3NMGY_O4Ss1JHlKMtRoE6kDup26v3zTi9gQPE4WBBkpFE0hpjo6qD7ALswUMP8ZRLzZqgujH86YVb2HQELJ60tVAMImSO7dBMjIBKXpZ9fKw9AIgZfAnZDgjfyP76A84yrL50ada0AKA3SRtx-2JYsbH93IJcXM1DpJ_9zIAz8En6EHyio6URKjJ_lyVNmHFM0BSPpaRK-BE2taU3nR9EFnaomGS64S8YcZ5";
+        String KS = "djJ8MzIwOXz9afY_1bcI12_NSeI36blvcAIRkX_VUGaTbP6mTVhZ37FnK9iSywL8cOMp91adP0PHoTRtt-FXooUa0tc30NDCBPOBXOhVsMjtKf_77DwQHgZ2kg_sfgEUwLC0hM4IbHS_vuprmmw99yk0xWSO5XetRrDECz-y2AXVquKcmR783zKk2wQHPYcM9SP-yFUvJAOJSRMLO1zGfAv9UgjPLDrGeKtCQA9DRZ9k4hvvccqS_tPD2-QnVNS1mAcwPRK-TkXGIhcHJAPNooj-nkpqXgPrVsHHcN0a_JyzUrOQN0_J240p5IDS0Gy-8SHLp38ariE=";
 
         mediaProvider = new PhoenixMediaProvider("https://rest-sgs1.ott.kaltura.com/api_v3/", 3209, KS)
                 .setAssetId(mediaId)

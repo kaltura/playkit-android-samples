@@ -43,8 +43,6 @@ import androidx.core.content.ContextCompat;
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
 import com.kaltura.netkit.BuildConfig;
-import com.kaltura.netkit.connect.executor.APIOkRequestsExecutor;
-import com.kaltura.netkit.connect.request.RequestConfiguration;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.utils.OnCompletion;
 import com.kaltura.netkit.utils.SessionProvider;
@@ -53,7 +51,6 @@ import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
-import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 import com.kaltura.playkit.PKRequestParams;
@@ -62,15 +59,13 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
-import com.kaltura.playkit.player.ABRSettings;
-import com.kaltura.playkit.player.AudioCodecSettings;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
 import com.kaltura.playkit.player.LoadControlBuffers;
 import com.kaltura.playkit.player.MediaSupport;
 import com.kaltura.playkit.player.PKExternalSubtitle;
 import com.kaltura.playkit.player.PKHttpClientManager;
-import com.kaltura.playkit.player.PKLlLiveConfiguration;
+import com.kaltura.playkit.player.PKLowLatencyConfig;
 import com.kaltura.playkit.player.PKSubtitlePosition;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.PlayerSettings;
@@ -123,7 +118,6 @@ import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_YEAR;
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_HOUSEHOLD_ID;
 import static com.kaltura.playkit.utils.Consts.DISTANCE_FROM_LIVE_THRESHOLD;
-import static com.kaltura.playkit.utils.Consts.TIME_UNSET;
 import static com.kaltura.playkitdemo.MockParams.FormatTest;
 import static com.kaltura.playkitdemo.MockParams.MediaIdTest;
 import static com.kaltura.playkitdemo.MockParams.OvpUserKS;
@@ -226,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isAdsEnabled = false;
+    private boolean isAdsEnabled = true;
     private boolean isDAIMode = false;
     SubtitleStyleSettings subtitleStyleSettings = new SubtitleStyleSettings("MyCustomSubtitleStyle");
     PKSubtitlePosition pkSubtitlePosition = new PKSubtitlePosition(true);
@@ -257,6 +251,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String QUALITY = "your_quality";
     public static final String CONTENT_CDN_CODE = "AAPTLIMI";
     public static final String DEVICE_CODE = "your_device_code";
+
+    TextView tvLiveEdge;
+    PKLowLatencyConfig pkLowLatencyConfig = new PKLowLatencyConfig();
 
     static {
         PKHttpClientManager.setHttpProvider("okhttp");
@@ -306,12 +303,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             public void run() {
                 log.v("Gourav 1sec In timer");
                 if (player != null && player.isPlaying()) {
-                    log.v("Gourav player.getCurrentLiveOffset() " +  player.getCurrentLiveOffset());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            tvLiveEdge.setText("Live Offset: " + player.getCurrentLiveOffset() + " ms" + "\n"
+                                    + "targetOffset: " + pkLowLatencyConfig.getTargetOffsetMs() + "\n"
+                                    + "MinOffset: " + pkLowLatencyConfig.getMinOffsetMs() + "\n"
+                                    + "MaxOffset: " + pkLowLatencyConfig.getMaxOffsetMs() + "\n"
+                                    + "MinPlaybackSpeed: " + pkLowLatencyConfig.getMinPlaybackSpeed() + "\n"
+                                    + "MaxPlaybackSpeed: " + pkLowLatencyConfig.getMaxPlaybackSpeed() + "\n");
+                        }
+                    });
+                  //  log.v("Gourav player.getCurrentLiveOffset() " +  player.getCurrentLiveOffset());
                 }
                 handler.postDelayed(this, 1000);
             }
         }, 1000);
 
+        tvLiveEdge = findViewById(R.id.liveEdge);
         Button button = findViewById(R.id.changeMedia);
         button.setText("Change");
 
@@ -330,8 +339,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //                useSubtitleStyle(false, subtitleStyleSettings2);
 //            }
 
-            player.updateLlLiveConfiguration(new PKLlLiveConfiguration()
-                    .setTargetOffsetMs(10000L).setMaxOffsetMs(7000L).setMaxPlaybackSpeed(1.5f));
+            if (q % 2 == 0) {
+                player.updatePKLowLatencyConfig(pkLowLatencyConfig
+                        .setTargetOffsetMs(10000L).setMaxOffsetMs(7000L).setMaxPlaybackSpeed(1.5f));
+
+            } else {
+                player.updatePKLowLatencyConfig(pkLowLatencyConfig
+                        .setTargetOffsetMs(15000L).setMaxOffsetMs(12000L).setMaxPlaybackSpeed(1.5f));
+            }
+            q++;
+
+
 
 //            if (player != null) {
 //                player.replay();
@@ -365,7 +383,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // startVootOttMediaLoadingProd(playLoadedEntry, "926531"); // DTG
         //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
         //    startVootOttMediaLoadingProd(playLoadedEntry, "975732", "dash Main"); // SRT/webvtt failure source error
-   //           startVootOttMediaLoadingProd(playLoadedEntry, "979570", "dash Main"); //Gourav
+        //           startVootOttMediaLoadingProd(playLoadedEntry, "979570", "dash Main"); //Gourav
         //    startVootOttMediaLoadingProd(playLoadedEntry, "1017737"); //Gourav // no text track
         //   startVootOttMediaLoadingProd(playLoadedEntry, "1013774"); //Gourav // 1 non default text track
         //    startVootOttMediaLoadingProd(playLoadedEntry, "618620");
@@ -470,11 +488,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             changeMediaIndex++;
 
             OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
-            //startMockMediaLoading(playLoadedEntry, 3);
+            startMockMediaLoading(playLoadedEntry, 5);
             //     startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
 
 
-            if (changeMediaIndex % 4 == 0) {
+           /* if (changeMediaIndex % 4 == 0) {
                 startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
 
             } else if (changeMediaIndex % 4 == 1) {
@@ -485,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
 
 
-            }
+            }*/
         }
     }
 
@@ -762,6 +780,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 .load(completion);
     }
 
+    int p = 0;
+    int q = 0;
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
         //  APIOkRequestsExecutor.getSingleton().setRequestConfiguration(new RequestConfiguration().setMaxRetries(5).setReadTimeoutMs(15000));
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
@@ -770,7 +790,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Live);
         PKMediaConfig mediaConfig = new PKMediaConfig();
 //        if (changeMediaIndex % 4 == 0) {
-//            setExternalSubtitles(mediaEntry, true);
+        setExternalSubtitles(mediaEntry, true);
 //        } else if (changeMediaIndex % 4 == 1) {
 //            setExternalSubtitles(mediaEntry, false);
 //        } else if (changeMediaIndex % 4 == 2) {
@@ -796,7 +816,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //  player.getSettings().setLicenseRequestAdapter(licenseRequestAdapter);
             player.getSettings().setAllowCrossProtocolRedirect(true);
             //     player.getSettings().setPlayReadyPlayback(false);
-            player.getSettings().forceWidevineL3Playback(true);
+            //     player.getSettings().forceWidevineL3Playback(true);
             // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
             //Gourav
             //   player.getSettings().setSubtitlePreference(PKSubtitlePreference.EXTERNAL);
@@ -806,19 +826,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             // Audio Player Configuration
             //   player.getSettings().setAudioPlayerMode(true, createNotificationForAudioOnlyService());
-
-//            player.getSettings().setLlLiveConfiguration(new PKLlLiveConfiguration()
-//                    .setTargetOffsetMs(5000L)
-//                    .setMinOffsetMs(10000L)
-//                    .setMaxOffsetMs(3000L)
-//                    .setMaxPlaybackSpeed(2.5f)
-//                    .setMinPlaybackSpeed(1.5f));
-
-//            player.getSettings().setLlLiveConfiguration(new PKLlLiveConfiguration()
-//                    .setTargetOffsetMs(10000L).setMaxOffsetMs(7000L).setMaxPlaybackSpeed(1.5f));
-
-            player.getSettings().setLlLiveConfiguration(new PKLlLiveConfiguration()
-                    .setTargetOffsetMs(15000L).setMaxOffsetMs(12000L).setMaxPlaybackSpeed(1.5f));
 
             if (mediaEntry.isVRMediaType()) {
                 VRSettings vrSettings = new VRSettings();
@@ -852,14 +859,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //   player.getSettings().setMaxVideoBitrate(878786);
             //   player.getSettings().setMaxVideoSize(new PKMaxVideoSize(640,360));
 
-
-            Map<String,String> headers = new HashMap<>();
-            headers.put("aaa", "bbb");
-            headers.put("ccc","ddd");
-
-            final MediaAdapter mediaAdapter = new MediaAdapter("app://PlaykitTestApp", player);
-            mediaAdapter.customHeaders = headers;
-           // player.getSettings().setContentRequestAdapter(mediaAdapter);
 
 
             log.d("Player: " + player.getClass());
@@ -936,6 +935,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             PhoenixAnalyticsConfig phoenixAnalyticsConfig = new PhoenixAnalyticsConfig(198, "http://api-preprod.ott.kaltura.com/v4_2/api_v3/", ks, 30);
             player.updatePluginConfig(PhoenixAnalyticsPlugin.factory.getName(), phoenixAnalyticsConfig);
         }
+
+        if (p % 2 == 0) {
+            player.getSettings().setPKLowLatencyConfig(pkLowLatencyConfig
+                    .setTargetOffsetMs(15000L).setMaxOffsetMs(12000L));
+
+        } else {
+            player.getSettings().setPKLowLatencyConfig(pkLowLatencyConfig
+                    .setTargetOffsetMs(10000L).setMaxOffsetMs(7000L));
+        }
+        p++;
+
+        Map<String,String> headers = new HashMap<>();
+        headers.put("aaa", "bbb");
+        headers.put("ccc","ddd");
+
+        final MediaAdapter mediaAdapter = new MediaAdapter("app://PlaykitTestApp", player);
+        mediaAdapter.customHeaders = headers;
+        player.getSettings().setContentRequestAdapter(mediaAdapter);
 
         //  player.setPlaybackRate(2f);
         player.prepare(mediaConfig);

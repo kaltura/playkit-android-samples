@@ -149,6 +149,15 @@
 
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/liveEdge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="35dp"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/player_container"
+        android:textColor="@android:color/holo_red_dark"/>
+
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

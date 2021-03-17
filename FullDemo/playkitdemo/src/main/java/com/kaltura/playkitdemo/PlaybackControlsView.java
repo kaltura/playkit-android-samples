@@ -30,11 +30,17 @@ import java.util.Locale;
 
 public class PlaybackControlsView extends LinearLayout implements View.OnClickListener {
 
+    public interface UIListener {
+        void onChangeMedia();
+    }
+
     private static final PKLog log = PKLog.get("PlaybackControlsView");
     private static final int PROGRESS_BAR_MAX = 100;
 
     private Player player;
     private PlayerState playerState;
+
+    private UIListener uiListener;
 
     private Formatter formatter;
     private StringBuilder formatBuilder;
@@ -64,6 +70,10 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         formatter = new Formatter(formatBuilder, Locale.getDefault());
         componentListener = new ComponentListener();
         initPlaybackControls();
+    }
+
+    public void setUiListener(UIListener uiListener) {
+        this.uiListener = uiListener;
     }
 
     private void initPlaybackControls() {
@@ -183,7 +193,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         }
 
         @Override
-        public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, @com.kaltura.android.exoplayer2.Player.TimelineChangeReason int reason) {
+        public void onTimelineChanged(Timeline timeline, @com.kaltura.android.exoplayer2.Player.TimelineChangeReason int reason) {
             updateProgress();
         }
 
@@ -271,10 +281,8 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
                 ///Do nothing for now
                 break;
             case R.id.kexo_next:
-                //Do nothing for now
-                break;
             case R.id.kexo_prev:
-                //Do nothing for now
+                uiListener.onChangeMedia();
                 break;
         }
     }

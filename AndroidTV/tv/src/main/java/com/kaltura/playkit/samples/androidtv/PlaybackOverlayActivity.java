@@ -262,13 +262,13 @@ public class PlaybackOverlayActivity extends Activity implements
 
     private void loadViews() {
         if (player == null) {
-            //PlayKitManager.registerPlugins(this, IMAPlugin.factory);
+            PlayKitManager.registerPlugins(this, IMAPlugin.factory);
             //PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
             //PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
 
             PKPluginConfigs pluginConfigs = new PKPluginConfigs();
             //addKalturaStatsPlugin(pluginConfigs);
-            //addIMAPluginConfig(pluginConfigs);
+            addIMAPluginConfig(pluginConfigs);
             //addYouboraPlugin(pluginConfigs);
             player = PlayKitManager.loadPlayer(this, pluginConfigs);
             player.getSettings().setAllowCrossProtocolRedirect(true);
@@ -285,8 +285,8 @@ public class PlaybackOverlayActivity extends Activity implements
                     playerKitView.setLayoutParams(layoutParams);
                     playerKitViewContainer.addView(playerKitView);
                     //mVideoView = (VideoView) findViewById(R.id.videoView);
-                    playerKitView.setFocusable(false);
-                    playerKitView.setFocusableInTouchMode(false);
+                    playerKitView.setFocusable(true);
+                    playerKitView.setFocusableInTouchMode(true);
                     //playerKitView.setVisibility(View.VISIBLE);
 
                 }
@@ -353,9 +353,9 @@ public class PlaybackOverlayActivity extends Activity implements
         String adTagUrl = //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/youth/MTV&t=Content+Type=Highlights,Series+Title=MTV+Roadies+Rising,Gender=,GeoCity=,Age=,Carrier=,Media+ID=491591,Genre=Reality,SBU=MTV,Content+Name=Highlights%3A+Rannvijay+makes+his+choice,OEM=LGE,Language=Hindi,WiFi=Y,appversion=1.6.119,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=365.40002&rnd=8170019078998&cd=489&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=73274a17-920a-4666-b844-540ab8dd29f9&rt=vmap_1.0&pf=and_6.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d4d36fd0-e5e2-4b28-a225-ee0dca05d724&cp.optout=false&cp.deviceid=aa5e1b6c96988d68&cp.osversion=6.0";
                 //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=vmap&t=Content+Type=Full+Episode,Series+Title=MTV+Unplugged+S06,Gender=U,Media+ID=476975,Genre=Music,SBU=MTV,Content+Name=The+fusion+of+stars,OEM=LGE,Language=Hindi,WiFi=Y,appversion=0.1.102,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false,&tid=43cdeafd-77f5-11e6-bff1-02a55d5f3a8d&tt=p%2Cm%2Cpo%2Co&bp=336.0,681.0,1128.0,1464.0,1655.4,2052.0&rnd=8170019078998&cd=2485&rt=vmap_1.0&pf=and_6.0.1&rt=vmap_1.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d928acbe-4276-422e-b97a-9d9b681f94c3&cp.optout=false";
                 //"https://in-viacom18.videoplaza.tv/proxy/distributor/v2?s=viacom18/youth/MTV&t=Content+Type=Highlights,Series+Title=MTV+Roadies+Rising,Gender=,GeoCity=,Age=,Carrier=,Media+ID=491591,Genre=Reality,SBU=MTV,Content+Name=Highlights%3A+Rannvijay+makes+his+choice,OEM=LGE,Language=Hindi,WiFi=Y,appversion=1.6.119,useragent=Android+LGE+google+Nexus+5,KidsPinEnabled=false&tt=p%2Cm%2Cpo&bp=365.40002&rnd=8170019078998&cd=489&vbw=400&ang_pbname=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.tv.v18.viola&pid=73274a17-920a-4666-b844-540ab8dd29f9&rt=vmap_1.0&pf=and_6.0&cp.useragent=Android+LGE+google+Nexus+5&cp.adid=d4d36fd0-e5e2-4b28-a225-ee0dca05d724&cp.optout=false&cp.deviceid=aa5e1b6c96988d68&cp.osversion=6.0";
-                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x360&iu=/6062/iab_vast_samples/skippable&ciu_szs=300x250,728x90&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&correlator=[timestamp]";
+                //"https://kaltura.github.io/playkit-admanager-samples/vast/pod-inline-someskip.xml";
                 //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostoptimizedpodbumper&cmsid=496&vid=short_onecue&correlator=";
-                //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+                "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/3274935/preroll&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=[referrer_url]&description_url=[description_url]&correlator=[timestamp]";
         //"https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpod&cmsid=496&vid=short_onecue&correlator=";
         List<String> videoMimeTypes = new ArrayList<>();
@@ -364,8 +364,8 @@ public class PlaybackOverlayActivity extends Activity implements
         //Map<Double, String> tagTimesMap = new HashMap<>();
         //tagTimesMap.put(2.0,"ADTAG");
 
-        IMAConfig adsConfig = new IMAConfig().setAdTagUrl(adTagUrl);//.enableDebugMode(true);
-        config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig.toJSONObject());
+        IMAConfig adsConfig = new IMAConfig().setAdTagUrl(adTagUrl).enableDebugMode(true).setEnableFocusSkipButton(true);
+        config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
     private void setupCallbacks() {

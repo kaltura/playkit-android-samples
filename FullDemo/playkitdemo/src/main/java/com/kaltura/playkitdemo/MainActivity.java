@@ -42,7 +42,6 @@ import androidx.core.content.ContextCompat;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
-import com.kaltura.netkit.BuildConfig;
 import com.kaltura.netkit.connect.response.PrimitiveResult;
 import com.kaltura.netkit.utils.OnCompletion;
 import com.kaltura.netkit.utils.SessionProvider;
@@ -55,6 +54,7 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
+import com.kaltura.playkit.PKRequestConfiguration;
 import com.kaltura.playkit.PKRequestParams;
 import com.kaltura.playkit.PKSubtitleFormat;
 //import com.kaltura.playkit.PKTracksAvailable;
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             "524710","526594","537514","538376","540085"));
 
 
-    private String V18_PROD_KS = "djJ8MjI1fDPtx_9UXyuG3G-MWwYfAgnHDKnXWlZ4m4YEpmAzlNnB9SXYSYzykhLflo6GP04zUwaueL7NAjVvXMnw2H3EY-BvEkjbtJZ0oNdvof6av4-eFJHub4CROSDouU9gH9lRDPXg0wZIzCtIChV4b2xdQlz2StCY_E7sMo1gdohN5spJnIqbSoN1fg-uFWB7LFc3aO99aueVCmP6tiQnlTjr-72DPJFzMWSSusBqWz5vXCR7l1AtgYsWi3s5hS-R5JmmsIrKgWJl3y4OqvvU8ISTYME9KTsbpYuUyjYCNob-48jSo6EAJ99btW2FHOsWz0guxvwCa04qXbDqkW_pOxP2dggYvx6xLEgDqO2TW0SAaeKzcYEnjl5_LKUjnHSPm_aSLf2aioFlY74hceDS3f_J9AA415O8ECs3910NJMIbzvG5";
+    private String V18_PROD_KS = "djJ8MjI1fBtpCvAGe5haywc8KTND2sI93X8HrML_QvIx3IqBOO9SLDKFIexUIlBclkeumIHIuL9GI9QDsXaQALKtQEM3Q2dSDOfcYz9JqexCqea0aYRMEsmp6wYTXy2FccSBsymKyADH_wHSCsF-RQ8EeYmcdoEEO7n0GN9e3IDppu6mgg2NRAhJ6PsrxcPx6LM5tTyRbzDdG4mFBfJvArB92TTEfimxsowylf5yHkZ7HMbfiURwXJ2X_WPFbqbj8QF6Lv1k82TPz-tYB5iTDOvLBXWioMRj-c3aBj8TOjhDZa-6cSOXaEKuHnVzDs3U-aG8NLER7yxNmcegrofT5MYoP56Nlth1Ix4yY455eAlkWw44wuLh1_FQWXl5SXZqr71w3eh4DQ==";
     private String VEON_PROD_KS = "djJ8NDc4fJWjbKhDMH2juWOB99NAWHeLComBe88EJ0qbNk63jiKzd51499P52eTAr5iwwIWlQ042lA93m97sn4PAuQl7XEw0X7o-lzwPk5Mji8y_1ZgFS_CRKHObJPNRP6AjWMEBEFulyz8mTCLJkp1OehvQ291L6Qu2-6nxl-QKTwGc8Gw4me9OzdfmrYqahLSFpcZq22js-e2_-woVTuwmNDESQ028ZgaO0-uUejiqimkGyJCQY8yuvHN-6MHW_mszUiFWSwDfhgBy9e5zDnagr5wKuQdj3CpfKFAAzqNYwA8mUMMAO9NsQJ5STzoQ-L8_WDM2uXEsDG63-vwLO7NJ4pAWizZKSxaoaAPfrRE2b9V0cE6wFIHHNDHHQmZyUdUq4XuN0Awbg8uLEyjeRGuBx7za8GG6GG9ZdSRV5JnzG0GkOro-pxsoX2HWn5fUiescmJkZ4PeB62XUYpRVLnKoSH6fBkP86eNWxDqAeTgIQwFkzpsSbQUikcqwAQuY0avM-L9GSlnwpT6SDcOd2ziFJsSUfDI=";
 
     // Vootkids skype wala issue where they face device not in household issue
@@ -210,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public String vootPremiumEmptyAdTag = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360%7C640x480&iu=%2F21633895671%2FQASVOD%2FVideo%2FAndroid_Native_App%2FVSO&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D13%26KidsPinEnabled%3DN%26distinct_id%3DXmWLVbUThyY3NzJGgw7NGPsFYAp2%26AppVersion%3D0.3.4_PPE_DBG%26DeviceModel%3DAndroid%20SDK%20built%20for%20x86%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2510338&ppid=XmWLVbUThyY3NzJGgw7NGPsFYAp2&vid=0_1sz284bq&ad_rule=1&correlator=1440&InterstitialRendered=False";
     public String v_18_ad = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOI&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DU%26Age%3DNULL%26KidsPinEnabled%3DN%26AppVersion%3D0.1.37%26DeviceModel%3DNexus%206&cmsid=2467608&ppid=693f0645-201b-4f2e-84c5-4879abd395aa&vid=0_b49uc8t6&ad_rule=1&correlator=12678";
     public String zee5_ad_non_skippable = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
+    public String astro_ad = "https://pubads.g.doubleclick.net/gampad/ads?iu=/142680780/MBNS_SOTT/MBNS_SOTT_App_PreRoll_400x300v_640x480v&description_url=[placeholder]&tfcd=0&npa=0&sz=400x300%7C640x480&gdfp_req=1&output=vast&unviewed_position_start=1&env=vp&impl=s&correlator=";
 
     public String ad_youbora = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F124319096%2Fexternal%2Fad_rule_samples&ciu_szs=300x250&ad_rule=1&gdfp_req=1&env=vp&output=xml_vmap1&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=4178520229405531&ms=upuacR6gQAr0KtuYm2jCKRfQ-dLzlTIkrpS9TCxaPhnR7jZi4aliCtq_qpOxVhKVsrwzgAxQX64X-FRZgT0yFR8oHyu_FznoTFnlKO2ie-0NTNYNu6lNmTT2DqcBvY_DN6DPu9k2ZJiR6ZaSIqTp987s99clneQsdaRaqFfpVo7suWVijnukZQ6sFtTMk9z-h6IklSeaP3XaZjN22MF15IqFaraVcMmzpwmT3I4MOPUceENqvXOa-0iGbLnyLiv61ixK65d6fu-LzaRAeK5Ogm_OuWxI6r0rF4N0SQp_mQ4n3h6FWB2jfd8-Sx7036W7eFhyU435mQC2Z_N2txoiLg&sdkv=h.3.258.1%2Fn.android.3.20.0%2Fcom.kaltura.kalturaplayertestapp&osd=2&frm=0&vis=1&sdr=1&hl=en&is_lat=0&idtype=adid&rdid=0c714bb8-889b-4297-a158-8dec2c15e2b6&is_amp=0&js=ima-android.3.20.0&an=com.kaltura.kalturaplayertestapp&msid=com.kaltura.kalturaplayertestapp&mv=82313010.com.android.vending&u_so=l&ctv=0&mpt=kaltura-vp-android&mpv=dev.2580ad14&sdki=445&sdk_apis=7%2C8&omid_p=Google1%2Fandroid.3.20.0&sid=172941A5-6E09-4564-B929-5E293F97FEC7&url=com.kaltura.kalturaplayertestapp.adsenseformobileapps.com%2F&eid=21064201%2C46130026&dlt=1608632084524&idt=102&dt=1608632084673&scor=4206523438118768";
 
@@ -337,9 +338,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         button.setOnClickListener(v -> {
 
             //Update ABR Settings
-            if (!click.get()) {
+            /*if (!click.get()) {
                 click.set(true);
-                player.updateABRSettings(new ABRSettings().setMaxVideoWidth(330).setMaxVideoHeight(190));
+            //    player.updateABRSettings(new ABRSettings().setMaxVideoWidth(330).setMaxVideoHeight(190));
                 //player.updateABRSettings(new ABRSettings().setMaxVideoBitrate(900000));
                 //player.resetABRSettings();
             } else {
@@ -348,8 +349,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 player.resetABRSettings();
             //    player.updateABRSettings(null);
                 //player.updateABRSettings(new ABRSettings().setMaxVideoBitrate(900000));
-            }
-           /* if (!click.get()) {
+            }*/
+            if (!click.get()) {
                 click.set(true);
                 pkSubtitlePosition.setPosition( 50, 100, Layout.Alignment.ALIGN_NORMAL);
                 SubtitleStyleSettings subtitleStyleSettings1 = new SubtitleStyleSettings("Replay_MyCustomSubtitleStyle1");
@@ -363,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 subtitleStyleSettings2.setBackgroundColor(Color.RED);
                 subtitleStyleSettings2.setSubtitlePosition(pkSubtitlePosition);
                 useSubtitleStyle(false, subtitleStyleSettings2);
-            }*/
+            }
 
 //            player.updatePKLowLatencyConfig(pkLowLatencyConfig
 //                    .setTargetOffsetMs(20000).setMaxOffsetMs(21000).setMaxPlaybackSpeed(4));
@@ -396,7 +397,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // startSimpleOvpMediaLoadingHlsSubtitle(playLoadedEntry);
 
         // "764459" : Vootkids firestick issue asset
-        //   startVootOttMediaLoadingProd(playLoadedEntry, "594159"); // Dolby Content
+      //     startVootOttMediaLoadingProd(playLoadedEntry, "594159", "dash Main"); // Dolby Content
         //  startVootOttMediaLoadingProd(playLoadedEntry, "805986"); // iOS linear
 
         // HEVC Clear live Dialog
@@ -412,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
         //    startVootOttMediaLoadingProd(playLoadedEntry, "975732", "dash Main"); // SRT/webvtt failure source error
 
-    //    startVootOttMediaLoadingProd(playLoadedEntry, "979570", "dash Main"); //Gourav
+       // startVootOttMediaLoadingProd(playLoadedEntry, "979570", "dash Main"); //Gourav
         startVootOttMediaLoadingProd(playLoadedEntry, "917558", "Tablet Main"); //Gourav
 
         //    startVootOttMediaLoadingProd(playLoadedEntry, "706534", "dash Main"); //Vootkids video
@@ -471,12 +472,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 //        startSimpleOvpMediaLoadingChromecast(playLoadedEntry);
 //        startOttMediaLoading(playLoadedEntry);
-//      startSimpleOvpMediaLoadingVR(playLoadedEntry);
+  //    startSimpleOvpMediaLoadingVR(playLoadedEntry);
         //     startSimpleOvpMediaLoadingHls(playLoadedEntry);
         //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive(playLoadedEntry);
-   //     startMockMediaLoading(playLoadedEntry, 10);
+      //  startMockMediaLoading(playLoadedEntry, 11);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
 //               startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
@@ -525,9 +526,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
-             startMockMediaLoading(playLoadedEntry, 7);
+            // startMockMediaLoading(playLoadedEntry, 7);
 
-           // startVootOttMediaLoadingProd(playLoadedEntry, "1092959", "dash Main");
+            startVootOttMediaLoadingProd(playLoadedEntry, "1092959", "dash Main");
 //            if (q % 2 == 0) {
 //                startMockMediaLoading(playLoadedEntry, 5);
 //            } else {
@@ -782,7 +783,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "mp4");
         } else if (val == 10){
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "multiABR");
-        }  else {
+        } else if (val == 11) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "harold-2");
+        } else {
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "single_br");
         }
         mediaProvider.load(completion);
@@ -876,7 +879,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             final DRMAdapter licenseRequestAdapter = new DRMAdapter();
           //  player.getSettings().setLicenseRequestAdapter(licenseRequestAdapter);
-            player.getSettings().setAllowCrossProtocolRedirect(true);
+           // player.getSettings().setAllowCrossProtocolRedirect(true);
+            player.getSettings().setPKRequestConfig(new PKRequestConfiguration(true));
             //     player.getSettings().setPlayReadyPlayback(false);
             //     player.getSettings().forceWidevineL3Playback(true);
             // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
@@ -906,7 +910,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             pkSubtitlePosition.setPosition( 10, 100, Layout.Alignment.ALIGN_NORMAL);
             subtitleStyleSettings.setBackgroundColor(Color.RED);
             subtitleStyleSettings.setSubtitlePosition(pkSubtitlePosition);
-            useSubtitleStyle(true, subtitleStyleSettings);
+          //  useSubtitleStyle(true, subtitleStyleSettings);
 
             player.getSettings().setSecureSurface(false);
             //  player.getSettings().forceSinglePlayerEngine(true);
@@ -999,7 +1003,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         if (p % 2 == 0) {
-            player.getSettings().setABRSettings(new ABRSettings().setMaxVideoWidth(330).setMaxVideoHeight(190));
+        //    player.getSettings().setABRSettings(new ABRSettings().setMaxVideoWidth(330).setMaxVideoHeight(190));
         } else {
             player.getSettings().setABRSettings(new ABRSettings().setMaxVideoBitrate(1000000));
         }
@@ -1041,11 +1045,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         final MediaAdapter mediaAdapter = new MediaAdapter("app://PlaykitTestApp", player);
         mediaAdapter.customHeaders = headers;
-        player.getSettings().setContentRequestAdapter(mediaAdapter);
+      //  player.getSettings().setContentRequestAdapter(mediaAdapter);
 
         //  player.setPlaybackRate(2f);
+       // player.getSettings().setPreferredAudioCodecSettings(new AudioCodecSettings(getDefaultCodecsPriorityList(), true));
+
         player.prepare(mediaConfig);
         player.play();
+    }
+
+    private List<PKAudioCodec> getDefaultCodecsPriorityList() {
+        ArrayList codecPriorityList = new ArrayList<>();
+
+        codecPriorityList.add(PKAudioCodec.E_AC3);
+
+        codecPriorityList.add(PKAudioCodec.AC3);
+
+        codecPriorityList.add(PKAudioCodec.OPUS);
+
+        codecPriorityList.add(PKAudioCodec.AAC);
+
+        return codecPriorityList;
     }
 
     static class MediaAdapter implements PKRequestParams.Adapter {
@@ -1192,7 +1212,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
         if (isAdsEnabled) {
             if (isDAIMode) {
-                addIMADAIPluginConfig(pluginConfigs, 2);
+                addIMADAIPluginConfig(pluginConfigs, 1);
             } else {
                 addIMAPluginConfig(pluginConfigs);
             }
@@ -1370,7 +1390,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         log.d("Play Ad preSkipAdTagUrl");
         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
         // IMAConfig adsConfig = getAdsConfigResponsePostrollBuggy(ads5AdsEvery10Secs);
-        IMAConfig adsConfig = getAdsConfig(zee5_ad_non_skippable);
+        IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
@@ -1909,14 +1929,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void addIMADAIPluginConfig(PKPluginConfigs config, int daiType) {
         switch (daiType) {
             case 1: {
-                promptMessage(DAI_PLUGIN, getDAIConfig5_1().getAssetTitle());
-                IMADAIConfig adsConfig = getDAIConfig5_1();
+                promptMessage(DAI_PLUGIN, getDAIConfig1().getAssetTitle());
+                IMADAIConfig adsConfig = getDAIConfig1();
                 config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig);
             }
             break;
             case 2: {
-                promptMessage(DAI_PLUGIN, getDAIConfig1().getAssetTitle());
-                IMADAIConfig adsConfigLive = getDAIConfig1();
+                promptMessage(DAI_PLUGIN, getDAIConfig2().getAssetTitle());
+                IMADAIConfig adsConfigLive = getDAIConfig2();
                 config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigLive);
             }
             break;
@@ -2455,7 +2475,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onResume();
         if (player != null) {
             player.onApplicationResumed();
-          //  player.play();
+         //   player.play();
         }
         if (controlsView != null) {
             controlsView.resume();

@@ -54,7 +54,7 @@ dependencies {
     implementation project(":MD360")
     implementation project(':fbads')
 
-    //implementation project(":netkit")
+    implementation project(":netkit")
     //implementation project(":admanager")
     //implementation project(":adsplugin")
 

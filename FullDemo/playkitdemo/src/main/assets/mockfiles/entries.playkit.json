@@ -191,6 +191,18 @@
       }
     ]
   },
+  "harold-2": {
+    "duration": 102000,
+    "id": "0_uka1msg4",
+    "name": "Harold-2",
+    "sources": [
+      {
+        "id": "0_uka1msg4",
+        "mimeType": "application/x-mpegURL",
+        "url": "https://qa-apache-php7.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_wifqaipd/protocol/https/format/applehttp/flavorIds/0_h65mfj7f,0_3flmvnwc,0_m131krws,0_5407xm9j,0_xcrwyk2n/a.m3u8"
+      }
+    ]
+  },
   "wowhls": {
     "duration": 102000,
     "id": "0_uka1msg4",

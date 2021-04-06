@@ -67,7 +67,7 @@ dependencies {
     implementation project(":MD360")
     implementation project(':fbads')
 
-    //implementation project(":netkit")
+    implementation project(":netkit")
 
 
 
@@ -84,4 +84,5 @@ repositories {
     google()
     jcenter()
     maven { url "https://jitpack.io" }
+    maven { url  "https://npaw.jfrog.io/artifactory/youbora/" }
 }

@@ -1,8 +1,8 @@
 include ':app'
 include ':playkitdemo'
 
-include ':tvplayer'
-project(':tvplayer').projectDir = new File('../../kaltura-player-android/tvplayer')
+//include ':tvplayer'
+//project(':tvplayer').projectDir = new File('../../kaltura-player-android/tvplayer')
 
 include ':playkit'
 project(':playkit').projectDir = new File(settingsDir, '../../playkit-android/playkit')

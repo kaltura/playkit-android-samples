@@ -297,5 +297,47 @@
         "url": "https://storage.googleapis.com/shaka-demo-assets/bbb-dark-truths-hls/hls.m3u8"
       }
     ]
+  },
+  "ABR-HLS": {
+    "duration": 102000,
+    "id": "HLS-APPLE",
+    "name": "HLS-APPLE",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll_2",
+        "mimeType": "application/x-mpegURL",
+        "url": "https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8"
+      }
+    ]
+  },
+  "astro": {
+    "duration": 102000,
+    "id": "0_hbhe2o9x",
+    "name": "hvec",
+    "sources": [
+      {
+        "id": "0_hbhe2o9x",
+        "url": "https://linear01-playback.sooka.my/CH3/masterCH3.mpd",
+        "mimeType": "application/dash+xml",
+        "drmData": [
+          {
+            "scheme": "WidevineCENC",
+            "licenseUri": "https://udrmv3.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJodHRwczovL3Jlc3QtYXMub3R0LmthbHR1cmEuY29tL2FwaV92My9zZXJ2aWNlL2Fzc2V0RmlsZS9hY3Rpb24vZ2V0Q29udGV4dD9rcz1kako4TXpJd09YeVlXVGpmWU1vWHphbEYzc0JuUXBwNmkyM2pkU19lSlVVcTF3WUhYcGNxODVmRV9TSFFWWlJFRWhtTTY0ZXA1N0c5RzBHNkdQRmowYTNrYWFhU3RMbEdFejNJcmVVTkxrRzhWMEg1UzVjbG5WMk12NXIwdzd0NjUxVUdXd1pGM1BsZTlSQVRhQkQzVGpHOWlMZ1hhcXVaT2VpSGwwbmRpckFhRVlIVkZycmQtMWhjNFZsT3JrRzRGZEZMcWFMSk9fRUNCcDFzYk9RNHdLUXFGSXFnQWdIdzZXSjVPU2o4cGN5Qk1saGNCdklJckNMWkdEbXRoS3hoM1BGZW5TT25HbHJVS0dHU2hwT3dtNUd2bTd4NU5VMXB0M0w1engwbFJFYnYwSHU4bmM3aVRGUlFWZkhtaHluWUlaM08zTHBmRnVfZFdFb2p1Y1B0VUZrTVpmSE9HRnZTJmNvbnRleHRUeXBlPW5vbmUmaWQ9MTMyMjUxNjYiLCJhY2NvdW50X2lkIjozMDg5NjMzLCJjb250ZW50X2lkIjoiOWY5OWZmYTJfZDI3YV80Y2ZiX2EwNWJfODNiOTFkYjg0NmRmIiwiZmlsZXMiOiIiLCJ1c2VyX3Rva2VuIjoiZGpKOE16SXdPWHlZV1RqZllNb1h6YWxGM3NCblFwcDZpMjNqZFNfZUpVVXExd1lIWHBjcTg1ZkVfU0hRVlpSRUVobU02NGVwNTdHOUcwRzZHUEZqMGEza2FhYVN0TGxHRXozSXJlVU5Ma0c4VjBINVM1Y2xuVjJNdjVyMHc3dDY1MVVHV3daRjNQbGU5UkFUYUJEM1RqRzlpTGdYYXF1Wk9laUhsMG5kaXJBYUVZSFZGcnJkLTFoYzRWbE9ya0c0RmRGTHFhTEpPX0VDQnAxc2JPUTR3S1FxRklxZ0FnSHc2V0o1T1NqOHBjeUJNbGhjQnZJSXJDTFpHRG10aEt4aDNQRmVuU09uR2xyVUtHR1NocE93bTVHdm03eDVOVTFwdDNMNXp4MGxSRWJ2MEh1OG5jN2lURlJRVmZIbWh5bllJWjNPM0xwZkZ1X2RXRW9qdWNQdFVGa01aZkhPR0Z2UyIsInVkaWQiOiIxNjdkNTY5ZWRjNWRmZTNkIiwiYWRkaXRpb25hbF9jYXNfc3lzdGVtIjozMjA5fQ%3d%3d&signature=bQ4IG1NYwa4zi%2b3xGyW3ehCQrcc%3d"
+          }
+        ]
+      }
+    ]
+  },
+  "LONG-TAIL": {
+    "duration": 102000,
+    "id": "HLS-APPLE",
+    "name": "HLS-APPLE",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll_2",
+        "mimeType": "application/x-mpegURL",
+        "url": "https://playertest.longtailvideo.com/adaptive/eleph-audio/playlist.m3u8"
+      }
+    ]
   }
 }

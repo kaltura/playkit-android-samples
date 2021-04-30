@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             "524710","526594","537514","538376","540085"));
 
 
-    private String V18_PROD_KS = "djJ8MjI1fCtwBc6XKT1Kh-jAT1GkfbEPxw4X8DjR-y42HTbqVNMqbBen2Fg7K3BXg8keM_xbn6Ozb83htV5rpo57bk3ARjRE1plFUqTtOSc9zyKdJNGKx_oKa8V9S1kBsN5EVqVxsu5nsNo0lAJkIYojN9jTU56sCQNVPMOE2itTTxyglRZTRLA_woUPXlZof940SYS57wUc-V6CMjBXD54wi9H32v8ZurCjo6ko72fXA-IvkR71uh2gfUbEYgU6GW2MXnshIbOKezVntl-aq8jI3Yex0zF0uvMmFC7SOHUpkZmBbETZjFuKvS6rNDfOB1-uHEu2U27WxWj12uMmuP7H0wxBAvWOKOPZxnGV35gZjPS2lrZSiAndV72rf9v5oRlU38BfPA==";
+    private String V18_PROD_KS = "djJ8MjI1fOtSXE9qQzXL9bpMzjOvrHPJheIOl4hPcqyLDSt45c8fH23Ijp1uG_t_1zuiiG6Fr8HEfpWrsNO5kea7t2aetMOWGTFunQu9X_aew_PaRJ5UlWmm6DqpPw7UJMKrPkyg-atZyQWZ14-74qiqu33Q0FeWIWqIMrRxRVDEBNDUnu9DuYXs9mvXk5EcC5rS1IZiH7g4YYYIsaBZw42UR7OuMhBNDYnKuHMZYPjLk7hsED5Tv2-nK2cZ0Pd7dE666FrgKPtzFYUrLTw3Wo58zRd4GpPLHtOVwyQhq2G6XejO-hXgceQf2r2wDq9BhVdqKctX5aLmHBfxR4-I-bCag15YhJ2eK4aThJlXJafaCXLIPNrTTT7FZk-i0DQ-_W-ljI1QYw==";
     private String VEON_PROD_KS = "djJ8NDc4fJWjbKhDMH2juWOB99NAWHeLComBe88EJ0qbNk63jiKzd51499P52eTAr5iwwIWlQ042lA93m97sn4PAuQl7XEw0X7o-lzwPk5Mji8y_1ZgFS_CRKHObJPNRP6AjWMEBEFulyz8mTCLJkp1OehvQ291L6Qu2-6nxl-QKTwGc8Gw4me9OzdfmrYqahLSFpcZq22js-e2_-woVTuwmNDESQ028ZgaO0-uUejiqimkGyJCQY8yuvHN-6MHW_mszUiFWSwDfhgBy9e5zDnagr5wKuQdj3CpfKFAAzqNYwA8mUMMAO9NsQJ5STzoQ-L8_WDM2uXEsDG63-vwLO7NJ4pAWizZKSxaoaAPfrRE2b9V0cE6wFIHHNDHHQmZyUdUq4XuN0Awbg8uLEyjeRGuBx7za8GG6GG9ZdSRV5JnzG0GkOro-pxsoX2HWn5fUiescmJkZ4PeB62XUYpRVLnKoSH6fBkP86eNWxDqAeTgIQwFkzpsSbQUikcqwAQuY0avM-L9GSlnwpT6SDcOd2ziFJsSUfDI=";
 
     // Vootkids skype wala issue where they face device not in household issue
@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
     String preSkipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
     String inLinePreAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
-    String preMidPostSingleAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
+    String preMidPostSingleAdTagUrl = "https://pubads.g.doubleclick.net/gampad/adsggyugugugugyu?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
     String ads5AdsEvery10Secs = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostlongpod&cmsid=496&vid=short_tencue&correlator=";
     String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
     String v18_ad_tag = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOI&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D33%26KidsPinEnabled%3DN%26distinct_id%3D42c92f17603e4ee2b4232666b9591134%26AppVersion%3D0.1.80%26DeviceModel%3Dmoto%20g(6)%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2467608&ppid=42c92f17603e4ee2b4232666b9591134&vid=0_im5ianso&ad_rule=1&correlator=10771&InterstitialRendered=False";
@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     //Youbora analytics Constants - https://developer.nicepeopleatwork.com/apidocs/js6/youbora.Options.html
     public static final String ACCOUNT_CODE = "kalturatest";
     public static final String UNIQUE_USER_NAME = "gourav@bundle.com";
-    public static final String MEDIA_TITLE = "your_media_title";
+    public static final String MEDIA_TITLE = "CONTENT";
     public static final boolean IS_LIVE = false;
     public static final boolean ENABLE_SMART_ADS = true;
     private static final String CAMPAIGN = "your_campaign_name";
@@ -505,7 +505,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //    startHorizonOttMediaLoadingLive(playLoadedEntry);
 
-         createPlayerWithoutPhoenixProvider();
+       //  createPlayerWithoutPhoenixProvider();
 
 //        startSimpleOvpMediaLoadingHls(playLoadedEntry);
 
@@ -520,7 +520,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive(playLoadedEntry);
-     //   startMockMediaLoading(playLoadedEntry, 14);
+        startMockMediaLoading(playLoadedEntry, 15);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
 //               startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
@@ -834,6 +834,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "astro");
         } else if (val == 14) {
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "LONG-TAIL");
+        } else if (val == 15) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "dash-if");
         } else {
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "single_br");
         }

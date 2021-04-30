@@ -339,5 +339,17 @@
         "url": "https://playertest.longtailvideo.com/adaptive/eleph-audio/playlist.m3u8"
       }
     ]
+  },
+  "dash-if": {
+    "duration": 102000,
+    "id": "HLS-APPLE",
+    "name": "HLS-APPLE",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll_2",
+        "mimeType": "application/x-mpegURL",
+        "url": "https://dash.akamaized.net/dash264/TestCases/5a/1/manifest.mpd"
+      }
+    ]
   }
 }

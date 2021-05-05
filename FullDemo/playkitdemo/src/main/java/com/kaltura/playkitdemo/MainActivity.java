@@ -68,6 +68,7 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
+import com.kaltura.playkit.ads.AdController;
 import com.kaltura.playkit.player.ABRSettings;
 import com.kaltura.playkit.player.AudioCodecSettings;
 import com.kaltura.playkit.player.AudioTrack;
@@ -207,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     String preMidPostAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostpodbumper&cmsid=496&vid=short_onecue&correlator=";
     String preSkipAdTagUrl    = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dskippablelinear&correlator=";
     String inLinePreAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=";
-    String preMidPostSingleAdTagUrl = "https://pubads.g.doubleclick.net/gampad/adsggyugugugugyu?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
+    String preMidPostSingleAdTagUrl = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpost&cmsid=496&vid=short_onecue&correlator=";
     String ads5AdsEvery10Secs = "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpremidpostlongpod&cmsid=496&vid=short_tencue&correlator=";
     String KALTURA_STATS_URL = "https://stats.kaltura.com/api_v3/index.php";
     String v18_ad_tag = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOI&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D33%26KidsPinEnabled%3DN%26distinct_id%3D42c92f17603e4ee2b4232666b9591134%26AppVersion%3D0.1.80%26DeviceModel%3Dmoto%20g(6)%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2467608&ppid=42c92f17603e4ee2b4232666b9591134&vid=0_im5ianso&ad_rule=1&correlator=10771&InterstitialRendered=False";
@@ -449,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
         //    startVootOttMediaLoadingProd(playLoadedEntry, "975732", "dash Main"); // SRT/webvtt failure source error
 
- //       startVootOttMediaLoadingProd(playLoadedEntry, "979570", "dash Main"); //Gourav
+        startVootOttMediaLoadingProd(playLoadedEntry, "979570", "dash Main"); //Gourav
  //       startVootOttMediaLoadingProd(playLoadedEntry, "917558", "Tablet Main"); //Gourav
     //    startVootOttMediaLoadingProd(playLoadedEntry, "1071710", "dash Main"); //Gourav
 
@@ -520,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive(playLoadedEntry);
-        startMockMediaLoading(playLoadedEntry, 15);
+     //   startMockMediaLoading(playLoadedEntry, 15);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
 //               startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
@@ -1459,7 +1460,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         log.d("Play Ad preSkipAdTagUrl");
         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
         // IMAConfig adsConfig = getAdsConfigResponsePostrollBuggy(ads5AdsEvery10Secs);
-        IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl);
+        IMAConfig adsConfig = getAdsConfig(preSkipAdTagUrl);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 
@@ -2375,6 +2376,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.addListener(this, AdEvent.started, event -> {
             log.d("AD_STARTED w/h - " + event.adInfo.getAdWidth() + "/" + event.adInfo.getAdHeight());
             appProgressBar.setVisibility(View.INVISIBLE);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    AdController adController = player.getController(AdController.class);
+                    if (adController != null && adController.isAdDisplayed()) {
+           //             adController.skip();
+                    }
+                }
+            }, 6000);
         });
 
         player.addListener(this, AdEvent.resumed, event -> {
@@ -2516,6 +2526,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         player.addListener(this, PlayerEvent.bytesLoaded, event -> {
             //log.d("BYTES_LOADED " + event.bytesLoaded);
+        });
+
+        player.addListener(this, AdEvent.skippableStateChanged, event -> {
+            log.d("skippableStateChanged " + event.eventType());
         });
 
         player.addListener(this, PlayerEvent.stateChanged, new PKEvent.Listener<PlayerEvent.StateChanged>() {
@@ -3297,6 +3311,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //.setReferrer()
                 //    .setFileIds("10677547", "10677551")
                 .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+               // .setPKStreamerType(APIDefines.KalturaStreamerType.Multicast)
                 .setContextType(APIDefines.PlaybackContextType.Playback)
                 .setAssetType(APIDefines.KalturaAssetType.Media)
                 //     .setPKUrlType(APIDefines.PKUrlType.PlayManifest)

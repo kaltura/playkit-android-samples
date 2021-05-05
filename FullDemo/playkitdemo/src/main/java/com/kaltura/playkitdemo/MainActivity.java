@@ -834,7 +834,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         log.d("Play Ad preSkipAdTagUrl");
         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
-        IMAConfig adsConfig = getAdsConfig(preMidPostSingleAdTagUrl).setCompanionAdConfig(companionAdSlot, 300, 250);
+        IMAConfig adsConfig = getAdsConfig(preSkipAdTagUrl).setCompanionAdConfig(companionAdSlot, 300, 250);
         config.setPluginConfig(IMAPlugin.factory.getName(), adsConfig);
     }
 

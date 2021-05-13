@@ -92,13 +92,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String AUDIO_CHANNELS = "your_audio_channels";
     public static final String DEVICE = "your_device";
     public static final String QUALITY = "your_quality";
-    /**
-     Follow this {@link http://mapi.youbora.com:8081/cdns}
-     */
+
+    //Follow this {http://mapi.youbora.com:8081/cdns}
     public static final String CONTENT_CDN_CODE = "your_cdn_code";
-    /**
-     Follow this {@link http://mapi.youbora.com:8081/devices}
-     */
+
+    //Follow this {http://mapi.youbora.com:8081/devices}
     public static final String DEVICE_CODE = "your_device_code";
 
     private Player player;

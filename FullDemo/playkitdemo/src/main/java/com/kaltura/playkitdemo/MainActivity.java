@@ -194,11 +194,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String DEVICE = "your_device";
     public static final String QUALITY = "your_quality";
     /**
-     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Properties#contentCdnCode}
+     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Content}
      */
     public static final String CONTENT_CDN_CODE = "your_cdn_code";
     /**
-     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Device#deviceCode}
+     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Device}
      */
     public static final String DEVICE_CODE = "your_device_code";
 

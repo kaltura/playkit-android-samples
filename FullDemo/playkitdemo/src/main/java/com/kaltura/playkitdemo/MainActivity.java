@@ -45,6 +45,7 @@ import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
+import com.kaltura.playkit.PKRequestConfiguration;
 import com.kaltura.playkit.PKRequestParams;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
@@ -164,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private Spinner videoSpinner, audioSpinner, textSpinner;
     private ViewGroup companionAdSlot;
 
-    private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
     private boolean isAdsEnabled = true;
@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } catch (GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
         }*/
-        mOrientationManager = new OrientationManager(this, SensorManager.SENSOR_DELAY_NORMAL, this);
+        OrientationManager mOrientationManager = new OrientationManager(this, SensorManager.SENSOR_DELAY_NORMAL, this);
         mOrientationManager.enable();
         setContentView(R.layout.activity_main);
 
@@ -562,7 +562,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
             //player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(Collections.singletonList(PKVideoCodec.VP9), true, false));
-            player.getSettings().setAllowCrossProtocolRedirect(true);
+            player.getSettings().setPKRequestConfig(new PKRequestConfiguration(true));
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
             player.getSettings().enableDecoderFallback(true);
             //player.setPlaybackRate(1.5f);
@@ -1048,7 +1048,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void addPlayerListeners(final ProgressBar appProgressBar) {
 
-
         player.addListener(this, AdEvent.contentResumeRequested, event -> {
             log.d("CONTENT_RESUME_REQUESTED");
             appProgressBar.setVisibility(View.INVISIBLE);
@@ -1056,10 +1055,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             controlsView.setPlayerState(PlayerState.READY);
         });
 
-        player.addListener(this, AdEvent.daiSourceSelected, event -> {
-            log.d("DAI_SOURCE_SELECTED: " + event.sourceURL);
-
-        });
+        player.addListener(this, AdEvent.daiSourceSelected, event -> log.d("DAI_SOURCE_SELECTED: " + event.sourceURL));
 
         player.addListener(this, AdEvent.contentPauseRequested, event -> {
             log.d("AD_CONTENT_PAUSE_REQUESTED");
@@ -1136,10 +1132,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             nowPlaying = true;
         });
 
-        player.addListener(this, PlayerEvent.surfaceAspectRationSizeModeChanged, event -> {
-            log.d("resizeMode updated" + event.resizeMode);
-        });
-
+        player.addListener(this, PlayerEvent.surfaceAspectRationSizeModeChanged, event -> log.d("resizeMode updated" + event.resizeMode));
 
         /////// PLAYER EVENTS
 
@@ -1159,14 +1152,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             nowPlaying = false;
         });
 
-        player.addListener(this, PlayerEvent.volumeChanged, event -> {
-            log.d("volumeChanged " + event.volume);
-        });
+        player.addListener(this, PlayerEvent.volumeChanged, event -> log.d("volumeChanged " + event.volume));
 
 
-        player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
-            log.d("playbackRateChanged event  rate = " + event.rate);
-        });
+        player.addListener(this, PlayerEvent.playbackRateChanged, event -> log.d("playbackRateChanged event  rate = " + event.rate));
 
         player.addListener(this, PlayerEvent.tracksAvailable, event -> {
             //When the track data available, this event occurs. It brings the info object with it.
@@ -1198,13 +1187,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
 
 
-        player.addListener(this, PlayerEvent.sourceSelected, event -> {
-            log.d("sourceSelected event source = " + event.source);
-        });
+        player.addListener(this, PlayerEvent.sourceSelected, event -> log.d("sourceSelected event source = " + event.source));
 
-        player.addListener(this, PlayerEvent.playbackRateChanged, event -> {
-            log.d("playbackRateChanged event  rate = " + event.rate);
-        });
+        player.addListener(this, PlayerEvent.playbackRateChanged, event -> log.d("playbackRateChanged event  rate = " + event.rate));
 
         player.addListener(this, PlayerEvent.error, event -> {
             //When the track data available, this event occurs. It brings the info object with it.
@@ -1213,9 +1198,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-        player.addListener(this, PlayerEvent.ended, event -> {
-            appProgressBar.setVisibility(View.INVISIBLE);
-        });
+        player.addListener(this, PlayerEvent.ended, event -> appProgressBar.setVisibility(View.INVISIBLE));
 
         player.addListener(this, PlayerEvent.playheadUpdated, event -> {
             //When the track data available, this event occurs. It brings the info object with it.
@@ -1249,25 +1232,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         /////Phoenix events
 
-        player.addListener(this, PhoenixAnalyticsEvent.bookmarkError, event -> {
-            log.d("bookmarkErrorEvent errorCode = " + event.errorCode + " message = " + event.errorMessage);
-        });
+        player.addListener(this, PhoenixAnalyticsEvent.bookmarkError, event -> log.d("bookmarkErrorEvent errorCode = " + event.errorCode + " message = " + event.errorMessage));
 
-        player.addListener(this, PhoenixAnalyticsEvent.concurrencyError, event -> {
-            log.d("ConcurrencyErrorEvent errorCode = " + event.errorCode + " message = " + event.errorMessage);
-        });
+        player.addListener(this, PhoenixAnalyticsEvent.concurrencyError, event -> log.d("ConcurrencyErrorEvent errorCode = " + event.errorCode + " message = " + event.errorMessage));
 
-        player.addListener(this, PhoenixAnalyticsEvent.error, event -> {
-            log.d("Phoenox Analytics errorEvent errorCode = " + event.errorCode + " message = " + event.errorMessage);
-        });
+        player.addListener(this, PhoenixAnalyticsEvent.error, event -> log.d("Phoenox Analytics errorEvent errorCode = " + event.errorCode + " message = " + event.errorMessage));
 
-        player.addListener(this, PhoenixAnalyticsEvent.error, event -> {
-            log.d("Phoenox Analytics errorEvent errorCode = " + event.errorCode + " message = " + event.errorMessage);
-        });
+        player.addListener(this, PhoenixAnalyticsEvent.error, event -> log.d("Phoenox Analytics errorEvent errorCode = " + event.errorCode + " message = " + event.errorMessage));
 
-        player.addListener(this, OttEvent.ottEvent, event -> {
-            log.d("Concurrency event = " + event.type);
-        });
+        player.addListener(this, OttEvent.ottEvent, event -> log.d("Concurrency event = " + event.type));
     }
 
     @Override
@@ -1324,9 +1297,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * For example if user want to display in UI bitrate of the available tracks,
      * he can do it, by obtaining the tackType of video, and getting the getBitrate() from videoTrackInfo.
      *
-     * @param trackType  - tyoe of the track you are interested in.
-     * @param trackInfos - all availables tracks.
-     * @return
+     * @param trackType  - type of the track you are interested in.
+     * @param trackInfos - all available tracks.
+     * @return Tracks Items array
      */
     private TrackItem[] obtainRelevantTrackInfo(int trackType, List<? extends BaseTrack> trackInfos) {
         TrackItem[] trackItems = new TrackItem[trackInfos.size()];
@@ -1368,7 +1341,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     String bitrate = (audioTrackInfo.getBitrate() >  0) ? "" + audioTrackInfo.getBitrate() : "";
                     if (TextUtils.isEmpty(bitrate) && addChannel) {
                         bitrate = buildAudioChannelString(audioTrackInfo.getChannelCount());
+                    } else if (addChannel){
+                        bitrate = buildAudioChannelString(audioTrackInfo.getChannelCount()) + " " + bitrate;
                     }
+
                     if (audioTrackInfo.isAdaptive()) {
                         if (!TextUtils.isEmpty(bitrate)) {
                             bitrate += " Adaptive";
@@ -1379,7 +1355,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             label = "";
                         }
                     }
-                    trackItems[i] = new TrackItem(label + " " + bitrate, audioTrackInfo.getUniqueId());
+                    trackItems[i] = new TrackItem(bitrate + " " + label, audioTrackInfo.getUniqueId());
                 }
                 break;
             case Consts.TRACK_TYPE_TEXT:

@@ -351,5 +351,17 @@
         "url": "https://dash.akamaized.net/dash264/TestCases/5a/1/manifest.mpd"
       }
     ]
+  },
+  "exo-tears-clear": {
+    "duration": 102000,
+    "id": "exo-tears-clear",
+    "name": "exo-tears-clear",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll_2",
+        "mimeType": "application/x-mpegURL",
+        "url": "https://storage.googleapis.com/wvmedia/clear/h264/tears/tears.mpd"
+      }
+    ]
   }
 }

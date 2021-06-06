@@ -60,14 +60,17 @@ import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 //import com.kaltura.playkit.PKRequestConfiguration;
+import com.kaltura.playkit.PKRequestConfiguration;
 import com.kaltura.playkit.PKRequestParams;
 import com.kaltura.playkit.PKSubtitleFormat;
 //import com.kaltura.playkit.PKTracksAvailable;
+import com.kaltura.playkit.PKSubtitlePreference;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
 import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.ads.AdController;
+import com.kaltura.playkit.player.ABRSettings;
 import com.kaltura.playkit.player.AudioCodecSettings;
 import com.kaltura.playkit.player.AudioTrack;
 import com.kaltura.playkit.player.BaseTrack;
@@ -177,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             "524710","526594","537514","538376","540085"));
 
 
-    private String V18_PROD_KS = "djJ8MjI1fHhCUjoTPRjGpuRoJcqbN8EsBgGVqa1EMR2hbydxjc5Hr1T9LJ2NUzIWZU1I4UxRwdT7c7e5MMWYBxEy58OIarVvUuG8D3tXSND6DYpt1p8yXq96h69wnqNy8oh3webHNgS2XX0oeqAf4BnYaAFqnyTywBsazLFJ35Kv3qldWj0YdVZNA1xA-ARwYt8Y-frePDefbzAZaZch2TOzE8MTxmUUKNzp1pgx41TaKMpm1BeU0sqkhwrDzk36I7vTwfQjiUB5lNVscRKc_hrWCk6DmemeDEN7FQxInbg8a7wENcXqaHOF6kHrtsAMk8-H7PE6RxPrxRDUEV9Oiha-xDIfa76vGdSQbF2Y9ibTO10yg_ctxdE6wkBPgDoCUsb_uySG1MH6oFvvzH8g5w9dkj9RSKc=";
+    private String V18_PROD_KS = "djJ8MjI1fC3_3ayEyDBsD5y4U0jk5wPg1pQEKSsucTDcSyzIKaeGXeGZoNK42-fhH0vIgDHOH6FSL0dyJhDZYQlvnBaQH7jPJIyc28egIzxTB7pmWaI7VkEVf4kQkXFTmAetRbTXWjQf6dPeTlxK0-AfIJ69QadeBaBGL4en6MT12lgLQApyP6P0Viq6NS2gtVjBqwjVirRccpToPWbFgGbIuSijTbEf57yF_voMJhuLVLR5nRi3yQg77rFzxhM-Hi66yztuH49CfoOF6dkznHHmKCI6LdMNfkGd6QuzpM40hHhO94qmG2wyGMfVCu7fhieSYe5bsms0sTgxZIO8ZuccnQ1j4T8Jz-9rF1d_ZpCl2SVdjx_Iid_futV2-78Aw6SmFs1UTxPPZYd-WDIvIyzIosvLBZU=";
     private String VEON_PROD_KS = "djJ8NDc4fJWjbKhDMH2juWOB99NAWHeLComBe88EJ0qbNk63jiKzd51499P52eTAr5iwwIWlQ042lA93m97sn4PAuQl7XEw0X7o-lzwPk5Mji8y_1ZgFS_CRKHObJPNRP6AjWMEBEFulyz8mTCLJkp1OehvQ291L6Qu2-6nxl-QKTwGc8Gw4me9OzdfmrYqahLSFpcZq22js-e2_-woVTuwmNDESQ028ZgaO0-uUejiqimkGyJCQY8yuvHN-6MHW_mszUiFWSwDfhgBy9e5zDnagr5wKuQdj3CpfKFAAzqNYwA8mUMMAO9NsQJ5STzoQ-L8_WDM2uXEsDG63-vwLO7NJ4pAWizZKSxaoaAPfrRE2b9V0cE6wFIHHNDHHQmZyUdUq4XuN0Awbg8uLEyjeRGuBx7za8GG6GG9ZdSRV5JnzG0GkOro-pxsoX2HWn5fUiescmJkZ4PeB62XUYpRVLnKoSH6fBkP86eNWxDqAeTgIQwFkzpsSbQUikcqwAQuY0avM-L9GSlnwpT6SDcOd2ziFJsSUfDI=";
 
     // Vootkids skype wala issue where they face device not in household issue
@@ -352,13 +355,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         AtomicBoolean click = new AtomicBoolean(false);
         button.setOnClickListener(v -> {
-
+           // player.resetABRSettings();
+        //    player.updateABRSettings(new ABRSettings().setMaxVideoWidth(320).setMinVideoWidth(0));
             //Update ABR Settings
             /*if (!click.get()) {
                 click.set(true);
             //    player.updateABRSettings(new ABRSettings().setMaxVideoWidth(330).setMaxVideoHeight(190));
                 //player.updateABRSettings(new ABRSettings().setMaxVideoBitrate(900000));
-                //player.resetABRSettings();
+
             } else {
                 click.set(false);
 //                player.updateABRSettings(new ABRSettings().setMaxVideoBitrate(2500000));
@@ -435,7 +439,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //  startVootOttMediaLoadingProd(playLoadedEntry, "805986"); // iOS linear
 
         // DOLBY CONTENT From JIO Backend
-         createPlayerWithoutPhoenixProvider();
+  //       createPlayerWithoutPhoenixProvider();
 
 
 
@@ -448,7 +452,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //    startVootOttMediaLoadingProd(playLoadedEntry, "975732", "dash Main"); // SRT/webvtt failure source error
 
      //   startVootOttMediaLoadingProd(playLoadedEntry, "979570", "dash Main"); //Gourav
- //       startVootOttMediaLoadingProd(playLoadedEntry, "917558", "Tablet Main"); //Gourav
+     //   startVootOttMediaLoadingProd(playLoadedEntry, "917558", "Tablet Main"); //Gourav
     //    startVootOttMediaLoadingProd(playLoadedEntry, "1071710", "dash Main"); //Gourav
 
         //    startVootOttMediaLoadingProd(playLoadedEntry, "706534", "dash Main"); //Vootkids video
@@ -513,15 +517,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 //        startSimpleOvpMediaLoadingChromecast(playLoadedEntry);
 //        startOttMediaLoading(playLoadedEntry);
-  //    startSimpleOvpMediaLoadingVR(playLoadedEntry);
+ //     startSimpleOvpMediaLoadingVR(playLoadedEntry);
         //     startSimpleOvpMediaLoadingHls(playLoadedEntry);
         //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive(playLoadedEntry);
-  //      startMockMediaLoading(playLoadedEntry, 16);
+   //     startMockMediaLoading(playLoadedEntry, 7);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
-//               startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
+               startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
         //       startSimpleOvpMediaLoadingHEVCKarin(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
@@ -567,7 +571,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
 
-            // startMockMediaLoading(playLoadedEntry, 7);
+           //  startMockMediaLoading(playLoadedEntry, 7);
+           // startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
 
             startVootOttMediaLoadingProd(playLoadedEntry, "1092959", "dash Main");
 //            if (q % 2 == 0) {
@@ -640,7 +645,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         PlayKitManager.registerPlugins(this, IMAPlugin.factory);
         PlayKitManager.registerPlugins(this, IMADAIPlugin.factory);
         //PlayKitManager.registerPlugins(this, KalturaStatsPlugin.factory);
-        //PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
+        PlayKitManager.registerPlugins(this, KavaAnalyticsPlugin.factory);
         PlayKitManager.registerPlugins(this, YouboraPlugin.factory);
         //PlayKitManager.registerPlugins(this, TVPAPIAnalyticsPlugin.factory);
       //  PlayKitManager.registerPlugins(this, PhoenixAnalyticsPlugin.factory);
@@ -836,6 +841,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "dash-if");
         } else if (val == 16) {
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "exo-tears-clear");
+        } else if (val == 17) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "Dolby_Multilanguage");
         } else {
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "single_br");
         }
@@ -905,7 +912,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         PKMediaConfig mediaConfig = new PKMediaConfig();
 //        if (changeMediaIndex % 4 == 0) {
-       // setExternalSubtitles(mediaEntry, false);
+        setExternalSubtitles(mediaEntry, false);
 //        } else if (changeMediaIndex % 4 == 1) {
 //            setExternalSubtitles(mediaEntry, false);
 //        } else if (changeMediaIndex % 4 == 2) {
@@ -935,7 +942,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //     player.getSettings().forceWidevineL3Playback(true);
             // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
             //Gourav
-            //   player.getSettings().setSubtitlePreference(PKSubtitlePreference.EXTERNAL);
+             //  player.getSettings().setSubtitlePreference(PKSubtitlePreference.EXTERNAL);
 //            player.getSettings().enableDecoderFallback(true);
 //            player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings().setAllowSoftwareDecoder(true));
               // player.getSettings().setPreferredAudioCodecSettings(new AudioCodecSettings(audioPriorityList(), false));
@@ -944,11 +951,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             // Audio Player Configuration
             //   player.getSettings().setAudioPlayerMode(true, createNotificationForAudioOnlyService());
 
+           // player.getSettings().setABRSettings(new ABRSettings().setMaxVideoWidth(1920).setMaxVideoHeight(570));
+
             if (mediaEntry.isVRMediaType()) {
                 VRSettings vrSettings = new VRSettings();
                 vrSettings.setFlingEnabled(true);
-                vrSettings.setVrModeEnabled(false);
-                vrSettings.setInteractionMode(VRInteractionMode.MotionWithTouch);
+                vrSettings.setVrModeEnabled(true);
+                vrSettings.setInteractionMode(VRInteractionMode.CardboardMotionWithTouch);
                 vrSettings.setZoomWithPinchEnabled(true);
                 VRInteractionMode interactionMode = vrSettings.getInteractionMode();
                 if (!VRUtil.isModeSupported(MainActivity.this, interactionMode)) {
@@ -977,12 +986,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             //   player.getSettings().setMaxVideoSize(new PKMaxVideoSize(640,360));
 //            player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.SELECTION).setTrackLanguage())
 
-            player.getSettings().setCustomLoadControlStrategy(loadControlStrategy);
+       //     player.getSettings().setCustomLoadControlStrategy(loadControlStrategy);
             player.getSettings().setAdAutoPlayOnResume(true);
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
             //player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(Collections.singletonList(PKVideoCodec.VP9), true, false));
-            player.getSettings().setAllowCrossProtocolRedirect(true);
+          //  player.getSettings().setAllowCrossProtocolRedirect(true);
+            player.getSettings().setPKRequestConfig(new PKRequestConfiguration(true));
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
             player.getSettings().enableDecoderFallback(true);
 
@@ -1010,7 +1020,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preMidPostAdTagUrl media2"));
-                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(2222401, "1_f93tepsn"));
+              //  player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(2222401, "1_f93tepsn"));
 
             } else if (changeMediaIndex % 4 == 1) {
                 if (isAdsEnabled) {
@@ -1024,7 +1034,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(true, "inLinePreAdTagUrl media3"));
-                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1740481, "1_fdv46dba"));
+               // player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1740481, "1_fdv46dba"));
             } if (changeMediaIndex % 4 == 2) {
                 if (isAdsEnabled) {
                     if (isDAIMode) {
@@ -1037,7 +1047,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "NO AD media4"));
-                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1091, "0_wu32qrt3"));
+             //   player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1091, "0_wu32qrt3"));
             } if (changeMediaIndex % 4 == 3) {
                 if (isAdsEnabled) {
                     if (isDAIMode) {
@@ -1055,7 +1065,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         setMaxPlayerBufferMs(50000).setAllowedVideoJoiningTimeMs(4000));
 
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preSkipAdTagUrl media1"));
-                player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1734751, "1_3o1seqnv"));
+              //  player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1734751, "1_3o1seqnv"));
             }
             String ks = "djJ8MTk4fHFftqeAPxdlLVzZBk0Et03Vb8on1wLsKp7cbOwzNwfOvpgmOGnEI_KZDhRWTS-76jEY7pDONjKTvbWyIJb5RsP4NL4Ng5xuw6L__BeMfLGAktkVliaGNZq9SXF5n2cMYX-sqsXLSmWXF9XN89io7-k=";
             PhoenixAnalyticsConfig phoenixAnalyticsConfig = new PhoenixAnalyticsConfig(198, "http://api-preprod.ott.kaltura.com/v4_2/api_v3/", ks, 30);
@@ -1067,7 +1077,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
         }
         p++;
-      //  player.getSettings().setABRSettings(new ABRSettings().setInitialBitrateEstimate(100000));
+
+       // player.getSettings().setABRSettings(new ABRSettings().setInitialBitrateEstimate(1800000));
+
+       // player.getSettings().setABRSettings(new ABRSettings().setMinVideoHeight(272).setMaxVideoHeight(300).setMinVideoWidth(640));
+
+        /**
+         * Stream has 0, 142, 380, 570, 856
+         *
+         * Cases:
+         * 0, 140 -> Not in range ( All will come )
+         * 0, 142 -> 142 will come
+         * 150, 200 -> 142 will come
+         * 150, 380 -> 380 will come
+         * 390, 500 -> 380 will come
+         * 500, 570 -> 570 will come
+         * 600, 800 -> 570 will come
+         * 700, 900 -> 856 will come
+         * 856, 1000 -> 856 will come
+         * 1000, 2000 -> Not in range ( All will come )
+         *
+         * -1, 150 -> 142 will come
+         * 800, 150 -> UNEXPECTED Either given min ABR value is greater than max ABR or max ABR is <= 0
+         *
+         *
+         */
 
 //        player.getSettings().allowClearLead(true);
 //        player.getSettings().setSecureSurface(true);
@@ -1131,13 +1165,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         codecPriorityList.add(PKAudioCodec.AC3);
         codecPriorityList.add(PKAudioCodec.E_AC3);
         codecPriorityList.add(PKAudioCodec.AAC);
-
-
-
-
-
-
-
 
         return codecPriorityList;
     }
@@ -1293,7 +1320,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
         //addKaluraStatsPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
         addYouboraPluginConfig(pluginConfigs, false, "preMidPostSingleAdTagUrl Title1");
-        addKavaPluginConfig(pluginConfigs, 1734751, "1_3o1seqnv");
+        addKavaPluginConfig(pluginConfigs, 12, "1_3o1seqnv");
       //  addPhoenixAnalyticsPluginConfig(pluginConfigs);
         //addTVPAPIAnalyticsPluginConfig(pluginConfigs);
     }

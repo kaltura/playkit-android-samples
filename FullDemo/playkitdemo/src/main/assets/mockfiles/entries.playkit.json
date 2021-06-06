@@ -363,5 +363,17 @@
         "url": "https://storage.googleapis.com/wvmedia/clear/h264/tears/tears.mpd"
       }
     ]
+  },
+  "Dolby_Multilanguage": {
+    "duration": 102000,
+    "id": "HLS-APPLE",
+    "name": "HLS-APPLE",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll_2",
+        "mimeType": "application/x-mpegURL",
+        "url": "https://d3rlna7iyyu8wu.cloudfront.net/skip_armstrong/skip_armstrong_multi_language_subs.m3u8"
+      }
+    ]
   }
 }

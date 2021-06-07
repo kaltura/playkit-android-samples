@@ -60,7 +60,8 @@ import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
 //import com.kaltura.playkit.PKRequestConfiguration;
-import com.kaltura.playkit.PKRequestConfiguration;
+import com.kaltura.playkit.PKRequestConfig;
+
 import com.kaltura.playkit.PKRequestParams;
 import com.kaltura.playkit.PKSubtitleFormat;
 //import com.kaltura.playkit.PKTracksAvailable;
@@ -100,6 +101,7 @@ import com.kaltura.playkit.plugins.ott.OttEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
+import com.kaltura.playkit.plugins.playback.CustomPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
 //import com.kaltura.playkit.plugins.youbora.pluginconfig.SmartSwitchParser;
 import com.kaltura.playkit.providers.MediaEntryProvider;
@@ -992,7 +994,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player.getSettings().setAdAutoPlayOnResume(true);
             //player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(Collections.singletonList(PKVideoCodec.VP9), true, false));
           //  player.getSettings().setAllowCrossProtocolRedirect(true);
-            player.getSettings().setPKRequestConfig(new PKRequestConfiguration(true));
+            player.getSettings().setPKRequestConfig(new PKRequestConfig(true));
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
             player.getSettings().enableDecoderFallback(true);
 
@@ -1147,9 +1149,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         headers.put("aaa", "bbb");
         headers.put("ccc","ddd");
 
-        final MediaAdapter mediaAdapter = new MediaAdapter("app://PlaykitTestApp", player);
-        mediaAdapter.customHeaders = headers;
-       // player.getSettings().setContentRequestAdapter(mediaAdapter);
+//        final MediaAdapter mediaAdapter = new MediaAdapter("app://PlaykitTestApp", player);
+//        mediaAdapter.customHeaders = headers;
+        CustomPlaybackRequestAdapter customPlaybackRequestAdapter = new CustomPlaybackRequestAdapter("app://PlaykitTestApp", player);
+        customPlaybackRequestAdapter.setHttpHeaders(null);
+        player.getSettings().setContentRequestAdapter(customPlaybackRequestAdapter);
 
         //  player.setPlaybackRate(2f);
        // player.getSettings().setPreferredAudioCodecSettings(new AudioCodecSettings(getDefaultCodecsPriorityList(), true));
@@ -1169,7 +1173,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return codecPriorityList;
     }
 
-    static class MediaAdapter implements PKRequestParams.Adapter {
+    /*static class MediaAdapter implements PKRequestParams.Adapter {
 
         private static final String CLIENT_TAG = "customAdapter" ;
         private final String applicationName;
@@ -1236,7 +1240,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         public String getApplicationName() {
             return applicationName;
         }
-    }
+    }*/
 
     private void startWOW(final OnMediaLoadCompletion completion) {
         String KS = "djJ8MzA3OXwg98BCP1hSFcm0dMQHtqFHc8UmirTKFTcOY_wTj_ftVDP09KEE5HY2nwVNtHgwBUoiYTQ7h6OHdFOX1ORRnVZ_04ldLbSWhYnsMksuc1Rh9EWLsHu-LokYPq9cCY2hmx9Iq3G0P81KGKOiqc3LpPrWxuH07fQ920ULbHx6xSNFnldal3kR9TAN-Hbnd17VDwxIMshNKTJz9quLx6vNTSJFQQ2eqQn3qMgwjfgkaMd-PSmX_Uhh3BGZFBiPzC7KqEYMx5CV1o8YZQzT_SRnST7CVh6RZkGyMsbGq3h62ZYlUMHWAxEUKIP84yYTwPNRFiQmIr5tgRHyoswRk9NncSXp21leQAQKU6NfLRN6lSv2MR3ATLv2M5jS3a5PgUJ1FvpiWBTW6haqGbwnseJppUg7PVBzh1D68U0dV6SPISHZnA==";

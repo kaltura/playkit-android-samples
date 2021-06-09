@@ -83,11 +83,13 @@ import com.kaltura.playkit.player.MediaSupport;
 import com.kaltura.playkit.player.PKExternalSubtitle;
 import com.kaltura.playkit.player.PKHttpClientManager;
 //import com.kaltura.playkit.player.PKLowLatencyConfig;
+import com.kaltura.playkit.player.PKMaxVideoSize;
 import com.kaltura.playkit.player.PKSubtitlePosition;
 import com.kaltura.playkit.player.PKTracks;
 import com.kaltura.playkit.player.PlayerSettings;
 import com.kaltura.playkit.player.SubtitleStyleSettings;
 import com.kaltura.playkit.player.TextTrack;
+import com.kaltura.playkit.player.VideoCodecSettings;
 import com.kaltura.playkit.player.VideoTrack;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
 import com.kaltura.playkit.player.vr.VRSettings;
@@ -497,7 +499,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
        // startOttMediaLoadingAstroVOD(playLoadedEntry);
 
-        startOttMediaLoadingAstroLive(playLoadedEntry);
+     //   startOttMediaLoadingAstroLive(playLoadedEntry);
 
         // ASTRO
 
@@ -533,10 +535,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive(playLoadedEntry);
-  //      startMockMediaLoading(playLoadedEntry, 16);
+        startMockMediaLoading(playLoadedEntry, 16);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
-   //            startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
+         //      startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
         //       startSimpleOvpMediaLoadingHEVCKarin(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
@@ -995,8 +997,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             // player.getSettings().enableDecoderFallback(true);
             //player.setPlaybackRate(1.5f);
             //    player.getSettings().setAdAutoPlayOnResume(true);
-            //   player.getSettings().setMaxVideoBitrate(878786);
-            //   player.getSettings().setMaxVideoSize(new PKMaxVideoSize(640,360));
+               player.getSettings().setMaxVideoBitrate(769255);
+            //   player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings().setAllowMixedCodecAdaptiveness(true));
+            //   player.getSettings().setMaxVideoSize(new PKMaxVideoSize(1280,570));
 //            player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.SELECTION).setTrackLanguage())
 
        //     player.getSettings().setCustomLoadControlStrategy(loadControlStrategy);
@@ -1073,9 +1076,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
 
-                player.getSettings().setPlayerBuffers(new LoadControlBuffers().
-                        setMinPlayerBufferMs(2500).
-                        setMaxPlayerBufferMs(50000).setAllowedVideoJoiningTimeMs(4000));
+//                player.getSettings().setPlayerBuffers(new LoadControlBuffers().
+//                        setMinPlayerBufferMs(2500).
+//                        setMaxPlayerBufferMs(50000).setAllowedVideoJoiningTimeMs(4000));
 
                 player.updatePluginConfig(YouboraPlugin.factory.getName(), getYouboraJsonObject(false, "preSkipAdTagUrl media1"));
               //  player.updatePluginConfig(KavaAnalyticsPlugin.factory.getName(),  getKavaAnalyticsConfig(1734751, "1_3o1seqnv"));
@@ -1093,9 +1096,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
        // player.getSettings().setABRSettings(new ABRSettings().setInitialBitrateEstimate(1800000));
 
-        player.getSettings().setABRSettings(new ABRSettings()
-                .setMinVideoHeight(200)
-                .setMaxVideoHeight(570));
+//        player.getSettings().setABRSettings(new ABRSettings()
+//                .setMinVideoHeight(200)
+//                .setMaxVideoHeight(570));
 
         /**
          * Stream has 0, 142, 380, 570, 856

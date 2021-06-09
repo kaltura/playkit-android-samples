@@ -73,6 +73,7 @@ import com.kaltura.playkit.plugins.ott.OttEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
+import com.kaltura.playkit.plugins.playback.CustomPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.playback.KalturaPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.playback.KalturaUDRMLicenseRequestAdapter;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
@@ -90,7 +91,9 @@ import com.kaltura.playkitvr.VRUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_CAST;
@@ -194,11 +197,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String DEVICE = "your_device";
     public static final String QUALITY = "your_quality";
     /**
-     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Properties#contentCdnCode}
+     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Content}
      */
     public static final String CONTENT_CDN_CODE = "your_cdn_code";
     /**
-     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Device#deviceCode}
+     Follow this {@link com.kaltura.playkit.plugins.youbora.pluginconfig.Device}
      */
     public static final String DEVICE_CODE = "your_device_code";
 
@@ -542,6 +545,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //            DRMAdapter.customData = customAdapterData;
 //            final DRMAdapter licenseRequestAdapter = new DRMAdapter();
 //            player.getSettings().setLicenseRequestAdapter(licenseRequestAdapter);
+
+//            Map<String,String> headers = new HashMap<>();
+//            headers.put("aaa", "bbb");
+//            headers.put("ccc","ddd");
+//
+//            CustomPlaybackRequestAdapter customPlaybackRequestAdapter = new CustomPlaybackRequestAdapter("app://PlaykitTestApp", player);
+//            customPlaybackRequestAdapter.setHttpHeaders(null);
+//            player.getSettings().setContentRequestAdapter(customPlaybackRequestAdapter);
+
 
             if (mediaEntry.isVRMediaType()) {
                 VRSettings vrSettings = new VRSettings();

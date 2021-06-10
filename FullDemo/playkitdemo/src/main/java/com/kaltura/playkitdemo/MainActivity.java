@@ -535,10 +535,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive(playLoadedEntry);
-        startMockMediaLoading(playLoadedEntry, 16);
+     //   startMockMediaLoading(playLoadedEntry, 16);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
-         //      startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
+               startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
         //       startSimpleOvpMediaLoadingHEVCKarin(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
@@ -952,7 +952,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             final DRMAdapter licenseRequestAdapter = new DRMAdapter();
           //  player.getSettings().setLicenseRequestAdapter(licenseRequestAdapter);
          //   player.getSettings().setAllowCrossProtocolRedirect(true);
-            player.getSettings().setPKRequestConfig(new PKRequestConfig(false, 2000));
+         //   player.getSettings().setPKRequestConfig(new PKRequestConfig(false, 2000));
             //     player.getSettings().setPlayReadyPlayback(false);
             //     player.getSettings().forceWidevineL3Playback(true);
             // player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls);
@@ -997,7 +997,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             // player.getSettings().enableDecoderFallback(true);
             //player.setPlaybackRate(1.5f);
             //    player.getSettings().setAdAutoPlayOnResume(true);
-               player.getSettings().setMaxVideoBitrate(769255);
+             //  player.getSettings().setMaxVideoBitrate(1774254);
+
+           //    player.getSettings().setMaxVideoBitrate(7203938);
+          //  player.getSettings().setABRSettings(new ABRSettings().setMinVideoBitrate(769255));
+
+
+            //   player.getSettings().setMaxVideoSize(769255);
+
             //   player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings().setAllowMixedCodecAdaptiveness(true));
             //   player.getSettings().setMaxVideoSize(new PKMaxVideoSize(1280,570));
 //            player.getSettings().setPreferredAudioTrack(new PKTrackConfig().setPreferredMode(PKTrackConfig.Mode.SELECTION).setTrackLanguage())
@@ -2568,7 +2575,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         player.addListener(this, PlayerEvent.playheadUpdated, event -> {
             //When the track data available, this event occurs. It brings the info object with it.
-            //log.d("playheadUpdated event  position = " + event.position + " duration = " + event.duration);
+            log.d("playheadUpdated event  position = " + event.position + " duration = " + event.duration);
         });
 
         player.addListener(this, PlayerEvent.videoFramesDropped, event -> {

@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             "524710","526594","537514","538376","540085"));
 
 
-    private String V18_PROD_KS = "djJ8MjI1fC3_3ayEyDBsD5y4U0jk5wPg1pQEKSsucTDcSyzIKaeGXeGZoNK42-fhH0vIgDHOH6FSL0dyJhDZYQlvnBaQH7jPJIyc28egIzxTB7pmWaI7VkEVf4kQkXFTmAetRbTXWjQf6dPeTlxK0-AfIJ69QadeBaBGL4en6MT12lgLQApyP6P0Viq6NS2gtVjBqwjVirRccpToPWbFgGbIuSijTbEf57yF_voMJhuLVLR5nRi3yQg77rFzxhM-Hi66yztuH49CfoOF6dkznHHmKCI6LdMNfkGd6QuzpM40hHhO94qmG2wyGMfVCu7fhieSYe5bsms0sTgxZIO8ZuccnQ1j4T8Jz-9rF1d_ZpCl2SVdjx_Iid_futV2-78Aw6SmFs1UTxPPZYd-WDIvIyzIosvLBZU=";
+    private String V18_PROD_KS = "djJ8MjI1fDAaEyBzYfdqOsQYp_qcgU-AzhlJE4I8mkUXuwMYzLx7JYs-vGOSv6b5TjPFNvPuPneliyrAgmEKmmQ_F223-GMuBm8Y-75a_DVNXx929d1JLXoVMMQXlVEkw2IKHOLA_eqiotQbPIX3pBdDE7Umx06D4Dr4Y9Dw-2yvwFSePCU0tS5yFo9FuOHEroaQa4oI5kCugR5odmh88iZ7d3VE3U9OeQbPhAxu4PGXAwX4AvI2UW6T7yVrSCOOIF8LjTjtbY0RMfGnrfSMPmU0auzE2rtYiDaXgOoljTybwL0NbI48O53yLz3Vn36heEX4viWgrQBHShw1uFTCtHg9H8d6r6BEu_aYMyWu9iB1WZ11AvSZiHtcr52mmTtnZFJQaILU63hb1asmD3dl2PWQZ789Ots=";
     private String VEON_PROD_KS = "djJ8NDc4fJWjbKhDMH2juWOB99NAWHeLComBe88EJ0qbNk63jiKzd51499P52eTAr5iwwIWlQ042lA93m97sn4PAuQl7XEw0X7o-lzwPk5Mji8y_1ZgFS_CRKHObJPNRP6AjWMEBEFulyz8mTCLJkp1OehvQ291L6Qu2-6nxl-QKTwGc8Gw4me9OzdfmrYqahLSFpcZq22js-e2_-woVTuwmNDESQ028ZgaO0-uUejiqimkGyJCQY8yuvHN-6MHW_mszUiFWSwDfhgBy9e5zDnagr5wKuQdj3CpfKFAAzqNYwA8mUMMAO9NsQJ5STzoQ-L8_WDM2uXEsDG63-vwLO7NJ4pAWizZKSxaoaAPfrRE2b9V0cE6wFIHHNDHHQmZyUdUq4XuN0Awbg8uLEyjeRGuBx7za8GG6GG9ZdSRV5JnzG0GkOro-pxsoX2HWn5fUiescmJkZ4PeB62XUYpRVLnKoSH6fBkP86eNWxDqAeTgIQwFkzpsSbQUikcqwAQuY0avM-L9GSlnwpT6SDcOd2ziFJsSUfDI=";
 
     // Vootkids skype wala issue where they face device not in household issue
@@ -244,8 +244,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isAdsEnabled = false;
-    private boolean isDAIMode = false;
+    private boolean isAdsEnabled = true;
+    private boolean isDAIMode = true;
     SubtitleStyleSettings subtitleStyleSettings = new SubtitleStyleSettings("MyCustomSubtitleStyle");
     PKSubtitlePosition pkSubtitlePosition = new PKSubtitlePosition(true);
     // private TextView tvSourceUrl;
@@ -450,14 +450,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //      startVootOttMediaLoadingProd(playLoadedEntry, "618610", "HLS_Linear_P"); // Live News18 asset
 
-
+    //    startOttMediaLoadingEmiritus_prod(playLoadedEntry);
         //startVootOttMediaLoadingProd(playLoadedEntry, "873033"); // 404 on cdnapisec
         // startVootOttMediaLoadingProd(playLoadedEntry, "926531"); // DTG
         //      startVootOttMediaLoadingProd(playLoadedEntry, "977185"); // Voot device not in household media
         //    startVootOttMediaLoadingProd(playLoadedEntry, "975732", "dash Main"); // SRT/webvtt failure source error
 
      //   startVootOttMediaLoadingProd(playLoadedEntry, "979570", "dash Main"); //Gourav
-     //   startVootOttMediaLoadingProd(playLoadedEntry, "917558", "Tablet Main"); //Gourav
+      //  startVootOttMediaLoadingProd(playLoadedEntry, "917558", "Tablet Main"); //Gourav
     //    startVootOttMediaLoadingProd(playLoadedEntry, "1071710", "dash Main"); //Gourav
 
         //    startVootOttMediaLoadingProd(playLoadedEntry, "706534", "dash Main"); //Vootkids video
@@ -535,10 +535,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         //       startSimpleOvpMediaLoadinExtSubtitle(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive1(playLoadedEntry);
         //startSimpleOvpMediaLoadingLive(playLoadedEntry);
-     //   startMockMediaLoading(playLoadedEntry, 16);
+        startMockMediaLoading(playLoadedEntry, 19);
 //      startOvpMediaLoading(playLoadedEntry);
 //      startSimpleOvpMediaLoadingDRM(playLoadedEntry);
-               startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
+     //          startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
         //       startSimpleOvpMediaLoadingHEVCKarin(playLoadedEntry);
 //      LocalAssets.start(this, playLoadedEntry);
         playerContainer = (RelativeLayout)findViewById(R.id.player_container);
@@ -587,13 +587,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
            // startOttMediaLoadingAstroLive(playLoadedEntry);
 
            //  startMockMediaLoading(playLoadedEntry, 7);
-            startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
+          //  startSimpleOvpMediaLoadingHEVC(playLoadedEntry);
 
           //  startVootOttMediaLoadingProd(playLoadedEntry, "1092959", "dash Main");
 //            if (q % 2 == 0) {
 //                startMockMediaLoading(playLoadedEntry, 5);
 //            } else {
-//                startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
+                startVootOttMediaLoadingProd(playLoadedEntry, mediaArray.get(getRandomNo()), "dash Main");
 //            }
 //            q++;
 
@@ -858,6 +858,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "exo-tears-clear");
         } else if (val == 17) {
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "Dolby_Multilanguage");
+        } else if (val == 18) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "TEARS_HLS");
+        } else if (val == 19) {
+            mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "LIVE_DASH");
         } else {
             mediaProvider = new MockMediaProvider("mockfiles/entries.playkit.json", getApplicationContext(), "single_br");
         }
@@ -914,7 +918,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
             START_POSITION = null; // force live streams to play from live edge
         }
-         //   mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Live);
+            mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Live);
 
 //        if (p % 2 == 0) {
 //            mediaEntry.setMediaType(PKMediaEntry.MediaEntryType.Live);
@@ -1035,7 +1039,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (isAdsEnabled) {
                     if (isDAIMode) {
                         promptMessage(DAI_PLUGIN, getDAIConfig2().getAssetTitle());
-                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigISSUE());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig2());
                     } else {
                         log.d("Play Ad preMidPostAdTagUrl");
                         promptMessage(IMA_PLUGIN, "preMidPostAdTagUrl");
@@ -1048,8 +1052,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             } else if (changeMediaIndex % 4 == 1) {
                 if (isAdsEnabled) {
                     if (isDAIMode) {
-                        promptMessage(DAI_PLUGIN, getDAIConfig10().getAssetTitle());
-                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigISSUE());
+                        promptMessage(DAI_PLUGIN, getDAIConfig_live_dash().getAssetTitle());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig_live_dash());
                     } else {
                         log.d("Play Ad inLinePreAdTagUrl");
                         promptMessage(IMA_PLUGIN, "inLinePreAdTagUrl");
@@ -1061,8 +1065,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             } if (changeMediaIndex % 4 == 2) {
                 if (isAdsEnabled) {
                     if (isDAIMode) {
-                        promptMessage(DAI_PLUGIN, getDAIConfig8().getAssetTitle());
-                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigISSUE());
+                        promptMessage(DAI_PLUGIN, getDAIConfig2().getAssetTitle());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig2());
                     } else {
                         log.d("Play NO Ad");
                         promptMessage(IMA_PLUGIN, "Enpty AdTag");
@@ -1074,8 +1078,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             } if (changeMediaIndex % 4 == 3) {
                 if (isAdsEnabled) {
                     if (isDAIMode) {
-                        promptMessage(DAI_PLUGIN, getDAIConfig5().getAssetTitle());
-                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfigISSUE());
+                        promptMessage(DAI_PLUGIN, getDAIConfig_live_dash().getAssetTitle());
+                        player.updatePluginConfig(IMADAIPlugin.factory.getName(), getDAIConfig_live_dash());
                     } else {
                         log.d("Play Ad preSkipAdTagUrl");
                         promptMessage(IMA_PLUGIN, "preSkipAdTagUrl");
@@ -1340,7 +1344,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
         if (isAdsEnabled) {
             if (isDAIMode) {
-                addIMADAIPluginConfig(pluginConfigs, 1);
+                addIMADAIPluginConfig(pluginConfigs, 14);
             } else {
                 addIMAPluginConfig(pluginConfigs);
             }
@@ -1531,7 +1535,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // return new IMAConfig().setAdTagUrl("https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=%2F21633895671%2FQA%2FAndroid_Native_App%2FCOI&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=sample_ar%3Dskippablelinear%26Gender%3DM%26Age%3D33%26KidsPinEnabled%3DN%26distinct_id%3D42c92f17603e4ee2b4232666b9591134%26AppVersion%3D0.1.80%26DeviceModel%3Dmoto%20g(6)%26OptOut%3DFalse%26OSVersion%3D9%26PackageName%3Dcom.tv.v18.viola%26first_time%3DFalse%26logintype%3DTraditional&description_url=https%253A%252F%252Fwww.voot.com&cmsid=2467608&ppid=42c92f17603e4ee2b4232666b9591134&vid=0_im5ianso&ad_rule=1&correlator=10771&InterstitialRendered=False").enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
         String sessionId = UUID.randomUUID().toString();
         log.e("Gourav - sessionId => " + sessionId);
-        return new IMAConfig().setSessionId(sessionId).setAdTagUrl(adTagUrl).setEnableFocusSkipButton(false).setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
+        return new IMAConfig().setSessionId(sessionId).setAdTagUrl(adTagUrl).enableDebugMode(true).setVideoMimeTypes(videoMimeTypes).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
     }
 
     private IMAConfig getAdsConfigResponsePostrollBuggy(String ad) {
@@ -1901,7 +1905,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 "            </Extensions>\n" +
                 "        </InLine>\n" +
                 "    </Ad>\n" +
-                "</VAST>\n").setVideoMimeTypes(videoMimeTypes).enableDebugMode(true).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
+                "</VAST>\n").setVideoMimeTypes(videoMimeTypes).setAlwaysStartWithPreroll(true).setAdLoadTimeOut(8);
     }
 
     private IMAConfig getAdsConfigResponsePostroll(String adResponse) {
@@ -2128,6 +2132,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 IMADAIConfig adsConfig13 = getDAIConfigLiveHlsZee5();
                 config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig13);
             }
+            case 14: {
+                promptMessage(DAI_PLUGIN, getDAIConfig_live_dash().getAssetTitle());
+                IMADAIConfig adsConfig14 = getDAIConfig_live_dash();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig14);
+            }
             break;
             default:
                 break;
@@ -2148,7 +2157,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 assetKey,
                 apiKey,
                 streamFormat,
-                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+                licenseUrl).enableDebugMode(true);
     }
 
     private IMADAIConfig getDAIConfig8() {
@@ -2161,7 +2170,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 assetKey,
                 apiKey,
                 streamFormat,
-                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+                licenseUrl).enableDebugMode(true);
     }
 
     private IMADAIConfig getDAIConfig9() {
@@ -2174,7 +2183,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 assetKey,
                 apiKey,
                 streamFormat,
-                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+                licenseUrl).enableDebugMode(true);
     }
 
     private IMADAIConfig getDAIConfig10() {
@@ -2187,7 +2196,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 assetKey,
                 apiKey,
                 streamFormat,
-                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+                licenseUrl).enableDebugMode(true);
     }
 
     private IMADAIConfig getDAIConfig6() {
@@ -2280,7 +2289,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 assetKey,
                 apiKey,
                 streamFormat,
-                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+                licenseUrl).enableDebugMode(true);
+    }
+
+    private IMADAIConfig getDAIConfig_live_dash() {
+        String assetTitle = "Live Dash DAI";
+        String assetKey = "PSzZMzAkSXCmlJOWDmRj8Q";
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.DASH;
+        String licenseUrl = null;
+        return IMADAIConfig.getLiveIMADAIConfig(assetTitle,
+                assetKey,
+                apiKey,
+                streamFormat,
+                licenseUrl).enableDebugMode(true);
     }
 
     private IMADAIConfig getDAIConfig1() {
@@ -2297,7 +2319,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 videoId,
                 apiKey,
                 streamFormat,
-                licenseUrl).enableDebugMode(true).setAlwaysStartWithPreroll(true);
+                licenseUrl).enableDebugMode(true);
     }
 
     private IMADAIConfig getDAIConfigLiveHlsZee5() {
@@ -2310,7 +2332,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 assetKey,
                 apiKey,
                 streamFormat,
-                licenseUrl).setAlwaysStartWithPreroll(true).enableDebugMode(true);
+                licenseUrl).enableDebugMode(true);
     }
 
     private IMADAIConfig getDAIConfigISSUE() {
@@ -3481,6 +3503,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         player.prepare(config);
         player.play();
         initSpinners();
+    }
+
+    private void startOttMediaLoadingEmiritus_prod(final OnMediaLoadCompletion completion) {
+
+        String mediaId = "1098962";
+        String KS = "djJ8MzIwOHzVwiaQLdpzv3KKh5y40MyK_0nZVuAfTS2A50YmW7itnpx5PCTvg5PQAzJj0HfVsIDI4I7-8OLT3jajKMqdBdCxBq0ZduJXL2euELv9WtnRUDEvEiI9-UoA3BlIfN5EpvPQ1175L_pRtqkbl94jGFIciVx2XK-6bg2UXyVdBPZX4k9LuTbgkDmgWfdarr2NMECT8b4tT_p39xHc-MzUYL7Okf-jLgNV-kXvmgfsvmGn-Q8b6YpiB-ujIXxkFSqWfc119KOk0zgLrCiA-KzKyHIdzCmWOXnaZgXziUSj1WbDgd4KmFh9ucuuvVq1ADz24AkPqZZg7xTG6yNq5NGOezzowXokI-LERNVFP7zHd7ap_mQvh4F89YuHS62OUHXMUTHAEIrwj-n37GKYjXf4c5ZbL4RbLqaEc_EBQh7kiiqzaw==";
+
+        mediaProvider = new PhoenixMediaProvider("https://rest-as.ott.kaltura.com/v5_0_3/api_v3/", 3208, KS)
+                .setAssetId(mediaId)
+                .setProtocol(PhoenixMediaProvider.HttpProtocol.Https)
+                .setFormats("dash_widevine")
+                .setContextType(APIDefines.PlaybackContextType.Playback)
+                .setAssetType(APIDefines.KalturaAssetType.Media);
+
+        mediaProvider.load(completion);
     }
 
     private void startOttMediaLoadingEmiritus(final OnMediaLoadCompletion completion) {

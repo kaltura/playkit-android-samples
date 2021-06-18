@@ -375,5 +375,34 @@
         "url": "https://d3rlna7iyyu8wu.cloudfront.net/skip_armstrong/skip_armstrong_multi_language_subs.m3u8"
       }
     ]
+  },
+  "TEARS_HLS": {
+    "duration": 102000,
+    "id": "TEARS_HLS",
+    "name": "TEARS_HLS",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll_2",
+        "mimeType": "application/x-mpegURL",
+        "url": "http://demo.unified-streaming.com/video/tears-of-steel/tears-of-steel.ism/.m3u8"
+      }
+    ]
+  },
+  "LIVE_DASH": {
+    "duration": 102000,
+    "id": "TEARS_HLS",
+    "name": "TEARS_HLS",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live_ll_2",
+        "mimeType": "application/dash+xml",
+        "url": "https://livesim.dashif.org/livesim/mup_30/testpic_2s/Manifest.mpd"
+      }
+    ]
   }
 }
+
+
+
+
+

@@ -672,7 +672,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
         if (isAdsEnabled) {
             if (isDAIMode) {
-                addIMADAIPluginConfig(pluginConfigs, 1);
+                addIMADAIPluginConfig(pluginConfigs, 7);
             } else {
                 addIMAPluginConfig(pluginConfigs);
             }
@@ -905,6 +905,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 IMADAIConfig adsConfigError = getDAIConfig6();
                 config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfigError);
             }
+            case 7: {
+                promptMessage(DAI_PLUGIN, getDAIConfig7().getAssetTitle());
+                IMADAIConfig adsConfig7 = getDAIConfig7();
+                config.setPluginConfig(IMADAIPlugin.factory.getName(), adsConfig7);
+            }
             break;
             default:
                 break;
@@ -913,6 +918,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void promptMessage(String type, String title) {
         Toast.makeText(this, type + " " + title, Toast.LENGTH_SHORT).show();
+    }
+
+    private IMADAIConfig getDAIConfig7() {
+        String assetTitle = "Live DASH Video - Tears of Steel";
+        String assetKey = "PSzZMzAkSXCmlJOWDmRj8Q";
+        String apiKey = null;
+        StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.DASH;
+        String licenseUrl = null;
+        return IMADAIConfig.getLiveIMADAIConfig(assetTitle,
+                assetKey,
+                apiKey,
+                streamFormat,
+                licenseUrl).enableDebugMode(true);
     }
 
     private IMADAIConfig getDAIConfig6() {
@@ -963,7 +981,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 licenseUrl).enableDebugMode(true);
     }
 
-
     @NonNull
     private IMADAIConfig getDAIConfig4() {
         String assetTitle = "AD4";
@@ -996,7 +1013,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private IMADAIConfig getDAIConfig2() {
-        String assetTitle = "Live Video - Big Buck Bunny";
+        String assetTitle = "Live HLS Video - Big Buck Bunny";
         String assetKey = "sN_IYUG8STe1ZzhIIE_ksA";
         String apiKey = null;
         StreamRequest.StreamFormat streamFormat = StreamRequest.StreamFormat.HLS;

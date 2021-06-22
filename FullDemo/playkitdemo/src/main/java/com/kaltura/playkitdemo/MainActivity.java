@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
@@ -73,7 +74,6 @@ import com.kaltura.playkit.plugins.ott.OttEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
-import com.kaltura.playkit.plugins.playback.CustomPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.playback.KalturaPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.playback.KalturaUDRMLicenseRequestAdapter;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
@@ -88,12 +88,12 @@ import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.utils.Consts;
 import com.kaltura.playkitvr.VRUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_CAST;
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final PKLog log = PKLog.get("MainActivity");
     public static final String IMA_PLUGIN = "IMA";
     public static final String DAI_PLUGIN = "DAI";
-    public static int READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 123;
+    public static int WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 123;
     public static int changeMediaIndex = -1;
     public static Long START_POSITION = 0L;
 
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isAdsEnabled = true;
+    private boolean isAdsEnabled = false;
     private boolean isDAIMode = false;
 
     //Youbora analytics Constants
@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         //getPermissionToReadExternalStorage();
         initDrm();
+        getPermissionToReadExternalStorage();
         /*try {
             ProviderInstaller.installIfNeeded(this);
         } catch (GooglePlayServicesRepairableException e) {
@@ -235,9 +236,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         log.i("PlayKitManager: " + PlayKitManager.CLIENT_TAG);
 
         Button button = findViewById(R.id.changeMedia);
+        button.setText("Save Logs");
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (player != null) {
+                printLogsToFile();
+                /*if (player != null) {
                     changeMediaIndex++;
                     OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
                     if (changeMediaIndex % 4 == 0) {
@@ -251,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     } if (changeMediaIndex % 4 == 3) {
                         startSimpleOvpMediaLoadingHls(playLoadedEntry);
                     }
-                }
+                }*/
             }
         });
 
@@ -305,15 +308,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
+    private void printLogsToFile() {
+        try {
+            File filePath = new File(Environment.getExternalStorageDirectory()+"/PlaykitLogs.txt");
+            boolean fileName = filePath.createNewFile();
+            if (fileName) {
+                String cmd = "logcat -d -f" + filePath.getAbsolutePath();
+                Runtime.getRuntime().exec(cmd);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void getPermissionToReadExternalStorage() {
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             }
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST);
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST);
         }
     }
 
@@ -323,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
         // Make sure it's our original READ_CONTACTS request
-        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST) {
+        if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST) {
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Read Storage permission granted", Toast.LENGTH_SHORT).show();
@@ -445,6 +461,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void startSimpleOvpMediaLoadingDRM(OnMediaLoadCompletion completion) {
+        // printLogsToFile();
         new KalturaOvpMediaProvider("https://cdnapisec.kaltura.com", 2222401, null)
                 .setEntryId("1_f93tepsn")//("1_asoyc5ef") //("1_uzea2uje")
                 .load(completion);
@@ -525,6 +542,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
+
+        printLogsToFile();
 
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
             START_POSITION = null; // force live streams to play from live edge

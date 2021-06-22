@@ -12,6 +12,9 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -212,8 +215,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private ExoPlayerWrapper.LoadControlStrategy loadControlStrategy;
     private String logFileName = "PlaykitLogs.txt";
-    // Turn this boolean true to start logcat logging
-    private boolean enableLogsCapturing = false;
+
+    // Turn this true to start logcat logging
+    private boolean enableLogsCapturing = true;
 
     static {
         PKHttpClientManager.setHttpProvider("okhttp");
@@ -227,7 +231,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getPermissionToReadExternalStorage();
         initDrm();
         if (enableLogsCapturing) {
             getPermissionToStorage();
@@ -246,15 +249,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         log.i("PlayKitManager: " + PlayKitManager.CLIENT_TAG);
 
         Button button = findViewById(R.id.changeMedia);
-        if (enableLogsCapturing) {
-            button.setText("Capture Logs");
-        }
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if (enableLogsCapturing) {
-                    printLogsToFile();
-                    return;
-                }
                 if (player != null) {
                     changeMediaIndex++;
                     OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
@@ -323,6 +319,31 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (enableLogsCapturing) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu_main, menu);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.start_logging:
+                printLogsToFile();
+                return true;
+            case R.id.send_email:
+                sendLogsToEmail();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void printLogsToFile() {
         try {
             File filePath = new File(Environment.getExternalStorageDirectory() + File.separator + logFileName);
@@ -331,11 +352,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
             boolean fileName = filePath.createNewFile();
             if (fileName) {
-                String cmd = "logcat -d -f" + filePath.getAbsolutePath();
+                String cmd = "logcat -f" + filePath.getAbsolutePath();
                 Runtime.getRuntime().exec(cmd);
+                promptMessage("", "Logging Started..");
             }
-            Snackbar.make(fullScreenBtn, "Send an Email", Snackbar.LENGTH_LONG)
-                    .setAction("YES", view -> sendLogsToEmail()).show();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -383,9 +403,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                            @NonNull int[] grantResults) {
         if (requestCode == STORAGE_PERMISSIONS_REQUEST_CODE) {
             if ((grantResults.length > 0) && (grantResults[0] + grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
-                Toast.makeText(this,"Permissions granted.",Toast.LENGTH_SHORT).show();
+                promptMessage("", "Permissions granted.");
             } else {
-                Toast.makeText(this,"Permissions denied.",Toast.LENGTH_SHORT).show();
+                promptMessage("", "Permissions denied.");
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -407,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Sending playkit logs");
             this.startActivity(Intent.createChooser(emailIntent, "Sending email..."));
         } catch (Throwable t) {
-            Toast.makeText(this, "Request failed try again: "+ t.toString(), Toast.LENGTH_LONG).show();
+            promptMessage("Request failed try again:" , t.toString());
         }
     }
 
@@ -436,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         //onMediaLoaded(listodmedia.get(1));
                     }
                 } else {
-                    Toast.makeText(MainActivity.this, "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""), Toast.LENGTH_LONG).show();
+                    promptMessage("failed to fetch media data: ", (response.getError() != null ? response.getError().getMessage() : ""));
                     log.e("failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""));
                 }
             }
@@ -515,7 +535,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void startSimpleOvpMediaLoadingDRM(OnMediaLoadCompletion completion) {
-        // printLogsToFile();
         new KalturaOvpMediaProvider("https://cdnapisec.kaltura.com", 2222401, null)
                 .setEntryId("1_f93tepsn")//("1_asoyc5ef") //("1_uzea2uje")
                 .load(completion);
@@ -596,10 +615,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
-        if (enableLogsCapturing) {
-            printLogsToFile();
-        }
-
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
             START_POSITION = null; // force live streams to play from live edge
         }

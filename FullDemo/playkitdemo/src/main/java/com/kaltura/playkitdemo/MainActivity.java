@@ -1,10 +1,12 @@
 package com.kaltura.playkitdemo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -23,12 +25,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 import com.kaltura.android.exoplayer2.LoadControl;
 import com.kaltura.android.exoplayer2.upstream.BandwidthMeter;
@@ -144,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final PKLog log = PKLog.get("MainActivity");
     public static final String IMA_PLUGIN = "IMA";
     public static final String DAI_PLUGIN = "DAI";
-    public static int WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 123;
+    public static int STORAGE_PERMISSIONS_REQUEST_CODE = 123;
     public static int changeMediaIndex = -1;
     public static Long START_POSITION = 0L;
 
@@ -206,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String DEVICE_CODE = "your_device_code";
 
     private ExoPlayerWrapper.LoadControlStrategy loadControlStrategy;
+    private String logFileName = "PlaykitLogs.txt";
+    // Turn this boolean true to start logcat logging
+    private boolean enableLogsCapturing = false;
 
     static {
         PKHttpClientManager.setHttpProvider("okhttp");
@@ -221,7 +229,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         //getPermissionToReadExternalStorage();
         initDrm();
-        getPermissionToReadExternalStorage();
+        if (enableLogsCapturing) {
+            getPermissionToStorage();
+        }
         /*try {
             ProviderInstaller.installIfNeeded(this);
         } catch (GooglePlayServicesRepairableException e) {
@@ -236,11 +246,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         log.i("PlayKitManager: " + PlayKitManager.CLIENT_TAG);
 
         Button button = findViewById(R.id.changeMedia);
-        button.setText("Save Logs");
+        if (enableLogsCapturing) {
+            button.setText("Capture Logs");
+        }
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                printLogsToFile();
-                /*if (player != null) {
+                if (enableLogsCapturing) {
+                    printLogsToFile();
+                    return;
+                }
+                if (player != null) {
                     changeMediaIndex++;
                     OnMediaLoadCompletion playLoadedEntry = registerToLoadedMediaCallback();
                     if (changeMediaIndex % 4 == 0) {
@@ -254,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     } if (changeMediaIndex % 4 == 3) {
                         startSimpleOvpMediaLoadingHls(playLoadedEntry);
                     }
-                }*/
+                }
             }
         });
 
@@ -310,52 +325,91 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private void printLogsToFile() {
         try {
-            File filePath = new File(Environment.getExternalStorageDirectory()+"/PlaykitLogs.txt");
+            File filePath = new File(Environment.getExternalStorageDirectory() + File.separator + logFileName);
+            if (filePath.exists()) {
+                filePath.delete();
+            }
             boolean fileName = filePath.createNewFile();
             if (fileName) {
                 String cmd = "logcat -d -f" + filePath.getAbsolutePath();
                 Runtime.getRuntime().exec(cmd);
             }
+            Snackbar.make(fullScreenBtn, "Send an Email", Snackbar.LENGTH_LONG)
+                    .setAction("YES", view -> sendLogsToEmail()).show();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void getPermissionToReadExternalStorage() {
-
+    private void getPermissionToStorage() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                + ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    || ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Read External Storage and Write External Storage" +
+                        " Storage permissions are required to do the task.");
+                builder.setTitle("Please grant those permissions");
+                builder.setPositiveButton("OK", (dialogInterface, i) -> ActivityCompat.requestPermissions(
+                        MainActivity.this,
+                        new String[]{
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE
+                        },
+                        STORAGE_PERMISSIONS_REQUEST_CODE
+                ));
+                builder.setNeutralButton("Cancel",null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            } else {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                        STORAGE_PERMISSIONS_REQUEST_CODE
+                );
             }
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST);
         }
     }
 
-    // Callback with the request from calling requestPermissions(...)
+    // Callback with the request from calling getPermissionToStorage(...)
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
-        // Make sure it's our original READ_CONTACTS request
-        if (requestCode == WRITE_EXTERNAL_STORAGE_PERMISSIONS_REQUEST) {
-            if (grantResults.length == 1 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Read Storage permission granted", Toast.LENGTH_SHORT).show();
+        if (requestCode == STORAGE_PERMISSIONS_REQUEST_CODE) {
+            if ((grantResults.length > 0) && (grantResults[0] + grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
+                Toast.makeText(this,"Permissions granted.",Toast.LENGTH_SHORT).show();
             } else {
-                boolean showRationale = ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
-                if (showRationale) {
-                    // do something here to handle degraded mode
-                } else {
-                    Toast.makeText(this, "Read Storage permission denied", Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(this,"Permissions denied.",Toast.LENGTH_SHORT).show();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
+    public void sendLogsToEmail() {
+        try {
+            final Intent emailIntent = new Intent();
+            emailIntent.setAction(Intent.ACTION_SEND);
+            emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            emailIntent.setType("vnd.android.cursor.dir/email");
+            emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"xyz@gmail.com"});
+            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Sending Playkit Logs");
+            File filePath = new File(Environment.getExternalStorageDirectory() + File.separator + logFileName);
+            Uri fileURI = FileProvider.getUriForFile(MainActivity.this, BuildConfig.APPLICATION_ID + ".provider", filePath);
+            emailIntent.putExtra(android.content.Intent.EXTRA_STREAM, fileURI);
+            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Sending playkit logs");
+            this.startActivity(Intent.createChooser(emailIntent, "Sending email..."));
+        } catch (Throwable t) {
+            Toast.makeText(this, "Request failed try again: "+ t.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
 
     private void registerPlugins() {
 
@@ -542,8 +596,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
-
-        printLogsToFile();
+        if (enableLogsCapturing) {
+            printLogsToFile();
+        }
 
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
             START_POSITION = null; // force live streams to play from live edge

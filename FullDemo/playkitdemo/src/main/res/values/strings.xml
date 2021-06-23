@@ -18,4 +18,7 @@
     <string name="video">Video</string>
     <string name="audio">Audio</string>
     <string name="cc">CC</string>
+    <string name="start_logging">Start Logging</string>
+    <string name="stop_logging">Stop Logging</string>
+    <string name="send_email">Send Email</string>
 </resources>

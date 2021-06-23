@@ -36,7 +36,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.JsonObject;
 import com.kaltura.android.exoplayer2.LoadControl;
 import com.kaltura.android.exoplayer2.upstream.BandwidthMeter;
@@ -336,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         switch (item.getItemId()) {
             case R.id.start_logging:
                 if (logsCapturingProcess == null) {
-                    printLogsToFile();
+                    appendLogsToFile();
                 } else {
                     promptMessage("", "Logs are already being captured");
                 }
@@ -356,27 +355,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    private void printLogsToFile() {
+    private void appendLogsToFile() {
         try {
+            PKLog.setGlobalLevel(PKLog.Level.verbose);
             File filePath = new File(Environment.getExternalStorageDirectory() + File.separator + logFileName);
             if (filePath.exists()) {
                 filePath.delete();
             }
             boolean fileName = filePath.createNewFile();
             if (fileName) {
+                Runtime.getRuntime().exec("logcat -b all -c");
                 String cmd = "logcat -f" + filePath.getAbsolutePath();
                 logsCapturingProcess = Runtime.getRuntime().exec(cmd);
                 promptMessage("", "Logging Started..");
             }
         } catch (IOException e) {
+            PKLog.setGlobalLevel(PKLog.Level.debug);
             e.printStackTrace();
         }
     }
 
     private void stopLogging() {
+        PKLog.setGlobalLevel(PKLog.Level.debug);
         if (logsCapturingProcess != null) {
             logsCapturingProcess.destroy();
             logsCapturingProcess = null;
+            promptMessage("", "Logging Stopped..");
         }
     }
 
@@ -432,19 +436,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void sendLogsToEmail() {
+        if (logsCapturingProcess != null) {
+            promptMessage("", "Please stop the logging.");
+            return;
+        }
+
         try {
             final Intent emailIntent = new Intent();
             emailIntent.setAction(Intent.ACTION_SEND);
             emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             emailIntent.setType("vnd.android.cursor.dir/email");
             emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"xyz@gmail.com"});
+            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"your_email_address@gmail.com"});
             emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Sending Playkit Logs");
             File filePath = new File(Environment.getExternalStorageDirectory() + File.separator + logFileName);
-            Uri fileURI = FileProvider.getUriForFile(MainActivity.this, BuildConfig.APPLICATION_ID + ".provider", filePath);
-            emailIntent.putExtra(android.content.Intent.EXTRA_STREAM, fileURI);
-            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Sending playkit logs");
-            this.startActivity(Intent.createChooser(emailIntent, "Sending email..."));
+            if (filePath.exists()) {
+                Uri fileURI = FileProvider.getUriForFile(MainActivity.this, BuildConfig.APPLICATION_ID + ".provider", filePath);
+                emailIntent.putExtra(android.content.Intent.EXTRA_STREAM, fileURI);
+                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Sending playkit logs");
+                this.startActivity(Intent.createChooser(emailIntent, "Sending email..."));
+            } else {
+                promptMessage("" , "There is no log file. Please start the session to capture logs.");
+            }
         } catch (Throwable t) {
             promptMessage("Request failed try again:" , t.toString());
         }

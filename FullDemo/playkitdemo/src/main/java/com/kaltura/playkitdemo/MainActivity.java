@@ -218,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     // Turn this true to start logcat logging
     private boolean enableLogsCapturing = true;
+    private Process logsCapturingProcess = null;
 
     static {
         PKHttpClientManager.setHttpProvider("okhttp");
@@ -334,10 +335,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.start_logging:
-                printLogsToFile();
+                if (logsCapturingProcess == null) {
+                    printLogsToFile();
+                } else {
+                    promptMessage("", "Logs are already being captured");
+                }
                 return true;
             case R.id.send_email:
                 sendLogsToEmail();
+                return true;
+            case R.id.stop_logging:
+                if (logsCapturingProcess != null) {
+                    stopLogging();
+                } else {
+                    promptMessage("", "No log capture process found.");
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -353,11 +365,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             boolean fileName = filePath.createNewFile();
             if (fileName) {
                 String cmd = "logcat -f" + filePath.getAbsolutePath();
-                Runtime.getRuntime().exec(cmd);
+                logsCapturingProcess = Runtime.getRuntime().exec(cmd);
                 promptMessage("", "Logging Started..");
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void stopLogging() {
+        if (logsCapturingProcess != null) {
+            logsCapturingProcess.destroy();
+            logsCapturingProcess = null;
         }
     }
 
@@ -1139,6 +1158,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onDestroy() {
+        stopLogging();
         if (player != null) {
             player.removeListeners(this);
             player.destroy();

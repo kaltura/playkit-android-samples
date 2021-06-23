@@ -5,4 +5,6 @@
         android:title="@string/start_logging"/>
     <item android:id="@+id/send_email"
         android:title="@string/send_email" />
+    <item android:id="@+id/stop_logging"
+        android:title="@string/stop_logging" />
 </menu>

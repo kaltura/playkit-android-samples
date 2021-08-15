@@ -67,10 +67,10 @@ public class PlayerFragment extends Fragment {
     private PKMediaEntry createMediaEntry() {
         PKMediaEntry entry = new PKMediaEntry();
         PKMediaSource source = new PKMediaSource();
-        source.setId("0_uka1msg4");
+        source.setId("1_w9zx2eti");
         source.setUrl("https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8");
         source.setMediaFormat(PKMediaFormat.hls);
-        entry.setId("0_uka1msg4");
+        entry.setId("1_w9zx2eti");
         entry.setDuration(102000);
         entry.setMediaType(PKMediaEntry.MediaEntryType.Unknown);
         ArrayList<PKMediaSource> sourceList = new ArrayList<>();
@@ -119,96 +119,74 @@ public class PlayerFragment extends Fragment {
 //    }
 
     private void addPlayerListeners(final ProgressBar appProgressBar) {
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_CONTENT_PAUSE_REQUESTED");
-                appProgressBar.setVisibility(View.VISIBLE);
-            }
-        }, AdEvent.Type.CONTENT_PAUSE_REQUESTED);
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                AdEvent.AdCuePointsUpdateEvent cuePointsList = (AdEvent.AdCuePointsUpdateEvent) event;
-                AdCuePoints adCuePoints = cuePointsList.cuePoints;
-                if (adCuePoints != null) {
-                    log.d("Has Postroll = " + adCuePoints.hasPostRoll());
-                }
-            }
-        }, AdEvent.Type.CUEPOINTS_CHANGED);
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("AD_STARTED");
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.STARTED);
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("Ad Event AD_RESUMED");
-                nowPlaying = true;
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.RESUMED);
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("Ad Event AD_ALL_ADS_COMPLETED");
-                appProgressBar.setVisibility(View.INVISIBLE);
-            }
-        }, AdEvent.Type.ALL_ADS_COMPLETED);
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = true;
-            }
-        }, PlayerEvent.Type.PLAY);
+        player.addListener(this, AdEvent.contentPauseRequested, event -> {
+            log.d("AD_CONTENT_PAUSE_REQUESTED");
+            appProgressBar.setVisibility(View.VISIBLE);
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = false;
-            }
-        }, PlayerEvent.Type.PAUSE);
+        player.addListener(this, AdEvent.contentResumeRequested, event -> {
+            log.d("AD_CONTENT_RESUME_REQUESTED");
+        });
 
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                nowPlaying = true;
-            }
-        }, AdEvent.Type.SKIPPED);
 
-        player.addStateChangeListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                if (event instanceof PlayerEvent.StateChanged) {
-                    PlayerEvent.StateChanged stateChanged = (PlayerEvent.StateChanged) event;
-                    log.d("State changed from " + stateChanged.oldState + " to " + stateChanged.newState);
-
-                    if(controlsView != null){
-                        controlsView.setPlayerState(stateChanged.newState);
-                    }
-                }
+        player.addListener(this, AdEvent.cuepointsChanged, event -> {
+            AdEvent.AdCuePointsUpdateEvent cuePointsList = event;
+            AdCuePoints adCuePoints = cuePointsList.cuePoints;
+            if (adCuePoints != null) {
+                log.d("Has Postroll = " + adCuePoints.hasPostRoll());
             }
         });
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                log.d("player play");
-                root.getLayoutParams().width = root.getWidth() + 1;
-                root.getLayoutParams().height = root.getHeight() + 1;
-                root.requestLayout();
-            }
-        }, PlayerEvent.Type.PLAY);
-        player.addEventListener(new PKEvent.Listener() {
-            @Override
-            public void onEvent(PKEvent event) {
-                //When the track data available, this event occurs. It brings the info object with it.
-                PlayerEvent.TracksAvailable tracksAvailable = (PlayerEvent.TracksAvailable) event;
 
+        player.addListener(this, AdEvent.started, event -> {
+            log.d("AD_STARTED");
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+
+        player.addListener(this, AdEvent.resumed, event -> {
+            log.d("Ad Event AD_RESUMED");
+            nowPlaying = true;
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+        player.addListener(this, AdEvent.skipped, event -> {
+            log.d("SKIPPED");
+            nowPlaying = true;
+
+        });
+
+        player.addListener(this, AdEvent.allAdsCompleted, event -> {
+            log.d("Ad Event AD_ALL_ADS_COMPLETED");
+            appProgressBar.setVisibility(View.INVISIBLE);
+        });
+
+        player.addListener(this, PlayerEvent.play, event -> {
+            log.d("PLAY");
+            nowPlaying = true;
+            root.getLayoutParams().width = root.getWidth() + 1;
+            root.getLayoutParams().height = root.getHeight() + 1;
+            root.requestLayout();
+
+        });
+
+        player.addListener(this, PlayerEvent.pause, event -> {
+            log.d("PAUSE");
+            nowPlaying = false;
+        });
+
+
+        player.addListener(this, PlayerEvent.stateChanged, event -> {
+            PlayerEvent.StateChanged stateChanged = event;
+            log.d("State changed from " + stateChanged.oldState + " to " + stateChanged.newState);
+            if(controlsView != null){
+                controlsView.setPlayerState(stateChanged.newState);
             }
-        }, PlayerEvent.Type.TRACKS_AVAILABLE);
+
+        });
+
+        player.addListener(this, PlayerEvent.tracksAvailable, event -> {
+            PlayerEvent.TracksAvailable tracksAvailable = event;
+        });
     }
 
     @Override
@@ -224,7 +202,7 @@ public class PlayerFragment extends Fragment {
 
     @Override
     public void onResume() {
-        log.d("Ad Event onResume");
+        log.d("onResume");
         super.onResume();
         if (player != null) {
             player.onApplicationResumed();

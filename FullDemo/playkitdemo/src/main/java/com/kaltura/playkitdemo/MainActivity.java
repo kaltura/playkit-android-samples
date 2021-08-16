@@ -574,7 +574,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             player.getSettings().setSecureSurface(false);
             player.getSettings().setAdAutoPlayOnResume(true);
             //player.getSettings().setPreferredVideoCodecSettings(new VideoCodecSettings(Collections.singletonList(PKVideoCodec.VP9), true, false));
-            player.getSettings().setAllowCrossProtocolRedirect(true);
+            player.getSettings().setPKRequestConfig(new PKRequestConfig(true));
             //player.getSettings().setPlayerBuffers(new LoadControlBuffers());
             player.getSettings().enableDecoderFallback(true);
             //player.setPlaybackRate(1.5f);

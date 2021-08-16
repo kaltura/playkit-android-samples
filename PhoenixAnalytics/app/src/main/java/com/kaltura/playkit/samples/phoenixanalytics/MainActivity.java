@@ -16,6 +16,7 @@ import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKPluginConfigs;
+import com.kaltura.playkit.PKRequestConfig;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.player.vr.VRInteractionMode;
@@ -70,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
         createKavaAnalyticsPlugin(pluginConfigs);
 
         //Create instance of the player with specified pluginConfigs.
-        player = PlayKitManager.loadPlayer(this, pluginConfigs);
-        player.getSettings().setAllowCrossProtocolRedirect(true);
+        player = PlayKitManager.loadPlayer(this, pluginConfigs);;
+        player.getSettings().setPKRequestConfig(new PKRequestConfig(true));
         player.getSettings().setPreferredMediaFormat(PKMediaFormat.hls); // usually dash
 
         //Subscribe to analytics report event.

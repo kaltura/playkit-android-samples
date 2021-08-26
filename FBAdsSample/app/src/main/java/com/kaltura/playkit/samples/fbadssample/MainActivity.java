@@ -12,6 +12,7 @@ import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
 import com.kaltura.playkit.PKMediaSource;
 import com.kaltura.playkit.PKPluginConfigs;
+import com.kaltura.playkit.PKRequestConfig;
 import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerEvent;
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
         addPlayPauseButton();
         addSeekButton();
         //Prepare player with media configuration.
-        player.getSettings().setAllowCrossProtocolRedirect(true);
+        player.getSettings().setPKRequestConfig(new PKRequestConfig(true));
         player.prepare(mediaConfig);
         player.play();
     }

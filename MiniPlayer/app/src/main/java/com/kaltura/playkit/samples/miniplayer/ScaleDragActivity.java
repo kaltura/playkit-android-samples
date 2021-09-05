@@ -136,10 +136,10 @@ public class ScaleDragActivity extends Activity {
     private PKMediaEntry createMediaEntry() {
         PKMediaEntry entry = new PKMediaEntry();
         PKMediaSource source = new PKMediaSource();
-        source.setId("0_uka1msg4");
+        source.setId("1_w9zx2eti");
         source.setUrl("https://cdnapisec.kaltura.com/p/2215841/sp/221584100/playManifest/entryId/1_w9zx2eti/protocol/https/format/applehttp/falvorIds/1_1obpcggb,1_yyuvftfz,1_1xdbzoa6,1_k16ccgto,1_djdf6bk8/a.m3u8");
         source.setMediaFormat(PKMediaFormat.hls);
-        entry.setId("0_uka1msg4");
+        entry.setId("1_w9zx2eti");
         entry.setDuration(102000);
         entry.setMediaType(PKMediaEntry.MediaEntryType.Unknown);
         ArrayList<PKMediaSource> sourceList = new ArrayList<>();

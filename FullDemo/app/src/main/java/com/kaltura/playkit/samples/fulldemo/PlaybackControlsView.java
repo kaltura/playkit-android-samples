@@ -8,7 +8,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import com.kaltura.android.exoplayer2.C;
@@ -138,7 +137,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
      * Component Listener for Default time bar from ExoPlayer UI
      */
     private final class ComponentListener
-            implements com.kaltura.android.exoplayer2.Player.EventListener, TimeBar.OnScrubListener, OnClickListener {
+            implements com.kaltura.android.exoplayer2.Player.Listener, TimeBar.OnScrubListener, OnClickListener {
 
         @Override
         public void onScrubStart(TimeBar timeBar, long position) {
@@ -161,17 +160,17 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         }
 
         @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        public void onPlaybackStateChanged(int playbackState) {
             updateProgress();
         }
 
         @Override
-        public void onPositionDiscontinuity(@com.kaltura.android.exoplayer2.Player.DiscontinuityReason int reason) {
+        public void onPositionDiscontinuity(com.kaltura.android.exoplayer2.Player.PositionInfo oldPosition, com.kaltura.android.exoplayer2.Player.PositionInfo newPosition, int reason) {
             updateProgress();
         }
 
         @Override
-        public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, @com.kaltura.android.exoplayer2.Player.TimelineChangeReason int reason) {
+        public void onTimelineChanged(Timeline timeline, int reason) {
             updateProgress();
         }
 

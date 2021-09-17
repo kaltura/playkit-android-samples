@@ -27,7 +27,6 @@ import com.kaltura.android.exoplayer2.util.MimeTypes;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.kaltura.playkit.PKDrmParams;
-import com.kaltura.playkit.PKEvent;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
 import com.kaltura.playkit.PKMediaFormat;
@@ -68,7 +67,6 @@ import static com.kaltura.playkit.samples.fulldemo.Consts.MIME_TYPE;
 import static com.kaltura.playkit.samples.fulldemo.Consts.MIN_AD_DURATION_FOR_SKIP_BUTTON;
 import static com.kaltura.playkit.samples.fulldemo.Consts.PREFERRED_BITRATE;
 import static com.kaltura.playkit.samples.fulldemo.Consts.START_FROM;
-import static com.kaltura.playkit.samples.fulldemo.Consts.STATS_KALTURA_URL;
 
 //import com.kaltura.plugins.adsmanager.AdsConfig;
 //import com.kaltura.plugins.adsmanager.AdsPlugin;

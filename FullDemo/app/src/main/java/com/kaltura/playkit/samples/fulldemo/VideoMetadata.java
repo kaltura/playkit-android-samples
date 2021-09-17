@@ -1,8 +1,5 @@
 package com.kaltura.playkit.samples.fulldemo;
 
-import com.google.ads.interactivemedia.v3.api.StreamRequest;
-import com.kaltura.playkit.plugins.imadai.IMADAIConfig;
-
 import java.util.ArrayList;
 import java.util.List;
 

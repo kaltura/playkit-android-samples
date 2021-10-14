@@ -1402,7 +1402,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 for (int i = 0; i < trackInfos.size(); i++) {
 
                     TextTrack textTrackInfo = (TextTrack) trackInfos.get(i);
-                    String lang = (textTrackInfo.getLabel() != null) ? textTrackInfo.getLabel() : "unknown";
+                    String lang = (textTrackInfo.getLabel() != null) ? textTrackInfo.getLabel() : (textTrackInfo.getLanguage() != null) ? textTrackInfo.getLanguage() : "unknown";
+                    log.d("text track lang = " + lang);
                     trackItems[i] = new TrackItem(lang, textTrackInfo.getUniqueId());
                 }
                 break;

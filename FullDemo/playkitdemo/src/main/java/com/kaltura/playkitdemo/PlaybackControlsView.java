@@ -19,7 +19,6 @@ import com.kaltura.playkit.PKLog;
 import com.kaltura.playkit.Player;
 import com.kaltura.playkit.PlayerState;
 import com.kaltura.playkit.ads.AdController;
-import com.kaltura.playkit.utils.Consts;
 
 import java.util.Formatter;
 import java.util.Locale;
@@ -149,7 +148,7 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
      * Component Listener for Default time bar from ExoPlayer UI
      */
     private final class ComponentListener
-            implements com.kaltura.android.exoplayer2.Player.EventListener, TimeBar.OnScrubListener, OnClickListener {
+            implements com.kaltura.android.exoplayer2.Player.Listener, TimeBar.OnScrubListener, OnClickListener {
 
         @Override
         public void onScrubStart(TimeBar timeBar, long position) {
@@ -173,17 +172,17 @@ public class PlaybackControlsView extends LinearLayout implements View.OnClickLi
         }
 
         @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        public void onPlaybackStateChanged(int playbackState) {
             updateProgress();
         }
 
         @Override
-        public void onPositionDiscontinuity(@com.kaltura.android.exoplayer2.Player.DiscontinuityReason int reason) {
+        public void onPositionDiscontinuity(com.kaltura.android.exoplayer2.Player.PositionInfo oldPosition, com.kaltura.android.exoplayer2.Player.PositionInfo newPosition, int reason) {
             updateProgress();
         }
 
         @Override
-        public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, @com.kaltura.android.exoplayer2.Player.TimelineChangeReason int reason) {
+        public void onTimelineChanged(Timeline timeline, int reason) {
             updateProgress();
         }
 

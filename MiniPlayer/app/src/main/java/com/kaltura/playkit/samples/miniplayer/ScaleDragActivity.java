@@ -29,7 +29,6 @@ import com.kaltura.playkit.samples.miniplayer.dragging.DragView;
 import com.kaltura.playkit.samples.miniplayer.dragging.DragViewController;
 
 import java.util.ArrayList;
-import java.util.List;
 
 //import com.kaltura.playkit.plugins.ima.IMAConfig;
 //import com.kaltura.playkit.plugins.ima.IMAPlugin;

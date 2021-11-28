@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Prepare player with media configuration.
         player.prepare(mediaConfig);
-
+        player.play();
     }
 
     /**
@@ -457,6 +457,35 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (player != null) {
+            player.onApplicationPaused();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+
+        if (player != null && player.getView() != null &&  player.getView().getChildCount() > 0) {
+            player.onApplicationResumed();
+            player.play();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (player != null) {
+            player.removeListeners(this);
+            player.destroy();
+            player = null;
+        }
+        super.onDestroy();
     }
 
 

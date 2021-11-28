@@ -415,4 +415,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "onPause");
+        super.onPause();
+        if (player != null) {
+            player.onApplicationPaused();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+
+        if (player != null && player.getView() != null &&  player.getView().getChildCount() > 0) {
+            player.onApplicationResumed();
+            player.play();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (player != null) {
+            player.removeListeners(this);
+            player.destroy();
+            player = null;
+        }
+        super.onDestroy();
+    }
 }

@@ -16,7 +16,7 @@ public class MockParams {
     public static String PhoenixBaseUrlUS = "https://rest-us.ott.kaltura.com/v4_5/api_v3/";
     public static int OttPartnerIdTest = 3009;
     public static final String MediaIdTest = "548576"; //vod
-    public static final String MediaIdTest = "548572"; //vod 360 tag
+    //public static final String MediaIdTest = "548572"; //vod 360 tag
     public static final String FormatTest = "Mobile_Main";
 
     //result of login with : [username: albert@gmail.com, pass: 123456]

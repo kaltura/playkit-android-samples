@@ -672,7 +672,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void configurePlugins(PKPluginConfigs pluginConfigs) {
         if (isAdsEnabled) {
             if (isDAIMode) {
-                addIMADAIPluginConfig(pluginConfigs, 7);
+                addIMADAIPluginConfig(pluginConfigs, 1);
             } else {
                 addIMAPluginConfig(pluginConfigs);
             }

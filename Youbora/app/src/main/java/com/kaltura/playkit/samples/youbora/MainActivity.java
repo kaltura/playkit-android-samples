@@ -232,13 +232,7 @@ public class MainActivity extends AppCompatActivity {
         JsonObject pluginEntry = new JsonObject();
 
         pluginEntry.addProperty("accountCode", "kalturatest");
-        pluginEntry.addProperty("host", "a-fds.youborafds01.com");
-        pluginEntry.addProperty("authToken", "myTokenString");
-        pluginEntry.addProperty("authType", "Bearer");
         pluginEntry.addProperty("username", "gouravYouboraTest");
-        //  pluginEntry.addProperty("haltOnError", true); // these are not there in config REMOVED
-        //  pluginEntry.addProperty("enableAnalytics", true);
-        //  pluginEntry.addProperty("enableSmartAds", true);
 
         pluginEntry.addProperty("httpSecure", true);
         pluginEntry.addProperty("offline", false);

@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.kaltura.playkit.PKMediaConfig;
 import com.kaltura.playkit.PKMediaEntry;
@@ -32,6 +33,8 @@ import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_HOUSEHOLD_ID;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_ACCOUNT_CODE;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_AD_CAMPAIGN;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_APP_NAME;
+import static com.npaw.youbora.lib6.plugin.Options.KEY_APP_RELEASE_VERSION;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CDN;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_CHANNEL;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_CONTENT_ENCODING_AUDIO_CODEC;
@@ -52,8 +55,6 @@ import static com.npaw.youbora.lib6.plugin.Options.KEY_DEVICE_TYPE;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_ENABLED;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_USERNAME;
 import static com.npaw.youbora.lib6.plugin.Options.KEY_USER_EMAIL;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_APP_NAME;
-import static com.npaw.youbora.lib6.plugin.Options.KEY_APP_RELEASE_VERSION;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -231,63 +232,196 @@ public class MainActivity extends AppCompatActivity {
         JsonObject pluginEntry = new JsonObject();
 
         pluginEntry.addProperty("accountCode", "kalturatest");
-        pluginEntry.addProperty("username", "a@a.com");
-        pluginEntry.addProperty("haltOnError", true);
-        pluginEntry.addProperty("enableAnalytics", true);
-        pluginEntry.addProperty("enableSmartAds", true);
-        pluginEntry.addProperty("appName", "TestApp");
-        pluginEntry.addProperty("appReleaseVersion", "v1.0");
+        pluginEntry.addProperty("host", "a-fds.youborafds01.com");
+        pluginEntry.addProperty("authToken", "myTokenString");
+        pluginEntry.addProperty("authType", "Bearer");
+        pluginEntry.addProperty("username", "gouravYouboraTest");
+        //  pluginEntry.addProperty("haltOnError", true); // these are not there in config REMOVED
+        //  pluginEntry.addProperty("enableAnalytics", true);
+        //  pluginEntry.addProperty("enableSmartAds", true);
 
+        pluginEntry.addProperty("httpSecure", true);
+        pluginEntry.addProperty("offline", false);
+        pluginEntry.addProperty("autoDetectBackground", true);
+        pluginEntry.addProperty("forceInit", false);
+        pluginEntry.addProperty("linkedViewId", "my linked View ID");
+        pluginEntry.addProperty("waitForMetadata", false);
+        pluginEntry.addProperty("householdId", "My householdId");
+
+        JsonArray pendingMetaDataArray = new JsonArray();
+        pendingMetaDataArray.add("title");
+        pendingMetaDataArray.add("userName");
+
+        pluginEntry.add("pendingMetadata", pendingMetaDataArray);
+
+        // Backward compatibility
+//        pluginEntry.addProperty("userEmail", "gourav@at.com");
+//        pluginEntry.addProperty("userAnonymousId", "my anonymousId");
+//        pluginEntry.addProperty("userType", "my user type");
+//        pluginEntry.addProperty("userObfuscateIp", false);
+
+        JsonObject userJson = new JsonObject();
+        userJson.addProperty("email", "gourav@at.com");
+        userJson.addProperty("anonymousId", "my anonymousId");
+        userJson.addProperty("type", "my user type");
+        userJson.addProperty("obfuscateIp", "My ObfuscateIp");
+
+        //Youbora ads configuration json.
+        JsonObject adsJson = new JsonObject();
+        adsJson.addProperty("blockerDetected", false);
+        adsJson.addProperty("campaign", "zzz");
+        // Create AdMetaData
+        JsonObject adMetaData = new JsonObject();
+        adMetaData.addProperty("year", "2022");
+        adMetaData.addProperty("cast", "cast 2022");
+        adMetaData.addProperty("director", "director 2022");
+        adMetaData.addProperty("owner", "owner 2022");
+        adMetaData.addProperty("parental", "parental 2022");
+        adMetaData.addProperty("rating", "rating 2022");
+        adMetaData.addProperty("device", "device 2022");
+        adMetaData.addProperty("audioChannels", "audioChannels 2022");
+        adsJson.add("metadata", adMetaData);
+        adsJson.addProperty("campaign", "ad campaign 2022");
+        adsJson.addProperty("title", "ad title 2022");
+        adsJson.addProperty("resource", "resource 2022");
+        adsJson.addProperty("givenBreaks", 5);
+        adsJson.addProperty("expectedBreaks", 4);
+        // Create expectedPattern for Ads
+        JsonObject expectedPatternJson = new JsonObject();
+        JsonArray preRoll = new JsonArray();
+        preRoll.add(2);
+        JsonArray midRoll = new JsonArray();
+        midRoll.add(1);
+        midRoll.add(4);
+        JsonArray postRoll = new JsonArray();
+        postRoll.add(3);
+        expectedPatternJson.add("pre", preRoll);
+        expectedPatternJson.add("mid", midRoll);
+        expectedPatternJson.add("post", postRoll);
+        adsJson.add("expectedPattern", expectedPatternJson);
+        // create adBreaksTime
+        JsonArray adBreaksTimeArray = new JsonArray();
+        adBreaksTimeArray.add(0);
+        adBreaksTimeArray.add(25);
+        adBreaksTimeArray.add(60);
+        adBreaksTimeArray.add(75);
+        adsJson.add("adBreaksTime", adBreaksTimeArray);
+        adsJson.addProperty("adGivenAds", 7);
+        adsJson.addProperty("adCreativeId", "ad creativeId");
+        adsJson.addProperty("adProvider", "ad provider");
+        // Create Ad Custom Dimensions
+        JsonObject adCustomDimensions = new JsonObject();
+        adCustomDimensions.addProperty("param1" , "my adCustomDimension1");
+        adCustomDimensions.addProperty("10" , "my adCustomDimension10");
+        adsJson.add("customDimension", adCustomDimensions);
+
+        // Create Parse JSON object
+        JsonObject parseJson = new JsonObject();
+        parseJson.addProperty("parseManifest", true);
+        parseJson.addProperty("parseCdnNode", true);
+        parseJson.addProperty("parseCdnSwitchHeader", true);
+        JsonArray cdnNodeListArray = new JsonArray();
+        cdnNodeListArray.add("Akamai");
+        cdnNodeListArray.add("Cloudfront");
+        cdnNodeListArray.add("NosOtt");
+        parseJson.add("parseCdnNodeList", cdnNodeListArray);
+        parseJson.addProperty("parseCdnNameHeader", "x-cdn");
+        parseJson.addProperty("parseNodeHeader", "x-node");
+        parseJson.addProperty("parseCdnTTL", 60);
+
+        // Create Network JSON object
+        JsonObject networkJson = new JsonObject();
+        networkJson.addProperty("networkConnectionType", "Wireless");
+        networkJson.addProperty("networkIP", "1.1.1.1");
+        networkJson.addProperty("networkIsp", "XYZ TTML");
 
         //Optional - Device json o/w youbora will decide by its own.
         JsonObject deviceJson = new JsonObject();
         deviceJson.addProperty("deviceCode", DEVICE_CODE);
-        deviceJson.addProperty("brand", "Xiaomi");
-        deviceJson.addProperty("model", "Mii3");
-        deviceJson.addProperty("type", "TvBox");
-        deviceJson.addProperty("osName", "Android/Oreo");
-        deviceJson.addProperty("osVersion", "8.1");
+        deviceJson.addProperty("deviceBrand", "Brand Xiaomi");
+        deviceJson.addProperty("deviceCode", "Code Xiaomi");
+        deviceJson.addProperty("deviceId", "Device ID Xiaomi");
+        deviceJson.addProperty("deviceEdId", "EdId Xiaomi");
+        deviceJson.addProperty("deviceModel", "Model MI3");
+        deviceJson.addProperty("deviceOsName", "Android/Oreo");
+        deviceJson.addProperty("deviceOsVersion", "8.1");
+        deviceJson.addProperty("deviceType", "TvBox TYPE");
+        deviceJson.addProperty("deviceName", "TvBox");
+        deviceJson.addProperty("deviceIsAnonymous", "TvBox");
 
-
-        //Media entry json.
+        //Media entry json. [Content JSON]
         JsonObject mediaEntryJson = new JsonObject();
-        //    mediaEntryJson.addProperty("isLive", isLive);
-        //    mediaEntryJson.addProperty("title", title);
+        mediaEntryJson.addProperty("isLive", false);
+        mediaEntryJson.addProperty("contentBitrate", 480000);
+        JsonObject encodingJson = new JsonObject();
+        encodingJson.addProperty("videoCodec", "video codec name");
+        mediaEntryJson.add("contentEncodingCodecSettings", encodingJson);
+        // Create Content MetaData
+        JsonObject contentMetaData = new JsonObject();
+        contentMetaData.addProperty("year", "2022");
+        contentMetaData.addProperty("cast", "cast 2022");
+        contentMetaData.addProperty("director", "director 2022");
+        contentMetaData.addProperty("owner", "owner 2022");
+        contentMetaData.addProperty("parental", "parental 2022");
+        contentMetaData.addProperty("rating", "rating 2022");
+        contentMetaData.addProperty("device", "device 2022");
+        contentMetaData.addProperty("audioChannels", "audioChannels 2022");
+        mediaEntryJson.add("metadata", contentMetaData);
+        // Create Content Custom Dimensions
+        JsonObject contentCustomDimensions = new JsonObject();
+        contentCustomDimensions.addProperty("param1", "param1");
+        contentCustomDimensions.addProperty("param2", "param2");
+        mediaEntryJson.add("customDimensions", contentCustomDimensions);
 
-        //Youbora ads configuration json.
-        JsonObject adsJson = new JsonObject();
-        adsJson.addProperty("adsExpected", true);
-        adsJson.addProperty("campaign", "zzz");
+        JsonObject appJson = new JsonObject();
+        appJson.addProperty("appName", "Kaltura Full demo sample");
+        appJson.addProperty("appReleaseVersion", "1.0.1");
 
-        //Configure custom properties here:
-        JsonObject propertiesJson = new JsonObject();
-        propertiesJson.addProperty("genre", "");
-        propertiesJson.addProperty("type", "");
-        propertiesJson.addProperty("transaction_type", "");
-        propertiesJson.addProperty("year", "");
-        propertiesJson.addProperty("cast", "");
-        propertiesJson.addProperty("director", "");
-        propertiesJson.addProperty("owner", "");
-        propertiesJson.addProperty("parental", "");
-        propertiesJson.addProperty("price", "");
-        propertiesJson.addProperty("rating", "");
-        propertiesJson.addProperty("audioType", "");
-        propertiesJson.addProperty("audioChannels", "");
-        propertiesJson.addProperty("device", "");
-        propertiesJson.addProperty("quality", "");
-        propertiesJson.addProperty("contentCdnCode", CONTENT_CDN_CODE);
+        JsonObject errorJson = new JsonObject();
+        JsonArray ignoredErrors = new JsonArray();
+        ignoredErrors.add("exception1");
+        ignoredErrors.add("exception2");
+        errorJson.add("errorsIgnore", ignoredErrors);
 
-        //You can add some extra params here:
-        JsonObject extraParamJson = new JsonObject();
-        extraParamJson.addProperty("param1", "param1");
-        extraParamJson.addProperty("param2", "param2");
+        JsonObject sessionJson = new JsonObject();
+        sessionJson.addProperty("metricsKey", "metricsValue");
+
+        //Configure custom properties here: DEPRECATED in the Youbora Plugin
+//        JsonObject propertiesJson = new JsonObject();
+//        propertiesJson.addProperty("genre", "");
+//        propertiesJson.addProperty("type", "");
+//        propertiesJson.addProperty("transactionType", "TransactionType-1");
+//        propertiesJson.addProperty("year", "");
+//        propertiesJson.addProperty("cast", "");
+//        propertiesJson.addProperty("director", "");
+//        propertiesJson.addProperty("owner", "");
+//        propertiesJson.addProperty("parental", "");
+//        propertiesJson.addProperty("price", "");
+//        propertiesJson.addProperty("rating", "");
+//        propertiesJson.addProperty("audioType", "");
+//        propertiesJson.addProperty("audioChannels", "");
+//        propertiesJson.addProperty("device", "");
+//        propertiesJson.addProperty("quality", "");
+//        propertiesJson.addProperty("contentCdnCode", CONTENT_CDN_CODE);
+
+        //You can add some extra params here: DEPRECATED in the plugin
+//        JsonObject extraParamJson = new JsonObject();
+//        extraParamJson.addProperty("1", "param1");
+//        extraParamJson.addProperty("2", "param2");
 
         //Add all the json objects created before to the pluginEntry json.
+        pluginEntry.add("user", userJson);
+        pluginEntry.add("parse", parseJson);
+        pluginEntry.add("network", networkJson);
         pluginEntry.add("device", deviceJson);
         pluginEntry.add("media", mediaEntryJson);
-        pluginEntry.add("ads", adsJson);
-        pluginEntry.add("properties", propertiesJson);
-        pluginEntry.add("extraParams", extraParamJson);
+        pluginEntry.add("ad", adsJson);
+        pluginEntry.add("app", appJson);
+        pluginEntry.add("errors", errorJson);
+        pluginEntry.add("sessionMetrics", sessionJson);
+        //  pluginEntry.add("properties", propertiesJson);
+        //   pluginEntry.add("extraParams", extraParamJson);
+
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);
 

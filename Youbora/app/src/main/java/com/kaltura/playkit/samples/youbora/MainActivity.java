@@ -231,39 +231,59 @@ public class MainActivity extends AppCompatActivity {
 
         JsonObject pluginEntry = new JsonObject();
 
+        // MUST to have config
         pluginEntry.addProperty("accountCode", "kalturatest");
-        pluginEntry.addProperty("username", "gouravYouboraTest");
 
-        pluginEntry.addProperty("httpSecure", true);
-        pluginEntry.addProperty("offline", false);
-        pluginEntry.addProperty("autoDetectBackground", true);
-        pluginEntry.addProperty("forceInit", false);
-        pluginEntry.addProperty("linkedViewId", "my linked View ID");
-        pluginEntry.addProperty("waitForMetadata", false);
-        pluginEntry.addProperty("householdId", "My householdId");
+        // Backward compatibility DEPRECATED
+//        pluginEntry.addProperty("appName", "Kaltura Full demo sample deprecated");
+//        pluginEntry.addProperty("appReleaseVersion", "1.0.1 deprecated");
 
-        JsonArray pendingMetaDataArray = new JsonArray();
-        pendingMetaDataArray.add("title");
-        pendingMetaDataArray.add("userName");
+        // App JSON
+        JsonObject appJson = new JsonObject();
+        appJson.addProperty("appName", "Kaltura Full demo sample");
+        appJson.addProperty("appReleaseVersion", "1.0.1");
 
-        pluginEntry.add("pendingMetadata", pendingMetaDataArray);
-
-        // Backward compatibility
-//        pluginEntry.addProperty("userEmail", "gourav@at.com");
-//        pluginEntry.addProperty("userAnonymousId", "my anonymousId");
-//        pluginEntry.addProperty("userType", "my user type");
+        // Backward compatibility DEPRECATED
+//        pluginEntry.addProperty("userEmail", "gourav@at.com DEPRECATED");
+//        pluginEntry.addProperty("userAnonymousId", "my anonymousId DEPRECATED");
+//        pluginEntry.addProperty("userType", "my user type DEPRECATED");
 //        pluginEntry.addProperty("userObfuscateIp", false);
+//        pluginEntry.addProperty("privacyProtocol", "https DEPRECATED");
 
+        // USER Json
         JsonObject userJson = new JsonObject();
         userJson.addProperty("email", "gourav@at.com");
         userJson.addProperty("anonymousId", "my anonymousId");
         userJson.addProperty("type", "my user type");
-        userJson.addProperty("obfuscateIp", "My ObfuscateIp");
+        userJson.addProperty("obfuscateIp", true);
+        userJson.addProperty("privacyProtocol", "https");
+
+        // Miscellaneous Configs
+        pluginEntry.addProperty("authToken", "myTokenString");
+        pluginEntry.addProperty("authType", "Bearer");
+        pluginEntry.addProperty("username", "gouravYouboraTest");
+        pluginEntry.addProperty("linkedViewId", "my linked View ID");
+        pluginEntry.addProperty("urlToParse", "http://abcasd.com");
+
+        pluginEntry.addProperty("householdId", "My householdId");
+        pluginEntry.addProperty("host", "a-fds.youborafds01.com");
+        pluginEntry.addProperty("autoStart", true);
+        pluginEntry.addProperty("autoDetectBackground", true);
+        pluginEntry.addProperty("enabled", true);
+        pluginEntry.addProperty("forceInit", false);
+        pluginEntry.addProperty("offline", false);
+        pluginEntry.addProperty("httpSecure", true);
+        pluginEntry.addProperty("waitForMetadata", false);
+
+        // Pending Meta Data JSON
+        JsonArray pendingMetaDataArray = new JsonArray();
+        pendingMetaDataArray.add("title");
+        pendingMetaDataArray.add("userName");
+        pluginEntry.add("pendingMetadata", pendingMetaDataArray);
 
         //Youbora ads configuration json.
         JsonObject adsJson = new JsonObject();
         adsJson.addProperty("blockerDetected", false);
-        adsJson.addProperty("campaign", "zzz");
         // Create AdMetaData
         JsonObject adMetaData = new JsonObject();
         adMetaData.addProperty("year", "2022");
@@ -275,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
         adMetaData.addProperty("device", "device 2022");
         adMetaData.addProperty("audioChannels", "audioChannels 2022");
         adsJson.add("metadata", adMetaData);
+
         adsJson.addProperty("campaign", "ad campaign 2022");
         adsJson.addProperty("title", "ad title 2022");
         adsJson.addProperty("resource", "resource 2022");
@@ -307,27 +328,55 @@ public class MainActivity extends AppCompatActivity {
         JsonObject adCustomDimensions = new JsonObject();
         adCustomDimensions.addProperty("param1" , "my adCustomDimension1");
         adCustomDimensions.addProperty("10" , "my adCustomDimension10");
-        adsJson.add("customDimension", adCustomDimensions);
+        adsJson.add("adCustomDimension", adCustomDimensions);
 
-        // Create Parse JSON object
-        JsonObject parseJson = new JsonObject();
-        parseJson.addProperty("parseManifest", true);
-        parseJson.addProperty("parseCdnNode", true);
-        parseJson.addProperty("parseCdnSwitchHeader", true);
-        JsonArray cdnNodeListArray = new JsonArray();
-        cdnNodeListArray.add("Akamai");
-        cdnNodeListArray.add("Cloudfront");
-        cdnNodeListArray.add("NosOtt");
-        parseJson.add("parseCdnNodeList", cdnNodeListArray);
-        parseJson.addProperty("parseCdnNameHeader", "x-cdn");
-        parseJson.addProperty("parseNodeHeader", "x-node");
-        parseJson.addProperty("parseCdnTTL", 60);
+        // Error JSON
+        JsonObject errorJson = new JsonObject();
+        JsonArray ignoredErrors = new JsonArray();
+        ignoredErrors.add("Asset Not Found.");
+        errorJson.add("errorsIgnore", ignoredErrors);
 
         // Create Network JSON object
         JsonObject networkJson = new JsonObject();
         networkJson.addProperty("networkConnectionType", "Wireless");
-        networkJson.addProperty("networkIP", "1.1.1.1");
+        networkJson.addProperty("networkIP", "18212.16218.01.012132");
         networkJson.addProperty("networkIsp", "XYZ TTML");
+
+        // Create Parse JSON object
+        JsonObject parseJson = new JsonObject();
+//        parseJson.addProperty("parseManifest", true); // Deprecated way to pass value
+        JsonObject parseManifestJson = new JsonObject(); // New way to pass value
+        parseManifestJson.addProperty("manifest", true);
+        JsonObject manifestAuthMap = new JsonObject();
+        manifestAuthMap.addProperty("AUTH1", "VALUE1");
+        manifestAuthMap.addProperty("AUTH2", "VALUE2");
+        manifestAuthMap.addProperty("AUTH3", "VALUE3");
+        manifestAuthMap.addProperty("AUTH4", "VALUE4");
+        parseManifestJson.add("auth", manifestAuthMap);
+        parseJson.add("parseManifest", parseManifestJson);
+
+        parseJson.addProperty("parseCdnSwitchHeader", true);
+
+//        parseJson.addProperty("parseCdnNode", true); // Deprecated way to pass value
+//        JsonArray cdnNodeListArray = new JsonArray(); // Deprecated way to pass value
+//        cdnNodeListArray.add("Akamai");
+//        cdnNodeListArray.add("Cloudfront");
+//        cdnNodeListArray.add("NosOtt");
+//        parseJson.add("parseCdnNodeList", cdnNodeListArray);
+
+        JsonObject cdnNodeJson = new JsonObject(); // New way to pass value
+        cdnNodeJson.addProperty("requestDebugHeaders", true);
+        JsonArray cdnNodeListJson = new JsonArray();
+        cdnNodeListJson.add("Akamai");
+        cdnNodeListJson.add("Cloudfront");
+        cdnNodeListJson.add("NosOtt");
+        cdnNodeJson.add("parseCdnNodeList", cdnNodeListJson);
+
+        parseJson.add("cdnNode", cdnNodeJson);
+
+        parseJson.addProperty("parseCdnNameHeader", "x-cdn");
+        parseJson.addProperty("parseNodeHeader", "x-node");
+        parseJson.addProperty("parseCdnTTL", 60);
 
         //Optional - Device json o/w youbora will decide by its own.
         JsonObject deviceJson = new JsonObject();
@@ -345,11 +394,25 @@ public class MainActivity extends AppCompatActivity {
 
         //Media entry json. [Content JSON]
         JsonObject mediaEntryJson = new JsonObject();
-        mediaEntryJson.addProperty("isLive", false);
+        //mediaEntryJson.addProperty("isLive", isLive); // IT's REMOVED NOW USE `isLive` class instead
+        JsonObject isLiveJson = new JsonObject();
+        isLiveJson.addProperty("isLiveContent", true);
+        isLiveJson.addProperty("noSeek", true);
+        isLiveJson.addProperty("noMonitor", true);
+        mediaEntryJson.add("isLive", isLiveJson);
+
+//        mediaEntryJson.addProperty("isLive", true);
+
         mediaEntryJson.addProperty("contentBitrate", 480000);
         JsonObject encodingJson = new JsonObject();
         encodingJson.addProperty("videoCodec", "video codec name");
-        mediaEntryJson.add("contentEncodingCodecSettings", encodingJson);
+        JsonObject codecSettingsMap = new JsonObject();
+        codecSettingsMap.addProperty("AV1_KEY", "AV1_VALUE");
+        codecSettingsMap.addProperty("HEVC_KEY", "HEVC_VALUE");
+        codecSettingsMap.addProperty("AC3_KEY", "AC3_VALUE");
+        encodingJson.add("contentEncodingCodecSettings", codecSettingsMap);
+        mediaEntryJson.add("encoding", encodingJson);
+
         // Create Content MetaData
         JsonObject contentMetaData = new JsonObject();
         contentMetaData.addProperty("year", "2022");
@@ -367,19 +430,10 @@ public class MainActivity extends AppCompatActivity {
         contentCustomDimensions.addProperty("param2", "param2");
         mediaEntryJson.add("customDimensions", contentCustomDimensions);
 
-        JsonObject appJson = new JsonObject();
-        appJson.addProperty("appName", "Kaltura Full demo sample");
-        appJson.addProperty("appReleaseVersion", "1.0.1");
-
-        JsonObject errorJson = new JsonObject();
-        JsonArray ignoredErrors = new JsonArray();
-        ignoredErrors.add("exception1");
-        ignoredErrors.add("exception2");
-        errorJson.add("errorsIgnore", ignoredErrors);
-
+        JsonObject sessionMetricsMap = new JsonObject();
+        sessionMetricsMap.addProperty("sessionKey", "sessionValue");
         JsonObject sessionJson = new JsonObject();
-        sessionJson.addProperty("metricsKey", "metricsValue");
-
+        sessionJson.add("metrics", sessionMetricsMap);
         //Configure custom properties here: DEPRECATED in the Youbora Plugin
 //        JsonObject propertiesJson = new JsonObject();
 //        propertiesJson.addProperty("genre", "");
@@ -412,9 +466,9 @@ public class MainActivity extends AppCompatActivity {
         pluginEntry.add("ad", adsJson);
         pluginEntry.add("app", appJson);
         pluginEntry.add("errors", errorJson);
-        pluginEntry.add("sessionMetrics", sessionJson);
-        //  pluginEntry.add("properties", propertiesJson);
-        //   pluginEntry.add("extraParams", extraParamJson);
+        pluginEntry.add("session", sessionJson);
+//        pluginEntry.add("properties", propertiesJson);
+//        pluginEntry.add("extraParams", extraParamJson);
 
         //Set plugin entry to the plugin configs.
         pluginConfigs.setPluginConfig(YouboraPlugin.factory.getName(), pluginEntry);

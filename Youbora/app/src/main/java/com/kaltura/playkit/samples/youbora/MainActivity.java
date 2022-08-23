@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
         appJson.addProperty("appReleaseVersion", "1.0.1");
 
         // Backward compatibility DEPRECATED
-//        pluginEntry.addProperty("userEmail", "gourav@at.com DEPRECATED");
+//        pluginEntry.addProperty("userEmail", "test@at.com DEPRECATED");
 //        pluginEntry.addProperty("userAnonymousId", "my anonymousId DEPRECATED");
 //        pluginEntry.addProperty("userType", "my user type DEPRECATED");
 //        pluginEntry.addProperty("userObfuscateIp", false);
@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
 
         // USER Json
         JsonObject userJson = new JsonObject();
-        userJson.addProperty("email", "gourav@at.com");
+        userJson.addProperty("email", "playkitsample@at.com");
         userJson.addProperty("anonymousId", "my anonymousId");
         userJson.addProperty("type", "my user type");
         userJson.addProperty("obfuscateIp", true);
@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
         // Miscellaneous Configs
         pluginEntry.addProperty("authToken", "myTokenString");
         pluginEntry.addProperty("authType", "Bearer");
-        pluginEntry.addProperty("username", "gouravYouboraTest");
+        pluginEntry.addProperty("username", "youboraTest");
         pluginEntry.addProperty("linkedViewId", "my linked View ID");
         pluginEntry.addProperty("urlToParse", "http://abcasd.com");
 

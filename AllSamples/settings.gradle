@@ -41,7 +41,6 @@ def samples = [
         //'TVPapiStats',
         //'ChromecastSample',
         'ChromecastCAFSample',
-        'FBAdsSample',
         'MiniPlayer',
         'MediaSession'
 ]

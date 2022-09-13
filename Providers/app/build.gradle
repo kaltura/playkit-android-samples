@@ -45,7 +45,6 @@ dependencies {
     implementation 'com.kaltura.playkit:kavaplugin:4.23.0'
     implementation 'com.kaltura.playkit:googlecast:4.23.0'
     implementation 'com.kaltura.playkit:vrplugin:4.23.0'
-    implementation 'com.kaltura.playkit:fbadsplugin:4.23.0'
 
 //    implementation 'com.kaltura:playkit-android:dev-SNAPSHOT'
 //    implementation 'com.kaltura:playkit-android-providers:develop-SNAPSHOT'

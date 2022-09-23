@@ -13,14 +13,9 @@ if ($num_args != 3) {
 my ($pathToSamplesFolder, $oldVer, $newVer) = @ARGV;
 print "Release Android Samples\n";
 
-my @files = `find $pathToSamplesFolder/*/app | grep build.gradle`;
-my @filesplaykitdemo = `find $pathToSamplesFolder/*/playkitdemo | grep build.gradle`;
-my @filestv = `find $pathToSamplesFolder/AndroidTV/tv | grep build.gradle`;
-push @files, @filesplaykitdemo;
-push @files, @filestv;
+my @files = `find $pathToSamplesFolder/*/* | grep version.gradle`;
 
 #my @files = `find $ENV{'HOME'}/Dev/android/kaltura/playkit-android-samples/*/app | grep build.gradle`;
-
 
 foreach my $file(@files) {
    print "Updating $file\n";
@@ -30,7 +25,7 @@ foreach my $file(@files) {
    
    my @updatedFileLines = ();
    foreach my $line(@data) {
-      if ($line =~ /implementation 'com.kaltura.playkit/) {
+      if ($line =~ /def playerVersion =/) {
            $line =~ s/$oldVer/$newVer/;
       }
       push(@updatedFileLines, $line);

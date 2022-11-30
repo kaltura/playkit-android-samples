@@ -32,7 +32,7 @@ project.ext {
     ]
 
     snapshot = [
-            playkit: "com.kaltura.playkit:playkit:$snapshot",
+            playkit: "com.kaltura.playkit:playkit:dev-SNAPSHOT", // Only for Playkit dev-SNAPSHOT is there hence hardcoded it
             providers: "com.kaltura.playkit:playkitproviders:$snapshot",
             kava: "com.kaltura.playkit:kavaplugin:$snapshot",
             ima: "com.kaltura:playkit-android-ima:$snapshot",

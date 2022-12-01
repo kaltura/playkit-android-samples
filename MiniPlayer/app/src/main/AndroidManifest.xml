@@ -11,8 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name="com.kaltura.playkit.samples.miniplayer.ScaleDragActivity"
-                  android:screenOrientation="portrait"
-            android:configChanges="keyboard|keyboardHidden">
+            android:screenOrientation="portrait"
+            android:configChanges="keyboard|keyboardHidden"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

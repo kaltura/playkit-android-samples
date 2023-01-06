@@ -24,7 +24,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name="com.kaltura.playkit.samples.mediasession.RemoteControlReceiver">
+        <receiver android:name="com.kaltura.playkit.samples.mediasession.RemoteControlReceiver"
+                  android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
                 <action android:name="android.media.AUDIO_BECOMING_NOISY" />

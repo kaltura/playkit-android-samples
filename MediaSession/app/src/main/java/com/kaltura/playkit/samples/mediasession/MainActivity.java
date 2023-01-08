@@ -5,8 +5,10 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.support.v4.media.MediaBrowserCompat;
@@ -20,7 +22,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.media.session.MediaButtonReceiver;
@@ -33,7 +37,9 @@ import com.kaltura.playkit.PlayKitManager;
 import com.kaltura.playkit.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 
 public class MainActivity extends AppCompatActivity implements AudioManager.OnAudioFocusChangeListener{
@@ -54,15 +60,23 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
     private AudioManager audioManager;
     private ComponentName componentName;
 
-
     private Player player;
     private PKMediaConfig mediaConfig;
     private Button playPauseButton;
+    // permission request codes need to be < 256
+    private int RC_HANDLE_NOTIFICATION_PERM = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            int rc = ActivityCompat.checkSelfPermission(this, "android.permission.POST_NOTIFICATIONS");
+            if (rc != PackageManager.PERMISSION_GRANTED) {
+                requestNotificationPermission();
+            }
+        }
         mMediaBrowserCompat = new MediaBrowserCompat(this, new ComponentName(this, RemoteControlReceiver.class),
                 mMediaBrowserCompatConnectionCallback, getIntent().getExtras());
 
@@ -438,7 +452,12 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
         mMediaSessionCompat.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
         Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
         mediaButtonIntent.setClass(this, RemoteControlReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
+        PendingIntent pendingIntent;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            pendingIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            pendingIntent = PendingIntent.getBroadcast(this, 0, mediaButtonIntent, 0);
+        }
         mMediaSessionCompat.setMediaButtonReceiver(pendingIntent);
 
         mMediaControllerCompat = new MediaControllerCompat(MainActivity.this, mMediaSessionCompat.getSessionToken());
@@ -523,6 +542,18 @@ public class MainActivity extends AppCompatActivity implements AudioManager.OnAu
                 break;
             }
         }
+    }
+
+    /**
+     * Handles the requesting of the camera permission.  This includes
+     * showing a "Snackbar" message of why the permission is needed then
+     * sending the request.
+     */
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private void requestNotificationPermission() {
+        Log.w("Permission", "Notification permission is not granted. Requesting permission");
+        String[] permissions = { "android.permission.POST_NOTIFICATIONS" };
+        ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_NOTIFICATION_PERM);
     }
 
 }

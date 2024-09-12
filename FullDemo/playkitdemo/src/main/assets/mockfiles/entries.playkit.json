@@ -22,10 +22,14 @@
     "sources": [
       {
         "id": "0_pl5lbfo0_dash",
-        "url": "http://cdnapi.kaltura.com/p/1851571/sp/185157100/playManifest/entryId/0_pl5lbfo0/flavorIds/0_ywkmqnkg/format/mpegdash/protocol/http/a.mpd",
-        "drmData": {
-          "licenseUri": "https://udrm.kaltura.com/cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJPVlAiLCJ1c2VyX3Rva2VuIjoiZGpKOE1UZzFNVFUzTVh6NnJxM3hFYnI0aFBWU3N0ajRDaGtkT1NoVU1QYV9sTFFaNWpkSVdscWdYNld6YnJuSGZORHZ0V3hmYmExT3dJVmVjeXNIVTc3ci1VazBvWWZkaGttd0dZNWQwSmdCUGdfMkZ3Wi13cE1yRlE9PSIsImFjY291bnRfaWQiOiIxODUxNTcxIiwiY29udGVudF9pZCI6IjBfcGw1bGJmbzAiLCJmaWxlcyI6IjBfendxM2w0NHIsMF91YTYycms2cywwX290bWFxcG5mLDBfeXdrbXFua2csMV9lMHF0YWoxaiwxX2IycXp5dmE3In0%3D&signature=eFrsxqplBh6b8%2BRkn4XaLsKD7Lc%3D"
-        }
+        "url": "https://cdnapisec.kaltura.com/p/2222401/sp/222240100/playManifest/entryId/1_f93tepsn/protocol/https/format/mpegdash/flavorIds/1_7cgwjy2a,1_xc3jlgr7,1_cn83nztu,1_pgoeohrs/a.mpd",
+        "mimeType": "application/dash+xml",
+        "drmData": [
+          {
+            "scheme": "WidevineCENC",
+            "licenseUri": "https://udrmv3.kaltura.com//cenc/widevine/license?custom_data=eyJjYV9zeXN0ZW0iOiJPVlAiLCJ1c2VyX3Rva2VuIjoiZGpKOE1qSXlNalF3TVh6b3pObG5uektfaUhrbkZFTURsS0dSZ1Z5N0U1UVBLMVJObEtqLXYtWU9LMUJIbTFHMEdNaGIwRTYwM2tXcXFCNUpTazZ6clN5QjFBRTZEY21aMVFYSGFpRXZDX2thZXpQQTQ1cm95c3k1WHc9PSIsImFjY291bnRfaWQiOjIyMjI0MDEsImNvbnRlbnRfaWQiOiIxX2Y5M3RlcHNuIiwiZmlsZXMiOiIxXzdjZ3dqeTJhLDFfeGMzamxncjcsMV9jbjgzbnp0dSwxX3Bnb2VvaHJzIn0%3D&signature=lVy0v4ATDSS%2Br%2F5hBTfl%2BxHH%2BO4%3D"
+          }
+        ]
       }
     ]
   },
@@ -117,16 +121,16 @@
       }
     ]
   },
-"live": {
-  "duration": 102000,
-  "id": "0_f8re4ujs",
-  "name": "Live",
-  "sources": [
-    {
-      "id": "0_f8re4ujs_live",
-      "mimeType": "application/x-mpegURL",
-      "url": "http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_f8re4ujs/format/applehttp/protocol/http/uiConfId/15068781/a.m3u8"
-    }
-  ]
-}
+  "live": {
+    "duration": 102000,
+    "id": "0_f8re4ujs",
+    "name": "Live",
+    "sources": [
+      {
+        "id": "0_f8re4ujs_live",
+        "mimeType": "application/x-mpegURL",
+        "url": "http://qa-apache-testing-ubu-01.dev.kaltura.com/p/1091/sp/109100/playManifest/entryId/0_f8re4ujs/format/applehttp/protocol/http/uiConfId/15068781/a.m3u8"
+      }
+    ]
+  }
 }

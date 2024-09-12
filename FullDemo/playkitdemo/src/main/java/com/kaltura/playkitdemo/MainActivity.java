@@ -1,14 +1,20 @@
 package com.kaltura.playkitdemo;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -22,10 +28,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.google.ads.interactivemedia.v3.api.StreamRequest;
 import com.google.gson.JsonObject;
@@ -74,7 +82,6 @@ import com.kaltura.playkit.plugins.ott.OttEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsConfig;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsEvent;
 import com.kaltura.playkit.plugins.ott.PhoenixAnalyticsPlugin;
-import com.kaltura.playkit.plugins.playback.CustomPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.playback.KalturaPlaybackRequestAdapter;
 import com.kaltura.playkit.plugins.playback.KalturaUDRMLicenseRequestAdapter;
 import com.kaltura.playkit.plugins.youbora.YouboraPlugin;
@@ -89,12 +96,12 @@ import com.kaltura.playkit.providers.ovp.KalturaOvpMediaProvider;
 import com.kaltura.playkit.utils.Consts;
 import com.kaltura.playkitvr.VRUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.kaltura.playkit.plugins.youbora.pluginconfig.YouboraConfig.KEY_CONTENT_METADATA_CAST;
@@ -145,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private static final PKLog log = PKLog.get("MainActivity");
     public static final String IMA_PLUGIN = "IMA";
     public static final String DAI_PLUGIN = "DAI";
-    public static int READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 123;
+    public static int STORAGE_PERMISSIONS_REQUEST_CODE = 123;
     public static int changeMediaIndex = -1;
     public static Long START_POSITION = 0L;
 
@@ -171,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private OrientationManager mOrientationManager;
     private boolean userIsInteracting;
     private PKTracks tracksInfo;
-    private boolean isAdsEnabled = true;
+    private boolean isAdsEnabled = false;
     private boolean isDAIMode = false;
 
     //Youbora analytics Constants
@@ -207,6 +214,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String DEVICE_CODE = "your_device_code";
 
     private ExoPlayerWrapper.LoadControlStrategy loadControlStrategy;
+    private String logFileName = "PlaykitLogs.txt";
+
+    // Turn this true to start logcat logging
+    private boolean enableLogsCapturing = true;
+    private Process logsCapturingProcess = null;
 
     static {
         PKHttpClientManager.setHttpProvider("okhttp");
@@ -220,8 +232,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //getPermissionToReadExternalStorage();
         initDrm();
+        if (enableLogsCapturing) {
+            getPermissionToStorage();
+        }
         /*try {
             ProviderInstaller.installIfNeeded(this);
         } catch (GooglePlayServicesRepairableException e) {
@@ -306,41 +320,149 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
-    private void getPermissionToReadExternalStorage() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (enableLogsCapturing) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.menu_main, menu);
+            return true;
+        }
+        return false;
+    }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            }
-            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.start_logging:
+                if (logsCapturingProcess == null) {
+                    appendLogsToFile();
+                } else {
+                    promptMessage("", "Logs are already being captured");
+                }
+                return true;
+            case R.id.send_email:
+                sendLogsToEmail();
+                return true;
+            case R.id.stop_logging:
+                if (logsCapturingProcess != null) {
+                    stopLogging();
+                } else {
+                    promptMessage("", "No log capture process found.");
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
-    // Callback with the request from calling requestPermissions(...)
+    private void appendLogsToFile() {
+        try {
+            PKLog.setGlobalLevel(PKLog.Level.verbose);
+            File filePath = new File(Environment.getExternalStorageDirectory() + File.separator + logFileName);
+            if (filePath.exists()) {
+                filePath.delete();
+            }
+            boolean fileName = filePath.createNewFile();
+            if (fileName) {
+                Runtime.getRuntime().exec("logcat -b all -c");
+                String cmd = "logcat -f" + filePath.getAbsolutePath();
+                logsCapturingProcess = Runtime.getRuntime().exec(cmd);
+                promptMessage("", "Logging Started..");
+            }
+        } catch (IOException e) {
+            PKLog.setGlobalLevel(PKLog.Level.debug);
+            e.printStackTrace();
+        }
+    }
+
+    private void stopLogging() {
+        PKLog.setGlobalLevel(PKLog.Level.debug);
+        if (logsCapturingProcess != null) {
+            logsCapturingProcess.destroy();
+            logsCapturingProcess = null;
+            promptMessage("", "Logging Stopped..");
+        }
+    }
+
+    private void getPermissionToStorage() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                + ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    || ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Read External Storage and Write External Storage" +
+                        " Storage permissions are required to do the task.");
+                builder.setTitle("Please grant those permissions");
+                builder.setPositiveButton("OK", (dialogInterface, i) -> ActivityCompat.requestPermissions(
+                        MainActivity.this,
+                        new String[]{
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                Manifest.permission.READ_EXTERNAL_STORAGE
+                        },
+                        STORAGE_PERMISSIONS_REQUEST_CODE
+                ));
+                builder.setNeutralButton("Cancel",null);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            } else {
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                        STORAGE_PERMISSIONS_REQUEST_CODE
+                );
+            }
+        }
+    }
+
+    // Callback with the request from calling getPermissionToStorage(...)
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
-        // Make sure it's our original READ_CONTACTS request
-        if (requestCode == READ_EXTERNAL_STORAGE_PERMISSIONS_REQUEST) {
-            if (grantResults.length == 1 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Read Storage permission granted", Toast.LENGTH_SHORT).show();
+        if (requestCode == STORAGE_PERMISSIONS_REQUEST_CODE) {
+            if ((grantResults.length > 0) && (grantResults[0] + grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
+                promptMessage("", "Permissions granted.");
             } else {
-                boolean showRationale = ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
-                if (showRationale) {
-                    // do something here to handle degraded mode
-                } else {
-                    Toast.makeText(this, "Read Storage permission denied", Toast.LENGTH_SHORT).show();
-                }
+                promptMessage("", "Permissions denied.");
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
+    public void sendLogsToEmail() {
+        if (logsCapturingProcess != null) {
+            promptMessage("", "Please stop the logging.");
+            return;
+        }
+
+        try {
+            final Intent emailIntent = new Intent();
+            emailIntent.setAction(Intent.ACTION_SEND);
+            emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            emailIntent.setType("vnd.android.cursor.dir/email");
+            emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[]{"your_email_address@gmail.com"});
+            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Sending Playkit Logs");
+            File filePath = new File(Environment.getExternalStorageDirectory() + File.separator + logFileName);
+            if (filePath.exists()) {
+                Uri fileURI = FileProvider.getUriForFile(MainActivity.this, BuildConfig.APPLICATION_ID + ".provider", filePath);
+                emailIntent.putExtra(android.content.Intent.EXTRA_STREAM, fileURI);
+                emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Sending playkit logs");
+                this.startActivity(Intent.createChooser(emailIntent, "Sending email..."));
+            } else {
+                promptMessage("" , "There is no log file. Please start the session to capture logs.");
+            }
+        } catch (Throwable t) {
+            promptMessage("Request failed try again:" , t.toString());
+        }
+    }
 
     private void registerPlugins() {
 
@@ -367,7 +489,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         //onMediaLoaded(listodmedia.get(1));
                     }
                 } else {
-                    Toast.makeText(MainActivity.this, "failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""), Toast.LENGTH_LONG).show();
+                    promptMessage("failed to fetch media data: ", (response.getError() != null ? response.getError().getMessage() : ""));
                     log.e("failed to fetch media data: " + (response.getError() != null ? response.getError().getMessage() : ""));
                 }
             }
@@ -526,7 +648,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     private void onMediaLoaded(PKMediaEntry mediaEntry) {
-
         if (mediaEntry.getMediaType() != PKMediaEntry.MediaEntryType.Vod) {
             START_POSITION = null; // force live streams to play from live edge
         }
@@ -1068,6 +1189,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onDestroy() {
+        stopLogging();
         if (player != null) {
             player.removeListeners(this);
             player.destroy();

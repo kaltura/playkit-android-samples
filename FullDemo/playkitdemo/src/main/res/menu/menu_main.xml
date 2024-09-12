@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/start_logging"
+        android:title="@string/start_logging"/>
+    <item android:id="@+id/send_email"
+        android:title="@string/send_email" />
+    <item android:id="@+id/stop_logging"
+        android:title="@string/stop_logging" />
+</menu>

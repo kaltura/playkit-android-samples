@@ -80,5 +80,10 @@
     <string name="pref_show_true">Auto Play ON</string>
     <string name="pref_show_false">Auto Play OFF</string>
     <string name="replay">Replay</string>
+    <string name="skip_btn">skip_btn</string>
+    <string name="learn_more_btn">learn_more_btn</string>
+    <string name="time">time</string>
+    <string name="time_current">time_current</string>
+    <string name="full_screen_switcher">full_screen_switcher</string>
 
 </resources>

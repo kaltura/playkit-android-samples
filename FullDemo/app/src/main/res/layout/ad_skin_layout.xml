@@ -7,6 +7,7 @@
 
     <Button
         android:id="@+id/skip_btn"
+        android:contentDescription="@string/skip_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Skip Ad"
@@ -34,6 +35,7 @@
 
     <Button
         android:id="@+id/learn_more_btn"
+        android:contentDescription="@string/learn_more_btn"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:text="Learn More"

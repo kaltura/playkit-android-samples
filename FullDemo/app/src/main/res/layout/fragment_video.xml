@@ -72,6 +72,7 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/full_screen_switcher"
+                android:contentDescription="@string/full_screen_switcher"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -116,6 +117,7 @@
 
     <Button
         android:id="@+id/changeMedia"
+        android:contentDescription="change_media_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
